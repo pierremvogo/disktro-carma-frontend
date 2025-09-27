@@ -1,0 +1,153 @@
+{
+  "login": {
+    "form": {
+      "username": "Nombre de usuario",
+      "email": "Correo electrónico",
+      "password": "Contraseña",
+      "submit": "Registrarse",
+      "cancel": "Cancelar",
+      "login": "Iniciar sesión",
+      "loading": "Cargando...",
+      "errors": {
+        "emailInvalid": "Correo electrónico no válido",
+        "emailRequired": "El correo electrónico es obligatorio",
+        "passwordMin": "Mínimo 6 caracteres",
+        "passwordRequired": "La contraseña es obligatoria"
+      },
+      "cancelAlert": "Formulario cancelado"
+    },
+    "formHandler": {
+      "imageCaption": "Unifique su logística",
+      "logIn": "Iniciar sesión",
+      "forgotPassword": "¿Olvidó su contraseña?",
+      "reset": "Restablecer",
+      "noAccount": "¿No tiene cuenta?",
+      "register": "Crear una cuenta"
+    }
+  },
+  "confirmEmail": {
+    "form": {
+      "token": "Código de confirmación",
+      "submit": "Registrarse",
+      "cancel": "Cancelar",
+      "cancelAlert": "Formulario cancelado",
+      "activateAccount": "Activar mi cuenta",
+      "errors": {
+        "tokenRequired": "El código de confirmación es obligatorio"
+      }
+    },
+    "title": "Activación de cuenta",
+    "instructions": "Por favor, revise su correo electrónico y utilice el código que le hemos enviado para activar su cuenta.",
+    "noCodeReceived": "¿No recibió un código?",
+    "resend": "Reenviar",
+    "backToLogin": "Volver al inicio de sesión",
+    "modal": {
+      "title": "Nuevo código de confirmación enviado",
+      "content": "Por favor, revise su correo electrónico. Le hemos enviado un nuevo código de activación.",
+      "okButton": "Ok"
+    },
+    "success": {
+      "title": "Su cuenta ha sido activada",
+      "description": "Ahora puede disfrutar de todas las funciones de nuestro servicio. Gracias por registrarse.",
+      "button": "Iniciar sesión"
+    },
+    "formActivate": {
+      "activateAccount": "Activar mi cuenta"
+    }
+  },
+  "forgotPassword": {
+    "form": {
+      "email": {
+        "label": "Correo electrónico",
+        "invalid": "Correo electrónico no válido",
+        "required": "El correo electrónico es obligatorio"
+      },
+      "submit": "Registrarse",
+      "cancel": "Cancelar",
+      "cancelAlert": "Formulario cancelado"
+    },
+    "sendCode": "Enviar código",
+    "leftPanelText": "La fluidez versión Pro",
+    "successTitle": "Correo de restablecimiento enviado",
+    "successButton": "Ingresar código",
+    "successMessage": "Se ha enviado un correo electrónico para restablecer su contraseña. Por favor, revise su bandeja de entrada y siga las instrucciones.",
+    "pageTitle": "Olvidé mi contraseña",
+    "backToText": "Volver a",
+    "backToLogin": "Iniciar sesión"
+  },
+  "register": {
+    "username": "Nombre de usuario",
+    "firstName": "Nombre",
+    "lastName": "Apellido",
+    "email": "Correo electrónico",
+    "gender": "Género",
+    "genderOptions": {
+      "male": "Hombre",
+      "female": "Mujer"
+    },
+    "country": "País",
+    "city": "Ciudad",
+    "password": "Contraseña",
+    "passwordConfirmation": "Confirmación de la contraseña",
+    "agree": "Acepto los términos y condiciones de uso",
+    "submitButton": "Registrarse",
+    "cancelButton": "Cancelar",
+    "cancelAlert": "Formulario cancelado",
+    "validation": {
+      "username": "El nombre de usuario es obligatorio",
+      "firstName": "El nombre es obligatorio",
+      "lastName": "El apellido es obligatorio",
+      "email": "El correo electrónico es obligatorio",
+      "emailInvalid": "Correo electrónico no válido",
+      "gender": "El género es obligatorio",
+      "country": "El país es obligatorio",
+      "city": "La ciudad es obligatoria",
+      "password": "La contraseña es obligatoria",
+      "passwordMin": "Mínimo 6 caracteres",
+      "passwordConfirmation": "La confirmación de la contraseña es obligatoria",
+      "passwordMatch": "Las contraseñas no coinciden",
+      "agree": "Por favor acepte los términos de uso"
+    },
+    "title": "Registro",
+    "success": {
+      "title": "Su cuenta ha sido creada con éxito",
+      "message": "Por favor, revise su correo electrónico y utilice el código que le hemos enviado para activar su cuenta.",
+      "button": "Activar mi cuenta"
+    },
+    "login": {
+      "text": "¿Ya tienes cuenta?",
+      "link": "Iniciar sesión"
+    },
+    "error": {
+      "default": "Ha ocurrido un error, por favor inténtelo más tarde."
+    },
+    "imageCaption": "Orden en el movimiento"
+  },
+  "newPasswordLabel": "Nueva contraseña",
+  "passwordConfirmationLabel": "Confirmación de la contraseña",
+  "passwordMinLength": "Mínimo 6 caracteres",
+  "passwordRequired": "La contraseña es obligatoria",
+  "passwordConfirmationRequired": "La confirmación de la contraseña es obligatoria",
+  "passwordsMustMatch": "Las contraseñas no coinciden",
+  "submitButton": "Restablecer",
+  "cancelButton": "Cancelar",
+  "formCancelled": "Formulario cancelado",
+  "resetButton": "Restablecer",
+  "passwordResetSuccess": "Su contraseña ha sido restablecida con éxito.",
+  "loginButton": "Iniciar sesión",
+  "passwordResetSuccessMessage": "Gracias por su confianza. Ahora puede iniciar sesión.",
+  "enterNewPassword": "Ingrese su nueva contraseña",
+  "backTo": "Volver a",
+  "loginReset": "Iniciar sesión",
+  "fluidityProVersion": "La fluidez versión Pro",
+  "validationCode": "Código de validación",
+  "codeRequired": "El código es obligatorio",
+  "submitButtonText": "Registrarse",
+  "cancelButtonText": "Cancelar",
+  "validateButton": "Validar",
+  "systemDesignedForYou": "Un sistema pensado para usted",
+  "identityVerificationTitle": "Verificación de identidad",
+  "didNotReceiveCode": "¿No recibió un código?",
+  "resendCodeButton": "Reenviar código por correo electrónico",
+  "backToLoginPage": "Volver a la página de inicio de sesión"
+}

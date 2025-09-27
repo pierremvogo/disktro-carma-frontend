@@ -1,0 +1,1775 @@
+{
+  "login": {
+    "form": {
+      "email": "Email",
+      "password": "Mot de passe",
+      "submit": "S'inscrire",
+      "cancel": "Annuler",
+      "login": "Se connecter",
+      "loading": "Chargement...",
+      "errors": {
+        "emailInvalid": "Adresse email invalide",
+        "emailRequired": "L'email est requis",
+        "passwordMin": "Minimum 6 caractères",
+        "passwordRequired": "Mot de passe requis"
+      },
+
+      "cancelAlert": "Formulaire annulé"
+    },
+    "formHandler": {
+      "logIn": "Connexion",
+      "forgotPassword": "Mot de passe oublié ?",
+      "reset": "Réinitialiser",
+      "noAccount": "Vous n'avez pas de compte ?",
+      "register": "Créer un compte"
+    }
+  },
+
+  "onboarding": {
+    "sidebar": {
+      "step1": {
+        "text": "Informations du Chef d'Entreprise",
+        "description": {
+          "text": "Entrez les informations de base de votre entreprise (nom, secteur, description, etc.)."
+        }
+      },
+      "step2": {
+        "text": "Informations de l'entreprise",
+        "description": {
+          "text": "Ajoutez les coordonnées de l'entreprise pour que nous puissions vous contacter facilement."
+        }
+      },
+      "step3": {
+        "text": "Configuration de votre workflow",
+        "description": {
+          "text": "Configurez votre workflow de transfert de colis."
+        }
+      },
+      "step4": {
+        "text": "Créer vos comptes administrateurs",
+        "description": {
+          "text": "Ajoutez vos comptes administrateur."
+        }
+      },
+      "step5": {
+        "text": "Récapitulatif et validation",
+        "description": {
+          "text": "Vérifiez vos données avant de finaliser l'onboarding."
+        }
+      }
+    },
+    "welcome": {
+      "title": {
+        "text": "Bienvenue !"
+      },
+      "subtitle": {
+        "text": "Quelques étapes rapides pour configurer votre espace entreprise."
+      },
+      "button": {
+        "text": "Commencer l'onboarding"
+      }
+    },
+    "navbar": {
+      "title": {
+        "text": "Company onboarding"
+      }
+    },
+    "maincontent": {
+      "step": {
+        "text": "Etape"
+      }
+    },
+
+    "step1": {
+      "components": {
+        "documents": {
+          "delete": {
+            "message": {
+              "success": "Suppression du document Réussie",
+              "confirm": "Êtes-vous sûr de vouloir supprimer ce document ?",
+              "ireversible": "Cette action est irréversible."
+            },
+            "button": {
+              "deleting": "Supression...",
+              "confirm": "Confirmer",
+              "cancel": "Annuler",
+              "ok": "Ok"
+            }
+          }
+        },
+        "form": {
+          "label1": {
+            "text": "Type de pièce"
+          },
+          "label2": {
+            "text": "Numéro de la pièce"
+          },
+          "label3": {
+            "text": "Date d’émission"
+          },
+          "label4": {
+            "text": "Date d’expiration"
+          },
+          "label5": {
+            "text": "Pays émetteur"
+          },
+          "label6": {
+            "text": "Fichier de la pièce (PDF ou image)"
+          },
+          "validation": {
+            "required1": {
+              "text": "Le type de pièce est requis"
+            },
+            "required2": {
+              "text": "Le numéro de la pièce est requis"
+            },
+            "required3": {
+              "text": "La date d’émission est requise"
+            },
+            "required4": {
+              "text": "La date d’expiration est requise"
+            },
+            "required5": {
+              "text": "Le pays émetteur est requis"
+            }
+          }
+        },
+        "formhandler": {
+          "message": {
+            "updateItem": {
+              "success": {
+                "text": "Mise à jour du document réussie avec succès"
+              }
+            },
+            "addItem": {
+              "success": {
+                "text": "Votre document à été enregistré avec succèes"
+              }
+            }
+          },
+          "button": {
+            "submit": {
+              "text": "Enregistrer"
+            },
+            "cancel": {
+              "text": "Annuler"
+            },
+            "ok": {
+              "text": "Ok"
+            }
+          }
+        },
+        "modalaction": {
+          "message": {
+            "success": {
+              "text": "Mise à jour du profil Réussie"
+            }
+          },
+          "button": {
+            "ok": {
+              "text": "Ok"
+            }
+          }
+        },
+        "profile": {
+          "form": {
+            "label1": {
+              "text": "Date de naissance"
+            },
+            "label2": {
+              "text": "Lieu de naissance"
+            },
+            "label3": {
+              "text": "Genre"
+            },
+            "label4": {
+              "text": "Email"
+            },
+            "label5": {
+              "text": "Nationalité"
+            },
+            "label6": {
+              "text": "Situation matrimoniale"
+            },
+            "label7": {
+              "text": "Profession"
+            },
+            "label8": {
+              "text": "Pays"
+            },
+            "label9": {
+              "text": "Région"
+            },
+            "label10": {
+              "text": "Ville"
+            },
+            "label11": {
+              "text": "Adresse ligne 1"
+            },
+            "label12": {
+              "text": "Adresse ligne 2"
+            },
+            "label13": {
+              "text": "Fuseau horaire"
+            },
+            "label14": {
+              "text": "Photo de profil"
+            },
+            "validation": {
+              "required1": {
+                "text": "La date de naissance est requise"
+              },
+              "required2": {
+                "text": "Le lieu de naissance est requis"
+              },
+              "required3": {
+                "text": "La situation matrimoniale est requise"
+              },
+              "required4": {
+                "text": "L'email est requis"
+              },
+              "invalid4": {
+                "text": "Email invalide"
+              },
+              "required5": {
+                "text": "La nationalité est requise"
+              },
+              "required6": {
+                "text": "La situation matrimoniale est requise"
+              },
+              "required7": {
+                "text": "La profession est requise"
+              },
+              "required8": {
+                "text": "Le pays est requis"
+              },
+              "required9": {
+                "text": "La région est requise"
+              },
+              "required10": {
+                "text": "La ville est requise"
+              },
+              "required11": {
+                "text": "L'adresse est requise"
+              },
+              "required12": {
+                "text": "Le fuseau horaire est requis"
+              }
+            }
+          },
+          "formhandler": {
+            "loading": {
+              "title": {
+                "text": "Opération en cours..."
+              }
+            },
+            "button": {
+              "cancel": "Annuler",
+              "submit": "Soumettre",
+              "confirmandsave": "Confirmer et enregistrer"
+            }
+          }
+        }
+      },
+      "main": {
+        "addItem": {
+          "title": {
+            "text": "Ajouter un document"
+          }
+        },
+        "editItem": {
+          "title": {
+            "text": "Mettre a jour le document,"
+          }
+        },
+        "deleteItem": {
+          "title": {
+            "text": "Supprimer le document"
+          }
+        },
+        "tab1": {
+          "button": {
+            "title": {
+              "text": "Profil"
+            }
+          },
+          "title": {
+            "text": "Mise à jour de vos informations de compte !"
+          }
+        },
+        "tab2": {
+          "button": {
+            "title": {
+              "text": "Documents"
+            },
+            "addItem": {
+              "text": "Ajouter un document"
+            }
+          },
+          "empty": {
+            "message": {
+              "text": "Vous n'avez encore aucun document enregistré"
+            }
+          }
+        }
+      }
+    },
+
+    "step2": {
+      "components": {
+        "companyaddress": {
+          "form": {
+            "label1": {
+              "text": "Adresse ligne 1"
+            },
+            "label2": {
+              "text": "Adresse ligne 2"
+            },
+            "label3": {
+              "text": "Code postal"
+            },
+            "label4": {
+              "text": "Ville"
+            },
+            "label5": {
+              "text": "Région"
+            },
+            "label6": {
+              "text": "Pays"
+            },
+            "validation": {
+              "required1": {
+                "text": "Adresse principale requise"
+              },
+              "required3": {
+                "text": "Code postal requis"
+              },
+              "required4": {
+                "text": "Ville requise"
+              },
+              "required5": {
+                "text": "Région requise"
+              },
+              "required6": {
+                "text": "Pays requis"
+              }
+            }
+          },
+          "formhandler": {
+            "message": {
+              "addItem": {
+                "text": "Adresse enregistrée avec succes"
+              },
+              "updateItem": {
+                "text": "Mise à jour de l'adresse réussie avec succes"
+              }
+            },
+            "button": {
+              "cancel": "Annuler",
+              "submit": "Enregistrer",
+              "ok": "Ok"
+            }
+          }
+        },
+        "companycontact": {
+          "form": {
+            "label1": {
+              "text": "Prénom"
+            },
+            "label2": {
+              "text": "Nom"
+            },
+            "label3": {
+              "text": "Poste"
+            },
+            "label4": {
+              "text": "Email"
+            },
+            "label5": {
+              "text": "Téléphone"
+            },
+            "validation": {
+              "required1": {
+                "text": "Le prénom est requis"
+              },
+              "required2": {
+                "text": "Le nom est requis"
+              },
+              "required3": {
+                "text": "Le poste est requis)"
+              },
+              "required4": {
+                "text": "L’email est requis"
+              },
+              "required5": {
+                "text": "Le numéro de téléphone est requis"
+              },
+              "invalid4": {
+                "text": "Email invalide"
+              }
+            }
+          },
+          "formhandler": {
+            "message": {
+              "addItem": {
+                "text": "Votre contact à été enregistré avec succèes"
+              },
+              "updateItem": {
+                "text": "Mise à jour du contact réussie avec succès"
+              }
+            },
+            "button": {
+              "cancel": {
+                "text": "Annuler"
+              },
+              "submit": {
+                "text": "Enregistrer"
+              },
+              "ok": {
+                "text": "Ok"
+              }
+            }
+          }
+        },
+        "companydocument": {
+          "form": {
+            "label1": {
+              "text": "Nom du document"
+            },
+            "label2": {
+              "text": "Type de document"
+            },
+            "label3": {
+              "text": "Fichier du document"
+            },
+            "label4": {
+              "text": "Remarques"
+            },
+            "validation": {
+              "required1": {
+                "text": "Le nom est requis"
+              }
+            }
+          },
+          "formhandler": {
+            "message": {
+              "updateItem": {
+                "text": "Mise à jour du document réussie avec succès"
+              },
+              "addItem": {
+                "text": "Votre document à été enregistré avec succèes"
+              }
+            },
+            "button": {
+              "cancel": "Annuler",
+              "submit": "Enregistrer",
+              "ok": "Ok"
+            }
+          }
+        },
+        "companyprofile": {
+          "form": {
+            "label1": {
+              "text": "Nom du représentant légal"
+            },
+            "label2": {
+              "text": "Prénom du représentant légal"
+            },
+            "label3": {
+              "text": "Raison sociale"
+            },
+            "label4": {
+              "text": "Nom commercial"
+            },
+            "label5": {
+              "text": "Secteur d’activité"
+            },
+            "label6": {
+              "text": "Statut juridique"
+            },
+            "label7": {
+              "text": "N° Identifiant Fiscal"
+            },
+            "label8": {
+              "text": "N° d’enregistrement (RCCM)"
+            },
+            "label9": {
+              "text": "Email de l’entreprise"
+            },
+            "label10": {
+              "text": "Date de création"
+            },
+            "label11": {
+              "text": "Téléphone de l’entreprise"
+            },
+            "label12": {
+              "text": "Site web"
+            },
+            "label13": {
+              "text": "Logo de l’entreprise (URL)"
+            },
+            "label14": {
+              "text": "Pays"
+            },
+            "label15": {
+              "text": "Région"
+            },
+            "label16": {
+              "text": "Ville"
+            },
+            "validation": {
+              "required1": {
+                "text": "Champ requis"
+              },
+              "required2": {
+                "text": "Champ requis"
+              },
+              "required3": {
+                "text": "Champ requis"
+              },
+              "required5": {
+                "text": "Champ requis"
+              },
+              "required6": {
+                "text": "Champ requis"
+              },
+              "required7": {
+                "text": "Champ requis"
+              },
+              "required8": {
+                "text": "Champ requis"
+              },
+              "required9": {
+                "text": "Champ requis"
+              },
+              "invalid9": {
+                "text": "Email invalide"
+              },
+              "required10": {
+                "text": "Champ requis"
+              },
+              "required11": {
+                "text": "Champ requis"
+              },
+              "invalid12": {
+                "text": "URL invalide"
+              },
+              "invalid13": {
+                "text": "URL invalide"
+              },
+              "required14": {
+                "text": "Champ requis"
+              },
+              "required16": {
+                "text": "Champ requis"
+              }
+            }
+          },
+          "formhandler": {
+            "loading": {
+              "title": {
+                "text": "Opération en cours..."
+              }
+            },
+            "button": {
+              "cancel": {
+                "text": "Annuler"
+              },
+              "submit": {
+                "text": "Soumettre"
+              },
+              "confirmandsave": {
+                "text": "Confirmer et enregistrer"
+              }
+            }
+          }
+        },
+        "delete": {
+          "document": {
+            "message": {
+              "confirm": {
+                "text": "Êtes-vous sûr de vouloir supprimer ce document ?"
+              }
+            }
+          },
+          "contact": {
+            "message": {
+              "confirm": {
+                "text": "Êtes-vous sûr de vouloir supprimer ce contact ?"
+              }
+            }
+          },
+          "address": {
+            "message": {
+              "confirm": {
+                "text": "Êtes-vous sûr de vouloir supprimer cette adresse ?"
+              }
+            }
+          },
+          "message": {
+            "ireversible": "Cette action est irréversible.",
+            "success": {
+              "text": "Suppression Réussie"
+            }
+          },
+          "button": {
+            "ok": "Ok",
+            "cancel": "Annuler",
+            "deleting": "Suppression",
+            "confirm": "Confirmer"
+          }
+        },
+        "modalaction": {
+          "message": {
+            "success": {
+              "text": "Profil entreprise mis à jour avec succes"
+            }
+          },
+          "button": {
+            "text": "Ok"
+          }
+        }
+      },
+      "main": {
+        "addItem": {
+          "title1": {
+            "text": "Ajouter une addresse"
+          },
+          "title2": {
+            "text": "Ajouter un contact"
+          },
+          "title3": {
+            "text": "Ajouter un document"
+          }
+        },
+        "editItem": {
+          "title1": {
+            "text": "Mettre à jour l'addresse"
+          },
+          "title2": {
+            "text": "Mise à jour du contact"
+          },
+          "title3": {
+            "text": "Mise à jour du document"
+          }
+        },
+        "deleteItem": {
+          "title1": {
+            "text": "Supprimer l'adresse"
+          },
+          "title2": {
+            "text": "Supprimer le document"
+          },
+          "title3": {
+            "text": "Supprimer le contact"
+          }
+        },
+        "tab1": {
+          "button": {
+            "title": {
+              "text": "Profil Entreprise",
+              "update": {
+                "text": "Mise à jour de vos informations d'entreprise!"
+              }
+            }
+          },
+          "title": {
+            "create": {
+              "text": "Veuillez Renseignez vos informations de Profil Entreprise"
+            }
+          }
+        },
+        "tab2": {
+          "button": {
+            "title": {
+              "text": "Contacts"
+            },
+            "addItem": {
+              "text": "Ajouter un contact"
+            }
+          },
+          "empty": {
+            "message": {
+              "text": "Vous n'avez encore aucun contact enregistré"
+            }
+          }
+        },
+        "tab3": {
+          "button": {
+            "title": {
+              "text": "Adresses"
+            },
+            "addItem": {
+              "text": "Ajouter une adresse"
+            }
+          },
+          "empty": {
+            "message": {
+              "text": "Vous n'avez encore aucune adresse enregistrée"
+            }
+          }
+        },
+        "tab4": {
+          "button": {
+            "title": {
+              "text": "Documents"
+            },
+            "addItem": {
+              "text": "Ajouter un document"
+            }
+          },
+          "empty": {
+            "message": {
+              "text": "Vous n'avez encore aucun document enregistré"
+            }
+          }
+        }
+      }
+    },
+    "step3": {
+      "components": {
+        "role": {
+          "form": {
+            "label1": {
+              "text": "Nom du rôle"
+            },
+            "label2": {
+              "text": "Permissions"
+            },
+            "label3": {
+              "text": "Description"
+            },
+            "validation": {
+              "required1": {
+                "text": "Le nom du rôle est requis"
+              },
+              "required3": {
+                "text": "La description est requise"
+              }
+            }
+          },
+          "formhandler": {
+            "message": {
+              "updateItem": {
+                "text": "Mise à jour du role réussie avec succès"
+              },
+              "addItem": {
+                "text": "Role enregistré avec succèes"
+              }
+            },
+            "button": {
+              "cancel": "Annuler",
+              "submit": "Enregistrer",
+              "ok": "Ok"
+            }
+          }
+        },
+        "workflow": {
+          "form": {
+            "label1": {
+              "text": "Version du workflow"
+            },
+            "required1": {
+              "text": "Un numéro est requis",
+              "min": {
+                "text": "La version doit être au moins 1"
+              },
+              "main": {
+                "text": "La version est requise"
+              }
+            }
+          },
+          "formhandler": {
+            "message": {
+              "updateItem": {
+                "text": "Mise à jour du workflow réussie avec succès"
+              },
+              "addItem": {
+                "text": "Votre workflow à été enregistré avec succèes. vous pouvez maintenant ajouter des étapes à votre workflow"
+              }
+            },
+            "button": {
+              "cancel": {
+                "text": "Annuler"
+              },
+              "submit": {
+                "text": "Enregistrer"
+              },
+              "ok": {
+                "text": "Ok"
+              }
+            }
+          },
+          "toggle": {
+            "deactivate": {
+              "success": {
+                "text": "Workflow désactivé avec succes"
+              }
+            },
+            "activate": {
+              "success": {
+                "text": "Workflow activé avec succes"
+              }
+            },
+            "confirm": {
+              "deactivate": {
+                "text": "Êtes-vous sûr de vouloir désactiver ce workflow ?"
+              },
+              "activate": {
+                "text": "Êtes-vous sûr de vouloir activer ce workflow ?"
+              }
+            },
+            "button": {
+              "ok": {
+                "text": "Ok"
+              },
+              "cancel": {
+                "text": "Annuler"
+              },
+              "deleting": {
+                "text": "Suppression..."
+              },
+              "confirm": {
+                "text": "Confirmer"
+              }
+            }
+          }
+        },
+        "workflowstep": {
+          "form": {
+            "label1": {
+              "text": "Nom de l’étape"
+            },
+            "label2": {
+              "text": "Ordre de l’étape"
+            },
+            "label3": {
+              "text": "Description"
+            },
+            "label4": {
+              "text": "Durée estimée (Heures)"
+            },
+            "label5": {
+              "text": "Template de notification"
+            },
+            "label6": {
+              "text": "Visible par le client"
+            },
+            "label7": {
+              "text": "Activer la notification"
+            },
+            "label8": {
+              "text": "Étape finale"
+            },
+            "label9": {
+              "text": "Rôles autorisés"
+            },
+            "label10": {
+              "text": "Destinataires des notifications"
+            },
+            "required1": {
+              "text": "Le nom de l’étape est requis"
+            },
+            "required2": {
+              "text": "L'ordre de l’étape est requis"
+            },
+            "error1": {
+              "text": "Un numéro est requis"
+            },
+            "min1": {
+              "text": "L’ordre doit être supérieur ou égal à 0"
+            }
+          },
+          "formhandler": {
+            "message": {
+              "updateItem": {
+                "text": "Mise à jour de l'étape réussie avec succès"
+              },
+              "addItem": {
+                "text": "l'étape à été enregistrée avec succes"
+              }
+            },
+            "button": {
+              "cancel": {
+                "text": "Annuler"
+              },
+              "submit": {
+                "text": "Enregistrer"
+              },
+              "ok": {
+                "text": "Ok"
+              }
+            }
+          }
+        },
+        "delete": {
+          "message": {
+            "success": {
+              "text": "Suppression Réussie"
+            }
+          },
+          "role": {
+            "message": {
+              "confirm": {
+                "text": "Êtes-vous sûr de vouloir supprimer ce rôle ?"
+              }
+            }
+          },
+          "workflow": {
+            "message": {
+              "confirm": {
+                "text": "Êtes-vous sûr de vouloir supprimer ce workflow ?"
+              }
+            }
+          },
+          "workflowstep": {
+            "message": {
+              "confirm": {
+                "text": "Êtes-vous sûr de vouloir supprimer cette étape ?"
+              },
+              "ireversible": {
+                "text": "Cette action est irréversible."
+              }
+            },
+            "button": {
+              "ok": {
+                "text": "Ok"
+              },
+              "cancel": {
+                "text": "Cancel"
+              },
+              "deleting": {
+                "text": "Suppression"
+              },
+              "confirm": {
+                "text": "Confirmer"
+              }
+            }
+          }
+        }
+      },
+      "main": {
+        "addItem": {
+          "title1": {
+            "text": "Ajouter un role entreprise"
+          },
+          "title2": {
+            "text": "Créer un worflow personalisé"
+          },
+          "title3": {
+            "text": "Ajouter une étape à votre workflow"
+          }
+        },
+        "editItem": {
+          "title1": {
+            "text": "Mise à jour du role"
+          },
+          "title2": {
+            "text": "Mise à jour de l'étape"
+          }
+        },
+        "deleteItem": {
+          "title1": {
+            "text": "Supprimer le role"
+          },
+          "title2": {
+            "text": "Supprimer le workflow"
+          },
+          "title3": {
+            "text": "Supprimer l'étape"
+          }
+        },
+        "toggleItem": {
+          "active": {
+            "text": "Réactiver votre workflow"
+          },
+          "desactive": {
+            "text": "Désactiver votre workflow"
+          }
+        },
+        "content": {
+          "home": {
+            "title": {
+              "text": "Choisissez comment démarrer votre workflow"
+            },
+            "button1": {
+              "text": "Créer un workflow personnalisé"
+            },
+            "button2": {
+              "text": "Utiliser un modèle"
+            }
+          },
+          "workflow": {
+            "tab1": {
+              "button": {
+                "title": {
+                  "text": "Roles entreprise"
+                },
+                "addItem": {
+                  "text": "Ajouter un role"
+                }
+              },
+              "empty": {
+                "message": {
+                  "text": "Vous n'avez encore aucun role enregistré"
+                }
+              }
+            },
+            "tab2": {
+              "button": {
+                "title": {
+                  "text": "Configuration du Workflow"
+                },
+                "addItem": {
+                  "text": "Ajouter une étape"
+                },
+                "confirmandsave": {
+                  "text": "Confirmer et enregistrer"
+                }
+              },
+              "button1": {
+                "addItem": {
+                  "text": "Créez votre workflow"
+                }
+              },
+              "empty": {
+                "message": {
+                  "text": "Vous n'avez encore aucune étape de workflow enregistrée"
+                }
+              },
+              "button2": {
+                "toggleItem": {
+                  "activate": {
+                    "text": "Activer le workflow"
+                  },
+                  "deactivate": {
+                    "text": "Désactiver le workflow"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "step4": {
+      "components": {
+        "delete": {
+          "message": {
+            "success": {
+              "text": "Suppression Réussie"
+            },
+            "confirm": {
+              "text": "Êtes-vous sûr de vouloir supprimer cet administrateur ?"
+            },
+            "ireversible": {
+              "text": "Cette action est irréversible."
+            }
+          },
+          "button": {
+            "cancel": {
+              "text": "Ok"
+            },
+            "ok": {
+              "text": "Annuler"
+            },
+            "deleting": {
+              "text": "Suppression"
+            },
+            "confirm": {
+              "text": "Confirmer"
+            }
+          }
+        },
+        "admin": {
+          "form": {
+            "label1": {
+              "text": "Prénom"
+            },
+            "label2": {
+              "text": "Nom"
+            },
+            "label3": {
+              "text": "Email"
+            },
+            "label4": {
+              "text": "Poste"
+            },
+            "label5": {
+              "text": "Créé par"
+            },
+            "label6": {
+              "text": "Genre"
+            },
+            "required1": {
+              "text": "Le prénom est requis"
+            },
+            "required2": {
+              "text": "Le nom est requis"
+            },
+            "required3": {
+              "text": "L'email est requis"
+            },
+            "invalid3": {
+              "text": "Email invalide"
+            },
+            "required6": {
+              "text": "Le Genre est requis"
+            }
+          },
+          "formhandler": {
+            "message": {
+              "updateItem": {
+                "text": "Mise à jour de l'admin réussie avec succès"
+              },
+              "addItem": {
+                "text": "Admin enregistré avec succes"
+              }
+            },
+            "button": {
+              "cancel": {
+                "text": "Annuler"
+              },
+              "submit": {
+                "text": "Enregistrer"
+              },
+              "ok": {
+                "text": "Ok"
+              }
+            }
+          }
+        }
+      },
+      "main": {
+        "addItem": {
+          "title": {
+            "text": "Ajouter un administrateur"
+          }
+        },
+        "editItem": {
+          "title": {
+            "text": "Mettre a jour le document"
+          }
+        },
+        "deleteItem": {
+          "title": {
+            "text": "Supprimer l'administrateur"
+          }
+        },
+        "title": {
+          "text": "Maximum 3 comptes administrateurs"
+        },
+        "subtitle": {
+          "text": "administrateurs enregistrés"
+        },
+        "empty": {
+          "message": {
+            "text": "Vous n'avez encore aucun administrateur enregistré"
+          }
+        },
+        "button": {
+          "addItem": {
+            "text": "Ajouter un admin"
+          },
+          "confirmandsave": {
+            "text": "Confirmer et enregistrer"
+          }
+        }
+      }
+    },
+    "main": {
+      "button": {
+        "back": {
+          "text": "Retour"
+        },
+        "next": {
+          "text": "Suivant"
+        }
+      }
+    },
+
+    "step5": {
+      "main": {
+        "button": {
+          "editItem": {
+            "text": "Mettre à jour"
+          },
+          "finish": {
+            "text": "Terminer"
+          }
+        },
+        "table1": {
+          "th": {
+            "text": "Profil du Chef d’Entreprise"
+          },
+          "td1": {
+            "text": "Nom"
+          },
+          "td2": {
+            "text": "Prenom"
+          },
+          "td3": {
+            "text": "Email personnel"
+          },
+          "td4": {
+            "text": "Genre"
+          },
+          "td5": {
+            "text": "Date et lieu de naissance"
+          },
+          "td6": {
+            "text": "Profession"
+          },
+          "td7": {
+            "text": "Nationalité"
+          },
+          "td8": {
+            "text": "Pays"
+          },
+          "td9": {
+            "text": "Region"
+          },
+          "td10": {
+            "text": "Ville"
+          },
+          "td11": {
+            "text": "Adresse 1"
+          },
+          "td12": {
+            "text": "Adresse 2"
+          },
+          "td13": {
+            "text": "Langue préférée"
+          }
+        },
+        "table2": {
+          "th": {
+            "text": "Informations sur l’Entreprise"
+          },
+          "td1": {
+            "text": "Nom commercial"
+          },
+          "td2": {
+            "text": "Nom du représentant légal"
+          },
+          "td3": {
+            "text": "Prenom du représentant légal"
+          },
+          "td4": {
+            "text": "Forme juridique"
+          },
+          "td5": {
+            "text": "Numéro de registre"
+          },
+          "td6": {
+            "text": "Date de creation"
+          },
+          "td7": {
+            "text": "Secteur d'activité"
+          },
+          "td8": {
+            "text": "Site web"
+          },
+          "td9": {
+            "text": "Lien du Logo"
+          },
+          "td10": {
+            "text": "Email entreprise"
+          },
+          "td11": {
+            "text": "Téléphone"
+          },
+          "td12": {
+            "text": "Site web"
+          },
+          "td13": {
+            "text": "Pays"
+          },
+          "td14": {
+            "text": "Région"
+          },
+          "td15": {
+            "text": "Ville"
+          },
+          "td16": {
+            "text": "Adresse 1"
+          },
+          "td17": {
+            "text": "Logo"
+          }
+        },
+        "table3": {
+          "th": {
+            "text": "Workflow de transfert de colis"
+          },
+          "td1": {
+            "text": "Étapes"
+          },
+          "td2": {
+            "text": "Roles"
+          },
+          "td3": {
+            "text": "Notifications"
+          },
+          "td4": {
+            "text": "Client voit ?"
+          },
+          "td5": {
+            "text": "Actions"
+          }
+        },
+        "table4": {
+          "th": {
+            "text": "Administrateurs de l’entreprise"
+          },
+          "td1": {
+            "text": "Nom(s)"
+          },
+          "td2": {
+            "text": "Prenom(s)"
+          },
+          "td3": {
+            "text": "Email"
+          },
+          "td4": {
+            "text": "Sexe"
+          },
+          "td5": {
+            "text": "Position"
+          }
+        },
+        "acceptcondition": {
+          "text": "J'accepte les conditions générales"
+        }
+      }
+    },
+
+    "tableconfig": {
+      "header": {
+        "document": {
+          "title1": {
+            "text": "Type du Document"
+          },
+          "title2": {
+            "text": "Numéro du Document"
+          },
+          "title3": {
+            "text": "Date d’émission"
+          },
+          "title4": {
+            "text": "Date d’expiration"
+          }
+        },
+        "admin": {
+          "title1": {
+            "text": "Prénom"
+          },
+          "title2": {
+            "text": "Nom"
+          },
+          "title3": {
+            "text": "Email"
+          },
+          "title4": {
+            "text": "Genre"
+          }
+        },
+        "employee": {
+          "title1": {
+            "text": "Nom"
+          },
+          "title2": {
+            "text": "Email"
+          },
+          "title3": {
+            "text": "Role"
+          },
+          "title4": {
+            "text": "Statut"
+          },
+          "title5": {
+            "text": "Phone"
+          }
+        },
+        "address": {
+          "title1": {
+            "text": "Adresse ligne 1"
+          },
+          "title2": {
+            "text": "Adresse ligne 2"
+          },
+          "title3": {
+            "text": "Code postal"
+          },
+          "title4": {
+            "text": "Région"
+          },
+          "title5": {
+            "text": "Pays"
+          }
+        },
+        "documentcompany": {
+          "title1": {
+            "text": "Type de document"
+          },
+          "title2": {
+            "text": "Nom du document"
+          },
+          "title3": {
+            "text": "Fichier"
+          },
+          "title4": {
+            "text": "Notes"
+          }
+        },
+        "role": {
+          "title1": {
+            "text": "Nom du rôle"
+          },
+          "title2": {
+            "text": "Description"
+          },
+          "title3": {
+            "text": "Permissions"
+          }
+        },
+        "workflow": {
+          "title1": {
+            "text": "Version"
+          },
+          "title2": {
+            "text": "Étapes"
+          }
+        },
+        "workflowstep": {
+          "title1": {
+            "text": "Etapes"
+          },
+          "title2": {
+            "text": "Rôles"
+          },
+          "title3": {
+            "text": "Notification",
+            "yes": {
+              "text": "oui"
+            },
+            "no": {
+              "text": "non"
+            }
+          },
+          "title4": {
+            "text": "Visible par le client ?"
+          }
+        },
+        "owner": {
+          "title1": {
+            "text": "Prénom"
+          },
+          "title2": {
+            "text": "Nom"
+          },
+          "title3": {
+            "text": "Genre"
+          },
+          "title4": {
+            "text": "Date de naissance"
+          },
+          "title5": {
+            "text": "Lieu de naissance"
+          },
+          "title6": {
+            "text": "Photo",
+            "nothing": {
+              "text": "Aucune"
+            }
+          },
+          "title7": {
+            "text": "Profession"
+          },
+          "title8": {
+            "text": "Adresse ligne 1"
+          },
+          "title9": {
+            "text": "Adresse ligne 2"
+          }
+        },
+        "companyprofile": {
+          "title1": {
+            "text": "Nom commercial"
+          },
+          "title2": {
+            "text": "Type d’entreprise"
+          },
+          "title3": {
+            "text": "Prénom du représentant légal"
+          },
+          "title4": {
+            "text": "Statut juridique"
+          },
+          "title5": {
+            "text": "Adresse"
+          },
+          "title6": {
+            "text": "Site web"
+          },
+          "title7": {
+            "text": "Logo",
+            "nothing": {
+              "text": "Aucun"
+            }
+          }
+        },
+        "contact": {
+          "title1": {
+            "text": "Prénom"
+          },
+          "title2": {
+            "text": "Nom"
+          },
+          "title3": {
+            "text": "Poste"
+          },
+          "title4": {
+            "text": "Email"
+          },
+          "title5": {
+            "text": "Téléphone"
+          }
+        }
+      }
+    },
+    "options": {
+      "nationality": {
+        "label1": {
+          "text": "Camerounais"
+        },
+        "label2": {
+          "text": "Anglais"
+        },
+        "label3": {
+          "text": "Egyptien"
+        },
+        "label4": {
+          "text": "Français"
+        }
+      },
+      "country": {
+        "label1": {
+          "text": "Cameroun"
+        },
+        "label2": {
+          "text": "Russie"
+        },
+        "label3": {
+          "text": "France"
+        }
+      },
+      "gender": {
+        "label1": {
+          "text": "Masculin"
+        },
+        "label2": {
+          "text": "Féminin"
+        },
+        "label3": {
+          "text": "Autre"
+        }
+      },
+      "permissions": {
+        "label1": {
+          "text": "Voir le tableau de bord"
+        },
+        "label2": {
+          "text": "Gérer les employés"
+        },
+        "label3": {
+          "text": "Gérer les rôles"
+        },
+        "label4": {
+          "text": "Gérer les clients"
+        },
+        "label5": {
+          "text": "Gérer les expéditions"
+        },
+        "label6": {
+          "text": "Gérer le flux de travail"
+        },
+        "label7": {
+          "text": "Gérer les factures"
+        },
+        "label8": {
+          "text": "Gérer les paiements"
+        },
+        "label9": {
+          "text": "Voir les rapports"
+        },
+        "label10": {
+          "text": "Gérer les incidents"
+        },
+        "label11": {
+          "text": "Gérer les paramètres"
+        }
+      },
+      "maritalstatus": {
+        "label1": {
+          "text": "Célibataire"
+        },
+        "label2": {
+          "text": "Marié(e)"
+        },
+        "label3": {
+          "text": "Divorcé(e)"
+        },
+        "label4": {
+          "text": "Veuf(ve)"
+        }
+      },
+      "companytype": {
+        "label1": {
+          "text": "SARL (Société à Responsabilité Limitée)"
+        },
+        "label2": {
+          "text": "SA (Société Anonyme)"
+        },
+        "label3": {
+          "text": "SAS (Société par Actions Simplifiée)"
+        },
+        "label4": {
+          "text": "SNC (Société en Nom Collectif)"
+        },
+        "label5": {
+          "text": "SCI (Société Civile Immobilière)"
+        },
+        "label6": {
+          "text": "GIE (Groupement d’Intérêt Économique)"
+        },
+        "label7": {
+          "text": "Entreprise individuelle"
+        },
+        "label8": {
+          "text": "EURL (Entreprise Unipersonnelle à Responsabilité Limitée)"
+        },
+        "label9": {
+          "text": "Coopérative"
+        },
+        "label10": {
+          "text": "Association"
+        }
+      },
+      "legalstatus": {
+        "label1": {
+          "text": "Entreprise individuelle (EI)"
+        },
+        "label2": {
+          "text": "Auto-entrepreneur / Micro-entreprise"
+        },
+        "label3": {
+          "text": "Entreprise unipersonnelle à responsabilité limitée (EURL)"
+        },
+        "label4": {
+          "text": "Société à responsabilité limitée (SARL)"
+        },
+        "label5": {
+          "text": "Société par actions simplifiée (SAS)"
+        },
+        "label6": {
+          "text": "Société par actions simplifiée unipersonnelle (SASU)"
+        },
+        "label7": {
+          "text": "Société anonyme (SA)"
+        },
+        "label8": {
+          "text": "Société en nom collectif (SNC)"
+        },
+        "label9": {
+          "text": "Société en commandite simple (SCS)"
+        },
+        "label10": {
+          "text": "Société civile (SC)"
+        },
+        "label11": {
+          "text": "Société d’exercice libéral (SEL)"
+        },
+        "label12": {
+          "text": "Groupement d’intérêt économique (GIE)"
+        },
+        "label13": {
+          "text": "Coopérative"
+        },
+        "label14": {
+          "text": "Association"
+        },
+        "label15": {
+          "text": "Organisation non gouvernementale (ONG)"
+        },
+        "label16": {
+          "text": "Établissement public"
+        },
+        "label17": {
+          "text": "Société d’économie mixte (SEM)"
+        }
+      },
+      "activitysector": {
+        "label1": {
+          "text": "Agriculture, sylviculture et pêche"
+        },
+        "label2": {
+          "text": "Industrie manufacturière"
+        },
+        "label3": {
+          "text": "Construction et BTP"
+        },
+        "label4": {
+          "text": "Commerce de gros et de détail"
+        },
+        "label5": {
+          "text": "Transports et entreposage"
+        },
+        "label6": {
+          "text": "Hébergement et restauration"
+        },
+        "label7": {
+          "text": "Information et communication"
+        },
+        "label8": {
+          "text": "Activités financières et d’assurance"
+        },
+        "label9": {
+          "text": "Activités immobilières"
+        },
+        "label10": {
+          "text": "Activités professionnelles, scientifiques et techniques"
+        },
+        "label11": {
+          "text": "Services administratifs et de soutien"
+        },
+        "label12": {
+          "text": "Administration publique"
+        },
+        "label13": {
+          "text": "Éducation, value"
+        },
+        "label14": {
+          "text": "Santé humaine et action sociale"
+        },
+        "label15": {
+          "text": "Arts, spectacles et activités récréatives"
+        },
+        "label16": {
+          "text": "Autres services"
+        }
+      },
+      "documenttype": {
+        "label1": {
+          "text": "Carte Nationale d'Identité"
+        },
+        "label2": {
+          "text": "Passeport"
+        },
+        "label3": {
+          "text": "Permis de conduire"
+        }
+      }
+    }
+  }
+}

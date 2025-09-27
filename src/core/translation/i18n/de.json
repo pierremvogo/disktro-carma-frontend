@@ -1,0 +1,153 @@
+{
+  "login": {
+    "form": {
+      "username": "Benutzername",
+      "email": "E-Mail",
+      "password": "Passwort",
+      "submit": "Registrieren",
+      "cancel": "Abbrechen",
+      "login": "Anmelden",
+      "loading": "Laden...",
+      "errors": {
+        "emailInvalid": "Ungültige E-Mail-Adresse",
+        "emailRequired": "E-Mail ist erforderlich",
+        "passwordMin": "Mindestens 6 Zeichen",
+        "passwordRequired": "Passwort ist erforderlich"
+      },
+      "cancelAlert": "Formular abgebrochen"
+    },
+    "formHandler": {
+      "imageCaption": "Vereinheitlichen Sie Ihre Logistik",
+      "logIn": "Anmeldung",
+      "forgotPassword": "Passwort vergessen?",
+      "reset": "Zurücksetzen",
+      "noAccount": "Noch kein Konto?",
+      "register": "Konto erstellen"
+    }
+  },
+  "confirmEmail": {
+    "form": {
+      "token": "Bestätigungscode",
+      "submit": "Registrieren",
+      "cancel": "Abbrechen",
+      "cancelAlert": "Formular abgebrochen",
+      "activateAccount": "Mein Konto aktivieren",
+      "errors": {
+        "tokenRequired": "Bestätigungscode ist erforderlich"
+      }
+    },
+    "title": "Kontoaktivierung",
+    "instructions": "Bitte prüfen Sie Ihre E-Mails und verwenden Sie den Code, den wir Ihnen geschickt haben, um Ihr Konto zu aktivieren.",
+    "noCodeReceived": "Keinen Code erhalten?",
+    "resend": "Erneut senden",
+    "backToLogin": "Zurück zur Anmeldung",
+    "modal": {
+      "title": "Neuer Bestätigungscode gesendet",
+      "content": "Bitte prüfen Sie Ihre E-Mails. Wir haben Ihnen einen neuen Aktivierungscode geschickt.",
+      "okButton": "Ok"
+    },
+    "success": {
+      "title": "Ihr Konto wurde aktiviert",
+      "description": "Sie können nun alle Funktionen unseres Dienstes nutzen. Vielen Dank für Ihre Anmeldung.",
+      "button": "Anmelden"
+    },
+    "formActivate": {
+      "activateAccount": "Mein Konto aktivieren"
+    }
+  },
+  "forgotPassword": {
+    "form": {
+      "email": {
+        "label": "E-Mail",
+        "invalid": "Ungültige E-Mail-Adresse",
+        "required": "E-Mail ist erforderlich"
+      },
+      "submit": "Registrieren",
+      "cancel": "Abbrechen",
+      "cancelAlert": "Formular abgebrochen"
+    },
+    "sendCode": "Code senden",
+    "leftPanelText": "Fluidität in der Pro-Version",
+    "successTitle": "Passwort-Reset-E-Mail gesendet",
+    "successButton": "Code eingeben",
+    "successMessage": "Eine E-Mail zum Zurücksetzen Ihres Passworts wurde gesendet. Bitte prüfen Sie Ihr Postfach und folgen Sie den Anweisungen.",
+    "pageTitle": "Passwort vergessen",
+    "backToText": "Zurück zu",
+    "backToLogin": "Anmeldung"
+  },
+  "register": {
+    "username": "Benutzername",
+    "firstName": "Vorname",
+    "lastName": "Nachname",
+    "email": "E-Mail",
+    "gender": "Geschlecht",
+    "genderOptions": {
+      "male": "Männlich",
+      "female": "Weiblich"
+    },
+    "country": "Land",
+    "city": "Stadt",
+    "password": "Passwort",
+    "passwordConfirmation": "Passwort bestätigen",
+    "agree": "Ich akzeptiere die Nutzungsbedingungen",
+    "submitButton": "Registrieren",
+    "cancelButton": "Abbrechen",
+    "cancelAlert": "Formular abgebrochen",
+    "validation": {
+      "username": "Benutzername ist erforderlich",
+      "firstName": "Vorname ist erforderlich",
+      "lastName": "Nachname ist erforderlich",
+      "email": "E-Mail ist erforderlich",
+      "emailInvalid": "Ungültige E-Mail-Adresse",
+      "gender": "Geschlecht ist erforderlich",
+      "country": "Land ist erforderlich",
+      "city": "Stadt ist erforderlich",
+      "password": "Passwort ist erforderlich",
+      "passwordMin": "Mindestens 6 Zeichen",
+      "passwordConfirmation": "Passwortbestätigung ist erforderlich",
+      "passwordMatch": "Passwörter stimmen nicht überein",
+      "agree": "Bitte akzeptieren Sie die Nutzungsbedingungen"
+    },
+    "title": "Registrierung",
+    "success": {
+      "title": "Ihr Konto wurde erfolgreich erstellt",
+      "message": "Bitte prüfen Sie Ihre E-Mails und nutzen Sie den Code, den wir Ihnen geschickt haben, um Ihr Konto zu aktivieren.",
+      "button": "Mein Konto aktivieren"
+    },
+    "login": {
+      "text": "Sie haben bereits ein Konto?",
+      "link": "Anmelden"
+    },
+    "error": {
+      "default": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut."
+    },
+    "imageCaption": "Ordnung in der Bewegung"
+  },
+  "newPasswordLabel": "Neues Passwort",
+  "passwordConfirmationLabel": "Passwort bestätigen",
+  "passwordMinLength": "Mindestens 6 Zeichen",
+  "passwordRequired": "Passwort ist erforderlich",
+  "passwordConfirmationRequired": "Passwortbestätigung ist erforderlich",
+  "passwordsMustMatch": "Passwörter stimmen nicht überein",
+  "submitButton": "Zurücksetzen",
+  "cancelButton": "Abbrechen",
+  "formCancelled": "Formular abgebrochen",
+  "resetButton": "Zurücksetzen",
+  "passwordResetSuccess": "Ihr Passwort wurde erfolgreich zurückgesetzt.",
+  "loginButton": "Anmelden",
+  "passwordResetSuccessMessage": "Vielen Dank für Ihr Vertrauen. Sie können sich jetzt anmelden.",
+  "enterNewPassword": "Neues Passwort eingeben",
+  "backTo": "Zurück zu",
+  "loginReset": "Anmeldung",
+  "fluidityProVersion": "Fluidität in der Pro-Version",
+  "validationCode": "Bestätigungscode",
+  "codeRequired": "Code ist erforderlich",
+  "submitButtonText": "Registrieren",
+  "cancelButtonText": "Abbrechen",
+  "validateButton": "Bestätigen",
+  "systemDesignedForYou": "Ein System für Sie entwickelt",
+  "identityVerificationTitle": "Identitätsprüfung",
+  "didNotReceiveCode": "Keinen Code erhalten?",
+  "resendCodeButton": "Code erneut per E-Mail senden",
+  "backToLoginPage": "Zurück zur Anmeldeseite"
+}
