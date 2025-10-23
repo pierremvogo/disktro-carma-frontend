@@ -6,19 +6,21 @@ import Header from "../layouts/header";
 import { wait } from "@/@disktro/utils";
 import CustomAlert from "@/@disktro/CustomAlert";
 import CustomSuccess from "@/@disktro/CustomSuccess";
-import { MediaModuleObject as ModuleObject } from "../module";
+import { UserModuleObject as ModuleObject } from "../module";
 import Loader from "@/@disktro/Loader";
 import { useRouter } from "next/navigation";
 
 export default function RegisterForm() {
   type FormRegister = {
     name: string;
+    surname: string;
     email: string;
     password: string;
     confirmPassword: string;
   };
   const DefaultValue: FormRegister = {
     name: "",
+    surname: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -33,6 +35,7 @@ export default function RegisterForm() {
   const [successMessage, setSuccessMessage] = useState("");
   const [form, setForm] = useState({
     name: "",
+    surname: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -48,6 +51,7 @@ export default function RegisterForm() {
     e.preventDefault();
     const newErrors: any = {};
     if (!form.name) newErrors.name = "Name is required";
+    if (!form.surname) newErrors.surname = "Surame is required";
     if (!form.email) newErrors.email = "Email is required";
     if (!form.password) newErrors.password = "Password is required";
     if (form.password !== form.confirmPassword)
@@ -70,6 +74,7 @@ export default function RegisterForm() {
         setIsLoading(false);
         setSuccessMessage(res.message);
         setSuccess(true);
+        router.push("/auth/confirm-email");
       } catch (error) {
         console.log(error);
         setErrorMessage((error as Error).message);
@@ -97,6 +102,9 @@ export default function RegisterForm() {
               </p>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
+                <label htmlFor="name" className="text">
+                  Name
+                </label>
                 <input
                   type="text"
                   name="name"
@@ -108,7 +116,23 @@ export default function RegisterForm() {
                 {errors.name && (
                   <p className="text-red-500 text-sm">{errors.name}</p>
                 )}
-
+                <label htmlFor="surname" className="text">
+                  Surname
+                </label>
+                <input
+                  type="text"
+                  name="surname"
+                  placeholder="Your surname"
+                  value={form.surname}
+                  onChange={handleChange}
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                />
+                {errors.surname && (
+                  <p className="text-red-500 text-sm">{errors.surname}</p>
+                )}
+                <label htmlFor="email" className="text">
+                  Email
+                </label>
                 <input
                   type="email"
                   name="email"
@@ -120,11 +144,13 @@ export default function RegisterForm() {
                 {errors.email && (
                   <p className="text-red-500 text-sm">{errors.email}</p>
                 )}
-
+                <label htmlFor="password" className="text">
+                  Password
+                </label>
                 <input
                   type="password"
                   name="password"
-                  placeholder="Password"
+                  placeholder="Your Password"
                   value={form.password}
                   onChange={handleChange}
                   className="w-full p-2 border border-gray-300 rounded-md"
@@ -132,11 +158,13 @@ export default function RegisterForm() {
                 {errors.password && (
                   <p className="text-red-500 text-sm">{errors.password}</p>
                 )}
-
+                <label htmlFor="confirmPassword" className="text">
+                  Confirm password
+                </label>
                 <input
                   type="password"
                   name="confirmPassword"
-                  placeholder="Confirm password"
+                  placeholder="Confirm your password"
                   value={form.confirmPassword}
                   onChange={handleChange}
                   className="w-full p-2 border rounded-md"

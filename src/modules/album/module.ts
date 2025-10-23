@@ -31,7 +31,7 @@ const API_URLS: API_URLS = {
 } as const;
 
 class ServiceObject {
-  static createAlbum = (info: FormData, token: string): Promise<any> =>
+  static createAlbum = (info: any, token: string): Promise<any> =>
     BaseMethods.postRequest(API_URLS.CREATE_ALBUM, info, true, {}, token);
 
   static createAlbumTag = (tagId: string, albumId: string): Promise<any> => {

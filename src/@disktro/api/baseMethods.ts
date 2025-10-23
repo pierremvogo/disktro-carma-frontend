@@ -28,17 +28,16 @@ class BaseMethods {
     inputToken?: string
   ): Promise<V> {
     try {
+      const isFile =
+        typeof FormData !== "undefined" && body instanceof FormData;
       const headers = required_auth
-        ? BaseMethods.getHeadersAuth(false, inputToken)
-        : BaseMethods.getHeaders();
-
+        ? BaseMethods.getHeadersAuth(isFile, inputToken)
+        : BaseMethods.getHeaders(isFile);
       const config: AxiosRequestConfig = {
         headers,
         params: queryParams,
       };
-      console.log("before");
       const { data } = await axios.post<V>(url, body, config);
-      console.log("after");
       await wait();
       return data;
     } catch (error) {

@@ -16,7 +16,8 @@ interface API_URLS {
   RESEND_CONFIRMATION_EMAIL: string;
   FORGOT_PASSWORD: string;
   RESET_PASSWORD: string;
-  GET_USERS: string;
+  GET_USER: string;
+  UPDATE_USER: string;
 }
 
 const API_URLS: API_URLS = {
@@ -27,7 +28,8 @@ const API_URLS: API_URLS = {
   RESEND_CONFIRMATION_EMAIL: `${BASE_API_URL}/resend-confirmation-email`,
   FORGOT_PASSWORD: `${BASE_API_URL}/auth/request-password-reset`,
   RESET_PASSWORD: `${BASE_API_URL}/auth/reset-password/:token`,
-  GET_USERS: `${BASE_API_URL}/users/:id`,
+  GET_USER: `${BASE_API_URL}/users/:id`,
+  UPDATE_USER: `${BASE_API_URL}/users/:id`,
 } as const;
 
 class ServiceObject {
@@ -37,12 +39,17 @@ class ServiceObject {
   };
 
   static getUser = (id: string): Promise<any> => {
-    const url = formatURL(API_URLS.GET_USERS, { id });
+    const url = formatURL(API_URLS.GET_USER, { id });
     return BaseMethods.getRequest(url, true);
   };
 
   static createUser = (info: any): Promise<any> =>
     BaseMethods.postRequest(API_URLS.REGISTER_USER, info, true);
+
+  static updateUser = (id: string, info: any): Promise<any> => {
+    const url = formatURL(API_URLS.UPDATE_USER, { id });
+    return BaseMethods.putRequest(url, info, true);
+  };
 
   static loginUser = (info: any): Promise<any> =>
     BaseMethods.postRequest(API_URLS.LOGIN_USER, info, false);
@@ -78,4 +85,4 @@ class Module {
   localState = LocalStateObjectKeys;
 }
 
-export const MediaModuleObject = new Module();
+export const UserModuleObject = new Module();

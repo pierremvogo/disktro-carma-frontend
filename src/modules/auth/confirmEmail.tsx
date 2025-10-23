@@ -6,8 +6,9 @@ import Footer from "../layouts/footer";
 import { wait } from "@/@disktro/utils";
 import CustomAlert from "@/@disktro/CustomAlert";
 import CustomSuccess from "@/@disktro/CustomSuccess";
-import { MediaModuleObject as ModuleObject } from "../module";
+import { UserModuleObject as ModuleObject } from "../module";
 import Loader from "@/@disktro/Loader";
+import { useRouter } from "next/navigation";
 
 export default function ConfirmEmailForm() {
   const [token, setToken] = useState("");
@@ -18,6 +19,7 @@ export default function ConfirmEmailForm() {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
+  const router = useRouter();
   const handleConfirm = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -36,6 +38,7 @@ export default function ConfirmEmailForm() {
       setIsLoading(false);
       setSuccessMessage(res.message);
       setSuccess(true);
+      router.push("/auth/login");
     } catch (error) {
       console.log(error);
       setErrorMessage((error as Error).message);
@@ -48,16 +51,21 @@ export default function ConfirmEmailForm() {
     <>
       <div className="flex flex-col min-h-screen">
         <Header />
-        <div className="flex-1 flex items-center justify-center px-4">
-          <div className="max-w-md mx-auto p-8 bg-white/60 backdrop-blur-md rounded-3xl shadow-lg mt-20 text-center">
-            <h2 className="text-3xl font-bold text-purple-700 mb-6">
+        <div className="flex-1 flex px-4">
+          <div className="max-w-md mx-auto p-8 bg-white/60 backdrop-blur-md rounded-3xl shadow-lg mt-20">
+            <h2 className="text-2xl font-bold text-[#1F89A5]  mb-6">
               📩 Confirm Your Email
             </h2>
-
+            <p className="text-green-600 font-medium">
+              Registration successful! Please check your email and enter your
+              confirmation code.
+            </p>
             <form onSubmit={handleConfirm} className="space-y-4">
+              <label htmlFor="token">Code de confirmation</label>
               <input
+                name="token"
                 type="text"
-                placeholder="Enter your confirmation token"
+                placeholder="Enter your confirmation code"
                 value={token}
                 onChange={(e) => setToken(e.target.value)}
                 className="w-full p-3 border border-gray-300 rounded-md"
@@ -67,7 +75,7 @@ export default function ConfirmEmailForm() {
               <button
                 disabled={isLoading}
                 type="submit"
-                className="w-full cursor-pointer bg-purple-600 text-white py-2 rounded-md hover:bg-purple-700 transition flex items-center justify-center gap-2"
+                className="w-full cursor-pointer bg-[#1F89A5] text-white py-2 rounded-md hover:bg-[#1A4C61] transition flex items-center justify-center gap-2"
               >
                 {isLoading ? <Loader /> : "Confirm Email"}
               </button>

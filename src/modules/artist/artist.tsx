@@ -15,7 +15,9 @@ import { errorMonitor } from "events";
 type Artist = {
   id?: string;
   name: string;
-  slug: string;
+  slug?: string;
+  location?: string;
+  biography?: string;
   tagId?: string;
 };
 
@@ -24,15 +26,15 @@ export default function ArtistsPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [editingArtist, setEditingArtist] = useState<Artist | null>(null);
-
-  const [submitted, setSubmitted] = useState(false);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [form, setForm] = useState<Artist>({
     name: "",
-    slug: "",
+    location: "",
+    biography: "",
     tagId: "",
   });
 
@@ -58,6 +60,14 @@ export default function ArtistsPage() {
       getTags();
     }
   }, []);
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => {
+        setSuccessMessage("");
+      }, 5000);
+      return () => clearTimeout(timer); // nettoyage si le composant change
+    }
+  }, [successMessage]);
 
   // Charger tous les artistes
   useEffect(() => {
@@ -83,15 +93,22 @@ export default function ArtistsPage() {
   }
 
   function resetForm() {
-    setForm({ name: "", slug: "", tagId: "" });
+    setForm({ name: "", tagId: "", location: "", biography: "" });
     setEditingArtist(null);
   }
 
   async function handleSubmit(e: React.FormEvent) {
-    const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
     e.preventDefault();
-    if (!form.name) {
-      setErrorMessage("Les champs Nom et Slug sont obligatoires");
+    const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
+    setErrors({}); // reset previous errors
+    const newErrors: { [key: string]: string } = {};
+    if (!form.name) newErrors.name = "Le nom de l'artiste est requis.";
+    if (!form.location) newErrors.location = "La lieu de résidence est requis";
+    if (!form.biography)
+      newErrors.biography = "La biography de l'artiste est requise.";
+    if (!form.tagId) newErrors.tagId = "Veuillez sélectionner un tag.";
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
       setIsLoading(false);
       return;
     }
@@ -104,16 +121,19 @@ export default function ArtistsPage() {
       if (editingArtist) {
         await ModuleObject.service.updateArtist(editingArtist.id!, {
           name: form.name,
-          slug: form.slug,
+          location: form.location,
+          biography: form.biography,
         });
       } else {
         const newArtist = await ModuleObject.service.createArtist(
           {
             name: form.name,
-            slug: form.slug,
+            location: form.location,
+            biography: form.biography,
           },
           token
         );
+
         if (form.tagId) {
           await ModuleObject.service.createArtistTag(
             form.tagId!,
@@ -122,7 +142,7 @@ export default function ArtistsPage() {
         }
       }
       setIsLoading(false);
-      setSuccessMessage("Success");
+      setSuccessMessage("Artiste enregistré avec succès");
       setSuccess(true);
       resetForm();
       fetchArtists();
@@ -151,8 +171,8 @@ export default function ArtistsPage() {
     setEditingArtist(artist);
     setForm({
       name: artist.name,
-      slug: artist.slug,
       tagId: artist.tagId || "",
+      location: artist.location,
     });
   }
 
@@ -184,6 +204,9 @@ export default function ArtistsPage() {
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
               />
+              {errors.name && (
+                <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+              )}
             </div>
 
             <div className="mb-4">
@@ -202,9 +225,45 @@ export default function ArtistsPage() {
                   </option>
                 ))}
               </select>
+              {errors.tagId && (
+                <p className="text-red-500 text-sm mt-1">{errors.tagId}</p>
+              )}
             </div>
 
-            <div className="flex gap-4">
+            <div className="mb-4">
+              <label className="block mb-1 font-medium text-gray-700">
+                Biographie
+              </label>
+              <textarea
+                className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#1F89A5]"
+                value={form.biography}
+                onChange={(e) =>
+                  setForm({ ...form, biography: e.target.value })
+                }
+              />
+              {errors.biography && (
+                <p className="text-red-500 text-sm mt-1">{errors.biography}</p>
+              )}
+            </div>
+
+            <div className="mb-4">
+              <label className="block mb-1 font-medium text-gray-700">
+                Ville / Pays de résidence
+              </label>
+              <input
+                type="text"
+                className="w-full border border-gray-300 rounded px-3 py-2"
+                value={form.location}
+                onChange={(e) => setForm({ ...form, location: e.target.value })}
+              />
+              {errors.location && (
+                <p className="text-red-500 text-sm mt-1">{errors.location}</p>
+              )}
+            </div>
+            {successMessage && <CustomSuccess message={successMessage} />}
+            {errorMessage && <CustomAlert message={errorMessage} />}
+            {isLoading && <Loader />}
+            <div className="flex gap-4 justify-end items-end">
               <button
                 type="submit"
                 disabled={loading}
@@ -239,7 +298,6 @@ export default function ArtistsPage() {
             <h2 className="text-xl font-semibold mb-4 text-[#1A4C61]">
               Artistes existants
             </h2>
-            {loading && <p>Chargement...</p>}
 
             {!loading && artists.length === 0 && (
               <p>Aucun artiste disponible.</p>
@@ -276,7 +334,6 @@ export default function ArtistsPage() {
                     </div>
                   </li>
                 ))}
-              {isLoading && <Loader />}
             </ul>
           </div>
         </div>
