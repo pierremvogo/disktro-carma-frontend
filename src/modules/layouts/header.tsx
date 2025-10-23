@@ -9,28 +9,20 @@ import Image from "next/image";
 import {
   Menu,
   X,
-  ChevronDown,
-  User2Icon,
   LogOut,
-  ArrowBigDown,
-  ArrowDown,
-  DropletIcon,
-  ArrowDown01,
-  ArrowDownFromLine,
   Settings,
   Album,
-  Play,
-  Music,
-  Megaphone,
   UserPen,
   CreditCard,
 } from "lucide-react";
-import { MediaModuleObject as ModuleObject } from "../module";
+import { UserModuleObject as UserModule } from "../module";
+import { getImageFile, isTokenExpired } from "@/@disktro/utils";
+import { MediaModuleObject as ModuleObject } from "../file/module";
 
 export default function Header() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [username, setUsername] = useState<string | null>(null); // Store username
+  const [username, setUsername] = useState<string | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [fade, setFade] = useState(false);
   const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
@@ -43,14 +35,33 @@ export default function Header() {
     const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
     if (!i18n.language) return;
     setIsAuthenticated(!!token);
-
     if (token) {
-      const user = localStorage.getItem(ModuleObject.localState.USER_DATA);
-      const currentUser = JSON.parse(user!);
-      setUsername(currentUser.name || "Utilisateur");
-      setProfileImageUrl(currentUser.profileImage || null);
+      if (isTokenExpired()) {
+        handleLogout();
+      } else {
+        if (!profileImageUrl) {
+          fetchUser();
+        }
+      }
     }
   }, []);
+  const fetchUser = async () => {
+    const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
+    const userId = localStorage.getItem(ModuleObject.localState.USER_ID);
+    if (!userId) return;
+    try {
+      const user = await UserModule.service.getUser(userId);
+      if (user.data.profileImageUrl) {
+        const imageObjectUrl = await getImageFile(
+          user.data.profileImageUrl,
+          token!
+        );
+        setProfileImageUrl(imageObjectUrl);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem(ModuleObject.localState.ACCESS_TOKEN);
@@ -138,7 +149,7 @@ export default function Header() {
               /> */}
               <div className="relative cursor-pointer rounded-full overflow-hidden border border-primary w-[40px] h-[40px]">
                 <Image
-                  src="/image/profile_default.png"
+                  src={profileImageUrl || "/image/profile_default.png"}
                   alt=""
                   className="object-cover h-full w-full"
                   width={80}

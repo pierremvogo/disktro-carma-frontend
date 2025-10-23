@@ -27,27 +27,66 @@ const API_URLS: API_URLS = {
 } as const;
 
 class ServiceObject {
-  static downloadAudioFile = (file: string): Promise<any> => {
+  static downloadAudioFile = async (
+    file: string,
+    token: string
+  ): Promise<Blob> => {
     const url = formatURL(API_URLS.DOWNLOAD_AUDIO_FILE, { file });
-    return BaseMethods.getRequest(url, true);
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error("Erreur lors du téléchargement du fichier audio.");
+    }
+    return await response.blob();
   };
-  static downloadVideoFile = (file: string): Promise<any> => {
+
+  static downloadVideoFile = async (
+    file: string,
+    token: string
+  ): Promise<Blob> => {
     const url = formatURL(API_URLS.DOWNLOAD_VIDEO_FILE, { file });
-    return BaseMethods.getRequest(url, true);
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error("Erreur lors du téléchargement du fichier vidéo.");
+    }
+
+    return await response.blob();
   };
-  static downloadImageFile = (file: string): Promise<any> => {
+
+  static downloadImageFile = async (
+    file: string,
+    token: string
+  ): Promise<Blob> => {
     const url = formatURL(API_URLS.DOWNLOAD_IMAGE_FILE, { file });
-    return BaseMethods.getRequest(url, true);
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error("Erreur lors du téléchargement de l'image.");
+    }
+    return await response.blob();
   };
 
-  static uploadAudioFile = (file: string): Promise<any> =>
-    BaseMethods.postRequest(API_URLS.UPLOAD_AUDIO_FILE, file, true);
+  static uploadAudioFile = (file: string, token: string): Promise<any> =>
+    BaseMethods.postRequest(API_URLS.UPLOAD_AUDIO_FILE, file, true, {}, token);
 
-  static uploadVideoFile = (file: string): Promise<any> =>
-    BaseMethods.postRequest(API_URLS.UPLOAD_VIDEO_FILE, file, true);
+  static uploadVideoFile = (file: string, token: string): Promise<any> =>
+    BaseMethods.postRequest(API_URLS.UPLOAD_VIDEO_FILE, file, true, {}, token);
 
-  static uploadImageFile = (file: string): Promise<any> =>
-    BaseMethods.postRequest(API_URLS.DOWNLOAD_IMAGE_FILE, file, true);
+  static uploadImageFile = (file: FormData, token: string): Promise<any> =>
+    BaseMethods.postRequest(API_URLS.UPLOAD_IMAGE_FILE, file, true, {}, token);
 }
 interface LocalState {
   ACCESS_TOKEN: string;
