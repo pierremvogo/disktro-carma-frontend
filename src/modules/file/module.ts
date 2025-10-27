@@ -79,10 +79,10 @@ class ServiceObject {
     return await response.blob();
   };
 
-  static uploadAudioFile = (file: string, token: string): Promise<any> =>
+  static uploadAudioFile = (file: FormData, token: string): Promise<any> =>
     BaseMethods.postRequest(API_URLS.UPLOAD_AUDIO_FILE, file, true, {}, token);
 
-  static uploadVideoFile = (file: string, token: string): Promise<any> =>
+  static uploadVideoFile = (file: FormData, token: string): Promise<any> =>
     BaseMethods.postRequest(API_URLS.UPLOAD_VIDEO_FILE, file, true, {}, token);
 
   static uploadImageFile = (file: FormData, token: string): Promise<any> =>
@@ -92,12 +92,14 @@ interface LocalState {
   ACCESS_TOKEN: string;
   USER_ID: string;
   USER_DATA: string;
+  USER_ROLE: string;
 }
 
 const LocalStateObjectKeys: LocalState = {
   ACCESS_TOKEN: "accessToken",
   USER_ID: "userId",
   USER_DATA: "userData",
+  USER_ROLE: "userRole",
 };
 
 class Module {

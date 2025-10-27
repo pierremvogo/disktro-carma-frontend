@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import LanguageSwitcher from "@/@disktro/translation/LanguageSwitcher";
@@ -14,6 +14,7 @@ import {
   Album,
   UserPen,
   CreditCard,
+  PlaySquareIcon,
 } from "lucide-react";
 import { UserModuleObject as UserModule } from "../module";
 import { getImageFile, isTokenExpired } from "@/@disktro/utils";
@@ -22,10 +23,10 @@ import { MediaModuleObject as ModuleObject } from "../file/module";
 export default function Header() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [username, setUsername] = useState<string | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [fade, setFade] = useState(false);
   const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const router = useRouter();
   const pathname = usePathname();
@@ -45,6 +46,28 @@ export default function Header() {
       }
     }
   }, []);
+
+  // 👇 Fermer le dropdown lorsqu'on clique à l’extérieur
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setFade(true);
+        setTimeout(() => setIsDropdownOpen(false), 100);
+      }
+    }
+    if (isDropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isDropdownOpen]);
+
   const fetchUser = async () => {
     const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
     const userId = localStorage.getItem(ModuleObject.localState.USER_ID);
@@ -67,9 +90,9 @@ export default function Header() {
     localStorage.removeItem(ModuleObject.localState.ACCESS_TOKEN);
     localStorage.removeItem(ModuleObject.localState.USER_ID);
     localStorage.removeItem(ModuleObject.localState.USER_DATA);
+    localStorage.removeItem(ModuleObject.localState.USER_ROLE);
     setIsAuthenticated(false);
     setIsDropdownOpen(false);
-    setUsername(null);
     router.push("/home");
   };
 
@@ -86,7 +109,7 @@ export default function Header() {
     if (isDropdownOpen && isAuthenticated) {
       // Si on ferme le dropdown, on démarre l'animation fadeOut
       setFade(true);
-      setTimeout(() => setIsDropdownOpen(false), 800); // Attendre la fin de l'animation (300ms)
+      setTimeout(() => setIsDropdownOpen(false), 100); // Attendre la fin de l'animation (300ms)
     } else {
       setIsDropdownOpen(true);
       setFade(false); // Réinitialiser l'animation fadeIn
@@ -135,7 +158,7 @@ export default function Header() {
               </div>
             </div>
           </div>
-          <div className="relative">
+          <div className="relative" ref={dropdownRef}>
             <button
               onClick={isAuthenticated ? toggleDropdown : handleLogin}
               className="flex items-center justify-center focus:outline-none"
@@ -168,19 +191,32 @@ export default function Header() {
               >
                 {/* tes éléments du menu dropdown ici */}
                 <button
-                  onClick={() => router.push("/album")}
-                  className="w-full flex items-center cursor-pointer text-sm text-left px-4 py-2 text-[#1F89A5] hover:bg-gray-200"
-                >
-                  <Album size={16} color="#1A4C61" className="mr-2" />
-                  Albums
-                </button>
-                <button
                   onClick={() => router.push("/artist")}
                   className="w-full flex items-center cursor-pointer text-sm text-left px-4 py-2 text-[#1F89A5] hover:bg-gray-200"
                 >
                   <UserPen size={16} color="#1A4C61" className="mr-2" />
                   Artists
                 </button>
+                <button
+                  onClick={() => {
+                    router.push("/album");
+                  }}
+                  className="w-full flex items-center cursor-pointer text-sm text-left px-4 py-2 text-[#1F89A5] hover:bg-gray-200"
+                >
+                  <Album size={16} color="#1A4C61" className="mr-2" />
+                  Albums
+                </button>
+
+                <button
+                  onClick={() => {
+                    router.push("/playlist");
+                  }}
+                  className="w-full flex items-center cursor-pointer text-sm text-left px-4 py-2 text-[#1F89A5] hover:bg-gray-200"
+                >
+                  <PlaySquareIcon size={16} color="#1A4C61" className="mr-2" />
+                  My Playlist
+                </button>
+
                 <button
                   onClick={() => router.push("/pricing")}
                   className="w-full flex items-center cursor-pointer text-sm text-left px-4 py-2 text-[#1F89A5] hover:bg-gray-200"
