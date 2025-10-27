@@ -37,12 +37,12 @@ const API_URLS: API_URLS = {
 } as const;
 
 class ServiceObject {
-  static createTrack = (info: any): Promise<any> =>
-    BaseMethods.postRequest(API_URLS.CREATE_TRACK, info, true);
+  static createTrack = (info: any, token: string): Promise<any> =>
+    BaseMethods.postRequest(API_URLS.CREATE_TRACK, info, true, {}, token);
 
-  static getTrack = (id: string): Promise<any> => {
+  static getTrack = (id: string, token: string): Promise<any> => {
     const url = formatURL(API_URLS.GET_TRACK, { id });
-    return BaseMethods.getRequest(url, true);
+    return BaseMethods.getRequest(url, true, {}, token);
   };
 
   static addTrackToAlbum = (albumId: string, trackId: string): Promise<any> => {
@@ -75,8 +75,8 @@ class ServiceObject {
     return BaseMethods.getRequest(url, true);
   };
 
-  static getTracks = (): Promise<any> => {
-    return BaseMethods.getRequest(API_URLS.GET_TRACKS, true);
+  static getTracks = (token: string): Promise<any> => {
+    return BaseMethods.getRequest(API_URLS.GET_TRACKS, true, {}, token);
   };
 
   static updateTrack = (id: string, info: any): Promise<any> => {

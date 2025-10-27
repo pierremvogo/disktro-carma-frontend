@@ -71,12 +71,14 @@ interface LocalState {
   ACCESS_TOKEN: string;
   USER_ID: string;
   USER_DATA: string;
+  USER_ROLE: string;
 }
 
 const LocalStateObjectKeys: LocalState = {
   ACCESS_TOKEN: "accessToken",
   USER_ID: "userId",
   USER_DATA: "userData",
+  USER_ROLE: "userRole",
 };
 
 class Module {

@@ -47,9 +47,9 @@ class ServiceObject {
     return BaseMethods.postRequest(url, {}, true);
   };
 
-  static getAlbum = (id: string): Promise<any> => {
+  static getAlbum = (id: string, token: string): Promise<any> => {
     const url = formatURL(API_URLS.GET_ALBUM, { id });
-    return BaseMethods.getRequest(url, true);
+    return BaseMethods.getRequest(url, true, {}, token);
   };
 
   static getAlbums = (token: string): Promise<any> => {

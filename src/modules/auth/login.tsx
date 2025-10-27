@@ -44,6 +44,10 @@ export default function LoginForm() {
         ModuleObject.localState.USER_DATA,
         JSON.stringify(res1.data)
       );
+      localStorage.setItem(
+        ModuleObject.localState.USER_ROLE,
+        JSON.stringify(res1.data.type)
+      );
       router.push("/home");
       setSuccess(true);
     } catch (error) {

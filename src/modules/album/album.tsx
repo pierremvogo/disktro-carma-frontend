@@ -1,7 +1,15 @@
 "use client";
 
 import React, { ChangeEvent, useEffect, useRef, useState } from "react";
-import { Trash2, Edit2, PlusCircle, Loader } from "lucide-react";
+import {
+  Trash2,
+  Edit2,
+  PlusCircle,
+  Loader,
+  ViewIcon,
+  View,
+  EyeIcon,
+} from "lucide-react";
 import Header from "../layouts/header";
 import Footer from "../layouts/footer";
 import { TagModuleObject as TagModuleObject } from "../../modules/tag/module";
@@ -12,6 +20,7 @@ import { getImageFile, wait } from "@/@disktro/utils";
 import CustomSuccess from "@/@disktro/CustomSuccess";
 import CustomAlert from "@/@disktro/CustomAlert";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 // Mock de tes services (remplace par tes vrais imports)
 
@@ -46,7 +55,7 @@ export default function AlbumsPage() {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [previewUrl, setPreviewUrl] = useState(form.coverUrl || "");
   const [artists, setArtists] = useState<{ id: string; name: string }[]>([]);
-  const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     if (artists.length === 0) fetchArtists();
@@ -106,7 +115,6 @@ export default function AlbumsPage() {
           return { ...album, coverImageUrl };
         })
       );
-      console.log("UPDATE ALBUMS : ", updatedAlbums);
       setAlbumData(updatedAlbums);
     };
     fetchCovers();
@@ -415,6 +423,9 @@ export default function AlbumsPage() {
             </h2>
             {loading && <p>Chargement...</p>}
             {!loading && albums.length === 0 && <p>Aucun album disponible.</p>}
+            <div className="flex justify-center items-center">
+              {isLoading && <Loader />}
+            </div>
 
             <ul>
               {albumData.map((album) => {
@@ -439,6 +450,13 @@ export default function AlbumsPage() {
                       </p>
                     </div>
                     <div className="flex gap-3">
+                      <button
+                        onClick={() => router.push(`album/${album.id}/details`)}
+                        className="text-[#1F89A5] hover:text-[#1A4C61] cursor-pointer"
+                        title="Details"
+                      >
+                        <EyeIcon size={18} />
+                      </button>
                       <button
                         onClick={() => startEdit(album)}
                         className="text-[#1F89A5] hover:text-[#1A4C61] cursor-pointer"

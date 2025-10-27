@@ -36,3 +36,27 @@ export const getImageFile = async (
   }
   return "";
 };
+
+export const getAudioFile = async (
+  audioUrl: string,
+  token: string
+): Promise<string> => {
+  if (audioUrl) {
+    const blob = await ModuleObject.service.downloadAudioFile(audioUrl, token);
+    const audioObjectUrl = URL.createObjectURL(blob);
+    return audioObjectUrl;
+  }
+  return "";
+};
+
+export const getVideoFile = async (
+  videoUrl: string,
+  token: string
+): Promise<string> => {
+  if (videoUrl) {
+    const blob = await ModuleObject.service.downloadVideoFile(videoUrl, token);
+    const videoObjectUrl = URL.createObjectURL(blob);
+    return videoObjectUrl;
+  }
+  return "";
+};
