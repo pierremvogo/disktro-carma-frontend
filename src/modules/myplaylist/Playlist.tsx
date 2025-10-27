@@ -201,6 +201,7 @@ export default function MyPlaylist() {
     }
 
     const token = localStorage.getItem(PlaylistModule.localState.ACCESS_TOKEN);
+    const userRole = localStorage.getItem(PlaylistModule.localState.USER_ROLE);
     if (!token) return;
 
     try {
