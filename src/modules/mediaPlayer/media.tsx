@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import AudioPlayer from "./components/audioPlayer";
 import VideoPlayer from "./components/videoPlayer";
 import SyncedLyrics from "./components/syncedLyrics";
-import { MediaModuleObject as ModuleObject } from "../module";
+import { UserModuleObject as ModuleObject } from "../module";
 import { wait } from "@/@disktro/utils";
 import Loading from "@/@disktro/loading";
 import Footer from "../layouts/footer";

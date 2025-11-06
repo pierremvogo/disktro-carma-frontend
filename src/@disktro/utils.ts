@@ -60,3 +60,8 @@ export const getVideoFile = async (
   }
   return "";
 };
+
+export const getUserRole = () => {
+  const rawRole = localStorage.getItem(ModuleObject.localState.USER_ROLE);
+  return rawRole ? rawRole.trim().toLowerCase().replace(/['"]+/g, "") : null;
+};
