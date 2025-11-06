@@ -299,21 +299,32 @@ export default function Header() {
 
           {(userRole === "artist" || userRole === "admin") && (
             <>
-              <Link
-                href="/album"
-                onClick={toggleSidebar}
+              <button
+                onClick={() => router.push("/single")}
+                className={linkClass("/single")}
+              >
+                <Disc size={16} className="mr-2" /> Mes singles
+              </button>
+              <button
+                onClick={() => router.push("/extended-play")}
+                className={linkClass("/extended-play")}
+              >
+                <ListMusic size={16} className="mr-2" /> Mes EPs
+              </button>
+              <button
+                onClick={() => router.push("/album")}
                 className={linkClass("/album")}
               >
-                <Album size={16} className="mr-2" /> Albums
-              </Link>
+                <Album size={16} className="mr-2" />
+                Mes Albums
+              </button>
 
-              <Link
-                href="/release"
-                onClick={toggleSidebar}
+              <button
+                onClick={() => router.push("/release")}
                 className={linkClass("/release")}
               >
                 <Disc3 size={16} className="mr-2" /> Releases
-              </Link>
+              </button>
             </>
           )}
 
