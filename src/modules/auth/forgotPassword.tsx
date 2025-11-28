@@ -7,7 +7,7 @@ import Loader from "@/@disktro/Loader";
 import { wait } from "@/@disktro/utils";
 import CustomAlert from "@/@disktro/CustomAlert";
 import CustomSuccess from "@/@disktro/CustomSuccess";
-import { MediaModuleObject as ModuleObject } from "../module";
+import { UserModuleObject as ModuleObject } from "../module";
 
 export default function ForgotPasswordForm() {
   const [email, setEmail] = useState("");
