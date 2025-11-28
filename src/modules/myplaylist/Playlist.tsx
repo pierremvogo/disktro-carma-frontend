@@ -282,16 +282,7 @@ export default function MyPlaylist() {
                   onChange={(e) => setNewPlaylistName(e.target.value)}
                   className="border rounded px-3 py-2 w-64"
                 />
-                {errorMessage && (
-                  <div className="mt-4">
-                    <CustomAlert message={errorMessage} />
-                  </div>
-                )}
-                {successMessage && (
-                  <div className="mt-4">
-                    <CustomSuccess message={successMessage} />
-                  </div>
-                )}
+
                 {isLoading && (
                   <div className="flex justify-center p-10 items-center text-gray-600">
                     <Loader className="animate-spin mr-2" /> Chargement...

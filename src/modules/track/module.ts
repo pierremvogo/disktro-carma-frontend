@@ -16,6 +16,8 @@ interface API_URLS {
   ADD_TAG_TO_TRACK: string;
   ADD_TRACK_TO_RELEASE: string;
   GET_TRACK_BY_ALBUM: string;
+  ADD_TRACK_TO_SINGLE: string;
+  ADD_TRACK_TO_EP: string;
   GET_TRACKS: string;
   UPDATE_TRACK: string;
   DELETE_TRACK: string;
@@ -28,6 +30,8 @@ const API_URLS: API_URLS = {
   ADD_TRACK_TO_ALBUM: `${BASE_API_URL}/trackAlbum/create/:albumId/:trackId`,
   ADD_TRACK_TO_RELEASE: `${BASE_API_URL}/trackAlbum/create/:releaseId/:trackId`,
   ADD_TAG_TO_TRACK: `${BASE_API_URL}/trackTag/create/:tagId/:trackId`,
+  ADD_TRACK_TO_SINGLE: `${BASE_API_URL}/trackSingle/create/:singleId/:trackId`,
+  ADD_TRACK_TO_EP: `${BASE_API_URL}/trackEp/create/:epId/:trackId`,
 
   GET_TRACK_BY_RELEASE: `${BASE_API_URL}/track/getByRelease/:releaseId`,
   GET_TRACK_BY_ALBUM: `${BASE_API_URL}/track/getByAlbum/:albumId`,
@@ -47,6 +51,19 @@ class ServiceObject {
 
   static addTrackToAlbum = (albumId: string, trackId: string): Promise<any> => {
     const url = formatURL(API_URLS.ADD_TRACK_TO_ALBUM, { albumId, trackId });
+    return BaseMethods.postRequest(url, {}, true);
+  };
+
+  static addTrackToSingle = (
+    singleId: string,
+    trackId: string
+  ): Promise<any> => {
+    const url = formatURL(API_URLS.ADD_TRACK_TO_SINGLE, { singleId, trackId });
+    return BaseMethods.postRequest(url, {}, true);
+  };
+
+  static addTrackToEp = (epId: string, trackId: string): Promise<any> => {
+    const url = formatURL(API_URLS.ADD_TRACK_TO_EP, { epId, trackId });
     return BaseMethods.postRequest(url, {}, true);
   };
 

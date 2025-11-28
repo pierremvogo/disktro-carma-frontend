@@ -309,7 +309,7 @@ export default function SinglesPage() {
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="px-4 py-2 bg-gray-100 border border-gray-400 rounded hover:bg-gray-200"
+                    className="px-4 py-2 cursor-pointer bg-gray-100 border border-gray-400 rounded hover:bg-gray-200"
                   >
                     {previewUrl
                       ? "Modifier l'image de couverture"
@@ -326,7 +326,7 @@ export default function SinglesPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="bg-[#1F89A5] text-white px-5 py-2 rounded hover:bg-[#1A4C61] transition"
+                className="bg-[#1F89A5] cursor-pointer text-white px-5 py-2 rounded hover:bg-[#1A4C61] transition"
               >
                 {editingSingle ? "Mettre à jour" : "Ajouter"}
               </button>
@@ -334,7 +334,7 @@ export default function SinglesPage() {
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="px-5 py-2 border border-gray-300 rounded hover:bg-gray-200 transition"
+                  className="px-5 py-2 cursor-pointer border border-gray-300 rounded hover:bg-gray-200 transition"
                 >
                   Annuler
                 </button>
@@ -383,21 +383,21 @@ export default function SinglesPage() {
                   <div className="flex gap-3">
                     <button
                       onClick={() => router.push(`single/${single.id}/details`)}
-                      className="text-[#1F89A5] hover:text-[#1A4C61]"
+                      className="text-[#1F89A5] hover:text-[#1A4C61] cursor-pointer"
                       title="Détails"
                     >
                       <EyeIcon size={18} />
                     </button>
                     <button
                       onClick={() => startEdit(single)}
-                      className="text-[#1F89A5] hover:text-[#1A4C61]"
+                      className="text-[#1F89A5] cursor-pointer hover:text-[#1A4C61]"
                       title="Modifier"
                     >
                       <Edit2 size={18} />
                     </button>
                     <button
                       onClick={() => handleDelete(single.id!)}
-                      className="text-red-500 hover:text-red-700"
+                      className="text-red-500 cursor-pointer hover:text-red-700"
                       title="Supprimer"
                     >
                       <Trash2 size={18} />

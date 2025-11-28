@@ -92,11 +92,11 @@ export default function ProfileSettings() {
     formData.append("file", file);
     try {
       const res = await ModuleObject.service.uploadImageFile(formData, token!);
-      if (res && res.fileName) {
-        setFormData((prev) => ({ ...prev, profileImageUrl: res.fileName }));
+      if (res && res.url) {
+        setFormData((prev) => ({ ...prev, profileImageUrl: res.url }));
         setSuccessMessage("Image uploadée avec succès.");
         await UserModule.service.updateUser(userId!, {
-          profileImageUrl: res.fileName,
+          profileImageUrl: res.url,
         });
         setSuccess(true);
         setIsLoading(false);

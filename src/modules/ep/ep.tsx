@@ -385,7 +385,9 @@ export default function EPsPage() {
                   </div>
                   <div className="flex gap-3">
                     <button
-                      onClick={() => router.push(`ep/${ep.id}/details`)}
+                      onClick={() =>
+                        router.push(`extended-play/${ep.id}/details`)
+                      }
                       className="text-[#1F89A5] hover:text-[#1A4C61]"
                       title="Détails"
                     >

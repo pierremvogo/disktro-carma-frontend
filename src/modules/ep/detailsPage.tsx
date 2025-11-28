@@ -15,7 +15,7 @@ import Image from "next/image";
 import Header from "../layouts/header";
 import Footer from "../layouts/footer";
 
-import { AlbumModuleObject as ModuleObject } from "./module";
+import { EpModuleObject as ModuleObject } from "./module";
 import { MediaModuleObject as MediaModule } from "../file/module";
 import { TrackModuleObject as TrackModule } from "../track/module";
 import { MoodModuleObject as MoodModule } from "../mood/module";
@@ -47,7 +47,7 @@ type Track = {
   formattedDuration: any;
 };
 
-type Album = {
+type Ep = {
   id?: string;
   title: string;
   duration: number;
@@ -61,8 +61,8 @@ type Album = {
 
 export default function DetailsPage() {
   const params = useParams();
-  const albumId = params.albumId as string;
-  const [album, setAlbum] = useState<Album | null>(null);
+  const epId = params.epId as string;
+  const [ep, setEp] = useState<Ep | null>(null);
   const [playingTrack, setPlayingTrack] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -78,18 +78,14 @@ export default function DetailsPage() {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
-  // --- Charger les détails de l'album ---
+  // --- Charger les détails de l'ep ---
   useEffect(() => {
     const userData = localStorage.getItem(ModuleObject.localState.USER_DATA);
     if (userData) {
-      console.log(
-        "USER DATA ---------------- ----------- ---------- : ",
-        JSON.parse(userData).name
-      );
       setArtistName(JSON.parse(userData).name);
     }
-    if (albumId) {
-      fetchAlbumDetails();
+    if (epId) {
+      fetchEpDetails();
       fetchMoods();
     }
   }, []);
@@ -102,13 +98,13 @@ export default function DetailsPage() {
     }
   }, [successMessage]);
 
-  async function fetchAlbumDetails() {
+  async function fetchEpDetails() {
     setIsLoading(true);
     try {
       const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
-      const res = await ModuleObject.service.getAlbum(albumId, token!);
+      const res = await ModuleObject.service.getEp(epId, token!);
 
-      const data = res.album;
+      const data = res.ep;
       const coverImageUrl = data.coverUrl
         ? await getImageFile(data.coverUrl, token!)
         : "/image/vinyle.jpg";
@@ -127,7 +123,7 @@ export default function DetailsPage() {
         })
       );
 
-      // Calcul de la durée totale de l'album
+      // Calcul de la durée totale de l'ep
       const totalSeconds = tracksWithAudioUrl.reduce(
         (sum, track) => sum + (track.duration || 0),
         0
@@ -136,7 +132,7 @@ export default function DetailsPage() {
       const remainingSeconds = Math.round(totalSeconds % 60);
       const formattedDuration = `${totalMinutes} min ${remainingSeconds} s`;
 
-      setAlbum({
+      setEp({
         ...data,
         coverImageUrl,
         tracks: tracksWithAudioUrl,
@@ -227,13 +223,13 @@ export default function DetailsPage() {
         duration, // ✅ on met directement la durée détectée ici
         moodId,
         audioUrl: uploadRes.fileName,
-        type: "TRACK_ALBUM",
+        type: "TRACK_EP",
       };
 
       const res = await TrackModule.service.createTrack(newTrack, token!);
 
-      if (albumId) {
-        await TrackModule.service.addTrackToAlbum(albumId, res.data.id);
+      if (epId) {
+        await TrackModule.service.addTrackToEp(epId, res.data.id);
       }
 
       // reset du formulaire
@@ -241,7 +237,7 @@ export default function DetailsPage() {
       setMoodId("");
       setFile(null);
       setSuccessMessage("Track ajouté avec succès !");
-      fetchAlbumDetails();
+      fetchEpDetails();
     } catch (error) {
       console.error("Erreur ajout track :", error);
       setErrorMessage((error as Error).message);
@@ -257,7 +253,7 @@ export default function DetailsPage() {
       const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
       await TrackModule.service.deleteTrack(trackId);
       setSuccessMessage("Track supprimé avec succès.");
-      fetchAlbumDetails();
+      fetchEpDetails();
     } catch (error) {
       setErrorMessage((error as Error).message);
     }
@@ -270,7 +266,7 @@ export default function DetailsPage() {
       <div className="flex-1 bg-gray-100 py-10 px-6">
         <div className="flex items-center">
           <Link
-            href={`/album`}
+            href={`/extended-play`}
             className="text-sm cursor-pointer text-[#1F89A5] font-bold py-5 rounded whitespace-nowrap flex items-center"
           >
             <ArrowLeft size={12} className="mr-3" />
@@ -278,22 +274,20 @@ export default function DetailsPage() {
           </Link>
         </div>
         <div className="max-w-4xl mx-auto bg-white shadow rounded-lg p-6">
-          {/* --- Infos Album --- */}
+          {/* --- Infos Ep --- */}
           <div className="flex items-center gap-6">
             <Image
-              src={album?.coverImageUrl || "/image/vinyle.jpg"}
-              alt={album?.title || "Image"}
+              src={ep?.coverImageUrl || "/image/vinyle.jpg"}
+              alt={ep?.title || "Image"}
               width={150}
               height={150}
               className="rounded border object-cover"
             />
             <div>
-              <h1 className="text-3xl font-bold text-[#1F89A5]">
-                {album?.title}
-              </h1>
+              <h1 className="text-3xl font-bold text-[#1F89A5]">{ep?.title}</h1>
               <p className="text-gray-600">Artiste : {artistName}</p>
               <p className="text-gray-600">
-                Durée totale : {album?.formattedDuration}
+                Durée totale : {ep?.formattedDuration}
               </p>
             </div>
           </div>
@@ -303,8 +297,8 @@ export default function DetailsPage() {
             Morceaux
           </h2>
           <ul className="mt-4 space-y-3">
-            {album?.tracks && album.tracks.length > 0 ? (
-              album.tracks.map((track) => (
+            {ep?.tracks && ep.tracks.length > 0 ? (
+              ep.tracks.map((track) => (
                 <li
                   key={track.id}
                   className="flex justify-between items-center border border-gray-400 p-3 rounded hover:bg-gray-50"
@@ -335,7 +329,7 @@ export default function DetailsPage() {
                 </li>
               ))
             ) : (
-              <p className="text-gray-500">Aucun morceau pour cet album.</p>
+              <p className="text-gray-500">Aucun morceau pour cet ep.</p>
             )}
           </ul>
 
