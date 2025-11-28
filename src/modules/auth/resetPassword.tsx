@@ -6,7 +6,7 @@ import Header from "../layouts/header";
 import { wait } from "@/@disktro/utils";
 import CustomAlert from "@/@disktro/CustomAlert";
 import CustomSuccess from "@/@disktro/CustomSuccess";
-import { MediaModuleObject as ModuleObject } from "../module";
+import { UserModuleObject as ModuleObject } from "../module";
 import Loader from "@/@disktro/Loader";
 
 export default function ResetPasswordForm() {
