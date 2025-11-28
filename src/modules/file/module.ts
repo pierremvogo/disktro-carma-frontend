@@ -18,9 +18,10 @@ interface API_URLS {
 }
 
 const API_URLS: API_URLS = {
-  DOWNLOAD_AUDIO_FILE: `${BASE_API_URL}/download/audio/:file`,
-  DOWNLOAD_VIDEO_FILE: `${BASE_API_URL}/download/video/:file`,
-  DOWNLOAD_IMAGE_FILE: `${BASE_API_URL}/download/image/:file`,
+  DOWNLOAD_AUDIO_FILE: `${BASE_API_URL}/download/audio`,
+  DOWNLOAD_VIDEO_FILE: `${BASE_API_URL}/download/video`,
+  DOWNLOAD_IMAGE_FILE: `${BASE_API_URL}/download/image`,
+
   UPLOAD_AUDIO_FILE: `${BASE_API_URL}/upload/audio`,
   UPLOAD_VIDEO_FILE: `${BASE_API_URL}/upload/video`,
   UPLOAD_IMAGE_FILE: `${BASE_API_URL}/upload/image`,
@@ -28,33 +29,42 @@ const API_URLS: API_URLS = {
 
 class ServiceObject {
   static downloadAudioFile = async (
-    file: string,
+    cloudinaryUrl: string,
     token: string
   ): Promise<Blob> => {
-    const url = formatURL(API_URLS.DOWNLOAD_AUDIO_FILE, { file });
+    const url = `${API_URLS.DOWNLOAD_AUDIO_FILE}?url=${encodeURIComponent(
+      cloudinaryUrl
+    )}`;
+
     const response = await fetch(url, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
+
     if (!response.ok) {
       throw new Error("Erreur lors du téléchargement du fichier audio.");
     }
+
     return await response.blob();
   };
 
   static downloadVideoFile = async (
-    file: string,
+    cloudinaryUrl: string,
     token: string
   ): Promise<Blob> => {
-    const url = formatURL(API_URLS.DOWNLOAD_VIDEO_FILE, { file });
+    const url = `${API_URLS.DOWNLOAD_VIDEO_FILE}?url=${encodeURIComponent(
+      cloudinaryUrl
+    )}`;
+
     const response = await fetch(url, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
+
     if (!response.ok) {
       throw new Error("Erreur lors du téléchargement du fichier vidéo.");
     }
@@ -63,19 +73,24 @@ class ServiceObject {
   };
 
   static downloadImageFile = async (
-    file: string,
+    cloudinaryUrl: string,
     token: string
   ): Promise<Blob> => {
-    const url = formatURL(API_URLS.DOWNLOAD_IMAGE_FILE, { file });
+    const url = `${API_URLS.DOWNLOAD_IMAGE_FILE}?url=${encodeURIComponent(
+      cloudinaryUrl
+    )}`;
+
     const response = await fetch(url, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
+
     if (!response.ok) {
       throw new Error("Erreur lors du téléchargement de l'image.");
     }
+
     return await response.blob();
   };
 

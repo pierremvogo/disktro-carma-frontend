@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: disktro-frontend
+    env: node
+    region: frankfurt # ou autre région Render
+    plan: free # ou "starter"
+    buildCommand: "npm install --frozen-lockfile && pnpm build"
+    startCommand: "npm start"
+    envVars:
+      NODE_VERSION: 20
+      NEXT_SHARP_PATH: "/tmp/node_modules/sharp"

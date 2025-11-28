@@ -14,7 +14,8 @@ interface API_URLS {
   CREATE_ALBUM_TAG: string;
   GET_ALBUM: string;
   GET_ALBUMS: string;
-  GET_ALBUM_BY_ARTIST: string;
+  GET_TAG_BY_ALBUM: string;
+  GET_ALBUM_BY_USER: string;
   UPDATE_ALBUM: string;
   DELETE_ALBUM: string;
 }
@@ -24,8 +25,9 @@ const API_URLS: API_URLS = {
   GET_ALBUM: `${BASE_API_URL}/album/getById/:id`,
   ADD_ALBUM_TO_ARTIST: `${BASE_API_URL}/albumArtist/create/:artistId/:albumId`,
   CREATE_ALBUM_TAG: `${BASE_API_URL}/albumTag/create/:tagId/:albumId`,
+  GET_TAG_BY_ALBUM: `${BASE_API_URL}/albumTag/get/albumId/:albumId`,
   GET_ALBUMS: `${BASE_API_URL}/album/getAll`,
-  GET_ALBUM_BY_ARTIST: `${BASE_API_URL}/album/getByArtist/:id`,
+  GET_ALBUM_BY_USER: `${BASE_API_URL}/album/getByUser/:id`,
   UPDATE_ALBUM: `${BASE_API_URL}/album/:id`,
   DELETE_ALBUM: `${BASE_API_URL}/album/:id`,
 } as const;
@@ -56,9 +58,14 @@ class ServiceObject {
     return BaseMethods.getRequest(API_URLS.GET_ALBUMS, true, {}, token);
   };
 
-  static getAlbumByArtist = (id: string): Promise<any> => {
-    const url = formatURL(API_URLS.GET_ALBUM_BY_ARTIST, { id });
-    return BaseMethods.getRequest(url, true);
+  static getAlbumByUser = (id: string, token: string): Promise<any> => {
+    const url = formatURL(API_URLS.GET_ALBUM_BY_USER, { id });
+    return BaseMethods.getRequest(url, true, {}, token);
+  };
+
+  static getTagByAlbum = (id: string, token: string): Promise<any> => {
+    const url = formatURL(API_URLS.GET_ALBUM_BY_USER, { id });
+    return BaseMethods.getRequest(url, true, {}, token);
   };
 
   static updateAlbum = (id: string, info: any): Promise<any> => {

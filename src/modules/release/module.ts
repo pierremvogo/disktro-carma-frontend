@@ -25,21 +25,25 @@ const API_URLS: API_URLS = {
 } as const;
 
 class ServiceObject {
-  static createRelease = (info: any): Promise<any> =>
-    BaseMethods.postRequest(API_URLS.CREATE_RELEASE, info, true);
+  static createRelease = (info: any, token: string): Promise<any> =>
+    BaseMethods.postRequest(API_URLS.CREATE_RELEASE, info, true, {}, token);
 
-  static getRelease = (id: string): Promise<any> => {
+  static getRelease = (id: string, token: string): Promise<any> => {
     const url = formatURL(API_URLS.GET_RELEASE, { id });
-    return BaseMethods.getRequest(url, true);
+    return BaseMethods.getRequest(url, true, {}, token);
   };
 
-  static getReleases = (): Promise<any> => {
-    return BaseMethods.getRequest(API_URLS.GET_RELEASES, true);
+  static getReleases = (token: string): Promise<any> => {
+    return BaseMethods.getRequest(API_URLS.GET_RELEASES, true, {}, token);
   };
 
-  static updateRelease = (id: string, info: any): Promise<any> => {
+  static updateRelease = (
+    id: string,
+    info: any,
+    token: string
+  ): Promise<any> => {
     const url = formatURL(API_URLS.UPDATE_RELEASE, { id });
-    return BaseMethods.postRequest(url, info, true);
+    return BaseMethods.postRequest(url, info, true, {}, token);
   };
 
   static deleteRelease = (id: string): Promise<any> => {

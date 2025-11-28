@@ -92,12 +92,11 @@ export default function ProfileSettings() {
     formData.append("file", file);
     try {
       const res = await ModuleObject.service.uploadImageFile(formData, token!);
-      if (res && res.fileName) {
-        const imageObjectUrl = await getImageFile(res.fileName, token!);
-        setFormData((prev) => ({ ...prev, profileImageUrl: imageObjectUrl }));
+      if (res && res.url) {
+        setFormData((prev) => ({ ...prev, profileImageUrl: res.url }));
         setSuccessMessage("Image uploadée avec succès.");
         await UserModule.service.updateUser(userId!, {
-          profileImageUrl: res.fileName,
+          profileImageUrl: res.url,
         });
         setSuccess(true);
         setIsLoading(false);
@@ -215,7 +214,7 @@ export default function ProfileSettings() {
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="px-4 py-2 bg-gray-100 border rounded hover:bg-gray-200"
+                  className="px-4 py-2 bg-gray-100 border rounded cursor-pointer border-gray-400 hover:bg-gray-200"
                 >
                   {previewUrl
                     ? "Modifier la photo du profil"

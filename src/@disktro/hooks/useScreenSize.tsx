@@ -1,13 +1,25 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const useScreenSize = () => {
-  const [isMobileScreen, setIsMobileScreen] = useState(
-    window.matchMedia("(max-width: 767px)").matches
-  );
-  window.addEventListener("resize", () => {
-    setIsMobileScreen(window.matchMedia("(max-width: 767px)").matches);
-  });
+  const [isMobileScreen, setIsMobileScreen] = useState(false);
+
+  useEffect(() => {
+    // Cette partie ne s'exécute que côté client
+    const mediaQuery = window.matchMedia("(max-width: 767px)");
+
+    // Fonction de mise à jour
+    const handleResize = () => setIsMobileScreen(mediaQuery.matches);
+
+    // Initialisation
+    handleResize();
+
+    // Écoute des changements
+    mediaQuery.addEventListener("change", handleResize);
+
+    // Nettoyage à la destruction du composant
+    return () => mediaQuery.removeEventListener("change", handleResize);
+  }, []);
 
   return { isMobileScreen };
 };

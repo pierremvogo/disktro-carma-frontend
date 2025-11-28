@@ -20,7 +20,7 @@ import Footer from "../layouts/footer";
 import { PlaylistModuleObject as PlaylistModule } from "./module";
 import { TrackModuleObject as TrackModule } from "../track/module";
 import { MediaModuleObject as MediaModule } from "../file/module";
-import { getAudioFile, getImageFile } from "@/@disktro/utils";
+import { getAudioFile, getImageFile, getUserRole } from "@/@disktro/utils";
 import CustomAlert from "@/@disktro/CustomAlert";
 import CustomSuccess from "@/@disktro/CustomSuccess";
 
@@ -64,7 +64,7 @@ export default function MyPlaylist() {
 
   // --- Au montage ---
   useEffect(() => {
-    const role = localStorage.getItem(PlaylistModule.localState.USER_ROLE);
+    const role = getUserRole();
     const userId = localStorage.getItem(PlaylistModule.localState.USER_ID);
     setUserRole(role || "user");
     fetchTracks();
@@ -99,24 +99,17 @@ export default function MyPlaylist() {
       if (playlists.length === 0) {
         throw new Error("Aucune playlist trouvée pour cet utilisateur.");
       }
-
       const data = playlists[0]; // on prend la première playlist
-
-      const coverImageUrl = data.coverUrl
-        ? await getImageFile(data.coverUrl, token!)
-        : "/image/playlist.jpg";
-
+      const coverImageUrl = "/image/playlist.jpg";
       const tracksWithAudio = await Promise.all(
         (data.tracks || []).map(async (t: any) => {
           const audioUrl = await getAudioFile(t.audioUrl, token!);
-          return { ...t, audioUrl };
+          if (audioUrl) return { ...t, audioUrl };
         })
       );
-
       setPlaylist({ ...data, coverImageUrl, tracks: tracksWithAudio });
-    } catch (err) {
-      console.error("Erreur récupération playlist :", err);
-      setErrorMessage("Impossible de charger la playlist.");
+    } catch (error) {
+      setErrorMessage((error as Error).message);
       setPlaylist(null);
     } finally {
       setIsLoading(false);
@@ -130,8 +123,8 @@ export default function MyPlaylist() {
       );
       const res = await TrackModule.service.getTracks(token!);
       setTracks(res.data);
-    } catch (err) {
-      console.error("Erreur récupération tracks :", err);
+    } catch (error) {
+      setErrorMessage((error as Error).message);
     }
   }
 
@@ -164,9 +157,8 @@ export default function MyPlaylist() {
       setPlaylist(res.data);
       setNewPlaylistName("");
       setSuccessMessage("Playlist créée avec succès !");
-    } catch (err) {
-      console.error("Erreur création playlist :", err);
-      setErrorMessage("Impossible de créer la playlist.");
+    } catch (error) {
+      setErrorMessage((error as Error).message);
     } finally {
       setIsLoading(false);
     }
@@ -194,20 +186,16 @@ export default function MyPlaylist() {
     e.preventDefault();
     setErrorMessage("");
     setSuccessMessage("");
-
     if (!playlist?.id) {
       setErrorMessage("Aucune playlist sélectionnée.");
       return;
     }
-
     const token = localStorage.getItem(PlaylistModule.localState.ACCESS_TOKEN);
     const userRole = localStorage.getItem(PlaylistModule.localState.USER_ROLE);
     if (!token) return;
-
     try {
       setIsLoading(true);
       let trackIdToAdd = selectedTrackId;
-
       // Si ARTIST → peut créer un nouveau morceau
       if (userRole === "artist" && file && trackTitle) {
         const formData = new FormData();
@@ -216,7 +204,6 @@ export default function MyPlaylist() {
           formData,
           token
         );
-
         const newTrack = {
           title: trackTitle,
           audioUrl: uploadRes.fileName,
@@ -227,25 +214,21 @@ export default function MyPlaylist() {
         );
         trackIdToAdd = createdTrack.data.id;
       }
-
-      if (!trackIdToAdd) {
+      if (!trackIdToAdd && !file) {
         setErrorMessage("Veuillez sélectionner ou créer un morceau.");
         return;
       }
-
       await PlaylistModule.service.addTrackToPlaylist(
         playlist.id,
         trackIdToAdd
       );
-
       setTrackTitle("");
       setFile(null);
       setSelectedTrackId("");
       setSuccessMessage("Morceau ajouté à la playlist !");
       fetchPlaylistDetails();
     } catch (error) {
-      console.error("Erreur ajout track :", error);
-      setErrorMessage("Erreur lors de l’ajout du morceau.");
+      setErrorMessage((error as Error).message);
     } finally {
       setIsLoading(false);
     }
@@ -262,8 +245,7 @@ export default function MyPlaylist() {
       setSuccessMessage("Morceau supprimé !");
       fetchPlaylistDetails();
     } catch (error) {
-      console.error("Erreur suppression track :", error);
-      setErrorMessage("Erreur lors de la suppression.");
+      setErrorMessage((error as Error).message);
     }
   }
 
@@ -300,16 +282,7 @@ export default function MyPlaylist() {
                   onChange={(e) => setNewPlaylistName(e.target.value)}
                   className="border rounded px-3 py-2 w-64"
                 />
-                {errorMessage && (
-                  <div className="mt-4">
-                    <CustomAlert message={errorMessage} />
-                  </div>
-                )}
-                {successMessage && (
-                  <div className="mt-4">
-                    <CustomSuccess message={successMessage} />
-                  </div>
-                )}
+
                 {isLoading && (
                   <div className="flex justify-center p-10 items-center text-gray-600">
                     <Loader className="animate-spin mr-2" /> Chargement...
@@ -410,7 +383,7 @@ export default function MyPlaylist() {
                 </select>
 
                 {/* Si ARTIST → possibilité d’ajouter un nouveau morceau */}
-                {userRole === "artist" && (
+                {/* {userRole === "artist" && (
                   <>
                     <div className="border-t pt-4 mt-4">
                       <h4 className="text-lg font-semibold text-[#1F89A5] mb-2">
@@ -433,7 +406,7 @@ export default function MyPlaylist() {
                       />
                     </div>
                   </>
-                )}
+                )} */}
 
                 {errorMessage && <CustomAlert message={errorMessage} />}
                 {successMessage && <CustomSuccess message={successMessage} />}

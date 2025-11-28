@@ -64,7 +64,7 @@ export default function PricingPage() {
                     </li>
                   ))}
                 </ul>
-                <button className="w-full bg-[#1F89A5] text-white text-sm py-2 px-4 rounded hover:bg-[#1A4C61] transition">
+                <button className="w-full cursor-pointer bg-[#1F89A5] text-white text-sm py-2 px-4 rounded hover:bg-[#1A4C61] transition">
                   Choisir ce plan
                 </button>
               </div>
