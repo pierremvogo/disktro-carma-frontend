@@ -63,8 +63,16 @@ export default function ResetPasswordForm({
             </h2>
 
             {success ? (
-              <p className="text-green-600 text-center font-medium">
-                ✅ Your password has been reset. You can now log in.
+              <p className="text-black text-center font-medium">
+                ✅ Your password has been reset successfully. <br />
+                You can now{" "}
+                <a
+                  href="/auth/login"
+                  className="text-green-600 hover:text-green-900"
+                >
+                  log in
+                </a>
+                .
               </p>
             ) : (
               <>
