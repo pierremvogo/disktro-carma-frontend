@@ -89,7 +89,7 @@ export default function ForgotPasswordForm() {
         <Header />
         <div className="flex-1 flex items-center justify-center px-4">
           <div className="max-w-md mx-auto p-8 bg-white/60 backdrop-blur-md rounded-3xl shadow-lg mt-12">
-            <h2 className="text-3xl font-bold text-center text-purple-700 mb-6">
+            <h2 className="text-3xl font-bold text-center text-[#1F89A5] mb-6">
               🔁 Forgot Password
             </h2>
 
@@ -103,7 +103,7 @@ export default function ForgotPasswordForm() {
                 {resendAvailable ? (
                   <button
                     onClick={handleResend}
-                    className=" cursor-pointer text-purple-600 font-semibold underline hover:text-purple-800"
+                    className=" cursor-pointer text-[#1F89A5] font-semibold underline hover:text-[#1A4C61]"
                   >
                     Didn’t receive the email? Resend it
                   </button>
@@ -127,7 +127,7 @@ export default function ForgotPasswordForm() {
                 <button
                   disabled={isLoading}
                   type="submit"
-                  className="w-full cursor-pointer bg-purple-600 text-white py-2 rounded-md hover:bg-purple-700 transition flex items-center justify-center gap-2"
+                  className="w-full cursor-pointer text-[#1F89A5] py-2 rounded-md hover:bg-[#1A4C61] transition flex items-center justify-center gap-2"
                 >
                   {isLoading ? <Loader /> : "Send reset link"}
                 </button>
