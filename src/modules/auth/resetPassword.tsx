@@ -8,10 +8,13 @@ import CustomAlert from "@/@disktro/CustomAlert";
 import CustomSuccess from "@/@disktro/CustomSuccess";
 import { UserModuleObject as ModuleObject } from "../module";
 import Loader from "@/@disktro/Loader";
-import { useSearchParams } from "next/navigation";
-
-export default function ResetPasswordForm() {
-  const [token, setToken] = useState("");
+interface ResetPasswordFormProps {
+  initialToken?: string;
+}
+export default function ResetPasswordForm({
+  initialToken = "",
+}: ResetPasswordFormProps) {
+  const [token, setToken] = useState(initialToken);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
@@ -19,14 +22,6 @@ export default function ResetPasswordForm() {
   const [success, setSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const searchParams = useSearchParams();
-  const tokenFromURL = searchParams.get("token") || "";
-
-  useEffect(() => {
-    if (tokenFromURL) {
-      setToken(tokenFromURL);
-    }
-  }, [tokenFromURL]);
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
