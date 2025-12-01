@@ -1,4 +1,4 @@
-import { ScreenEmbed } from "@/modules/screenEmbed/screenEmbed";
+import { ScreenEmbed } from "@/modules/components/screenEmbed";
 import React from "react";
 
 const page = () => {

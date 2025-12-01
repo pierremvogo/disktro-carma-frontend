@@ -5,7 +5,7 @@ interface Props {
 }
 const CustomAlert = ({ message }: Props) => {
   return (
-    <div className="p-3 px-2 bg-red-100 rounded-xs my-4 italic text-red-500 text-center">
+    <div className="bg-red-500/20 border text-center border-red-500/40 rounded-lg p-3 text-white text-sm">
       {message}
     </div>
   );

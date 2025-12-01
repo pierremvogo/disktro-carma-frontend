@@ -1,19 +1,25 @@
 export default function Footer() {
   return (
-    <footer className="mt-12 bg-white/50 backdrop-blur-md shadow-inner rounded-t-3xl px-6 py-4 text-center text-sm text-[#1A4C61]">
-      {" "}
-      <p>© {new Date().getFullYear()} Cosmic. All rights reserved.</p>{" "}
-      <div className="mt-2 space-x-4">
-        {" "}
-        {/* <a href="/legal" className="underline hover:text-purple-600">
-          {" "}
-          Mentions légales{" "}
-        </a>{" "}
-        <a href="/contact" className="underline hover:text-purple-600">
-          {" "}
-          Contact{" "}
-        </a>{" "} */}
-      </div>{" "}
+    <footer
+      className="
+        fixed
+        bottom-0
+        left-0
+        right-0
+        bg-black/50
+        backdrop-blur-xl
+        border-t border-white/20
+        px-6 py-4
+        text-center
+        text-sm
+        text-white/70
+        rounded-t-3xl
+        z-40
+      "
+    >
+      <p className="drop-shadow-sm">
+        © {new Date().getFullYear()} Music for all. All rights reserved.
+      </p>
     </footer>
   );
 }
