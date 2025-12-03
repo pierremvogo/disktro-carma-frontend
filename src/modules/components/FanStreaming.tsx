@@ -1022,59 +1022,84 @@ Underneath the shining star`,
             </button>
           </div>
         </div>
-
         {/* Tab Navigation */}
-        <div className="flex items-center justify-center gap-8 px-6 pb-4">
-          <button
-            onClick={() => setSelectedTab("discover")}
-            className={`text-white drop-shadow transition-all  cursor-pointer ${
-              selectedTab === "discover"
-                ? "opacity-100 border-b-2 border-white pb-1"
-                : "opacity-60 hover:opacity-80"
-            }`}
-          >
-            {text.discover}
-          </button>
-          <button
-            onClick={() => setSelectedTab("artists")}
-            className={`text-white  cursor-pointer drop-shadow transition-all ${
-              selectedTab === "artists"
-                ? "opacity-100 border-b-2 border-white pb-1"
-                : "opacity-60 hover:opacity-80"
-            }`}
-          >
-            {text.artists}
-          </button>
-          <button
-            onClick={() => setSelectedTab("mymusic")}
-            className={`text-white  cursor-pointer drop-shadow transition-all ${
-              selectedTab === "mymusic"
-                ? "opacity-100 border-b-2 border-white pb-1"
-                : "opacity-60 hover:opacity-80"
-            }`}
-          >
-            {text.myMusic}
-          </button>
-          <button
-            onClick={() => setSelectedTab("editorplaylists")}
-            className={`text-white drop-shadow  cursor-pointer transition-all ${
-              selectedTab === "editorplaylists"
-                ? "opacity-100 border-b-2 border-white pb-1"
-                : "opacity-60 hover:opacity-80"
-            }`}
-          >
-            {text.editorPlaylists}
-          </button>
-          <button
-            onClick={() => setSelectedTab("dashboard")}
-            className={`text-white drop-shadow  cursor-pointer transition-all ${
-              selectedTab === "dashboard"
-                ? "opacity-100 border-b-2 border-white pb-1"
-                : "opacity-60 hover:opacity-80"
-            }`}
-          >
-            {text.dashboard}
-          </button>
+        <div className="w-full overflow-x-auto">
+          <div className="flex flex-nowrap items-center justify-start sm:justify-center gap-4 sm:gap-8 px-4 sm:px-6 pb-3 sm:pb-4">
+            <button
+              onClick={() => setSelectedTab("discover")}
+              className={`
+        flex-shrink-0 text-sm sm:text-base text-white drop-shadow cursor-pointer 
+        pb-2 border-b-2 transition-colors
+        ${
+          selectedTab === "discover"
+            ? "border-white opacity-100"
+            : "border-transparent opacity-60 hover:opacity-80"
+        }
+      `}
+            >
+              {text.discover}
+            </button>
+
+            <button
+              onClick={() => setSelectedTab("artists")}
+              className={`
+        flex-shrink-0 text-sm sm:text-base text-white drop-shadow cursor-pointer 
+        pb-2 border-b-2 transition-colors
+        ${
+          selectedTab === "artists"
+            ? "border-white opacity-100"
+            : "border-transparent opacity-60 hover:opacity-80"
+        }
+      `}
+            >
+              {text.artists}
+            </button>
+
+            <button
+              onClick={() => setSelectedTab("mymusic")}
+              className={`
+        flex-shrink-0 text-sm sm:text-base text-white drop-shadow cursor-pointer 
+        pb-2 border-b-2 transition-colors
+        ${
+          selectedTab === "mymusic"
+            ? "border-white opacity-100"
+            : "border-transparent opacity-60 hover:opacity-80"
+        }
+      `}
+            >
+              {text.myMusic}
+            </button>
+
+            <button
+              onClick={() => setSelectedTab("editorplaylists")}
+              className={`
+        flex-shrink-0 text-sm sm:text-base text-white drop-shadow cursor-pointer 
+        pb-2 border-b-2 transition-colors
+        ${
+          selectedTab === "editorplaylists"
+            ? "border-white opacity-100"
+            : "border-transparent opacity-60 hover:opacity-80"
+        }
+      `}
+            >
+              {text.editorPlaylists}
+            </button>
+
+            <button
+              onClick={() => setSelectedTab("dashboard")}
+              className={`
+        flex-shrink-0 text-sm sm:text-base text-white drop-shadow cursor-pointer 
+        pb-2 border-b-2 transition-colors
+        ${
+          selectedTab === "dashboard"
+            ? "border-white opacity-100"
+            : "border-transparent opacity-60 hover:opacity-80"
+        }
+      `}
+            >
+              {text.dashboard}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -2770,144 +2795,145 @@ Underneath the shining star`,
 
       {/* Lyrics Panel */}
       {showLyrics && currentSong && (
-        <div className="absolute bottom-32 right-6 w-96 bg-black/60 backdrop-blur-xl rounded-2xl border border-white/20 overflow-hidden z-30">
-          <div className="p-4 border-b border-white/10 flex items-center justify-between">
-            <h3 className="text-white drop-shadow text-sm">
-              {text.lyrics} - {currentSong.title}
-            </h3>
-            <button
-              onClick={() => setShowLyrics(false)}
-              className="text-white/60 hover:text-white transition-colors"
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <line x1="18" y1="6" x2="6" y2="18" />
-                <line x1="6" y1="6" x2="18" y2="18" />
-              </svg>
-            </button>
-          </div>
-
-          {/* Toggle between Text and Sign Language */}
-          {currentSong.signLanguageVideo && (
-            <div className="flex p-2 border-b border-white/10 gap-2">
+        <div className="fixed inset-x-0 bottom-24 sm:bottom-28 z-30 px-3 sm:px-4 md:px-6">
+          <div className="mx-auto w-full max-w-md sm:max-w-lg bg-black/70 backdrop-blur-xl rounded-2xl border border-white/20 overflow-hidden shadow-2xl">
+            {/* Header */}
+            <div className="p-3 sm:p-4 border-b border-white/10 flex items-center justify-between gap-2">
+              <h3 className="text-white drop-shadow text-xs sm:text-sm line-clamp-2">
+                {text.lyrics} - {currentSong.title}
+              </h3>
               <button
-                onClick={() => setLyricsViewMode("text")}
-                className={`flex-1 py-2 px-3 rounded-lg text-sm transition-all ${
-                  lyricsViewMode === "text"
-                    ? "bg-white/20 text-white"
-                    : "text-white/60 hover:bg-white/10"
-                }`}
-              >
-                <FileText size={16} className="inline mr-2" />
-                {text.textLyrics}
-              </button>
-              <button
-                onClick={() => setLyricsViewMode("sign")}
-                className={`flex-1 py-2 px-3 rounded-lg text-sm transition-all ${
-                  lyricsViewMode === "sign"
-                    ? "bg-white/20 text-white"
-                    : "text-white/60 hover:bg-white/10"
-                }`}
+                onClick={() => setShowLyrics(false)}
+                className="text-white/60 hover:text-white transition-colors flex-shrink-0"
               >
                 <svg
-                  width="16"
-                  height="16"
+                  width="18"
+                  height="18"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="2"
-                  className="inline mr-2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 >
-                  <path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0" />
-                  <path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2" />
-                  <path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8" />
-                  <path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15" />
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
                 </svg>
-                {text.signLanguage}
               </button>
             </div>
-          )}
 
-          {/* Content Area */}
-          <div className="p-6 overflow-y-auto max-h-80">
-            {lyricsViewMode === "text" ? (
-              // Text Lyrics
-              <div className="text-white/80 text-sm leading-relaxed space-y-4">
-                {currentSong.lyrics ? (
-                  currentSong.lyrics
-                    .split("\n\n")
-                    .map((paragraph: string, idx: number) => (
-                      <p key={idx}>
-                        {paragraph
-                          .split("\n")
-                          .map((line: string, lineIdx: number) => (
-                            <React.Fragment key={lineIdx}>
-                              {line}
-                              {lineIdx < paragraph.split("\n").length - 1 && (
-                                <br />
-                              )}
-                            </React.Fragment>
-                          ))}
-                      </p>
-                    ))
-                ) : (
-                  <p className="text-white/50 italic">
-                    {language === "spanish" &&
-                      "No hay letras disponibles para esta canción"}
-                    {language === "english" &&
-                      "No lyrics available for this song"}
-                    {language === "catalan" &&
-                      "No hi ha lletres disponibles per aquesta cançó"}
-                  </p>
-                )}
-                <p className="text-white/40 text-xs italic mt-6">
-                  {language === "spanish" &&
-                    "Las letras se proporcionan solo con fines educativos"}
-                  {language === "english" &&
-                    "Lyrics provided for educational purposes only"}
-                  {language === "catalan" &&
-                    "Les lletres es proporcionen només amb finalitats educatives"}
-                </p>
-              </div>
-            ) : (
-              // Sign Language Video
-              <div>
-                {currentSong.signLanguageVideo ? (
-                  <div className="relative aspect-video rounded-lg overflow-hidden bg-black border border-white/20">
-                    <video
-                      src={currentSong.signLanguageVideo}
-                      controls
-                      className="w-full h-full object-contain"
-                    />
-                  </div>
-                ) : (
-                  <p className="text-white/50 italic text-sm text-center py-8">
-                    {language === "spanish" &&
-                      "No hay video en lenguaje de signos disponible"}
-                    {language === "english" &&
-                      "No sign language video available"}
-                    {language === "catalan" &&
-                      "No hi ha vídeo en llengua de signes disponible"}
-                  </p>
-                )}
-                <p className="text-white/40 text-xs italic mt-4">
-                  {language === "spanish" &&
-                    "Video en lenguaje de signos proporcionado por el artista"}
-                  {language === "english" &&
-                    "Sign language video provided by the artist"}
-                  {language === "catalan" &&
-                    "Vídeo en llengua de signes proporcionat per l'artista"}
-                </p>
+            {/* Toggle between Text and Sign Language */}
+            {currentSong.signLanguageVideo && (
+              <div className="flex p-2 border-b border-white/10 gap-2">
+                <button
+                  onClick={() => setLyricsViewMode("text")}
+                  className={`flex-1 py-1.5 sm:py-2 px-2 sm:px-3 rounded-lg text-xs sm:text-sm transition-all ${
+                    lyricsViewMode === "text"
+                      ? "bg-white/20 text-white"
+                      : "text-white/60 hover:bg-white/10"
+                  }`}
+                >
+                  <FileText size={14} className="inline mr-1 sm:mr-2" />
+                  {text.textLyrics}
+                </button>
+                <button
+                  onClick={() => setLyricsViewMode("sign")}
+                  className={`flex-1 py-1.5 sm:py-2 px-2 sm:px-3 rounded-lg text-xs sm:text-sm transition-all ${
+                    lyricsViewMode === "sign"
+                      ? "bg-white/20 text-white"
+                      : "text-white/60 hover:bg-white/10"
+                  }`}
+                >
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    className="inline mr-1 sm:mr-2"
+                  >
+                    <path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0" />
+                    <path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2" />
+                    <path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8" />
+                    <path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15" />
+                  </svg>
+                  {text.signLanguage}
+                </button>
               </div>
             )}
+
+            {/* Content Area */}
+            <div className="p-4 sm:p-6 overflow-y-auto max-h-[55vh] sm:max-h-[60vh]">
+              {lyricsViewMode === "text" ? (
+                // Text Lyrics
+                <div className="text-white/80 text-xs sm:text-sm leading-relaxed space-y-3 sm:space-y-4">
+                  {currentSong.lyrics ? (
+                    currentSong.lyrics
+                      .split("\n\n")
+                      .map((paragraph: string, idx: number) => (
+                        <p key={idx}>
+                          {paragraph
+                            .split("\n")
+                            .map((line: string, lineIdx: number, arr) => (
+                              <React.Fragment key={lineIdx}>
+                                {line}
+                                {lineIdx < arr.length - 1 && <br />}
+                              </React.Fragment>
+                            ))}
+                        </p>
+                      ))
+                  ) : (
+                    <p className="text-white/50 italic text-center">
+                      {language === "spanish" &&
+                        "No hay letras disponibles para esta canción"}
+                      {language === "english" &&
+                        "No lyrics available for this song"}
+                      {language === "catalan" &&
+                        "No hi ha lletres disponibles per aquesta cançó"}
+                    </p>
+                  )}
+                  <p className="text-white/40 text-[10px] sm:text-xs italic mt-4 sm:mt-6">
+                    {language === "spanish" &&
+                      "Las letras se proporcionan solo con fines educativos"}
+                    {language === "english" &&
+                      "Lyrics provided for educational purposes only"}
+                    {language === "catalan" &&
+                      "Les lletres es proporcionen només amb finalitats educatives"}
+                  </p>
+                </div>
+              ) : (
+                // Sign Language Video
+                <div>
+                  {currentSong.signLanguageVideo ? (
+                    <div className="relative aspect-video rounded-lg overflow-hidden bg-black border border-white/20">
+                      <video
+                        src={currentSong.signLanguageVideo}
+                        controls
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                  ) : (
+                    <p className="text-white/50 italic text-xs sm:text-sm text-center py-6 sm:py-8">
+                      {language === "spanish" &&
+                        "No hay video en lenguaje de signos disponible"}
+                      {language === "english" &&
+                        "No sign language video available"}
+                      {language === "catalan" &&
+                        "No hi ha vídeo en llengua de signes disponible"}
+                    </p>
+                  )}
+                  <p className="text-white/40 text-[10px] sm:text-xs italic mt-3 sm:mt-4">
+                    {language === "spanish" &&
+                      "Video en lenguaje de signos proporcionado por el artista"}
+                    {language === "english" &&
+                      "Sign language video provided by the artist"}
+                    {language === "catalan" &&
+                      "Vídeo en llengua de signes proporcionat per l'artista"}
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
@@ -2915,59 +2941,71 @@ Underneath the shining star`,
       {/* Player Bar */}
       {currentSong && (
         <div className="absolute bottom-0 left-0 right-0 z-20 bg-black/40 backdrop-blur-xl border-t border-white/10">
-          <div className="flex items-center justify-between p-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-6 p-3 sm:p-4 md:p-6">
             {/* Song Info */}
-            <div className="flex items-center gap-4 flex-1">
-              <div className="w-16 h-16 bg-white/5 rounded-lg overflow-hidden">
+            <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0 order-1 md:order-none">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white/5 rounded-lg overflow-hidden flex-shrink-0">
                 <img
                   src={currentSong.cover}
                   alt={currentSong.title}
                   className="w-full h-full object-cover"
                 />
               </div>
-              <div>
-                <h4 className="text-white drop-shadow">{currentSong.title}</h4>
-                <p className="text-white/60 text-sm">{currentSong.artist}</p>
+              <div className="min-w-0">
+                <h4 className="text-white drop-shadow text-sm sm:text-base truncate">
+                  {currentSong.title}
+                </h4>
+                <p className="text-white/60 text-xs sm:text-sm truncate">
+                  {currentSong.artist}
+                </p>
               </div>
             </div>
 
             {/* Player Controls */}
-            <div className="flex items-center gap-6">
+            <div className="flex items-center justify-center gap-4 sm:gap-6 order-0 md:order-none">
               <button
                 className={`text-white/80 hover:text-white ${animationClasses} ${buttonSizeClasses}`}
                 aria-label="Previous"
               >
-                <SkipBack size={largerTargets ? 32 : 24} />
+                <SkipBack size={largerTargets ? 32 : 22} />
               </button>
               <button
                 onClick={() => setIsPlaying(!isPlaying)}
-                className={`p-4 bg-white/20 backdrop-blur-sm rounded-full hover:bg-white/30 ${animationClasses} ${buttonSizeClasses}`}
+                className={`
+            ${buttonSizeClasses}
+            ${animationClasses}
+            flex items-center justify-center
+            p-3 sm:p-4 
+            bg-white/20 backdrop-blur-sm 
+            rounded-full hover:bg-white/30
+          `}
                 aria-label={isPlaying ? text.pause : text.play}
               >
                 {isPlaying ? (
                   <Pause
-                    size={largerTargets ? 36 : 28}
+                    size={largerTargets ? 36 : 26}
                     className="text-white"
                   />
                 ) : (
-                  <Play size={largerTargets ? 36 : 28} className="text-white" />
+                  <Play size={largerTargets ? 36 : 26} className="text-white" />
                 )}
               </button>
               <button
                 className={`text-white/80 hover:text-white ${animationClasses} ${buttonSizeClasses}`}
                 aria-label="Next"
               >
-                <SkipForward size={largerTargets ? 32 : 24} />
+                <SkipForward size={largerTargets ? 32 : 22} />
               </button>
             </div>
 
             {/* Volume & Duration */}
-            <div className="flex items-center gap-4 flex-1 justify-end">
-              <span className="text-white/60 text-sm">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 md:gap-4 flex-1 justify-between md:justify-end order-2">
+              <span className="text-white/60 text-xs sm:text-sm">
                 {currentSong.duration}
               </span>
+
               {textToSpeech && (
-                <span className="text-xs bg-white/20 px-2 py-1 rounded text-white/80">
+                <span className="text-[10px] sm:text-xs bg-white/20 px-2 py-1 rounded text-white/80 flex items-center gap-1">
                   <svg
                     width="12"
                     height="12"
@@ -2975,7 +3013,7 @@ Underneath the shining star`,
                     fill="none"
                     stroke="currentColor"
                     strokeWidth="2"
-                    className="inline mr-1"
+                    className="inline-block"
                   >
                     <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
                     <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
@@ -2983,28 +3021,35 @@ Underneath the shining star`,
                   TTS
                 </span>
               )}
-              <button
-                onClick={() => setShowLyrics(!showLyrics)}
-                className={`text-white/80 hover:text-white ${animationClasses} ${
-                  showLyrics ? "text-white" : ""
-                } ${buttonSizeClasses}`}
-                title={text.lyrics}
-                aria-label={text.lyrics}
-              >
-                <FileText size={largerTargets ? 32 : 24} />
-              </button>
-              <button
-                className={`text-white/80 hover:text-white ${animationClasses} ${buttonSizeClasses}`}
-                aria-label="Volume"
-              >
-                <Volume2 size={largerTargets ? 32 : 24} />
-              </button>
-              <button
-                className={`text-white/80 hover:text-white ${animationClasses} ${buttonSizeClasses}`}
-                aria-label={text.addToFavorites}
-              >
-                <Heart size={largerTargets ? 32 : 24} />
-              </button>
+
+              <div className="flex items-center gap-2 sm:gap-3">
+                <button
+                  onClick={() => setShowLyrics(!showLyrics)}
+                  className={`
+              text-white/80 hover:text-white 
+              ${animationClasses} ${buttonSizeClasses}
+              ${showLyrics ? "text-white" : ""}
+            `}
+                  title={text.lyrics}
+                  aria-label={text.lyrics}
+                >
+                  <FileText size={largerTargets ? 28 : 22} />
+                </button>
+
+                <button
+                  className={`text-white/80 hover:text-white ${animationClasses} ${buttonSizeClasses}`}
+                  aria-label="Volume"
+                >
+                  <Volume2 size={largerTargets ? 28 : 22} />
+                </button>
+
+                <button
+                  className={`text-white/80 hover:text-white ${animationClasses} ${buttonSizeClasses}`}
+                  aria-label={text.addToFavorites}
+                >
+                  <Heart size={largerTargets ? 28 : 22} />
+                </button>
+              </div>
             </div>
           </div>
         </div>

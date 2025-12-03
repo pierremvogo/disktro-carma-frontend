@@ -310,14 +310,16 @@ export function Login({
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder={content.passwordPlaceholder}
-                    className="w-full pl-11 pr-12 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-black placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/50"
+                    className="w-full px-4 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-black placeholder-white/40 focus:outline-none focus:ring-2"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-white/60 hover:text-white"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 
+             bg-black/80 p-1.5 rounded-full 
+             text-white hover:text-white cursor-pointer backdrop-blur-sm"
                   >
-                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
               </div>
