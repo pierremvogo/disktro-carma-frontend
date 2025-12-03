@@ -95,13 +95,13 @@ class ServiceObject {
   };
 
   static uploadAudioFile = (file: FormData, token: string): Promise<any> =>
-    BaseMethods.postRequest(API_URLS.UPLOAD_AUDIO_FILE, file, true, {}, token);
+    BaseMethods.postRequest(API_URLS.UPLOAD_AUDIO_FILE, file, true);
 
   static uploadVideoFile = (file: FormData, token: string): Promise<any> =>
-    BaseMethods.postRequest(API_URLS.UPLOAD_VIDEO_FILE, file, true, {}, token);
+    BaseMethods.postRequest(API_URLS.UPLOAD_VIDEO_FILE, file, true, {});
 
   static uploadImageFile = (file: FormData, token: string): Promise<any> =>
-    BaseMethods.postRequest(API_URLS.UPLOAD_IMAGE_FILE, file, true, {}, token);
+    BaseMethods.postRequest(API_URLS.UPLOAD_IMAGE_FILE, file, true, {});
 }
 interface LocalState {
   ACCESS_TOKEN: string;
