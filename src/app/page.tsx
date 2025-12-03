@@ -1,8 +1,5 @@
-import { ScreenEmbed } from "@/modules/components/screenEmbed";
-import React from "react";
+import { redirect } from "next/navigation";
 
-const page = () => {
-  return <ScreenEmbed />;
-};
-
-export default page;
+export default function Page() {
+  return redirect("/home");
+}

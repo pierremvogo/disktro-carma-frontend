@@ -31,8 +31,8 @@ const API_URLS: API_URLS = {
 } as const;
 
 class ServiceObject {
-  static createArtist = (info: any, token: string): Promise<any> =>
-    BaseMethods.postRequest(API_URLS.CREATE_ARTIST, info, true, {}, token);
+  static createArtist = (info: any): Promise<any> =>
+    BaseMethods.postRequest(API_URLS.CREATE_ARTIST, info, true);
 
   static createArtistTag = (tagId: string, artistId: string): Promise<any> => {
     const url = formatURL(API_URLS.CREATE_ARTIST_TAG, { tagId, artistId });
@@ -72,12 +72,14 @@ interface LocalState {
   ACCESS_TOKEN: string;
   USER_ID: string;
   USER_DATA: string;
+  USER_ROLE: string;
 }
 
 const LocalStateObjectKeys: LocalState = {
   ACCESS_TOKEN: "accessToken",
   USER_ID: "userId",
   USER_DATA: "userData",
+  USER_ROLE: "userRole",
 };
 
 class Module {

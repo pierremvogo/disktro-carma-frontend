@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-
+import { ArtistModuleObject as ModuleObject } from "../artist/module";
+import { useRouter } from "next/navigation";
 // Icon components
 const Upload = ({ size = 24, className = "" }) => (
   <svg
@@ -949,28 +950,18 @@ export function ArtistDashboard({
       setUploadedFile(null);
     }
   };
+  const router = useRouter();
+
+  const handleLogout = () => {
+    localStorage.removeItem(ModuleObject.localState.ACCESS_TOKEN);
+    localStorage.removeItem(ModuleObject.localState.USER_ID);
+    localStorage.removeItem(ModuleObject.localState.USER_DATA);
+    localStorage.removeItem(ModuleObject.localState.USER_ROLE);
+    router.push("/home");
+  };
 
   return (
-    <div className="w-full h-full overflow-y-auto p-8">
-      <button
-        onClick={onBack}
-        className="flex items-center gap-2 text-white drop-shadow hover:opacity-70 transition-opacity mb-6"
-      >
-        <svg
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M19 12H5M12 19l-7-7 7-7" />
-        </svg>
-        {text.back}
-      </button>
-
+    <div className="w-full h-full min-h-screen overflow-y-auto p-8 bg-gradient-to-br from-slate-900 via-purple-900 to-black">
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-4xl text-white drop-shadow-lg">{text.title}</h1>
@@ -996,6 +987,12 @@ export function ArtistDashboard({
               {language === "catalan" && "Anar a Plataforma d'Streaming"}
             </button>
           )}
+          <button
+            onClick={handleLogout}
+            className=" cursor-pointer px-5 py-2 bg-red-500/40 backdrop-blur-md border border-red-300/40 rounded-xl text-white shadow-lg hover:bg-red-500/60 hover:border-red-300 transition-all"
+          >
+            Disconnect
+          </button>
         </div>
 
         {/* Tab Navigation */}

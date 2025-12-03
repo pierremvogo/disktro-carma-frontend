@@ -53,8 +53,8 @@ class ServiceObject {
     return BaseMethods.getRequest(url, true);
   };
 
-  static getTags = (token: string): Promise<any> => {
-    return BaseMethods.getRequest(API_URLS.GET_TAGS, true, {}, token);
+  static getTags = (): Promise<any> => {
+    return BaseMethods.getRequest(API_URLS.GET_TAGS, true, {});
   };
 
   static updateTag = (id: string, info: any): Promise<any> => {

@@ -10,10 +10,9 @@ import { ArtistProfileSetup } from "./ArtistProfileSetup";
 import { Login } from "./Login";
 import { ArtistChoice } from "./ArtistChoice";
 
+type Language = "english" | "spanish" | "catalan";
 export function ScreenEmbed() {
-  const [language, setLanguage] = useState<"english" | "spanish" | "catalan">(
-    "english"
-  );
+  const [language, setLanguage] = useState<Language>("english");
   const [showQuestionnaire, setShowQuestionnaire] = useState(false);
   const [showUserType, setShowUserType] = useState(false);
   const [showArtistDashboard, setShowArtistDashboard] = useState(false);
@@ -42,8 +41,7 @@ export function ScreenEmbed() {
     catalan: "Registrar-se",
   };
 
-  // ─────────── ÉCRANS PLEIN ÉCRAN ───────────
-
+  // If showing artist choice screen, render it full screen
   if (showArtistChoice) {
     return (
       <ArtistChoice
@@ -64,10 +62,31 @@ export function ScreenEmbed() {
     );
   }
 
+  // If showing login page, render it full screen
   if (showLogin) {
-    return <Login />;
+    return (
+      <Login
+        onBack={() => setShowLogin(false)}
+        onLoginAsFan={() => {
+          setShowLogin(false);
+          setIsArtist(false);
+          setShowFanStreaming(true);
+        }}
+        onLoginAsArtist={() => {
+          setShowLogin(false);
+          setIsArtist(true);
+          setShowArtistChoice(true);
+        }}
+        language={language}
+        onSignUp={() => {
+          setShowLogin(false);
+          setShowUserType(true);
+        }}
+      />
+    );
   }
 
+  // If showing artist dashboard, render it full screen without the glassmorphic container
   if (showArtistDashboard) {
     return (
       <div className="fixed inset-0 w-screen h-screen">
@@ -86,6 +105,7 @@ export function ScreenEmbed() {
     );
   }
 
+  // If showing fan profile setup, render it full screen
   if (showFanProfileSetup) {
     return (
       <FanProfileSetup
@@ -95,10 +115,15 @@ export function ScreenEmbed() {
           setShowFanStreaming(true);
         }}
         language={language}
+        onSignUp={() => {
+          setShowFanProfileSetup(false);
+          setShowUserType(true);
+        }}
       />
     );
   }
 
+  // If showing artist profile setup, render it full screen
   if (showArtistProfileSetup) {
     return (
       <ArtistProfileSetup
@@ -108,10 +133,15 @@ export function ScreenEmbed() {
           setShowArtistDashboard(true);
         }}
         language={language}
+        onSignUp={() => {
+          setShowArtistProfileSetup(false);
+          setShowUserType(true);
+        }}
       />
     );
   }
 
+  // If showing fan streaming, render it full screen
   if (showFanStreaming) {
     return (
       <div className="fixed inset-0 w-screen h-screen">
@@ -128,41 +158,40 @@ export function ScreenEmbed() {
     );
   }
 
-  // ─────────── ÉCRAN D’ACCUEIL EMBED ───────────
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black/60 px-4 py-10">
-      <div className="w-full max-w-7xl flex flex-col items-center gap-10">
-        {/* Zone de l'écran encadré */}
-        <div className="relative w-full max-w-5xl">
-          {/* Panneaux de fond gauche/droite */}
-          <div className="absolute inset-0 flex justify-between pointer-events-none">
-            <div
-              className="w-56 md:w-64 h-full rounded-3xl overflow-hidden shadow-2xl bg-cover bg-center origin-center"
-              style={{
-                backgroundImage:
-                  'url("/image/4ac3eed398bb68113a14d0fa5efe7a6def6f7651.png")',
-                backgroundPosition: "25% 35%",
-                backgroundSize: "cover",
-                transform: "rotate(90deg)",
-              }}
-            />
-            <div
-              className="w-56 md:w-64 h-full rounded-3xl overflow-hidden shadow-2xl bg-cover bg-center origin-center hidden sm:block"
-              style={{
-                backgroundImage:
-                  'url("/image/4ac3eed398bb68113a14d0fa5efe7a6def6f7651.png")',
-                backgroundPosition: "75% 35%",
-                backgroundSize: "cover",
-                transform: "rotate(90deg)",
-              }}
-            />
-          </div>
+    <div className="min-h-screen flex items-center justify-center p-8 bg-gray-500">
+      <div
+        className="relative h-screen max-h-[900px] w-full max-w-7xl flex flex-col items-center justify-center gap-8"
+        style={{ transform: "translateY(-4rem)" }}
+      >
+        <div className="relative w-full flex items-center justify-center">
+          {/* Left Panel - Left half of background (vertical) */}
+          <div
+            className="absolute left-0 w-64 h-full rounded-3xl overflow-hidden shadow-2xl bg-cover bg-center origin-center"
+            style={{
+              backgroundImage: `url("/image/4ac3eed398bb68113a14d0fa5efe7a6def6f7651.png")`,
+              backgroundPosition: "25% 35%",
+              backgroundSize: "cover",
+              transform: "rotate(90deg)",
+            }}
+          />
 
-          {/* Écran principal au centre */}
-          <div className="relative z-10 mx-auto max-w-4xl">
-            <div className="w-full min-h-[320px] md:min-h-[420px] bg-white/10 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden border border-white/20 flex flex-col">
-              <div className="flex-1 relative bg-gradient-to-br from-purple-500/20 via-pink-500/20 to-blue-500/20 flex items-center justify-center p-6 md:p-8">
+          {/* Right Panel - Right half of background (vertical) */}
+          <div
+            className="absolute right-0 w-64 h-full rounded-3xl overflow-hidden shadow-2xl bg-cover bg-center origin-center"
+            style={{
+              backgroundImage: `url("/image/4ac3eed398bb68113a14d0fa5efe7a6def6f7651.png")`,
+              backgroundPosition: "75% 35%",
+              backgroundSize: "cover",
+              transform: "rotate(90deg)",
+            }}
+          />
+
+          {/* Middle Panel - Screen (in front) */}
+          <div className="relative z-10 w-full max-w-4xl aspect-video mt-40">
+            <div className="w-full h-full bg-white/10 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden border border-white/20 flex flex-col">
+              {/* Main Content Area */}
+              <div className="flex-1 relative bg-gradient-to-br from-purple-500/20 via-pink-500/20 to-blue-500/20 flex items-center justify-center p-8">
                 {showUserType ? (
                   <UserType
                     onBack={() => setShowUserType(false)}
@@ -201,19 +230,19 @@ export function ScreenEmbed() {
                     }}
                   />
                 ) : (
-                  <div className="text-center text-white space-y-6 max-w-xl mx-auto">
+                  <div className="text-center text-white space-y-4">
                     <div className="space-y-2">
-                      <h2 className="text-3xl md:text-4xl font-semibold drop-shadow-lg">
-                        Your Content Here
+                      <h2 className="text-4xl drop-shadow-lg">
+                        {messages[language]}
                       </h2>
-                      <p className="text-base md:text-lg opacity-90 drop-shadow">
+                      <p className="text-lg opacity-90 drop-shadow">
                         This screen is embedded within your artistic frame
                       </p>
                     </div>
 
                     {/* Sample Content Card */}
-                    <div className="mt-4 bg-white/10 backdrop-blur-md rounded-xl p-4 md:p-6 border border-white/20">
-                      <div className="aspect-video bg-black/20 backdrop-blur-sm rounded-lg mb-3 flex items-center justify-center overflow-hidden">
+                    <div className="mt-8 bg-white/10 backdrop-blur-md rounded-xl p-6 max-w-md mx-auto border border-white/20">
+                      <div className="aspect-video bg-black/20 backdrop-blur-sm rounded-lg mb-4 flex items-center justify-center overflow-hidden">
                         <ImageWithFallback
                           src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&q=80"
                           alt="Abstract art"
@@ -222,7 +251,7 @@ export function ScreenEmbed() {
                       </div>
                       <p className="text-sm opacity-80 drop-shadow">
                         Add any content: videos, images, apps, or interactive
-                        elements.
+                        elements
                       </p>
                     </div>
                   </div>
@@ -232,9 +261,9 @@ export function ScreenEmbed() {
           </div>
         </div>
 
-        {/* Zone sous l'écran : langues + texte + boutons */}
-        <div className="relative z-20 flex flex-col items-center gap-5 text-center">
-          {/* Langues */}
+        {/* Language Options and Controls - Below the screen */}
+        <div className="relative z-10 flex flex-col items-center gap-2">
+          {/* Language Options */}
           <nav
             aria-label={
               language === "spanish"
@@ -244,10 +273,10 @@ export function ScreenEmbed() {
                 : "Selecció d'idioma"
             }
           >
-            <div className="flex flex-wrap justify-center gap-4" role="group">
+            <div className="flex justify-center gap-6" role="group">
               <button
                 onClick={() => setLanguage("spanish")}
-                className={`text-white drop-shadow cursor-pointer hover:opacity-80 transition-opacity underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent rounded px-2 py-1 ${
+                className={`text-white cursor-pointer drop-shadow hover:opacity-70 transition-opacity underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent rounded px-2 py-1 ${
                   language === "spanish"
                     ? "opacity-100 font-bold"
                     : "opacity-70"
@@ -259,7 +288,7 @@ export function ScreenEmbed() {
               </button>
               <button
                 onClick={() => setLanguage("english")}
-                className={`text-white drop-shadow cursor-pointer hover:opacity-80 transition-opacity underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent rounded px-2 py-1 ${
+                className={`text-white cursor-pointer drop-shadow hover:opacity-70 transition-opacity underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent rounded px-2 py-1 ${
                   language === "english"
                     ? "opacity-100 font-bold"
                     : "opacity-70"
@@ -271,7 +300,7 @@ export function ScreenEmbed() {
               </button>
               <button
                 onClick={() => setLanguage("catalan")}
-                className={`text-white drop-shadow  cursor-pointer hover:opacity-80 transition-opacity underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent rounded px-2 py-1 ${
+                className={`text-white cursor-pointer drop-shadow hover:opacity-70 transition-opacity underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent rounded px-2 py-1 ${
                   language === "catalan"
                     ? "opacity-100 font-bold"
                     : "opacity-70"
@@ -284,19 +313,12 @@ export function ScreenEmbed() {
             </div>
           </nav>
 
-          {/* Message + boutons d'action */}
-          <div className="flex flex-col items-center gap-4">
-            <p
-              className="text-white drop-shadow text-lg md:text-xl"
-              role="status"
-              aria-live="polite"
-            >
-              {messages[language]}
-            </p>
-            <div className="flex flex-wrap items-center justify-center gap-3">
+          {/* Welcome Message */}
+          <div className="flex flex-col items-center justify-center gap-4">
+            <div className="flex items-center gap-3">
               <button
                 onClick={() => setShowQuestionnaire(true)}
-                className="flex items-center  cursor-pointer gap-2 px-4 py-2 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-white drop-shadow hover:bg-white/30 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex cursor-pointer items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-white drop-shadow hover:bg-white/30 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
                 aria-label={
                   language === "spanish"
                     ? "Entrar al cuestionario"
@@ -320,11 +342,10 @@ export function ScreenEmbed() {
                   <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
               </button>
-
               <button
                 onClick={() => setShowUserType(true)}
-                className="flex items-center  cursor-pointer gap-2 px-4 py-2 bg-white/30 backdrop-blur-md border border-white/40 rounded-lg text-white drop-shadow hover:bg:white/40 hover:bg-white/40 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
-                aria-label={signUpText[language]}
+                className="flex cursor-pointer items-center gap-2 px-4 py-2 bg-white/30 backdrop-blur-md border border-white/40 rounded-lg text-white drop-shadow hover:bg-white/40 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
+                aria-label={signUpText[language as keyof typeof signUpText]}
               >
                 <svg
                   width="18"
@@ -342,13 +363,12 @@ export function ScreenEmbed() {
                   <line x1="19" y1="8" x2="19" y2="14" />
                   <line x1="22" y1="11" x2="16" y2="11" />
                 </svg>
-                {signUpText[language]}
+                {signUpText[language as keyof typeof signUpText]}
               </button>
-
               <button
                 onClick={() => setShowLogin(true)}
-                className="flex items-center  cursor-pointer gap-2 px-4 py-2 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-white drop-shadow hover:bg-white/30 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
-                aria-label={loginText[language]}
+                className="flex cursor-pointer items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-white drop-shadow hover:bg-white/30 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
+                aria-label={loginText[language as keyof typeof loginText]}
               >
                 <svg
                   width="18"
@@ -365,7 +385,7 @@ export function ScreenEmbed() {
                   <polyline points="10 17 15 12 10 7" />
                   <line x1="15" y1="12" x2="3" y2="12" />
                 </svg>
-                {loginText[language]}
+                {loginText[language as keyof typeof loginText]}
               </button>
             </div>
           </div>

@@ -1,11 +1,12 @@
 "use client";
 import { wait } from "@/@disktro/utils";
-import React, { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import React, { useState } from "react";
+import { UserModuleObject as ModuleObject } from "../module";
+
 import CustomAlert from "@/@disktro/CustomAlert";
 import CustomSuccess from "@/@disktro/CustomSuccess";
-import { AuthModuleObject as ModuleObject } from "./api/authModule";
-import Link from "next/link";
 
 // Icon components
 const Mail = ({ size = 24, className = "" }) => (
@@ -111,6 +112,14 @@ const Music = ({ size = 24, className = "" }) => (
   </svg>
 );
 
+interface LoginProps {
+  onBack: () => void;
+  onLoginAsFan: () => void;
+  onLoginAsArtist: () => void;
+  language: string;
+  onSignUp?: () => void; // 👈 nouvelle prop
+}
+
 // Mock user database - in real app this would be a backend
 const mockUsers = [
   { email: "fan@example.com", password: "password123", type: "fan" },
@@ -119,17 +128,19 @@ const mockUsers = [
   { email: "test@artist.com", password: "artist", type: "artist" },
 ];
 
-export function Login() {
-  const [showPassword, setShowPassword] = useState(false);
-  const language = "";
+export function Login({
+  onBack,
+  onLoginAsFan,
+  onLoginAsArtist,
+  language,
+  onSignUp, // 👈 récupérée
+}: LoginProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
-  const router = useRouter();
+
   const text = {
     spanish: {
       title: "Iniciar Sesión",
@@ -185,50 +196,12 @@ export function Login() {
   };
 
   const content = text[language as keyof typeof text] || text.english;
+  const [success, setSuccess] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
-  const onBack = () => {
-    if (typeof window !== "undefined" && window.history.length > 1) {
-      router.back();
-    } else {
-      router.push("/home"); // ou une autre route par défaut
-    }
-  };
+  const router = useRouter();
 
-  const onLoginAsFan = () => {};
-  const onLoginAsArtist = () => {};
-
-  // const handleLogin = (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   setError("");
-
-  //   if (!email || !password) {
-  //     setError(content.fillFields);
-  //     return;
-  //   }
-
-  //   setIsLoading(true);
-
-  //   // Simulate API call
-  //   setTimeout(() => {
-  //     const user = mockUsers.find(
-  //       (u) =>
-  //         u.email.toLowerCase() === email.toLowerCase() &&
-  //         u.password === password
-  //     );
-
-  //     if (user) {
-  //       // Successful login - redirect based on user type
-  //       if (user.type === "fan") {
-  //         onLoginAsFan();
-  //       } else {
-  //         onLoginAsArtist();
-  //       }
-  //     } else {
-  //       setError(content.invalidCredentials);
-  //       setIsLoading(false);
-  //     }
-  //   }, 1000);
-  // };
   const handleLogin = async (e: any) => {
     e.preventDefault();
     if (!email || !password) {
@@ -256,7 +229,11 @@ export function Login() {
         ModuleObject.localState.USER_ROLE,
         JSON.stringify(res1.data.type)
       );
-      router.push("/home");
+      if (res1.data.type === "artist") {
+        router.push("/dashboard/artist");
+      } else {
+        router.push("/dashboard/fan-streaming");
+      }
       setSuccess(true);
     } catch (error) {
       console.log(error);
@@ -270,7 +247,8 @@ export function Login() {
     <div
       className="fixed inset-0 w-screen h-screen bg-cover bg-center"
       style={{
-        backgroundImage: `url(${"/image/4ac3eed398bb68113a14d0fa5efe7a6def6f7651.png"})`,
+        backgroundImage:
+          'url("/image/4ac3eed398bb68113a14d0fa5efe7a6def6f7651.png")',
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
@@ -280,16 +258,10 @@ export function Login() {
 
       {/* Content */}
       <div className="relative w-full h-full overflow-y-auto flex items-center justify-center p-6">
-        <div className="w-full max-w-md">
+        <div className="w-full max-w-md mt-10">
           <div className="bg-white/10 backdrop-blur-md rounded-3xl border border-white/20 p-8 shadow-2xl">
             {/* Header */}
-            <div className="flex items-center gap-4 mb-8 mt-25">
-              <button
-                onClick={onBack}
-                className="p-2 hover:bg-white/10 rounded-lg transition-all cursor-pointer"
-              >
-                <ArrowLeft className="text-white" size={24} />
-              </button>
+            <div className="flex items-center gap-4 mb-8">
               <div className="flex-1 text-center">
                 <div className="flex items-center justify-center gap-2 mb-2">
                   <Music className="text-white" size={32} />
@@ -319,7 +291,7 @@ export function Login() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder={content.emailPlaceholder}
-                    className="w-full pl-11 pr-4 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/50"
+                    className="w-full pl-11 pr-4 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-black placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/50"
                   />
                 </div>
               </div>
@@ -338,12 +310,12 @@ export function Login() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder={content.passwordPlaceholder}
-                    className="w-full pl-11 pr-12 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg  placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/50"
+                    className="w-full pl-11 pr-12 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-black placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/50"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer hover:text-whe"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-white/60 hover:text-white"
                   >
                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
@@ -351,9 +323,11 @@ export function Login() {
               </div>
 
               {/* Error Message */}
-
-              {successMessage && <CustomSuccess message={successMessage} />}
-              {errorMessage && <CustomAlert message={errorMessage} />}
+              {error && (
+                <div className="bg-red-500/20 border border-red-500/40 rounded-lg p-3 text-white text-sm">
+                  {error}
+                </div>
+              )}
 
               {/* Demo Hint */}
               <div className="bg-blue-500/20 border border-blue-500/40 rounded-lg p-3 text-white/80 text-xs">
@@ -369,12 +343,20 @@ export function Login() {
                   {content.forgotPassword}
                 </Link>
               </div>
+              {successMessage && (
+                <p className="m-4 text-sm text-green-400">{successMessage}</p>
+              )}
+              {errorMessage && (
+                <p className="m-4 text-sm text-center text-red-400">
+                  {errorMessage}
+                </p>
+              )}
 
               {/* Login Button */}
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full px-6 py-4 cursor-pointer bg-white/30 backdrop-blur-md border-2 border-white/40 rounded-xl text-white text-lg hover:bg-white/40 hover:border-white/60 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full cursor-pointer px-6 py-4 bg-white/30 backdrop-blur-md border-2 border-white/40 rounded-xl text-white text-lg hover:bg-white/40 hover:border-white/60 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
                   <div className="flex items-center justify-center gap-2">
@@ -390,12 +372,17 @@ export function Login() {
               <div className="text-center pt-4 border-t border-white/20">
                 <p className="text-white/70 text-sm">
                   {content.noAccount}{" "}
-                  <Link
-                    href="/auth/register"
+                  <a
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (onSignUp) onSignUp();
+                      else onBack();
+                    }}
                     className="text-white hover:underline"
                   >
                     {content.signUp}
-                  </Link>
+                  </a>
                 </p>
               </div>
             </form>

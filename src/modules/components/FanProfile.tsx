@@ -547,7 +547,7 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
   };
 
   return (
-    <div className="w-full h-full overflow-y-auto p-8">
+    <div className="w-full h-full overflow-y-auto p-8  bg-gradient-to-br from-slate-900 via-purple-900 to-black">
       <button
         onClick={onBack}
         className="flex items-center gap-2 text-white drop-shadow hover:opacity-70 transition-opacity mb-6"
