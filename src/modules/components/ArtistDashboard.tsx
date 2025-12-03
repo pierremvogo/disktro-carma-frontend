@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { ArtistModuleObject as ModuleObject } from "../artist/module";
 import { useRouter } from "next/navigation";
+import { AccessibilitySettingsPanel } from "./AccessibilitySettingsPanel";
 // Icon components
 const Upload = ({ size = 24, className = "" }) => (
   <svg
@@ -965,6 +966,7 @@ export function ArtistDashboard({
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-4xl text-white drop-shadow-lg">{text.title}</h1>
+
           {onGoToStreaming && (
             <button
               onClick={onGoToStreaming}
