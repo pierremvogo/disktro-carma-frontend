@@ -1,8 +1,8 @@
-import Home from "@/modules/home/home";
+import { ScreenEmbed } from "@/modules/components/screenEmbed";
 import React from "react";
 
 const page = () => {
-  return <Home />;
+  return <ScreenEmbed />;
 };
 
 export default page;

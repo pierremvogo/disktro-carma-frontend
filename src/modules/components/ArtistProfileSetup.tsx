@@ -1,4 +1,12 @@
-import React, { useState } from "react";
+"use client";
+
+import Loader from "@/@disktro/Loader";
+import { wait } from "@/@disktro/utils";
+import React, { ChangeEvent, useEffect, useRef, useState } from "react";
+import { UserModuleObject as ModuleObject } from "../module";
+import { MediaModuleObject as MediaModule } from "../file/module";
+import { TagModuleObject } from "../tag/module";
+import { useRouter } from "next/navigation";
 
 // Icon components
 const User = ({ size = 24, className = "" }) => (
@@ -158,12 +166,14 @@ interface ArtistProfileSetupProps {
   onComplete: () => void;
   onBack: () => void;
   language: string;
+  onSignUp?: () => void; // 👈 nouvelle prop
 }
 
 export function ArtistProfileSetup({
   onComplete,
   onBack,
   language,
+  onSignUp,
 }: ArtistProfileSetupProps) {
   const [artistName, setArtistName] = useState("");
   const [realName, setRealName] = useState("");
@@ -178,6 +188,18 @@ export function ArtistProfileSetup({
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
   const [showVerificationCode, setShowVerificationCode] = useState(false);
   const [verificationCode, setVerificationCode] = useState("");
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  // 👇 Gestion de la photo de profil comme dans ProfileSettings
+  const [previewUrl, setPreviewUrl] = useState<string>("");
+  const [profileImageUrl, setProfileImageUrl] = useState<string>("");
+  const [success, setSuccess] = useState(false);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
 
   const text = {
     spanish: {
@@ -301,7 +323,7 @@ export function ArtistProfileSetup({
   };
 
   const handleVerifyCode = () => {
-    if (verificationCode === "123456") {
+    if (verificationCode === "") {
       setEmailVerified(true);
       setShowVerificationCode(false);
     }
@@ -314,6 +336,124 @@ export function ArtistProfileSetup({
   const passwordsMatch =
     password && confirmPassword && password === confirmPassword;
   const passwordValid = password.length >= 8;
+
+  const [tags, setTags] = useState<{ id: string; name: string }[]>([]);
+  const getTags = async () => {
+    try {
+      const res = await TagModuleObject.service.getTags();
+      setTags(res.data);
+      await wait();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  useEffect(() => {
+    if (tags.length === 0) getTags();
+  }, []);
+
+  // ⚙️ Upload image comme dans ProfileSettings
+  const handleImageChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
+    const userId = localStorage.getItem(ModuleObject.localState.USER_ID);
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setErrorMessage("");
+    setSuccess(false);
+    setIsLoading(true);
+    setPreviewUrl(URL.createObjectURL(file));
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await MediaModule.service.uploadImageFile(formData, token!);
+      if (res && res.url) {
+        setProfileImageUrl(res.url);
+        if (userId) {
+          await ModuleObject.service.updateUser(userId, {
+            profileImageUrl: res.url,
+          });
+        }
+        setSuccess(true);
+        setIsLoading(false);
+        setErrorMessage("");
+      } else {
+        setErrorMessage("Erreur lors de l'upload de l'image.");
+        setIsLoading(false);
+      }
+    } catch (error) {
+      setErrorMessage((error as Error).message);
+      setIsLoading(false);
+      setSuccess(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMessage("");
+    setSuccessMessage("");
+    setIsLoading(true);
+    setErrors({}); // reset previous errors
+    const newErrors: { [key: string]: string } = {};
+    if (!artistName || !realName || !genre || !bio) {
+      setErrorMessage(
+        "Veuillez remplir tous les champs du profil (nom d'artiste, nom réel, genre, bio)."
+      );
+      setIsLoading(false);
+      return;
+    }
+
+    if (!email) {
+      setErrorMessage("Veuillez saisir une adresse email.");
+      setIsLoading(false);
+      return;
+    }
+
+    if (!passwordValid) {
+      setErrorMessage("Le mot de passe doit contenir au moins 8 caractères.");
+      setIsLoading(false);
+      return;
+    }
+
+    if (!passwordsMatch) {
+      setErrorMessage("Les mots de passe ne correspondent pas.");
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const payload = {
+        name: "name",
+        surname: "surname",
+        email,
+        password,
+        type: "artist",
+        artistName,
+        realName,
+        genre,
+        bio,
+        emailVerified,
+        twoFactorEnabled,
+        profileImageUrl, // 👈 on envoie aussi l'URL de l'image uploadée
+      };
+
+      const res = await ModuleObject.service.createUser(payload);
+
+      setSuccessMessage(res.message || "Profil artiste créé avec succès.");
+      setErrorMessage("");
+      setIsLoading(false);
+
+      await wait();
+      router.push("/auth/confirm-email");
+    } catch (err) {
+      console.error(err);
+      setErrorMessage(
+        (err as Error).message || "Erreur lors de l'inscription."
+      );
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div
@@ -334,8 +474,11 @@ export function ArtistProfileSetup({
             {/* Header */}
             <div className="flex items-center gap-4 mb-8">
               <button
-                onClick={onBack}
-                className="p-2 hover:bg-white/10 rounded-lg transition-all"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (onSignUp) onSignUp();
+                }}
+                className="p-2 hover:bg-white/10 cursor-pointer rounded-lg transition-all"
               >
                 <ArrowLeft className="text-white" size={24} />
               </button>
@@ -349,270 +492,294 @@ export function ArtistProfileSetup({
               </div>
             </div>
 
-            <div className="grid lg:grid-cols-2 gap-8">
-              {/* Profile Information Section */}
-              <div className="space-y-6">
-                <h2 className="text-2xl text-white drop-shadow-lg flex items-center gap-2">
-                  <Music size={24} />
-                  {content.profileInfo}
-                </h2>
+            {/* Messages globaux */}
 
-                {/* Profile Picture */}
-                <div>
-                  <label className="block text-white drop-shadow mb-3">
-                    {content.profilePicture}
-                  </label>
-                  <div className="aspect-square max-w-xs border-2 border-dashed border-white/30 rounded-xl bg-white/5 hover:bg-white/10 transition-all cursor-pointer flex items-center justify-center">
-                    <div className="text-center">
-                      <User size={48} className="text-white/40 mx-auto mb-2" />
-                      <p className="text-white/60 text-sm">
-                        {content.uploadPhoto}
-                      </p>
+            <form onSubmit={handleSubmit}>
+              <div className="grid lg:grid-cols-2 gap-8">
+                {/* Profile Information Section */}
+                <div className="space-y-6">
+                  <h2 className="text-2xl text-white drop-shadow-lg flex items-center gap-2">
+                    <Music size={24} />
+                    {content.profileInfo}
+                  </h2>
+
+                  {/* Profile Picture */}
+                  <div>
+                    <label className="block text-white drop-shadow mb-3">
+                      {content.profilePicture}
+                    </label>
+
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleImageChange}
+                    />
+
+                    <div
+                      onClick={() => fileInputRef.current?.click()}
+                      className="aspect-square max-w-xs border-2 border-dashed border-white/30 rounded-xl bg-white/5 hover:bg-white/10 transition-all cursor-pointer flex items-center justify-center overflow-hidden"
+                    >
+                      {previewUrl ? (
+                        <img
+                          src={previewUrl}
+                          alt="Profile preview"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="text-center">
+                          <User
+                            size={48}
+                            className="text-white/40 mx-auto mb-2"
+                          />
+                          <p className="text-white/60 text-sm">
+                            {content.uploadPhoto}
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </div>
-                </div>
 
-                {/* Artist Name */}
-                <div>
-                  <label className="block text-white drop-shadow mb-2">
-                    {content.artistName}
-                  </label>
-                  <input
-                    type="text"
-                    value={artistName}
-                    onChange={(e) => setArtistName(e.target.value)}
-                    placeholder={content.artistNamePlaceholder}
-                    className="w-full px-4 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/50"
-                  />
-                </div>
+                  {/* Artist Name */}
+                  <div>
+                    <label className="block text-white drop-shadow mb-2">
+                      {content.artistName}
+                    </label>
+                    <input
+                      type="text"
+                      value={artistName}
+                      onChange={(e) => setArtistName(e.target.value)}
+                      placeholder={content.artistNamePlaceholder}
+                      className="w-full px-4 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-black placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/50"
+                    />
+                  </div>
 
-                {/* Real Name */}
-                <div>
-                  <label className="block text-white drop-shadow mb-2">
-                    {content.realName}
-                  </label>
-                  <input
-                    type="text"
-                    value={realName}
-                    onChange={(e) => setRealName(e.target.value)}
-                    placeholder={content.realNamePlaceholder}
-                    className="w-full px-4 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/50"
-                  />
-                </div>
+                  {/* Real Name */}
+                  <div>
+                    <label className="block text-white drop-shadow mb-2">
+                      {content.realName}
+                    </label>
+                    <input
+                      type="text"
+                      value={realName}
+                      onChange={(e) => setRealName(e.target.value)}
+                      placeholder={content.realNamePlaceholder}
+                      className="w-full px-4 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-black placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/50"
+                    />
+                  </div>
 
-                {/* Genre */}
-                <div>
-                  <label className="block text-white drop-shadow mb-2">
-                    {content.genre}
-                  </label>
-                  <input
-                    type="text"
-                    value={genre}
-                    onChange={(e) => setGenre(e.target.value)}
-                    placeholder={content.genrePlaceholder}
-                    className="w-full px-4 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/50"
-                  />
-                </div>
+                  {/* Music Genre */}
+                  <div>
+                    <label className="block text-white drop-shadow mb-2">
+                      {content.genre}
+                    </label>
 
-                {/* Bio */}
-                <div>
-                  <label className="block text-white drop-shadow mb-2">
-                    {content.bio}
-                  </label>
-                  <textarea
-                    rows={4}
-                    value={bio}
-                    onChange={(e) => setBio(e.target.value)}
-                    placeholder={content.bioPlaceholder}
-                    className="w-full px-4 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/50 resize-none"
-                  />
-                </div>
-              </div>
+                    <select
+                      className={`w-full border cursor-pointer ${
+                        errors?.genre ? "border-red-500" : "border-white/30"
+                      } rounded px-3 py-3  backdrop-blur-md 
+       placeholder-white/40 focus:outline-none focus:ring-2 ${
+         errors?.genre ? "focus:ring-red-500" : "focus:ring-white/50"
+       }`}
+                      value={genre}
+                      onChange={(e) => setGenre(e.target.value)}
+                    >
+                      <option value="">-- Select a genre --</option>
+                      {tags.map((tag) => (
+                        <option key={tag.id} value={tag.id}>
+                          {tag.name}
+                        </option>
+                      ))}
+                    </select>
 
-              {/* Account Security Section */}
-              <div className="space-y-6">
-                <h2 className="text-2xl text-white drop-shadow-lg flex items-center gap-2">
-                  <Shield size={24} />
-                  {content.accountSecurity}
-                </h2>
-
-                {/* Email Verification */}
-                <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-2">
-                      <Mail className="text-white" size={20} />
-                      <h3 className="text-white drop-shadow">
-                        {content.verifyEmail}
-                      </h3>
-                    </div>
-                    {emailVerified && (
-                      <CheckCircle className="text-green-400" size={20} />
+                    {errors?.genre && (
+                      <p className="text-red-400 text-sm mt-1">
+                        {errors.genre}
+                      </p>
                     )}
                   </div>
 
-                  <div className="space-y-3">
+                  {/* Email */}
+                  <div>
+                    <label className="block text-white drop-shadow mb-2">
+                      {content.email}
+                    </label>
                     <input
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder={content.emailPlaceholder}
-                      className="w-full px-4 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/50"
+                      className="w-full px-4 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-black placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/50"
                       disabled={emailVerified}
                     />
+                  </div>
 
-                    {!emailVerified && !showVerificationCode && (
+                  {/* Bio */}
+                  <div>
+                    <label className="block text-white drop-shadow mb-2">
+                      {content.bio}
+                    </label>
+                    <textarea
+                      rows={4}
+                      value={bio}
+                      onChange={(e) => setBio(e.target.value)}
+                      placeholder={content.bioPlaceholder}
+                      className="w-full px-4 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-black placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/50 resize-none"
+                    />
+                  </div>
+                </div>
+
+                {/* Account Security Section */}
+                <div className="space-y-6">
+                  <h2 className="text-2xl text-white drop-shadow-lg flex items-center gap-2">
+                    <Shield size={24} />
+                    {content.accountSecurity}
+                  </h2>
+
+                  {/* Password */}
+                  <div>
+                    <label className="block text-white drop-shadow mb-2">
+                      {content.password}
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder={content.passwordPlaceholder}
+                        className="w-full px-4 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-black placeholder-white/40 focus:outline-none focus:ring-2"
+                      />
                       <button
-                        onClick={handleVerifyEmail}
-                        disabled={!email}
-                        className="w-full px-4 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-white hover:bg-white/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 
+             bg-black/80 p-1.5 rounded-full 
+             text-white hover:text-white cursor-pointer backdrop-blur-sm"
                       >
-                        {content.sendVerification}
+                        {showPassword ? (
+                          <EyeOff size={18} />
+                        ) : (
+                          <Eye size={18} />
+                        )}
                       </button>
+                    </div>
+                    {password && (
+                      <p
+                        className={`text-sm mt-2 ${
+                          passwordValid ? "text-green-400" : "text-yellow-400"
+                        }`}
+                      >
+                        {content.passwordRequirements}
+                      </p>
                     )}
+                  </div>
 
-                    {showVerificationCode && !emailVerified && (
-                      <div className="space-y-3">
-                        <input
-                          type="text"
-                          value={verificationCode}
-                          onChange={(e) => setVerificationCode(e.target.value)}
-                          placeholder={content.verificationCodePlaceholder}
-                          maxLength={6}
-                          className="w-full px-4 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/50"
-                        />
-                        <button
-                          onClick={handleVerifyCode}
-                          className="w-full px-4 py-3 bg-white/30 backdrop-blur-md border border-white/40 rounded-lg text-white hover:bg-white/40 transition-all"
-                        >
-                          {content.verify}
-                        </button>
+                  {/* Confirm Password */}
+                  <div>
+                    <label className="block text-white drop-shadow mb-2">
+                      {content.confirmPassword}
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showConfirmPassword ? "text" : "password"}
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        placeholder={content.confirmPasswordPlaceholder}
+                        className="w-full px-4 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-black placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/50"
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setShowConfirmPassword(!showConfirmPassword)
+                        }
+                        className="absolute right-3 top-1/2 -translate-y-1/2 
+                        bg-black/80 p-1.5 rounded-full 
+                        text-white hover:text-white cursor-pointer backdrop-blur-sm"
+                      >
+                        {showConfirmPassword ? (
+                          <EyeOff size={20} />
+                        ) : (
+                          <Eye size={20} />
+                        )}
+                      </button>
+                    </div>
+                    {confirmPassword && (
+                      <p
+                        className={`text-sm mt-2 ${
+                          passwordsMatch ? "text-green-400" : "text-red-400"
+                        }`}
+                      >
+                        {passwordsMatch
+                          ? content.passwordMatch
+                          : content.passwordMismatch}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Two-Factor Authentication */}
+                  <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <Lock className="text-white" size={20} />
+                          <h3 className="text-white drop-shadow">
+                            {content.twoFactor}
+                          </h3>
+                        </div>
+                        <p className="text-white/60 text-sm">
+                          {content.twoFactorDesc}
+                        </p>
                       </div>
-                    )}
+                      {twoFactorEnabled && (
+                        <CheckCircle className="text-green-400" size={20} />
+                      )}
+                    </div>
 
-                    {emailVerified && (
+                    {!twoFactorEnabled ? (
+                      <button
+                        type="button"
+                        onClick={handleEnableTwoFactor}
+                        className="w-full cursor-pointer px-4 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-white hover:bg-white/30 transition-all"
+                      >
+                        {content.enable}
+                      </button>
+                    ) : (
                       <div className="flex items-center gap-2 text-green-400 text-sm">
                         <CheckCircle size={16} />
-                        {content.emailVerified}
+                        {content.enabled}
                       </div>
                     )}
                   </div>
-                </div>
-
-                {/* Password */}
-                <div>
-                  <label className="block text-white drop-shadow mb-2">
-                    {content.password}
-                  </label>
-                  <div className="relative">
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder={content.passwordPlaceholder}
-                      className="w-full px-4 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/50"
-                    />
-                    <button
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-white/60 hover:text-white"
-                    >
-                      {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                    </button>
-                  </div>
-                  {password && (
-                    <p
-                      className={`text-sm mt-2 ${
-                        passwordValid ? "text-green-400" : "text-yellow-400"
-                      }`}
-                    >
-                      {content.passwordRequirements}
-                    </p>
-                  )}
-                </div>
-
-                {/* Confirm Password */}
-                <div>
-                  <label className="block text-white drop-shadow mb-2">
-                    {content.confirmPassword}
-                  </label>
-                  <div className="relative">
-                    <input
-                      type={showConfirmPassword ? "text" : "password"}
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      placeholder={content.confirmPasswordPlaceholder}
-                      className="w-full px-4 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/50"
-                    />
-                    <button
-                      onClick={() =>
-                        setShowConfirmPassword(!showConfirmPassword)
-                      }
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-white/60 hover:text-white"
-                    >
-                      {showConfirmPassword ? (
-                        <EyeOff size={20} />
-                      ) : (
-                        <Eye size={20} />
-                      )}
-                    </button>
-                  </div>
-                  {confirmPassword && (
-                    <p
-                      className={`text-sm mt-2 ${
-                        passwordsMatch ? "text-green-400" : "text-red-400"
-                      }`}
-                    >
-                      {passwordsMatch
-                        ? content.passwordMatch
-                        : content.passwordMismatch}
-                    </p>
-                  )}
-                </div>
-
-                {/* Two-Factor Authentication */}
-                <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <Lock className="text-white" size={20} />
-                        <h3 className="text-white drop-shadow">
-                          {content.twoFactor}
-                        </h3>
-                      </div>
-                      <p className="text-white/60 text-sm">
-                        {content.twoFactorDesc}
-                      </p>
-                    </div>
-                    {twoFactorEnabled && (
-                      <CheckCircle className="text-green-400" size={20} />
-                    )}
-                  </div>
-
-                  {!twoFactorEnabled ? (
-                    <button
-                      onClick={handleEnableTwoFactor}
-                      className="w-full px-4 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-white hover:bg-white/30 transition-all"
-                    >
-                      {content.enable}
-                    </button>
-                  ) : (
-                    <div className="flex items-center gap-2 text-green-400 text-sm">
-                      <CheckCircle size={16} />
-                      {content.enabled}
-                    </div>
-                  )}
                 </div>
               </div>
-            </div>
+              {successMessage && (
+                <p className="m-4 text-sm text-green-400">{successMessage}</p>
+              )}
+              {errorMessage && (
+                <p className="m-4 text-sm text-center text-red-400">
+                  {errorMessage}
+                </p>
+              )}
 
-            {/* Complete Button */}
-            <div className="mt-8 flex justify-end">
-              <button
-                onClick={onComplete}
-                className="px-8 py-4 bg-white/30 backdrop-blur-md border-2 border-white/40 rounded-xl text-white text-lg hover:bg-white/40 hover:border-white/60 transition-all shadow-lg"
-              >
-                {content.completeSetup}
-              </button>
-            </div>
+              {/* Complete Button */}
+              <div className="mt-8 flex justify-end">
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="px-8 cursor-pointer py-4 bg-white/30 backdrop-blur-md border-2 border-white/40 rounded-xl text-white text-lg hover:bg-white/40 hover:border-white/60 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isLoading ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                      <span>{content.completeSetup}...</span>
+                    </div>
+                  ) : (
+                    content.completeSetup
+                  )}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       </div>
