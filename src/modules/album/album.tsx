@@ -89,7 +89,7 @@ export default function AlbumsPage() {
     );
     try {
       if (!accessToken) return;
-      const res = await TagModuleObject.service.getTags(accessToken);
+      const res = await TagModuleObject.service.getTags();
       setTags(res.data);
       await wait();
     } catch (error) {
