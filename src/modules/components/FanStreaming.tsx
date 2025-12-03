@@ -977,72 +977,50 @@ Underneath the shining star`,
         }`}
       >
         <div className="flex items-center justify-between p-6">
-          <button
-            onClick={onBack}
-            className={`flex items-center gap-2 text-white drop-shadow hover:opacity-70 ${animationClasses} ${buttonSizeClasses}`}
-            aria-label={text.back}
-          >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M19 12H5M12 19l-7-7 7-7" />
-            </svg>
-            {text.back}
-          </button>
           <h1 className="text-2xl text-white drop-shadow-lg">{text.title}</h1>
-          <button
-            onClick={() => setShowProfile(true)}
-            className={`flex items-center cursor-pointer gap-2 text-white drop-shadow hover:opacity-70 ${animationClasses} ${buttonSizeClasses}`}
-            aria-label={
-              language === "spanish"
-                ? "Mi Perfil"
-                : language === "english"
-                ? "My Profile"
-                : "El Meu Perfil"
-            }
-          >
-            <User size={20} />
-            <span>
+          <div className="flex items-center gap-2 ml-auto">
+            {/* PROFILE BUTTON */}
+            <button
+              onClick={() => setShowProfile(true)}
+              className="flex cursor-pointer items-center gap-2 px-4 py-2 text-white bg-white/10
+    backdrop-blur-md border border-white/20 rounded-lg hover:bg-white/20 transition-all"
+            >
+              <User size={20} />
               {language === "spanish"
                 ? "Perfil"
                 : language === "english"
                 ? "Profile"
                 : "Perfil"}
-            </span>
-          </button>
-          <button
-            onClick={handleLogout}
-            className="px-4 py-2 bg-gradient-to-r cursor-pointer from-red-500/40 to-orange-500/40 
-      backdrop-blur-md border border-white/30 rounded-lg text-white 
-      hover:from-red-500/60 hover:to-orange-500/60 transition-all shadow-md flex items-center gap-2"
-          >
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="text-white"
-            >
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-              <polyline points="16 17 21 12 16 7" />
-              <line x1="21" y1="12" x2="9" y2="12" />
-            </svg>
+            </button>
 
-            {language === "spanish" && "Cerrar sesión"}
-            {language === "english" && "Logout"}
-            {language === "catalan" && "Tancar sessió"}
-          </button>
+            {/* LOGOUT BUTTON */}
+            <button
+              onClick={handleLogout}
+              className="px-4 py-2 bg-gradient-to-r cursor-pointer from-red-500/40 to-orange-500/40 
+    backdrop-blur-md border border-white/30 rounded-lg text-white
+    hover:from-red-500/60 hover:to-orange-500/60 transition-all flex items-center gap-2"
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-white"
+              >
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" y1="12" x2="9" y2="12" />
+              </svg>
+
+              {language === "spanish" && "Cerrar sesión"}
+              {language === "english" && "Logout"}
+              {language === "catalan" && "Tancar sessió"}
+            </button>
+          </div>
         </div>
 
         {/* Tab Navigation */}
@@ -1114,7 +1092,7 @@ Underneath the shining star`,
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={text.search}
-              className="w-full pl-12 pr-4 py-4 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
+              className="w-full pl-12 pr-4 py-4 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
             />
           </div>
         </div>
@@ -2107,7 +2085,7 @@ Underneath the shining star`,
               value={newPlaylistName}
               onChange={(e) => setNewPlaylistName(e.target.value)}
               placeholder={text.playlistName}
-              className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all mb-6"
+              className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all mb-6"
             />
             <div className="flex gap-4">
               <button
