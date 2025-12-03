@@ -650,7 +650,7 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder={content.name}
-                  className="w-full p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
+                  className="w-full p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
                 />
               </div>
 
@@ -664,7 +664,7 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder={content.email}
-                  className="w-full p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
+                  className="w-full p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
                 />
               </div>
 
@@ -699,7 +699,7 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
                     placeholder={content.currentPassword}
-                    className="w-full p-4 pr-12 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
+                    className="w-full p-4 pr-12 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
                   />
                   <button
                     type="button"
@@ -726,7 +726,7 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder={content.newPassword}
-                    className="w-full p-4 pr-12 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
+                    className="w-full p-4 pr-12 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
                   />
                   <button
                     type="button"
@@ -749,7 +749,7 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder={content.confirmPassword}
-                    className="w-full p-4 pr-12 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
+                    className="w-full p-4 pr-12 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
                   />
                   <button
                     type="button"
@@ -786,32 +786,36 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
           <div className="space-y-6">
             {/* Saved Payment Methods */}
             {savedPaymentMethods.length > 0 && (
-              <div className="bg-white/10 backdrop-blur-md rounded-xl p-8 border border-white/20">
-                <h2 className="text-2xl text-white drop-shadow-lg mb-6">
+              <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 sm:p-6 lg:p-8 border border-white/20">
+                <h2 className="text-xl sm:text-2xl text-white drop-shadow-lg mb-4 sm:mb-6">
                   {content.paymentMethods}
                 </h2>
-                <div className="space-y-4">
+
+                <div className="space-y-3 sm:space-y-4">
                   {savedPaymentMethods.map((method) => (
                     <div
                       key={method.id}
-                      className="bg-white/5 backdrop-blur-sm rounded-lg p-4 border border-white/10 flex items-center justify-between"
+                      className="bg-white/5 backdrop-blur-sm rounded-lg p-3 sm:p-4 border border-white/10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4"
                     >
-                      <div className="flex items-center gap-4">
+                      {/* Icône + infos */}
+                      <div className="flex items-center gap-3 sm:gap-4">
                         {getPaymentIcon(method.type)}
-                        <div>
-                          <p className="text-white drop-shadow">
+                        <div className="min-w-0">
+                          <p className="text-white drop-shadow text-sm sm:text-base truncate">
                             {method.displayInfo}
                           </p>
                           {method.details && (
-                            <p className="text-white/60 text-sm">
+                            <p className="text-white/60 text-xs sm:text-sm truncate">
                               {method.details}
                             </p>
                           )}
                         </div>
                       </div>
+
+                      {/* Bouton remove */}
                       <button
                         onClick={() => handleRemovePayment(method.id)}
-                        className="px-4 py-2 bg-red-500/30 backdrop-blur-sm border border-white/20 rounded-lg text-white hover:bg-red-500/40 transition-all"
+                        className="w-full sm:w-auto px-4 py-2 bg-red-500/40 backdrop-blur-sm border border-white/20 rounded-lg text-white text-sm sm:text-base hover:bg-red-500/60 transition-all"
                       >
                         {content.remove}
                       </button>
@@ -833,50 +837,53 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
                   <label className="block text-white drop-shadow mb-3">
                     {content.selectPaymentType}
                   </label>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
                     {[
                       {
                         value: "card",
                         label: content.creditCard,
-                        icon: <CreditCard size={20} />,
+                        icon: <CreditCard size={18} />,
                       },
                       {
                         value: "paypal",
                         label: "PayPal",
-                        icon: <Mail size={20} />,
+                        icon: <Mail size={18} />,
                       },
                       {
                         value: "bizum",
                         label: "Bizum",
-                        icon: <Smartphone size={20} />,
+                        icon: <Smartphone size={18} />,
                       },
                       {
                         value: "ideal",
                         label: "iDEAL",
-                        icon: <CreditCard size={20} />,
+                        icon: <CreditCard size={18} />,
                       },
                       {
                         value: "mobilemoney",
                         label: "Mobile Money",
-                        icon: <Smartphone size={20} />,
+                        icon: <Smartphone size={18} />,
                       },
                       {
                         value: "orangemoney",
                         label: "Orange Money",
-                        icon: <Smartphone size={20} />,
+                        icon: <Smartphone size={18} />,
                       },
                     ].map(({ value, label, icon }) => (
                       <button
                         key={value}
                         onClick={() => setPaymentType(value as any)}
-                        className={`flex items-center justify-center gap-2 p-4 rounded-lg transition-all ${
+                        className={`w-full flex items-center justify-center gap-2 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg border-2 text-sm sm:text-base transition-all ${
                           paymentType === value
-                            ? "bg-white/30 border-2 border-white/50"
-                            : "bg-white/10 border-2 border-white/20 hover:bg-white/20"
+                            ? "bg-white/30 border-white/50 text-white"
+                            : "bg-white/10 border-white/20 text-white/80 hover:bg-white/20"
                         }`}
                       >
                         <span className="text-white">{icon}</span>
-                        <span className="text-white text-sm">{label}</span>
+                        <span className="text-inherit text-xs sm:text-sm md:text-base text-center">
+                          {label}
+                        </span>
                       </button>
                     ))}
                   </div>
@@ -898,7 +905,7 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
                           )
                         }
                         placeholder="1234 5678 9012 3456"
-                        className="w-full p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
+                        className="w-full p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
                       />
                     </div>
                     <div>
@@ -910,7 +917,7 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
                         value={cardName}
                         onChange={(e) => setCardName(e.target.value)}
                         placeholder="John Doe"
-                        className="w-full p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
+                        className="w-full p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
                       />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
@@ -924,7 +931,7 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
                           onChange={(e) => setExpiryDate(e.target.value)}
                           placeholder="MM/YY"
                           maxLength={5}
-                          className="w-full p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
+                          className="w-full p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
                         />
                       </div>
                       <div>
@@ -940,7 +947,7 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
                             )
                           }
                           placeholder="123"
-                          className="w-full p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
+                          className="w-full p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
                         />
                       </div>
                     </div>
@@ -958,7 +965,7 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
                       value={paypalEmail}
                       onChange={(e) => setPaypalEmail(e.target.value)}
                       placeholder="user@example.com"
-                      className="w-full p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
+                      className="w-full p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
                     />
                   </div>
                 )}
@@ -974,7 +981,7 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
                       value={bizumPhone}
                       onChange={(e) => setBizumPhone(e.target.value)}
                       placeholder="+34 600 000 000"
-                      className="w-full p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
+                      className="w-full p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
                     />
                   </div>
                 )}
@@ -989,27 +996,27 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
                       <select
                         value={idealBank}
                         onChange={(e) => setIdealBank(e.target.value)}
-                        className="w-full p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white focus:outline-none focus:border-white/40 transition-all"
+                        className="w-full p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black focus:outline-none focus:border-white/40 transition-all"
                       >
-                        <option value="" className="bg-gray-900">
+                        <option value="" className="bg-white">
                           {content.selectBank}
                         </option>
-                        <option value="ABN AMRO" className="bg-gray-900">
+                        <option value="ABN AMRO" className="bg-white">
                           ABN AMRO
                         </option>
-                        <option value="ING" className="bg-gray-900">
+                        <option value="ING" className="bg-white">
                           ING
                         </option>
-                        <option value="Rabobank" className="bg-gray-900">
+                        <option value="Rabobank" className="bg-white">
                           Rabobank
                         </option>
-                        <option value="SNS Bank" className="bg-gray-900">
+                        <option value="SNS Bank" className="bg-white">
                           SNS Bank
                         </option>
-                        <option value="ASN Bank" className="bg-gray-900">
+                        <option value="ASN Bank" className="bg-white">
                           ASN Bank
                         </option>
-                        <option value="Bunq" className="bg-gray-900">
+                        <option value="Bunq" className="bg-white">
                           Bunq
                         </option>
                       </select>
@@ -1023,7 +1030,7 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
                         value={idealAccountHolder}
                         onChange={(e) => setIdealAccountHolder(e.target.value)}
                         placeholder="John Doe"
-                        className="w-full p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
+                        className="w-full p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
                       />
                     </div>
                   </>
@@ -1039,24 +1046,24 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
                       <select
                         value={mobileMoneyProvider}
                         onChange={(e) => setMobileMoneyProvider(e.target.value)}
-                        className="w-full p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white focus:outline-none focus:border-white/40 transition-all"
+                        className="w-full p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black focus:outline-none focus:border-white/40 transition-all"
                       >
-                        <option value="" className="bg-gray-900">
+                        <option value="" className="bg-white">
                           {content.selectProvider}
                         </option>
-                        <option value="MTN" className="bg-gray-900">
+                        <option value="MTN" className="bg-white">
                           MTN Mobile Money
                         </option>
-                        <option value="Vodafone" className="bg-gray-900">
+                        <option value="Vodafone" className="bg-white">
                           Vodafone Cash
                         </option>
-                        <option value="Airtel" className="bg-gray-900">
+                        <option value="Airtel" className="bg-white">
                           Airtel Money
                         </option>
-                        <option value="Tigo" className="bg-gray-900">
+                        <option value="Tigo" className="bg-white">
                           Tigo Cash
                         </option>
-                        <option value="M-Pesa" className="bg-gray-900">
+                        <option value="M-Pesa" className="bg-white">
                           M-Pesa
                         </option>
                       </select>
@@ -1070,7 +1077,7 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
                         value={mobileMoneyPhone}
                         onChange={(e) => setMobileMoneyPhone(e.target.value)}
                         placeholder="+233 000 000 000"
-                        className="w-full p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
+                        className="w-full p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
                       />
                     </div>
                   </>
@@ -1087,7 +1094,7 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
                       value={orangeMoneyPhone}
                       onChange={(e) => setOrangeMoneyPhone(e.target.value)}
                       placeholder="+225 00 00 00 00"
-                      className="w-full p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
+                      className="w-full p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
                     />
                   </div>
                 )}

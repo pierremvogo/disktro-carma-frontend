@@ -463,7 +463,7 @@ export function ArtistDashboard({
       orangeMoneyPhoneLabel: "Número de Teléfono Orange Money",
       savePaymentDetails: "Guardar Detalles de Pago",
       paymentDetailsSaved: "¡Detalles de pago guardados exitosamente!",
-      selectProvider: "Seleccionar proveedor",
+      selectProvider: "--Seleccionar proveedor--",
     },
     english: {
       title: "Artist Dashboard",
@@ -516,8 +516,8 @@ export function ArtistDashboard({
       musiciansWinds: "Winds",
       musiciansPercussion: "Percussion",
       musiciansStrings: "Strings",
-      mixingEngineer: "Mixing Engineer",
-      masteringEngineer: "Mastering Engineer",
+      mixingEngineer: "Mixing Eng",
+      masteringEngineer: "Mastering Eng",
       totalStreams: "Total Streams",
       monthlyStreams: "Monthly Streams",
       totalSubscribers: "Total Subscribers",
@@ -594,7 +594,7 @@ export function ArtistDashboard({
       orangeMoneyPhoneLabel: "Orange Money Phone Number",
       savePaymentDetails: "Save Payment Details",
       paymentDetailsSaved: "Payment details saved successfully!",
-      selectProvider: "Select provider",
+      selectProvider: "--Select provider--",
     },
     catalan: {
       title: "Panell de l'Artista",
@@ -727,7 +727,7 @@ export function ArtistDashboard({
       orangeMoneyPhoneLabel: "Número de Telèfon Orange Money",
       savePaymentDetails: "Guardar Detalls de Pagament",
       paymentDetailsSaved: "Detalls de pagament guardats amb èxit!",
-      selectProvider: "Seleccionar proveïdor",
+      selectProvider: "--Seleccionar proveïdor--",
     },
   };
 
@@ -963,7 +963,7 @@ export function ArtistDashboard({
 
   return (
     <div className="w-full h-full min-h-screen overflow-y-auto p-8 bg-gradient-to-br from-slate-900 via-purple-900 to-black">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-6xl mx-auto space-y-6 sm:space-y-8">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-4xl text-white drop-shadow-lg">{text.title}</h1>
 
@@ -998,7 +998,7 @@ export function ArtistDashboard({
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex gap-4 mb-8 overflow-x-auto">
+        <div className="flex gap-3 sm:gap-4 mb-4 sm:mb-6 overflow-x-auto pb-1">
           {[
             { id: "profile", label: text.profile, icon: Users },
             { id: "upload", label: text.upload, icon: Upload },
@@ -1192,7 +1192,7 @@ export function ArtistDashboard({
                   onChange={(e) => setBioOneWord(e.target.value)}
                   maxLength={50}
                   placeholder={text.bioPrompt}
-                  className="w-full p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all text-center text-xl"
+                  className="w-full p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all text-center text-xl"
                 />
                 {bioOneWord && (
                   <p className="text-white/60 text-sm mt-2 text-center">
@@ -1208,104 +1208,6 @@ export function ArtistDashboard({
                 {text.accountSecurity}
               </h3>
 
-              {/* Email Verification */}
-              <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/20 mb-4">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <label className="block text-white/80 drop-shadow mb-2 text-sm">
-                      {text.email}
-                    </label>
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
-                    />
-                  </div>
-                  <div className="ml-4 flex items-center gap-2">
-                    {isEmailVerified ? (
-                      <span className="flex items-center gap-2 px-4 py-2 bg-green-500/20 backdrop-blur-sm border border-green-500/40 rounded-lg text-green-300">
-                        <svg
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                        >
-                          <polyline points="20 6 9 17 4 12" />
-                        </svg>
-                        {text.emailVerified}
-                      </span>
-                    ) : (
-                      <span className="flex items-center gap-2 px-4 py-2 bg-yellow-500/20 backdrop-blur-sm border border-yellow-500/40 rounded-lg text-yellow-300">
-                        <svg
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                        >
-                          <circle cx="12" cy="12" r="10" />
-                          <line x1="12" y1="8" x2="12" y2="12" />
-                          <line x1="12" y1="16" x2="12.01" y2="16" />
-                        </svg>
-                        {text.emailNotVerified}
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                {!isEmailVerified && (
-                  <div className="space-y-3">
-                    {showVerificationSent && (
-                      <div className="p-3 bg-blue-500/20 backdrop-blur-sm border border-blue-500/40 rounded-lg text-blue-300 text-sm">
-                        {text.verificationSent}
-                      </div>
-                    )}
-                    <button
-                      onClick={() => {
-                        setShowVerificationSent(true);
-                        setTimeout(() => setShowVerificationSent(false), 5000);
-                        // In a real app, this would send a verification email
-                      }}
-                      className="w-full py-3 px-4 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-white drop-shadow hover:bg-white/30 transition-all"
-                    >
-                      {text.verifyEmail}
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              {/* Two-Factor Authentication */}
-              <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/20 mb-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="text-white drop-shadow mb-2">
-                      {text.twoFactorAuth}
-                    </h4>
-                    <p className="text-white/60 text-sm">
-                      {twoFactorEnabled
-                        ? text.twoFactorEnabled
-                        : text.twoFactorDisabled}
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => setTwoFactorEnabled(!twoFactorEnabled)}
-                    className={`py-3 px-6 backdrop-blur-md border rounded-lg text-white drop-shadow transition-all ${
-                      twoFactorEnabled
-                        ? "bg-red-500/20 border-red-500/40 hover:bg-red-500/30"
-                        : "bg-green-500/20 border-green-500/40 hover:bg-green-500/30"
-                    }`}
-                  >
-                    {twoFactorEnabled
-                      ? text.disableTwoFactor
-                      : text.enableTwoFactor}
-                  </button>
-                </div>
-              </div>
-
               {/* Change Password */}
               <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/20">
                 <h4 className="text-white drop-shadow mb-4">
@@ -1318,7 +1220,7 @@ export function ArtistDashboard({
                     </label>
                     <input
                       type="password"
-                      className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
+                      className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
                     />
                   </div>
                   <div>
@@ -1327,7 +1229,7 @@ export function ArtistDashboard({
                     </label>
                     <input
                       type="password"
-                      className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
+                      className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
                     />
                   </div>
                   <div>
@@ -1336,7 +1238,7 @@ export function ArtistDashboard({
                     </label>
                     <input
                       type="password"
-                      className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
+                      className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
                     />
                   </div>
                   <button
@@ -1389,10 +1291,12 @@ export function ArtistDashboard({
                 <label className="block text-white/90 drop-shadow mb-3">
                   {text.typeLabel}
                 </label>
-                <div className="grid grid-cols-3 gap-4">
+
+                {/* 1 colonne sur mobile, 3 colonnes à partir de sm */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                   <button
                     onClick={() => setUploadType("single")}
-                    className={`py-3 px-6 rounded-lg border-2 transition-all ${
+                    className={`w-full py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg border-2 text-sm sm:text-base transition-all ${
                       uploadType === "single"
                         ? "bg-white/30 border-white/60 text-white"
                         : "bg-white/10 border-white/20 text-white/70 hover:bg-white/15"
@@ -1400,9 +1304,10 @@ export function ArtistDashboard({
                   >
                     {text.single}
                   </button>
+
                   <button
                     onClick={() => setUploadType("ep")}
-                    className={`py-3 px-6 rounded-lg border-2 transition-all ${
+                    className={`w-full py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg border-2 text-sm sm:text-base transition-all ${
                       uploadType === "ep"
                         ? "bg-white/30 border-white/60 text-white"
                         : "bg-white/10 border-white/20 text-white/70 hover:bg-white/15"
@@ -1410,9 +1315,10 @@ export function ArtistDashboard({
                   >
                     {text.ep}
                   </button>
+
                   <button
                     onClick={() => setUploadType("album")}
-                    className={`py-3 px-6 rounded-lg border-2 transition-all ${
+                    className={`w-full py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg border-2 text-sm sm:text-base transition-all ${
                       uploadType === "album"
                         ? "bg-white/30 border-white/60 text-white"
                         : "bg-white/10 border-white/20 text-white/70 hover:bg-white/15"
@@ -1450,7 +1356,7 @@ export function ArtistDashboard({
                     type="text"
                     value={trackTitle}
                     onChange={(e) => setTrackTitle(e.target.value)}
-                    className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
+                    className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
                   />
                 </div>
               )}
@@ -1537,7 +1443,7 @@ export function ArtistDashboard({
                           newTracks[index].title = e.target.value;
                           setAlbumTracks(newTracks);
                         }}
-                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
+                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
                       />
                     </div>
 
@@ -1554,7 +1460,7 @@ export function ArtistDashboard({
                           setAlbumTracks(newTracks);
                         }}
                         placeholder={text.lyricsPlaceholder}
-                        className="w-full h-24 p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all resize-none text-sm"
+                        className="w-full h-24 p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all resize-none text-sm"
                       />
 
                       {/* Accessibility Options for Track */}
@@ -1736,7 +1642,7 @@ export function ArtistDashboard({
                             newTracks[index].authors = e.target.value;
                             setAlbumTracks(newTracks);
                           }}
-                          className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
+                          className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
                         />
                       </div>
                       <div>
@@ -1751,7 +1657,7 @@ export function ArtistDashboard({
                             newTracks[index].producers = e.target.value;
                             setAlbumTracks(newTracks);
                           }}
-                          className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
+                          className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
                         />
                       </div>
                       <div>
@@ -1766,7 +1672,7 @@ export function ArtistDashboard({
                             newTracks[index].lyricists = e.target.value;
                             setAlbumTracks(newTracks);
                           }}
-                          className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
+                          className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
                         />
                       </div>
                       <div>
@@ -1781,7 +1687,7 @@ export function ArtistDashboard({
                             newTracks[index].mixingEngineer = e.target.value;
                             setAlbumTracks(newTracks);
                           }}
-                          className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
+                          className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
                         />
                       </div>
                       <div>
@@ -1796,7 +1702,7 @@ export function ArtistDashboard({
                             newTracks[index].masteringEngineer = e.target.value;
                             setAlbumTracks(newTracks);
                           }}
-                          className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
+                          className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
                         />
                       </div>
                     </div>
@@ -1819,7 +1725,7 @@ export function ArtistDashboard({
                               newTracks[index].musiciansVocals = e.target.value;
                               setAlbumTracks(newTracks);
                             }}
-                            className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-xs"
+                            className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-xs"
                           />
                         </div>
                         <div>
@@ -1835,7 +1741,7 @@ export function ArtistDashboard({
                                 e.target.value;
                               setAlbumTracks(newTracks);
                             }}
-                            className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-xs"
+                            className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-xs"
                           />
                         </div>
                         <div>
@@ -1850,7 +1756,7 @@ export function ArtistDashboard({
                               newTracks[index].musiciansWinds = e.target.value;
                               setAlbumTracks(newTracks);
                             }}
-                            className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-xs"
+                            className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-xs"
                           />
                         </div>
                         <div>
@@ -1866,7 +1772,7 @@ export function ArtistDashboard({
                                 e.target.value;
                               setAlbumTracks(newTracks);
                             }}
-                            className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-xs"
+                            className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-xs"
                           />
                         </div>
                         <div className="col-span-2">
@@ -1882,7 +1788,7 @@ export function ArtistDashboard({
                                 e.target.value;
                               setAlbumTracks(newTracks);
                             }}
-                            className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-xs"
+                            className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-xs"
                           />
                         </div>
                       </div>
@@ -2091,7 +1997,7 @@ export function ArtistDashboard({
                 value={lyrics}
                 onChange={(e) => setLyrics(e.target.value)}
                 placeholder={text.lyricsPlaceholder}
-                className="w-full h-40 p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all resize-none"
+                className="w-full h-40 p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all resize-none"
               />
 
               {/* Accessibility Options */}
@@ -2258,7 +2164,7 @@ export function ArtistDashboard({
                     type="text"
                     value={trackTitle}
                     onChange={(e) => setTrackTitle(e.target.value)}
-                    className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
+                    className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
                   />
                 </div>
 
@@ -2271,7 +2177,7 @@ export function ArtistDashboard({
                     type="text"
                     value={authors}
                     onChange={(e) => setAuthors(e.target.value)}
-                    className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
+                    className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
                   />
                 </div>
 
@@ -2284,7 +2190,7 @@ export function ArtistDashboard({
                     type="text"
                     value={producers}
                     onChange={(e) => setProducers(e.target.value)}
-                    className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
+                    className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
                   />
                 </div>
 
@@ -2297,7 +2203,7 @@ export function ArtistDashboard({
                     type="text"
                     value={lyricists}
                     onChange={(e) => setLyricists(e.target.value)}
-                    className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
+                    className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
                   />
                 </div>
 
@@ -2316,7 +2222,7 @@ export function ArtistDashboard({
                         type="text"
                         value={musiciansVocals}
                         onChange={(e) => setMusiciansVocals(e.target.value)}
-                        className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
+                        className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
                       />
                     </div>
 
@@ -2331,7 +2237,7 @@ export function ArtistDashboard({
                         onChange={(e) =>
                           setMusiciansPianoKeyboards(e.target.value)
                         }
-                        className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
+                        className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
                       />
                     </div>
 
@@ -2344,7 +2250,7 @@ export function ArtistDashboard({
                         type="text"
                         value={musiciansWinds}
                         onChange={(e) => setMusiciansWinds(e.target.value)}
-                        className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
+                        className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
                       />
                     </div>
 
@@ -2357,7 +2263,7 @@ export function ArtistDashboard({
                         type="text"
                         value={musiciansPercussion}
                         onChange={(e) => setMusiciansPercussion(e.target.value)}
-                        className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
+                        className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
                       />
                     </div>
 
@@ -2370,7 +2276,7 @@ export function ArtistDashboard({
                         type="text"
                         value={musiciansStrings}
                         onChange={(e) => setMusiciansStrings(e.target.value)}
-                        className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
+                        className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
                       />
                     </div>
                   </div>
@@ -2385,7 +2291,7 @@ export function ArtistDashboard({
                     type="text"
                     value={mixingEngineer}
                     onChange={(e) => setMixingEngineer(e.target.value)}
-                    className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
+                    className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
                   />
                 </div>
 
@@ -2398,7 +2304,7 @@ export function ArtistDashboard({
                     type="text"
                     value={masteringEngineer}
                     onChange={(e) => setMasteringEngineer(e.target.value)}
-                    className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
+                    className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
                   />
                 </div>
               </div>
@@ -2572,7 +2478,7 @@ export function ArtistDashboard({
                   <select
                     value={trackFilter}
                     onChange={(e) => setTrackFilter(e.target.value)}
-                    className="px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-lg text-white cursor-pointer focus:outline-none focus:border-white/40 transition-all"
+                    className="px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-lg text-black cursor-pointer focus:outline-none focus:border-white/40 transition-all"
                   >
                     <option value="all" className="bg-gray-800">
                       {text.all}
@@ -2597,7 +2503,7 @@ export function ArtistDashboard({
                   value={trackSearch}
                   onChange={(e) => setTrackSearch(e.target.value)}
                   placeholder={text.searchTrack}
-                  className="w-full px-4 py-3 pl-12 bg-white/10 backdrop-blur-md border border-white/20 rounded-lg text-white placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
+                  className="w-full px-4 py-3 pl-12 bg-white/10 backdrop-blur-md border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
                 />
                 <Search
                   className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50"
@@ -2700,7 +2606,7 @@ export function ArtistDashboard({
                         placeholder="9.99"
                         step="0.01"
                         min="0"
-                        className="w-full pl-10 pr-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
+                        className="w-full pl-10 pr-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
                       />
                     </div>
                     <p className="text-white/60 text-sm mt-2">
@@ -2722,7 +2628,7 @@ export function ArtistDashboard({
                         value={quarterlyPrice}
                         readOnly
                         placeholder="—"
-                        className="w-full pl-10 pr-4 py-3 bg-white/5 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/40 cursor-not-allowed opacity-80"
+                        className="w-full pl-10 pr-4 py-3 bg-white/5 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 cursor-not-allowed opacity-80"
                       />
                     </div>
                     <p className="text-white/60 text-sm mt-2">
@@ -2751,7 +2657,7 @@ export function ArtistDashboard({
                         value={annualPrice}
                         readOnly
                         placeholder="—"
-                        className="w-full pl-10 pr-4 py-3 bg-white/5 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/40 cursor-not-allowed opacity-80"
+                        className="w-full pl-10 pr-4 py-3 bg-white/5 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 cursor-not-allowed opacity-80"
                       />
                     </div>
                     <p className="text-white/60 text-sm mt-2">
@@ -2892,7 +2798,7 @@ export function ArtistDashboard({
                     <select
                       value={exclusiveContentType}
                       onChange={(e) => setExclusiveContentType(e.target.value)}
-                      className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white focus:outline-none focus:border-white/40 transition-all"
+                      className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black focus:outline-none focus:border-white/40 transition-all"
                     >
                       <option value="music">{text.music}</option>
                       <option value="video">{text.video}</option>
@@ -2910,7 +2816,7 @@ export function ArtistDashboard({
                       value={exclusiveContentTitle}
                       onChange={(e) => setExclusiveContentTitle(e.target.value)}
                       placeholder={text.contentTitle}
-                      className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
+                      className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
                     />
                   </div>
 
@@ -2925,7 +2831,7 @@ export function ArtistDashboard({
                       }
                       placeholder={text.contentDescription}
                       rows={3}
-                      className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all resize-none"
+                      className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all resize-none"
                     />
                   </div>
 
@@ -3198,7 +3104,7 @@ export function ArtistDashboard({
                         value={bankAccountHolder}
                         onChange={(e) => setBankAccountHolder(e.target.value)}
                         placeholder="John Doe"
-                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
+                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
                       />
                     </div>
                     <div>
@@ -3210,7 +3116,7 @@ export function ArtistDashboard({
                         value={bankName}
                         onChange={(e) => setBankName(e.target.value)}
                         placeholder="Bank of America"
-                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
+                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
                       />
                     </div>
                     <div>
@@ -3222,7 +3128,7 @@ export function ArtistDashboard({
                         value={accountNumber}
                         onChange={(e) => setAccountNumber(e.target.value)}
                         placeholder="123456789"
-                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
+                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
                       />
                     </div>
                     <div>
@@ -3234,7 +3140,7 @@ export function ArtistDashboard({
                         value={routingNumber}
                         onChange={(e) => setRoutingNumber(e.target.value)}
                         placeholder="021000021"
-                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
+                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
                       />
                     </div>
                     <div>
@@ -3246,7 +3152,7 @@ export function ArtistDashboard({
                         value={swiftCode}
                         onChange={(e) => setSwiftCode(e.target.value)}
                         placeholder="BOFAUS3N"
-                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
+                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
                       />
                     </div>
                     <div>
@@ -3258,7 +3164,7 @@ export function ArtistDashboard({
                         value={iban}
                         onChange={(e) => setIban(e.target.value)}
                         placeholder="GB29 NWBK 6016 1331 9268 19"
-                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
+                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
                       />
                     </div>
                   </div>
@@ -3285,7 +3191,7 @@ export function ArtistDashboard({
                         value={paypalEmail}
                         onChange={(e) => setPaypalEmail(e.target.value)}
                         placeholder="artist@example.com"
-                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
+                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
                       />
                     </div>
 
@@ -3299,7 +3205,7 @@ export function ArtistDashboard({
                         value={bizumPhone}
                         onChange={(e) => setBizumPhone(e.target.value)}
                         placeholder="+34 600 000 000"
-                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
+                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
                       />
                     </div>
 
@@ -3311,24 +3217,24 @@ export function ArtistDashboard({
                       <select
                         value={mobileMoneyProvider}
                         onChange={(e) => setMobileMoneyProvider(e.target.value)}
-                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white focus:outline-none focus:border-white/40 transition-all"
+                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black focus:outline-none focus:border-white/40 transition-all"
                       >
-                        <option value="" className="bg-gray-900">
+                        <option value="" className="bg-white">
                           {text.selectProvider}
                         </option>
-                        <option value="MTN" className="bg-gray-900">
+                        <option value="MTN" className="bg-white">
                           MTN Mobile Money
                         </option>
-                        <option value="Vodafone" className="bg-gray-900">
+                        <option value="Vodafone" className="bg-white">
                           Vodafone Cash
                         </option>
-                        <option value="Airtel" className="bg-gray-900">
+                        <option value="Airtel" className="bg-white">
                           Airtel Money
                         </option>
-                        <option value="Tigo" className="bg-gray-900">
+                        <option value="Tigo" className="bg-white">
                           Tigo Cash
                         </option>
-                        <option value="M-Pesa" className="bg-gray-900">
+                        <option value="M-Pesa" className="bg-white">
                           M-Pesa
                         </option>
                       </select>
@@ -3344,7 +3250,7 @@ export function ArtistDashboard({
                         value={mobileMoneyPhone}
                         onChange={(e) => setMobileMoneyPhone(e.target.value)}
                         placeholder="+233 000 000 000"
-                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
+                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
                       />
                     </div>
 
@@ -3358,7 +3264,7 @@ export function ArtistDashboard({
                         value={orangeMoneyPhone}
                         onChange={(e) => setOrangeMoneyPhone(e.target.value)}
                         placeholder="+225 00 00 00 00"
-                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
+                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
                       />
                     </div>
                   </div>
