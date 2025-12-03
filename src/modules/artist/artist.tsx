@@ -47,7 +47,7 @@ export default function ArtistsPage() {
         ModuleObject.localState.ACCESS_TOKEN
       );
       if (!accessToken) return;
-      const res = await TagModuleObject.service.getTags(accessToken);
+      const res = await TagModuleObject.service.getTags();
       setTags(res.data);
       await wait();
     } catch (err) {
@@ -125,14 +125,11 @@ export default function ArtistsPage() {
           biography: form.biography,
         });
       } else {
-        const newArtist = await ModuleObject.service.createArtist(
-          {
-            name: form.name,
-            location: form.location,
-            biography: form.biography,
-          },
-          token
-        );
+        const newArtist = await ModuleObject.service.createArtist({
+          name: form.name,
+          location: form.location,
+          biography: form.biography,
+        });
 
         if (form.tagId) {
           await ModuleObject.service.createArtistTag(
