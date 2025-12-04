@@ -145,17 +145,16 @@ export default function ResetPasswordForm({
                 Choose a new password to secure your account.
               </p>
             </div>
+            {/* Messages */}
+            {successMessage && <CustomSuccess message={successMessage} />}
+            {errorMessage && <CustomAlert message={errorMessage} />}
 
             {success ? (
               <div className="text-center space-y-4">
                 <p className="text-white/80 text-sm bg-green-500/20 border border-green-500/40 rounded-lg p-3">
                   ✅ Your password has been reset successfully.
                 </p>
-                {successMessage && (
-                  <div className="bg-green-500/20 border border-green-500/40 rounded-lg p-3 text-white text-sm">
-                    <CustomSuccess message={successMessage} />
-                  </div>
-                )}
+
                 <p className="text-white/80">
                   You can now{" "}
                   <a
@@ -237,14 +236,6 @@ export default function ResetPasswordForm({
                       </button>
                     </div>
                   </div>
-
-                  {/* Messages */}
-                  {successMessage && (
-                    <div className="bg-green-500/20 border border-green-500/40 rounded-lg p-3 text-white text-sm">
-                      <CustomSuccess message={successMessage} />
-                    </div>
-                  )}
-                  {errorMessage && <CustomAlert message={errorMessage} />}
 
                   {/* Bouton */}
                   <button

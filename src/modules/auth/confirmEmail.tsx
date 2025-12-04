@@ -130,17 +130,9 @@ export default function ConfirmEmailForm() {
               </div>
 
               {/* Messages de succès / erreur (même thème que login) */}
-              {successMessage && (
-                <div className="bg-green-500/20 border border-green-500/40 rounded-lg p-3 text-white text-sm">
-                  <CustomSuccess message={successMessage} />
-                </div>
-              )}
+              {successMessage && <CustomSuccess message={successMessage} />}
 
-              {errorMessage && (
-                <div className="bg-red-500/20 border border-red-500/40 rounded-lg p-3 text-white text-sm">
-                  <CustomAlert message={errorMessage} />
-                </div>
-              )}
+              {errorMessage && <CustomAlert message={errorMessage} />}
 
               {status !== "idle" &&
                 message &&

@@ -215,13 +215,11 @@ const Smartphone = ({ size = 24, className = "" }) => (
 );
 
 interface ArtistDashboardProps {
-  onBack: () => void;
   language: string;
   onGoToStreaming?: () => void;
 }
 
 export function ArtistDashboard({
-  onBack,
   language,
   onGoToStreaming,
 }: ArtistDashboardProps) {
