@@ -5,7 +5,7 @@ interface Props {
 }
 const CustomSuccess = ({ message }: Props) => {
   return (
-    <div className="p-3 px-2 bg-green-100 text-green-700 rounded-md my-4 italic text-center">
+    <div className="bg-green-500/20 border text-center border-green-500/40 rounded-lg p-3 text-white text-sm">
       {message}
     </div>
   );

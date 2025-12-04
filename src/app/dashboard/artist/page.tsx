@@ -1,16 +1,11 @@
 "use client";
+
 import { ArtistDashboard } from "@/modules/components/ArtistDashboard";
+import { useLanguage } from "@/@disktro/hooks/useLanguage";
 import React from "react";
 
-const page = () => {
-  return (
-    <ArtistDashboard
-      onBack={function (): void {
-        throw new Error("Function not implemented.");
-      }}
-      language={"english"}
-    />
-  );
-};
+export default function Page() {
+  const { language } = useLanguage();
 
-export default page;
+  return <ArtistDashboard language={language} />;
+}

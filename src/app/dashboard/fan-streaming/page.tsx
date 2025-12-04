@@ -1,9 +1,17 @@
 "use client";
+
+import { ProtectedRoute } from "@/@disktro/protectedRoute";
 import { FanStreaming } from "@/modules/components/FanStreaming";
-import React from "react";
 
-const page = () => {
-  return <FanStreaming language="english" onBack={() => {}} />;
-};
-
-export default page;
+export default function FanStreamingPage() {
+  return (
+    <ProtectedRoute>
+      <FanStreaming
+        onBack={() => {
+          // éventuellement router.back() ou une autre navigation
+        }}
+        language="english" // ou récupéré depuis ton système de langue
+      />
+    </ProtectedRoute>
+  );
+}

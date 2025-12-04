@@ -316,8 +316,8 @@ export function Login({
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 
-             bg-black/80 p-1.5 rounded-full 
-             text-white hover:text-white cursor-pointer backdrop-blur-sm"
+              p-1.5 rounded-full 
+             text-black/90 hover:text-black/100 cursor-pointer backdrop-blur-sm"
                   >
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>

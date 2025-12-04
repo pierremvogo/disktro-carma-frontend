@@ -134,6 +134,10 @@ export default function ForgotPasswordForm() {
                 Enter your email to receive a password reset link.
               </p>
             </div>
+            {/* Messages succès / erreur */}
+            {successMessage && <CustomSuccess message={successMessage} />}
+
+            {errorMessage && <CustomAlert message={errorMessage} />}
 
             {/* Contenu selon succès ou non */}
             {success ? (
@@ -142,18 +146,6 @@ export default function ForgotPasswordForm() {
                   If this email exists in our system, we’ve sent you a reset
                   link 💌
                 </p>
-
-                {successMessage && (
-                  <div className="bg-green-500/20 border border-green-500/40 rounded-lg p-3 text-white text-sm">
-                    <CustomSuccess message={successMessage} />
-                  </div>
-                )}
-
-                {errorMessage && (
-                  <div className="bg-red-500/20 border border-red-500/40 rounded-lg p-3 text-white text-sm">
-                    <CustomAlert message={errorMessage} />
-                  </div>
-                )}
 
                 {resendAvailable ? (
                   <button
@@ -189,19 +181,6 @@ export default function ForgotPasswordForm() {
                     />
                   </div>
                 </div>
-
-                {/* Messages succès / erreur */}
-                {successMessage && (
-                  <div className="bg-green-500/20 border border-green-500/40 rounded-lg p-3 text-white text-sm">
-                    <CustomSuccess message={successMessage} />
-                  </div>
-                )}
-
-                {errorMessage && (
-                  <div className="bg-red-500/20 border border-red-500/40 rounded-lg p-3 text-white text-sm">
-                    <CustomAlert message={errorMessage} />
-                  </div>
-                )}
 
                 {/* Bouton */}
                 <button

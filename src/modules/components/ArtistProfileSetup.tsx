@@ -653,9 +653,8 @@ export function ArtistProfileSetup({
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 
-             bg-black/80 p-1.5 rounded-full 
-             text-white hover:text-white cursor-pointer backdrop-blur-sm"
+                        className="absolute right-3 top-1/2 -translate-y-1/2  p-1.5 rounded-full 
+             text-black/90 hover:text-black/100 cursor-pointer backdrop-blur-sm"
                       >
                         {showPassword ? (
                           <EyeOff size={18} />
@@ -694,8 +693,8 @@ export function ArtistProfileSetup({
                           setShowConfirmPassword(!showConfirmPassword)
                         }
                         className="absolute right-3 top-1/2 -translate-y-1/2 
-                        bg-black/80 p-1.5 rounded-full 
-                        text-white hover:text-white cursor-pointer backdrop-blur-sm"
+                        text-black/90 hover:text-black/100 p-1.5 rounded-full 
+                    cursor-pointer backdrop-blur-sm"
                       >
                         {showConfirmPassword ? (
                           <EyeOff size={20} />

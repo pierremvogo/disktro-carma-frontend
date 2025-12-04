@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { Questionnaire } from "./Questionnaire";
 import { UserType } from "./UserType";
@@ -11,6 +11,7 @@ import { Login } from "./Login";
 import { ArtistChoice } from "./ArtistChoice";
 
 type Language = "english" | "spanish" | "catalan";
+const LANGUAGE_STORAGE_KEY = "disktro_language";
 
 export function ScreenEmbed() {
   const [language, setLanguage] = useState<Language>("english");
@@ -23,6 +24,23 @@ export function ScreenEmbed() {
   const [showLogin, setShowLogin] = useState(false);
   const [showArtistChoice, setShowArtistChoice] = useState(false);
   const [isArtist, setIsArtist] = useState(false);
+
+  // 👉 Charger la langue depuis localStorage au montage
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const saved = localStorage.getItem(LANGUAGE_STORAGE_KEY);
+    if (saved === "english" || saved === "spanish" || saved === "catalan") {
+      setLanguage(saved);
+    }
+  }, []);
+
+  // 👉 Fonction pour changer la langue + la persister
+  const changeLanguage = (lang: Language) => {
+    setLanguage(lang);
+    if (typeof window !== "undefined") {
+      localStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
+    }
+  };
 
   const messages = {
     spanish: "Bienvenido a música para todos",
@@ -92,10 +110,6 @@ export function ScreenEmbed() {
     return (
       <div className="fixed inset-0 w-screen h-screen">
         <ArtistDashboard
-          onBack={() => {
-            setShowArtistDashboard(false);
-            setShowArtistChoice(true);
-          }}
           language={language}
           onGoToStreaming={() => {
             setShowArtistDashboard(false);
@@ -146,15 +160,7 @@ export function ScreenEmbed() {
   if (showFanStreaming) {
     return (
       <div className="fixed inset-0 w-screen h-screen">
-        <FanStreaming
-          onBack={() => {
-            setShowFanStreaming(false);
-            if (isArtist) {
-              setShowArtistChoice(true);
-            }
-          }}
-          language={language}
-        />
+        <FanStreaming language={language} />
       </div>
     );
   }
@@ -278,7 +284,7 @@ export function ScreenEmbed() {
               role="group"
             >
               <button
-                onClick={() => setLanguage("spanish")}
+                onClick={() => changeLanguage("spanish")}
                 className={`text-white cursor-pointer drop-shadow hover:opacity-70 transition-opacity underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent rounded px-2 py-1 text-sm sm:text-base ${
                   language === "spanish"
                     ? "opacity-100 font-bold"
@@ -290,7 +296,7 @@ export function ScreenEmbed() {
                 Spanish
               </button>
               <button
-                onClick={() => setLanguage("english")}
+                onClick={() => changeLanguage("english")}
                 className={`text-white cursor-pointer drop-shadow hover:opacity-70 transition-opacity underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent rounded px-2 py-1 text-sm sm:text-base ${
                   language === "english"
                     ? "opacity-100 font-bold"
@@ -302,7 +308,7 @@ export function ScreenEmbed() {
                 English
               </button>
               <button
-                onClick={() => setLanguage("catalan")}
+                onClick={() => changeLanguage("catalan")}
                 className={`text-white cursor-pointer drop-shadow hover:opacity-70 transition-opacity underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent rounded px-2 py-1 text-sm sm:text-base ${
                   language === "catalan"
                     ? "opacity-100 font-bold"

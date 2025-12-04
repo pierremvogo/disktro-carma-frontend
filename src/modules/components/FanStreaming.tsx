@@ -193,11 +193,10 @@ const FileText = ({ size = 24, className = "" }) => (
 );
 
 interface FanStreamingProps {
-  onBack: () => void;
   language: string;
 }
 
-export function FanStreaming({ onBack, language }: FanStreamingProps) {
+export function FanStreaming({ language }: FanStreamingProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTab, setSelectedTab] = useState("discover");
   const [isPlaying, setIsPlaying] = useState(false);
@@ -244,7 +243,6 @@ export function FanStreaming({ onBack, language }: FanStreamingProps) {
       if (e.key === "Escape") {
         if (showAccessibility) setShowAccessibility(false);
         else if (showLyrics) setShowLyrics(false);
-        else onBack();
       }
       if (e.key === " " && currentSong) {
         e.preventDefault();
@@ -258,14 +256,7 @@ export function FanStreaming({ onBack, language }: FanStreamingProps) {
 
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
-  }, [
-    keyboardNav,
-    showAccessibility,
-    showLyrics,
-    currentSong,
-    isPlaying,
-    onBack,
-  ]);
+  }, [keyboardNav, showAccessibility, showLyrics, currentSong, isPlaying]);
 
   const router = useRouter();
 
