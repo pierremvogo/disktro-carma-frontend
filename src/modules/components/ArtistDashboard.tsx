@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ArtistModuleObject as ModuleObject } from "../artist/module";
 import { useRouter } from "next/navigation";
 import { AccessibilitySettingsPanel } from "./AccessibilitySettingsPanel";
@@ -942,6 +942,7 @@ export function ArtistDashboard({
       setUploadedFile(e.target.files[0]);
     }
   };
+  const [isArtist, setIsArtist] = useState(false);
 
   const handleUpload = () => {
     if (uploadedFile) {
@@ -958,9 +959,47 @@ export function ArtistDashboard({
     localStorage.removeItem(ModuleObject.localState.USER_ROLE);
     router.push("/home");
   };
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const storedRole = localStorage.getItem(ModuleObject.localState.USER_ROLE);
+    // Tu avais fait: JSON.stringify(res1.data.type), donc ça ressemble à '"artist"'
+    let role: string | null = null;
+    try {
+      // Si c'est du JSON stringify, on parse
+      role = storedRole ? JSON.parse(storedRole) : null;
+    } catch {
+      // Si ce n’est pas du JSON, on le prend brut
+      role = storedRole;
+    }
+    if (role === "artist") {
+      setIsArtist(true);
+    } else {
+      setIsArtist(false);
+    }
+  }, []);
 
   return (
     <div className="w-full h-full min-h-screen overflow-y-auto p-8 bg-gradient-to-br from-slate-900 via-purple-900 to-black">
+      {isArtist && (
+        <button
+          onClick={() => router.push("/dashboard/artist/select")}
+          className="cursor-pointer flex items-center gap-2 text-white drop-shadow hover:opacity-70 transition-opacity mb-6"
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M19 12H5M12 19l-7-7 7-7" />
+          </svg>
+          {text.back}
+        </button>
+      )}
       <div className="max-w-6xl mx-auto space-y-6 sm:space-y-8">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-4xl text-white drop-shadow-lg">{text.title}</h1>
