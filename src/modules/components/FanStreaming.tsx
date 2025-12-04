@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FanProfile } from "./FanProfile";
 import { UserModuleObject as ModuleObject } from "../module";
 import { useRouter } from "next/navigation";
@@ -259,6 +259,7 @@ export function FanStreaming({ language }: FanStreamingProps) {
   }, [keyboardNav, showAccessibility, showLyrics, currentSong, isPlaying]);
 
   const router = useRouter();
+  const [isArtist, setIsArtist] = useState(false);
 
   // Show notification helper
   const showNotification = (message: string) => {
@@ -852,6 +853,27 @@ Underneath the shining star`,
       <FanProfile onBack={() => setShowProfile(false)} language={language} />
     );
   }
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const storedRole = localStorage.getItem(ModuleObject.localState.USER_ROLE);
+    // Tu avais fait: JSON.stringify(res1.data.type), donc ça ressemble à '"artist"'
+    let role: string | null = null;
+
+    try {
+      // Si c'est du JSON stringify, on parse
+      role = storedRole ? JSON.parse(storedRole) : null;
+    } catch {
+      // Si ce n’est pas du JSON, on le prend brut
+      role = storedRole;
+    }
+
+    if (role === "artist") {
+      setIsArtist(true);
+    } else {
+      setIsArtist(false);
+    }
+  }, []);
 
   return (
     <div
@@ -967,6 +989,27 @@ Underneath the shining star`,
           focusMode ? "opacity-80" : ""
         }`}
       >
+        {isArtist && (
+          <button
+            onClick={() => router.push("/dashboard/artist/select")}
+            className={`flex cursor-pointer items-center m-1 text-white drop-shadow hover:opacity-70 ${animationClasses} ${buttonSizeClasses}`}
+            aria-label={text.back}
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+            {text.back}
+          </button>
+        )}
         <div className="flex items-center justify-between p-6">
           <h1 className="text-2xl text-white drop-shadow-lg">{text.title}</h1>
           <div className="flex items-center gap-2 ml-auto">
@@ -1095,7 +1138,7 @@ Underneath the shining star`,
       </div>
 
       {/* Main Content */}
-      <div className="absolute top-40 left-0 right-0 bottom-32 overflow-y-auto px-6 pb-6">
+      <div className="absolute top-50 left-0 right-0 bottom-32 overflow-y-auto px-6 pb-6">
         {/* Search Bar */}
         <div className="mb-8 max-w-2xl mx-auto">
           <div className="relative">

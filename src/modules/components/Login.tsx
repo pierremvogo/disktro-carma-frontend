@@ -230,7 +230,7 @@ export function Login({
         JSON.stringify(res1.data.type)
       );
       if (res1.data.type === "artist") {
-        router.push("/dashboard/artist");
+        router.push("/dashboard/artist/select");
       } else {
         router.push("/dashboard/fan-streaming");
       }
