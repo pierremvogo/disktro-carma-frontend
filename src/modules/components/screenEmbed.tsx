@@ -77,6 +77,11 @@ export function ScreenEmbed() {
     el.scrollLeft = dragData.current.scrollLeft - walk;
   };
 
+  const [videos, setVideos] = useState<string[]>([
+    "https://res.cloudinary.com/dql4qiwjg/video/upload/v1765036472/video_song/1765036469226-496598996.mp4",
+    "https://res.cloudinary.com/dql4qiwjg/video/upload/v1765037601/video_song/1765037599148-810866371.mp4",
+  ]);
+
   const handleMouseUp = () => {
     setIsDragging(false);
   };
@@ -234,9 +239,135 @@ export function ScreenEmbed() {
     >
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/50" />
+      {/* Language Options and Controls - below the screen */}
+      <div className="relative z-10 flex flex-col items-center gap-3 w-full">
+        {/* Language Options */}
+        <nav
+          aria-label={
+            language === "spanish"
+              ? "Selección de idioma"
+              : language === "english"
+              ? "Language selection"
+              : "Selecció d'idioma"
+          }
+          className="w-full"
+        >
+          <div
+            className="flex flex-wrap justify-center gap-3 sm:gap-6"
+            role="group"
+          >
+            <button
+              onClick={() => changeLanguage("spanish")}
+              className={`text-white cursor-pointer drop-shadow hover:opacity-70 transition-opacity underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent rounded px-2 py-1 text-sm sm:text-base ${
+                language === "spanish" ? "opacity-100 font-bold" : "opacity-70"
+              }`}
+              aria-label="Español"
+              aria-current={language === "spanish" ? "true" : "false"}
+            >
+              Spanish
+            </button>
+            <button
+              onClick={() => changeLanguage("english")}
+              className={`text-white cursor-pointer drop-shadow hover:opacity-70 transition-opacity underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent rounded px-2 py-1 text-sm sm:text-base ${
+                language === "english" ? "opacity-100 font-bold" : "opacity-70"
+              }`}
+              aria-label="English"
+              aria-current={language === "english" ? "true" : "false"}
+            >
+              English
+            </button>
+            <button
+              onClick={() => changeLanguage("catalan")}
+              className={`text-white cursor-pointer drop-shadow hover:opacity-70 transition-opacity underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent rounded px-2 py-1 text-sm sm:text-base ${
+                language === "catalan" ? "opacity-100 font-bold" : "opacity-70"
+              }`}
+              aria-label="Català"
+              aria-current={language === "catalan" ? "true" : "false"}
+            >
+              Catalan
+            </button>
+          </div>
+        </nav>
 
+        {/* Bottom Buttons */}
+        <div className="flex flex-wrap items-center justify-center gap-3 mt-1">
+          <button
+            onClick={() => setShowQuestionnaire(true)}
+            className="flex cursor-pointer items-center gap-2 px-3 sm:px-4 py-2 bg-white/20 backdrop-blur-md border border.white/30 rounded-lg text-white text-sm sm:text-base drop-shadow hover:bg-white/30 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
+            aria-label={
+              language === "spanish"
+                ? "Entrar al cuestionario"
+                : language === "english"
+                ? "Enter questionnaire"
+                : "Entrar al qüestionari"
+            }
+          >
+            Test Group
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </button>
+
+          <button
+            onClick={() => setShowUserType(true)}
+            className="flex cursor-pointer items-center gap-2 px-3 sm:px-4 py-2 bg-white/30 backdrop-blur-md border border-white/40 rounded-lg text-white text-sm sm:text-base drop-shadow hover:bg-white/40 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
+            aria-label={signUpText[language as keyof typeof signUpText]}
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <line x1="19" y1="8" x2="19" y2="14" />
+              <line x1="22" y1="11" x2="16" y2="11" />
+            </svg>
+            {signUpText[language as keyof typeof signUpText]}
+          </button>
+
+          <button
+            onClick={() => setShowLogin(true)}
+            className="flex cursor-pointer items-center gap-2 px-3 sm:px-4 py-2 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text.white text-sm sm:text-base drop-shadow hover:bg-white/30 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
+            aria-label={loginText[language as keyof typeof loginText]}
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+              <polyline points="10 17 15 12 10 7" />
+              <line x1="15" y1="12" x2="3" y2="12" />
+            </svg>
+            {loginText[language as keyof typeof loginText]}
+          </button>
+        </div>
+      </div>
       {/* Content */}
-      <div className="relative w-full h-full overflow-y-auto flex items-center justify-center px-4 py-8 md:px-8">
+      <div className="relative w-full h-full overflow-y-auto flex items-center justify-center px-4 md:px-8">
         <div className="relative w-full max-w-7xl flex flex-col items-center gap-8 md:gap-10">
           <div className="relative w-full flex items-center justify-center">
             {/* Left Panel - vertical background (only on large screens) */}
@@ -264,7 +395,7 @@ export function ScreenEmbed() {
             />
 
             {/* Middle Panel - Screen (responsive) */}
-            <div className="relative z-10 w-full max-w-4xl mt-8 md:mt-20 lg:mt-32">
+            <div className="relative z-10 w-full max-w-4xl mt-8  md:mt-1 lg:mt-2">
               <div className="w-full h-full bg-white/10  backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden border border-white/20 flex flex-col">
                 {/* Main Content Area */}
                 <div className="flex-1 relative bg-gradient-to-br from-purple-500/20 via-pink-500/20 to-blue-500/20 flex items-center justify-center p-4 sm:p-6 md:p-8">
@@ -311,9 +442,7 @@ export function ScreenEmbed() {
                         <h2 className="text-2xl sm:text-3xl md:text-4xl drop-shadow-lg">
                           {messages[language]}
                         </h2>
-                        <p className="text-sm sm:text-base md:text-lg opacity-90 drop-shadow">
-                          This screen is embedded within your artistic frame
-                        </p>
+                        <p className="text-sm sm:text-base md:text-lg opacity-90 drop-shadow"></p>
                       </div>
 
                       {/* Sample Content Card */}
@@ -360,8 +489,26 @@ export function ScreenEmbed() {
     `}
                           style={{ scrollBehavior: "smooth" }}
                         >
+                          {/* Slide 2 : vidéo YouTube */}
+                          {videos.map((url, index) => (
+                            <div key={index} className="min-w-full snap-center">
+                              <div className="aspect-video bg-black rounded-lg mb-3 overflow-hidden">
+                                <iframe
+                                  className="w-full h-full"
+                                  src={videos[index]}
+                                  title={`Embedded YouTube video ${index + 1}`}
+                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                  allowFullScreen
+                                />
+                              </div>
+                              <p className="text-xs sm:text-sm opacity-80 drop-shadow text-center">
+                                #{index + 1}
+                              </p>
+                            </div>
+                          ))}
+
                           {/* Slide 1 */}
-                          <div className="min-w-full snap-center">
+                          {/* <div className="min-w-full snap-center">
                             <div className="aspect-video bg-black/20 backdrop-blur-sm rounded-lg mb-3 flex items-center justify-center overflow-hidden">
                               <ImageWithFallback
                                 src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&q=80"
@@ -372,23 +519,7 @@ export function ScreenEmbed() {
                             <p className="text-xs sm:text-sm opacity-80 drop-shadow text-center">
                               Artwork or hero image
                             </p>
-                          </div>
-
-                          {/* Slide 2 : vidéo YouTube */}
-                          <div className="min-w-full snap-center">
-                            <div className="aspect-video bg-black rounded-lg mb-3 overflow-hidden">
-                              <iframe
-                                className="w-full h-full"
-                                src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-                                title="Embedded YouTube video"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                allowFullScreen
-                              />
-                            </div>
-                            <p className="text-xs sm:text-sm opacity-80 drop-shadow text-center">
-                              Embedded YouTube preview
-                            </p>
-                          </div>
+                          </div> */}
 
                           {/* Slide 3 : autre image */}
                           <div className="min-w-full snap-center">
@@ -399,9 +530,7 @@ export function ScreenEmbed() {
                                 className="w-full h-full object-cover rounded-lg opacity-80"
                               />
                             </div>
-                            <p className="text-xs sm:text-sm opacity-80 drop-shadow text-center">
-                              Additional promo visual
-                            </p>
+                            <p className="text-xs sm:text-sm opacity-80 drop-shadow text-center"></p>
                           </div>
                         </div>
 
@@ -414,140 +543,6 @@ export function ScreenEmbed() {
                   )}
                 </div>
               </div>
-            </div>
-          </div>
-
-          {/* Language Options and Controls - below the screen */}
-          <div className="relative z-10 flex flex-col items-center gap-3 w-full">
-            {/* Language Options */}
-            <nav
-              aria-label={
-                language === "spanish"
-                  ? "Selección de idioma"
-                  : language === "english"
-                  ? "Language selection"
-                  : "Selecció d'idioma"
-              }
-              className="w-full"
-            >
-              <div
-                className="flex flex-wrap justify-center gap-3 sm:gap-6"
-                role="group"
-              >
-                <button
-                  onClick={() => changeLanguage("spanish")}
-                  className={`text-white cursor-pointer drop-shadow hover:opacity-70 transition-opacity underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent rounded px-2 py-1 text-sm sm:text-base ${
-                    language === "spanish"
-                      ? "opacity-100 font-bold"
-                      : "opacity-70"
-                  }`}
-                  aria-label="Español"
-                  aria-current={language === "spanish" ? "true" : "false"}
-                >
-                  Spanish
-                </button>
-                <button
-                  onClick={() => changeLanguage("english")}
-                  className={`text-white cursor-pointer drop-shadow hover:opacity-70 transition-opacity underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent rounded px-2 py-1 text-sm sm:text-base ${
-                    language === "english"
-                      ? "opacity-100 font-bold"
-                      : "opacity-70"
-                  }`}
-                  aria-label="English"
-                  aria-current={language === "english" ? "true" : "false"}
-                >
-                  English
-                </button>
-                <button
-                  onClick={() => changeLanguage("catalan")}
-                  className={`text-white cursor-pointer drop-shadow hover:opacity-70 transition-opacity underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent rounded px-2 py-1 text-sm sm:text-base ${
-                    language === "catalan"
-                      ? "opacity-100 font-bold"
-                      : "opacity-70"
-                  }`}
-                  aria-label="Català"
-                  aria-current={language === "catalan" ? "true" : "false"}
-                >
-                  Catalan
-                </button>
-              </div>
-            </nav>
-
-            {/* Bottom Buttons */}
-            <div className="flex flex-wrap items-center justify-center gap-3 mt-1">
-              <button
-                onClick={() => setShowQuestionnaire(true)}
-                className="flex cursor-pointer items-center gap-2 px-3 sm:px-4 py-2 bg-white/20 backdrop-blur-md border border.white/30 rounded-lg text-white text-sm sm:text-base drop-shadow hover:bg-white/30 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
-                aria-label={
-                  language === "spanish"
-                    ? "Entrar al cuestionario"
-                    : language === "english"
-                    ? "Enter questionnaire"
-                    : "Entrar al qüestionari"
-                }
-              >
-                Enter
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                >
-                  <path d="M5 12h14M12 5l7 7-7 7" />
-                </svg>
-              </button>
-
-              <button
-                onClick={() => setShowUserType(true)}
-                className="flex cursor-pointer items-center gap-2 px-3 sm:px-4 py-2 bg-white/30 backdrop-blur-md border border-white/40 rounded-lg text-white text-sm sm:text-base drop-shadow hover:bg-white/40 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
-                aria-label={signUpText[language as keyof typeof signUpText]}
-              >
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                >
-                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                  <circle cx="9" cy="7" r="4" />
-                  <line x1="19" y1="8" x2="19" y2="14" />
-                  <line x1="22" y1="11" x2="16" y2="11" />
-                </svg>
-                {signUpText[language as keyof typeof signUpText]}
-              </button>
-
-              <button
-                onClick={() => setShowLogin(true)}
-                className="flex cursor-pointer items-center gap-2 px-3 sm:px-4 py-2 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text.white text-sm sm:text-base drop-shadow hover:bg-white/30 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
-                aria-label={loginText[language as keyof typeof loginText]}
-              >
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                >
-                  <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
-                  <polyline points="10 17 15 12 10 7" />
-                  <line x1="15" y1="12" x2="3" y2="12" />
-                </svg>
-                {loginText[language as keyof typeof loginText]}
-              </button>
             </div>
           </div>
         </div>

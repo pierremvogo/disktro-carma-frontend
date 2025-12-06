@@ -91,7 +91,7 @@ export default function ProfileSettings() {
     const formData = new FormData();
     formData.append("file", file);
     try {
-      const res = await ModuleObject.service.uploadImageFile(formData, token!);
+      const res = await ModuleObject.service.uploadImageFile(formData);
       if (res && res.url) {
         setFormData((prev) => ({ ...prev, profileImageUrl: res.url }));
         setSuccessMessage("Image uploadée avec succès.");

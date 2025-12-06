@@ -12,21 +12,24 @@ interface API_URLS {
   DOWNLOAD_AUDIO_FILE: string;
   DOWNLOAD_VIDEO_FILE: string;
   DOWNLOAD_IMAGE_FILE: string;
+  DOWNLOAD_BRAILLE_FILE: string; // 🆕
   UPLOAD_AUDIO_FILE: string;
   UPLOAD_VIDEO_FILE: string;
   UPLOAD_IMAGE_FILE: string;
+  UPLOAD_BRAILLE_FILE: string;
 }
 
 const API_URLS: API_URLS = {
   DOWNLOAD_AUDIO_FILE: `${BASE_API_URL}/download/audio`,
   DOWNLOAD_VIDEO_FILE: `${BASE_API_URL}/download/video`,
   DOWNLOAD_IMAGE_FILE: `${BASE_API_URL}/download/image`,
+  DOWNLOAD_BRAILLE_FILE: `${BASE_API_URL}/download/braille`,
 
   UPLOAD_AUDIO_FILE: `${BASE_API_URL}/upload/audio`,
   UPLOAD_VIDEO_FILE: `${BASE_API_URL}/upload/video`,
   UPLOAD_IMAGE_FILE: `${BASE_API_URL}/upload/image`,
+  UPLOAD_BRAILLE_FILE: `${BASE_API_URL}/upload/braille`,
 } as const;
-
 class ServiceObject {
   static downloadAudioFile = async (
     cloudinaryUrl: string,
@@ -94,14 +97,35 @@ class ServiceObject {
     return await response.blob();
   };
 
-  static uploadAudioFile = (file: FormData, token: string): Promise<any> =>
+  static downloadBrailleFile = async (
+    cloudinaryUrl: string,
+    token: string
+  ): Promise<Blob> => {
+    const url = `${API_URLS.DOWNLOAD_BRAILLE_FILE}?url=${encodeURIComponent(
+      cloudinaryUrl
+    )}`;
+
+    const response = await fetch(url, {
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!response.ok)
+      throw new Error("Erreur lors du téléchargement du fichier braille.");
+    return await response.blob();
+  };
+
+  static uploadAudioFile = (file: FormData): Promise<any> =>
     BaseMethods.postRequest(API_URLS.UPLOAD_AUDIO_FILE, file, true);
 
-  static uploadVideoFile = (file: FormData, token: string): Promise<any> =>
+  static uploadVideoFile = (file: FormData): Promise<any> =>
     BaseMethods.postRequest(API_URLS.UPLOAD_VIDEO_FILE, file, true, {});
 
-  static uploadImageFile = (file: FormData, token: string): Promise<any> =>
+  static uploadImageFile = (file: FormData): Promise<any> =>
     BaseMethods.postRequest(API_URLS.UPLOAD_IMAGE_FILE, file, true, {});
+
+  static uploadBrailleFile = (file: FormData): Promise<any> =>
+    BaseMethods.postRequest(API_URLS.UPLOAD_BRAILLE_FILE, file, true, {});
 }
 interface LocalState {
   ACCESS_TOKEN: string;

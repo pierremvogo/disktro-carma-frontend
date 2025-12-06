@@ -61,6 +61,21 @@ export const getVideoFile = async (
   return "";
 };
 
+export const getBrailleFile = async (
+  brailleUrl: string,
+  token: string
+): Promise<string> => {
+  if (brailleUrl) {
+    const blob = await ModuleObject.service.downloadBrailleFile(
+      brailleUrl,
+      token
+    );
+    const brailleObjectUrl = URL.createObjectURL(blob);
+    return brailleObjectUrl;
+  }
+  return "";
+};
+
 export const getUserRole = () => {
   const rawRole = localStorage.getItem(ModuleObject.localState.USER_ROLE);
   return rawRole ? rawRole.trim().toLowerCase().replace(/['"]+/g, "") : null;
