@@ -235,6 +235,28 @@ export function FanStreaming({ language }: FanStreamingProps) {
   const [readingGuide, setReadingGuide] = useState(false);
   const [notification, setNotification] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const storedRole = localStorage.getItem(ModuleObject.localState.USER_ROLE);
+    // Tu avais fait: JSON.stringify(res1.data.type), donc ça ressemble à '"artist"'
+    let role: string | null = null;
+
+    try {
+      // Si c'est du JSON stringify, on parse
+      role = storedRole ? JSON.parse(storedRole) : null;
+    } catch {
+      // Si ce n’est pas du JSON, on le prend brut
+      role = storedRole;
+    }
+
+    if (role === "artist") {
+      setIsArtist(true);
+    } else {
+      setIsArtist(false);
+    }
+  }, []);
+
   // Keyboard navigation
   React.useEffect(() => {
     if (!keyboardNav) return;
@@ -853,27 +875,6 @@ Underneath the shining star`,
       <FanProfile onBack={() => setShowProfile(false)} language={language} />
     );
   }
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const storedRole = localStorage.getItem(ModuleObject.localState.USER_ROLE);
-    // Tu avais fait: JSON.stringify(res1.data.type), donc ça ressemble à '"artist"'
-    let role: string | null = null;
-
-    try {
-      // Si c'est du JSON stringify, on parse
-      role = storedRole ? JSON.parse(storedRole) : null;
-    } catch {
-      // Si ce n’est pas du JSON, on le prend brut
-      role = storedRole;
-    }
-
-    if (role === "artist") {
-      setIsArtist(true);
-    } else {
-      setIsArtist(false);
-    }
-  }, []);
 
   return (
     <div

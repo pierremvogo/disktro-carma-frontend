@@ -57,12 +57,11 @@ export default function ConfirmEmailForm() {
       const res = await ModuleObject.service.verifyEmail(token);
       await wait();
 
-      setIsLoading(false);
-      setSuccessMessage(res.message);
       setSuccess(true);
       setStatus("success");
       setMessage(res.message);
-
+      setSuccessMessage(res.message);
+      setIsLoading(false);
       router.push("/auth/login");
     } catch (error) {
       console.log(error);

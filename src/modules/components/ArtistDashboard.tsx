@@ -1,7 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 import { ArtistModuleObject as ModuleObject } from "../artist/module";
 import { useRouter } from "next/navigation";
 import { AccessibilitySettingsPanel } from "./AccessibilitySettingsPanel";
+import { MediaModuleObject as MediaModule } from "../file/module";
+import { UserModuleObject as UserModule } from "../module";
+import { getImageFile, getVideoFile } from "@/@disktro/utils";
+import CustomSuccess from "@/@disktro/CustomSuccess";
+import CustomAlert from "@/@disktro/CustomAlert";
+import { MoodModuleObject as MoodModule } from "../mood/module";
+import { TrackModuleObject as TrackModule } from "../track/module";
 // Icon components
 const Upload = ({ size = 24, className = "" }) => (
   <svg
@@ -218,6 +225,69 @@ interface ArtistDashboardProps {
   language: string;
   onGoToStreaming?: () => void;
 }
+interface User {
+  id?: string;
+  name?: string;
+  surname?: string;
+  email?: string;
+  bio?: string;
+  artistName?: string;
+  genre?: string;
+  twoFactorEnabled?: boolean;
+  type?: string;
+  isSubscribed?: boolean;
+  emailVerified?: boolean;
+  oldPassword?: string;
+  newPassword?: string;
+  confirmNewPassword?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  profileImageUrl?: string;
+  videoIntroUrl?: string;
+  miniVideoLoopUrl?: string;
+}
+type FormSetting = {
+  name: string;
+  surname: string;
+  email: string;
+  oldPassword: string;
+  newPassword: string;
+  confirmNewPassword: string;
+};
+const DefaultValue: FormSetting = {
+  name: "",
+  surname: "",
+  email: "",
+  oldPassword: "",
+  newPassword: "",
+  confirmNewPassword: "",
+};
+type PasswordErrors = {
+  oldPassword?: string;
+  newPassword?: string;
+  confirmNewPassword?: string;
+};
+type Mood = {
+  id: string;
+  name: string;
+};
+type TrackForm = {
+  id?: string;
+  title: string;
+  duration?: number;
+  moodId: string;
+
+  // fichiers côté front (pour l’UI uniquement)
+  brailleFile?: File | null;
+  signLanguageVideo?: File | null;
+
+  // URLs qui partent vers le backend Track
+  brailleFileUrl?: string | null;
+  signLanguageVideoUrl?: string | null;
+
+  lyrics?: string;
+  audioUrl?: string;
+};
 
 export function ArtistDashboard({
   language,
@@ -226,7 +296,6 @@ export function ArtistDashboard({
   const [activeTab, setActiveTab] = useState("profile");
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
-  const [videoIntro, setVideoIntro] = useState<File | null>(null);
   const [bioOneWord, setBioOneWord] = useState<string>("");
   const [monthlyPrice, setMonthlyPrice] = useState<string>("");
 
@@ -250,6 +319,19 @@ export function ArtistDashboard({
   const [mobileMoneyProvider, setMobileMoneyProvider] = useState<string>("");
   const [orangeMoneyPhone, setOrangeMoneyPhone] = useState<string>("");
   const [paymentSaved, setPaymentSaved] = useState<boolean>(false);
+  const [moodId, setMoodId] = useState("");
+  const [brailleUploadError, setBrailleUploadError] = useState<string | null>(
+    null
+  );
+  const [brailleUploadingTrackIndex, setBrailleUploadingTrackIndex] = useState<
+    number | null
+  >(null);
+  const [file, setFile] = useState<File | null>(null);
+
+  const [signLanguageVideoUrl, setSignLanguageVideoUrl] = useState<
+    string | null
+  >(null);
+  const [brailleFileUrl, setBrailleFileUrl] = useState<string | null>(null);
 
   // Exclusive content states
   const [exclusiveContentType, setExclusiveContentType] =
@@ -292,6 +374,637 @@ export function ArtistDashboard({
   const [uploadType, setUploadType] = useState<"single" | "ep" | "album">(
     "single"
   );
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [profilePicturePreview, setProfilePicturePreview] =
+    useState<string>("");
+  const [profileImageUrl, setProfileImageUrl] = useState<string>("");
+  const [videoIntro, setVideoIntro] = useState<File | null>(null);
+  const [videoIntroPreview, setVideoIntroPreview] = useState<string>("");
+  const [moods, setMoods] = useState<Mood[] | null>(null);
+
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => {
+        setSuccessMessage("");
+      }, 5000); // 10 secondes
+
+      return () => clearTimeout(timer); // cleanup
+    }
+  }, [successMessage]);
+
+  useEffect(() => {
+    if (errorMessage) {
+      const timer = setTimeout(() => {
+        setErrorMessage("");
+      }, 5000); // 10 secondes
+
+      return () => clearTimeout(timer); // cleanup
+    }
+  }, [errorMessage]);
+
+  const [formData, setFormData] = useState<User>({
+    name: "",
+    surname: "",
+    bio: "",
+    email: "",
+    type: "",
+    oldPassword: "",
+    videoIntroUrl: "",
+    miniVideoLoopUrl: "",
+    newPassword: "",
+    confirmNewPassword: "",
+  });
+  const [audioPreviewUrl, setAudioPreviewUrl] = useState<string | null>(null);
+  const [audioUrl, setAudioUrl] = useState<string>("");
+
+  const [errors, setErrors] = useState<PasswordErrors>(DefaultValue);
+
+  const [miniVideoPreview, setMiniVideoPreview] = useState<string>("");
+  const [miniVideoUrl, setMiniVideoUrl] = useState<string>("");
+
+  const handleAudioFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setErrorMessage("");
+    setSuccessMessage("");
+    setIsLoading(true);
+
+    // On garde le fichier en state
+    setFile(file);
+
+    // Preview local : on nettoie l’ancienne URL si besoin
+    setAudioPreviewUrl((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return URL.createObjectURL(file);
+    });
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      // appel backend via ton module media
+      const res = await MediaModule.service.uploadAudioFile(formData);
+
+      if (res && (res.fileName || res.url)) {
+        // on garde l’URL pour la création du track
+        const uploadedAudioUrl = res.url ?? res.fileName;
+        setAudioUrl(uploadedAudioUrl);
+
+        setSuccessMessage("Fichier audio uploadé avec succès.");
+        setErrorMessage("");
+      } else {
+        setErrorMessage("Erreur lors de l'upload du fichier audio.");
+      }
+    } catch (error) {
+      console.error("Erreur upload audio :", error);
+      setErrorMessage(
+        (error as Error).message || "Erreur lors de l'upload du fichier audio."
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    console.log("FORM DATA : ", formData);
+    if (!formData.name) {
+      fetchUser();
+    }
+  }, []);
+
+  const fetchUser = async () => {
+    const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
+    const userId = localStorage.getItem(UserModule.localState.USER_ID);
+    if (!userId || !token) return;
+
+    try {
+      setIsLoading(true);
+      setSuccess(false);
+      setErrorMessage("");
+
+      const user = await UserModule.service.getUser(userId);
+
+      // On garde EXACTEMENT ce que renvoie le backend dans formData
+      setFormData({
+        name: user.data.name,
+        surname: user.data.surname,
+        email: user.data.email,
+        type: user.data.type,
+        profileImageUrl: user.data.profileImageUrl, // 👉 URL backend
+        bio: user.data.bio,
+        artistName: user.data.artistName,
+        videoIntroUrl: user.data.videoIntroUrl,
+        miniVideoLoopUrl: user.data.miniVideoLoopUrl,
+        oldPassword: "",
+        newPassword: "",
+        confirmNewPassword: "",
+      });
+
+      // 👉 Preview image de profil
+      if (user.data.profileImageUrl) {
+        const imageObjectUrl = await getImageFile(
+          user.data.profileImageUrl,
+          token
+        );
+        setProfilePicturePreview(imageObjectUrl);
+      } else {
+        setProfilePicturePreview("");
+      }
+
+      // 👉 Preview vidéo d'intro
+      if (user.data.videoIntroUrl) {
+        const videoObjectUrl = await getVideoFile(
+          user.data.videoIntroUrl,
+          token
+        );
+        setVideoIntroPreview(videoObjectUrl);
+      } else {
+        setVideoIntroPreview("");
+      }
+
+      // 👉 Preview mini loop vidéo
+      if (user.data.miniVideoLoopUrl) {
+        const miniVideoObjectUrl = await getVideoFile(
+          user.data.miniVideoLoopUrl,
+          token
+        );
+        setMiniVideoPreview(miniVideoObjectUrl);
+      } else {
+        setMiniVideoPreview("");
+      }
+
+      setIsLoading(false);
+      setSuccess(true);
+      setErrorMessage("");
+    } catch (error) {
+      setErrorMessage((error as Error).message);
+      setIsLoading(false);
+      setSuccess(false);
+    }
+  };
+
+  const [artworkPreview, setArtworkPreview] = useState<string>("");
+
+  const handleArtwork = async (e: ChangeEvent<HTMLInputElement>) => {
+    const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
+    const file = e.target.files?.[0];
+
+    if (!file) return;
+
+    setErrorMessage("");
+    setSuccess(false);
+    setIsLoading(true);
+
+    // On garde le fichier en state
+    setArtwork(file);
+    // Preview local
+    setArtworkPreview(URL.createObjectURL(file));
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      // upload via ton module Media
+      const res = await MediaModule.service.uploadImageFile(formData);
+
+      if (res && res.url) {
+        // stocker l'URL dans ton form (single / album / ep)
+        setFormData((prev: any) => ({
+          ...prev,
+          coverUrl: res.url, // 👉 adapte le nom: singleCoverUrl / albumCoverUrl...
+        }));
+
+        setSuccessMessage("Artwork uploadé avec succès.");
+        setSuccess(true);
+        setErrorMessage("");
+      } else {
+        setErrorMessage("Erreur lors de l'upload de l'artwork.");
+        setSuccess(false);
+      }
+    } catch (error) {
+      setErrorMessage((error as Error).message);
+      setSuccess(false);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // --- Ajouter un morceau ---
+  async function handleAddTrack(e: React.FormEvent) {
+    e.preventDefault();
+    setErrorMessage("");
+    setSuccessMessage("");
+
+    if (!file || !trackTitle || !moodId) {
+      setErrorMessage(
+        "Veuillez renseigner le fichier audio, le titre et le mood du morceau."
+      );
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
+      const userId = localStorage.getItem(UserModule.localState.USER_ID);
+      if (!userId || !token) {
+        setIsLoading(false);
+        setErrorMessage("Utilisateur non authentifié.");
+        return;
+      }
+
+      const audioFile = file;
+      const formData = new FormData();
+
+      const duration = await new Promise<number>((resolve, reject) => {
+        const audio = document.createElement("audio");
+        audio.src = URL.createObjectURL(audioFile);
+        audio.preload = "metadata";
+
+        audio.onloadedmetadata = () => {
+          const d = audio.duration;
+          URL.revokeObjectURL(audio.src);
+          resolve(d);
+        };
+
+        audio.onerror = () => {
+          reject(new Error("Impossible de lire le fichier audio"));
+        };
+      });
+
+      formData.append("file", audioFile);
+      const uploadRes = await MediaModule.service.uploadAudioFile(formData);
+
+      if (!uploadRes || (!uploadRes.fileName && !uploadRes.url)) {
+        throw new Error("Réponse d'upload audio invalide.");
+      }
+
+      const audioUrl = uploadRes.url ?? uploadRes.fileName;
+
+      const newTrack = {
+        title: trackTitle,
+        duration,
+        moodId,
+        userId,
+        audioUrl,
+        type: "TRACK_SINGLE" as const,
+        lyrics: lyrics || "",
+        signLanguageVideoUrl: signLanguageVideoUrl || null,
+        brailleFileUrl: brailleFileUrl || null,
+      };
+
+      await TrackModule.service.createTrack(newTrack, token);
+
+      // ✅ RESET complet, incluant l’URL de preview
+      setTrackTitle("");
+      setMoodId("");
+      setLyrics("");
+      setFile(null);
+
+      if (audioPreviewUrl) {
+        URL.revokeObjectURL(audioPreviewUrl);
+        setAudioPreviewUrl(null);
+      }
+
+      setSuccessMessage("Track ajouté avec succès !");
+    } catch (error) {
+      console.error("Erreur ajout track :", error);
+      setErrorMessage(
+        (error as Error).message || "Erreur lors de l'ajout du track."
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  const handleBrailleFileChange = async (
+    e: ChangeEvent<HTMLInputElement>,
+    trackIndex: number
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // reset erreurs et set loading pour ce track
+    setBrailleUploadError(null);
+    setBrailleUploadingTrackIndex(trackIndex);
+
+    // On garde le fichier en state pour l'UI (nom, etc.)
+    setAlbumTracks((prev) => {
+      const copy = [...prev];
+      copy[trackIndex] = {
+        ...copy[trackIndex],
+        brailleFile: file,
+      };
+      return copy;
+    });
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const userId = localStorage.getItem(UserModule.localState.USER_ID);
+      // appel backend via ton module Media
+      const res = await MediaModule.service.uploadBrailleFile(formData);
+
+      if (res && res.fileName && res.url) {
+        // On stocke l'URL Cloudinary dans le track
+        setAlbumTracks((prev) => {
+          const copy = [...prev];
+          copy[trackIndex] = {
+            ...copy[trackIndex],
+            brailleFile: res.url,
+          };
+          return copy;
+        });
+        setBrailleUploadError(null);
+        await UserModule.service.updateUser(userId!, {
+          videoIntroUrl: res.url,
+        });
+      } else {
+        setBrailleUploadError("Erreur lors de l'upload du fichier braille.");
+      }
+    } catch (error) {
+      console.error("Erreur upload braille :", error);
+      setBrailleUploadError(
+        (error as Error).message ||
+          "Erreur lors de l'upload du fichier braille."
+      );
+    } finally {
+      setBrailleUploadingTrackIndex(null);
+    }
+  };
+
+  async function fetchMoods() {
+    try {
+      const token = localStorage.getItem(MoodModule.localState.ACCESS_TOKEN);
+      if (!token) return;
+      const res = await MoodModule.service.getMoods(token);
+      setMoods(res.data);
+      console.log("MY MOOD : ", res.data);
+    } catch (error) {
+      console.error("Erreur récupération des moods :", error);
+    }
+  }
+
+  useEffect(() => {
+    if (!moods) {
+      fetchMoods();
+    }
+  }, []);
+
+  const handleVideoIntro = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const token = localStorage.getItem(MediaModule.localState.ACCESS_TOKEN);
+    const userId = localStorage.getItem(UserModule.localState.USER_ID);
+
+    setErrorMessage("");
+    setSuccessMessage("");
+    setIsLoading(true);
+
+    // garder le fichier en state
+    setVideoIntro(file);
+
+    // preview local
+    setVideoIntroPreview((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return URL.createObjectURL(file);
+    });
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await MediaModule.service.uploadVideoFile(formData);
+
+      if (res && res.url) {
+        // stocker l’URL backend dans ton form
+        setFormData((prev: any) => ({
+          ...prev,
+          videoIntroUrl: res.url,
+        }));
+
+        // éventuellement synchro côté backend user
+        if (userId && token) {
+          await UserModule.service.updateUser(userId, {
+            videoIntroUrl: res.url,
+          });
+        }
+
+        setSuccessMessage("Vidéo de présentation uploadée avec succès.");
+      } else {
+        setErrorMessage("Erreur lors de l'upload de la vidéo.");
+      }
+    } catch (error) {
+      console.error("Erreur upload vidéo intro :", error);
+      setErrorMessage(
+        (error as Error).message || "Erreur lors de l'upload de la vidéo."
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleProfilePicture = async (e: ChangeEvent<HTMLInputElement>) => {
+    const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
+    const file = e.target.files?.[0];
+
+    if (!file) return;
+
+    setErrorMessage("");
+    setSuccess(false);
+    setIsLoading(true);
+
+    // On garde le fichier en state si besoin
+    setProfilePicture(file);
+    // Preview local
+    setProfilePicturePreview(URL.createObjectURL(file));
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await MediaModule.service.uploadImageFile(formData);
+      const userId = localStorage.getItem(UserModule.localState.USER_ID);
+      if (res && res.fileName) {
+        // On stocke le nom de fichier / url dans le form
+        setFormData((prev: any) => ({
+          ...prev,
+          profileImageUrl: res.url, // 👉 adapte le nom du champ si nécessaire
+        }));
+        if (res && res.url) {
+          setProfileImageUrl(res.url);
+          setSuccessMessage("Image uploadée avec succès.");
+          await UserModule.service.updateUser(userId!, {
+            profileImageUrl: res.url,
+          });
+          setSuccess(true);
+          setIsLoading(false);
+          setErrorMessage("");
+        } else {
+          setErrorMessage("Erreur lors de l'upload de l'image.");
+        }
+        setSuccess(true);
+        setIsLoading(false);
+        setErrorMessage("");
+      } else {
+        setErrorMessage("Erreur lors de l'upload de l'image.");
+        setIsLoading(false);
+      }
+    } catch (error) {
+      setErrorMessage((error as Error).message);
+      setIsLoading(false);
+      setSuccess(false);
+    }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmitBio = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const userId = localStorage.getItem(ModuleObject.localState.USER_ID);
+    if (!userId) return;
+    setSuccessMessage("");
+    setErrorMessage("");
+    setIsLoading(true);
+    setSuccess(false);
+
+    try {
+      const payload = {
+        ...formData,
+      };
+
+      await UserModule.service.updateUser(userId, payload);
+
+      setErrorMessage("");
+      setSuccess(true);
+      fetchUser(); // si tu veux re-synchroniser les données
+      setSuccessMessage("Profil mis à jour avec succès.");
+    } catch (error) {
+      setErrorMessage((error as Error).message);
+      setSuccess(false);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleMiniVideo = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setErrorMessage("");
+    setSuccessMessage("");
+    setIsLoading(true);
+
+    // garder le fichier localement
+    setMiniVideo(file);
+
+    // preview local
+    setMiniVideoPreview((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return URL.createObjectURL(file);
+    });
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await MediaModule.service.uploadVideoFile(formData);
+
+      if (res && res.url) {
+        // stock prématuré de l'URL cloudinary
+        setMiniVideoUrl(res.url);
+
+        // si tu veux aussi le stocker dans un form global :
+        setFormData((prev: any) => ({
+          ...prev,
+          miniVideoUrl: res.url,
+        }));
+
+        setSuccessMessage("Mini-video uploadée avec succès.");
+      } else {
+        setErrorMessage("Erreur lors de l'upload de la mini-video.");
+      }
+    } catch (error) {
+      console.error("Erreur upload mini-video :", error);
+      setErrorMessage(
+        (error as Error).message || "Erreur lors de l'upload de la mini-video."
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const userId = localStorage.getItem(ModuleObject.localState.USER_ID);
+    if (!userId) return;
+
+    const newErrors: PasswordErrors = {};
+
+    // 🔐 1. Ancien mot de passe obligatoire
+    if (!formData.oldPassword) {
+      newErrors.oldPassword = "Please enter your current password";
+    }
+
+    // 🔐 2. Nouveau mot de passe obligatoire + min 8 caractères
+    if (!formData.newPassword) {
+      newErrors.newPassword = "Please enter your new password";
+    } else if (formData.newPassword.length < 8) {
+      newErrors.newPassword = "Password must be at least 8 characters long";
+    }
+
+    // 🔐 3. Confirmation obligatoire
+    if (!formData.confirmNewPassword) {
+      newErrors.confirmNewPassword = "Please confirm your new password";
+    } else if (formData.newPassword !== formData.confirmNewPassword) {
+      newErrors.confirmNewPassword = "Passwords do not match";
+    }
+
+    // 👉 on pousse les erreurs dans le state
+    setErrors(newErrors);
+
+    // S'il y a au moins une erreur, on stoppe là
+    if (Object.keys(newErrors).length > 0) {
+      return;
+    }
+
+    // Aucune erreur -> on peut appeler l'API
+    setSuccessMessage("");
+    setErrorMessage("");
+    setIsLoading(true);
+    setSuccess(false);
+
+    try {
+      const payload = {
+        ...formData,
+      };
+
+      await UserModule.service.updateUser(userId, payload);
+
+      setErrorMessage("");
+      setSuccess(true);
+      fetchUser(); // si tu veux re-synchroniser les données
+      setSuccessMessage("Profil mis à jour avec succès.");
+    } catch (error) {
+      setErrorMessage((error as Error).message);
+      setSuccess(false);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const [albumTracks, setAlbumTracks] = useState<
     Array<{
       file: File | null;
@@ -299,6 +1012,7 @@ export function ArtistDashboard({
       lyrics: string;
       signLanguageVideo: File | null;
       brailleFile: File | null;
+
       authors: string;
       producers: string;
       lyricists: string;
@@ -336,6 +1050,8 @@ export function ArtistDashboard({
       profile: "Perfil",
       upload: "Subir Música",
       streams: "Reproducciones",
+      trackMood: "Estado de ánimo",
+      selectMoodPlaceholder: "eleccionar el estado de ánimo",
       subscriptions: "Suscripciones",
       royalties: "Regalías",
       profileTitle: "Tu Perfil de Artista",
@@ -351,6 +1067,7 @@ export function ArtistDashboard({
       selectType: "Selecciona el tipo",
       typeLabel: "Tipo de lanzamiento",
       single: "Single",
+      updateBio: "",
       ep: "EP",
       album: "Álbum",
       dragDrop: "Arrastra y suelta tu archivo aquí o haz clic para seleccionar",
@@ -470,6 +1187,8 @@ export function ArtistDashboard({
       streams: "Streams",
       subscriptions: "Subscriptions",
       royalties: "Royalties",
+      trackMood: "Mood",
+      selectMoodPlaceholder: "Select the mood",
       profileTitle: "Your Artist Profile",
       uploadPicture: "Upload Profile Picture",
       uploadVideo: "Upload Video Introduction",
@@ -483,6 +1202,7 @@ export function ArtistDashboard({
       selectType: "Select type",
       typeLabel: "Release type",
       single: "Single",
+      updateBio: "Update your biography",
       ep: "EP",
       album: "Album",
       dragDrop: "Drag and drop your file here or click to select",
@@ -514,8 +1234,8 @@ export function ArtistDashboard({
       musiciansWinds: "Winds",
       musiciansPercussion: "Percussion",
       musiciansStrings: "Strings",
-      mixingEngineer: "Mixing Eng",
-      masteringEngineer: "Mastering Eng",
+      mixingEngineer: "Mixing Eng.",
+      masteringEngineer: "Mastering Eng.",
       totalStreams: "Total Streams",
       monthlyStreams: "Monthly Streams",
       totalSubscribers: "Total Subscribers",
@@ -607,6 +1327,8 @@ export function ArtistDashboard({
       pictureDragDrop: "Arrossega la teva foto aquí o fes clic (JPG, PNG)",
       videoDragDrop: "Arrossega el teu video aquí o fes clic (MP4, MOV)",
       bioTitle: "Bio",
+      trackMood: "Estat d’ànim",
+      selectMoodPlaceholder: "Seleccionar l’estat d’ànim",
       bioPrompt: "Descriu-te en unes paraules",
       saveProfile: "Guardar Perfil",
       uploadTitle: "Puja la teva música",
@@ -616,6 +1338,7 @@ export function ArtistDashboard({
       single: "Single",
       ep: "EP",
       album: "Àlbum",
+      updateBio: "",
       dragDrop:
         "Arrossega i deixa anar el teu fitxer aquí o fes clic per seleccionar",
       uploadButton: "Pujar Música",
@@ -1026,11 +1749,32 @@ export function ArtistDashboard({
               {language === "catalan" && "Anar a Plataforma d'Streaming"}
             </button>
           )}
+
           <button
             onClick={handleLogout}
-            className=" cursor-pointer px-5 py-2 bg-red-500/40 backdrop-blur-md border border-red-300/40 rounded-xl text-white shadow-lg hover:bg-red-500/60 hover:border-red-300 transition-all"
+            className="px-4 py-2 bg-gradient-to-r cursor-pointer from-red-500/40 to-orange-500/40 
+    backdrop-blur-md border border-white/30 rounded-lg text-white
+    hover:from-red-500/60 hover:to-orange-500/60 transition-all flex items-center gap-2"
           >
-            Disconnect
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="text-white"
+            >
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+
+            {language === "spanish" && "Cerrar sesión"}
+            {language === "english" && "Logout"}
+            {language === "catalan" && "Tancar sessió"}
           </button>
         </div>
 
@@ -1046,7 +1790,7 @@ export function ArtistDashboard({
             <button
               key={id}
               onClick={() => setActiveTab(id)}
-              className={`flex items-center gap-2 px-6 py-3 rounded-lg transition-all whitespace-nowrap ${
+              className={`cursor-pointer flex items-center gap-2 px-6 py-3 rounded-lg transition-all whitespace-nowrap ${
                 activeTab === id
                   ? "bg-white/30 backdrop-blur-md border-2 border-white/50"
                   : "bg-white/10 backdrop-blur-md border-2 border-white/20 hover:bg-white/20"
@@ -1057,7 +1801,6 @@ export function ArtistDashboard({
             </button>
           ))}
         </div>
-
         {/* Profile Tab */}
         {activeTab === "profile" && (
           <div className="bg-white/10 backdrop-blur-md rounded-xl p-8 border border-white/20">
@@ -1072,28 +1815,26 @@ export function ArtistDashboard({
                   {text.uploadPicture}
                 </h3>
 
-                {profilePicture ? (
+                {profilePicturePreview ? (
                   <div className="relative aspect-square rounded-xl overflow-hidden bg-white/5 border-2 border-white/20">
                     <img
-                      src={URL.createObjectURL(profilePicture)}
+                      src={profilePicturePreview}
                       alt="Profile"
                       className="w-full h-full object-cover"
                     />
                     <button
-                      onClick={() => setProfilePicture(null)}
-                      className="absolute top-2 right-2 bg-red-500/80 backdrop-blur-sm text-white p-2 rounded-lg hover:bg-red-600/80 transition-all"
+                      type="button"
+                      onClick={() => {
+                        setProfilePicture(null);
+                        setProfilePicturePreview("");
+                        setFormData((prev: any) => ({
+                          ...prev,
+                          profileImageUrl: "",
+                        }));
+                      }}
+                      className="absolute cursor-pointer top-2 right-2 bg-red-500/80 backdrop-blur-sm text-white p-2 rounded-lg hover:bg-red-600/80 transition-all"
                     >
-                      <svg
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      >
-                        <line x1="18" y1="6" x2="6" y2="18" />
-                        <line x1="6" y1="6" x2="18" y2="18" />
-                      </svg>
+                      <X size={20} />
                     </button>
                   </div>
                 ) : (
@@ -1101,10 +1842,7 @@ export function ArtistDashboard({
                     <input
                       type="file"
                       accept="image/*"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) setProfilePicture(file);
-                      }}
+                      onChange={handleProfilePicture}
                       className="hidden"
                       id="picture-upload"
                     />
@@ -1146,15 +1884,24 @@ export function ArtistDashboard({
                   {text.uploadVideo}
                 </h3>
 
-                {videoIntro ? (
+                {videoIntroPreview ? (
                   <div className="relative aspect-square rounded-xl overflow-hidden bg-black border-2 border-white/20">
                     <video
-                      src={URL.createObjectURL(videoIntro)}
+                      src={videoIntroPreview || formData.videoIntroUrl}
                       controls
                       className="w-full h-full object-cover"
                     />
                     <button
-                      onClick={() => setVideoIntro(null)}
+                      type="button"
+                      onClick={() => {
+                        setVideoIntro(null);
+                        setVideoIntroPreview("");
+                        // si tu stockes l’URL dans un form user:
+                        setFormData((prev: any) => ({
+                          ...prev,
+                          videoIntroUrl: "",
+                        }));
+                      }}
                       className="absolute top-2 right-2 bg-red-500/80 backdrop-blur-sm text-white p-2 rounded-lg hover:bg-red-600/80 transition-all"
                     >
                       <svg
@@ -1175,10 +1922,7 @@ export function ArtistDashboard({
                     <input
                       type="file"
                       accept="video/*"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) setVideoIntro(file);
-                      }}
+                      onChange={handleVideoIntro}
                       className="hidden"
                       id="video-upload"
                     />
@@ -1219,23 +1963,56 @@ export function ArtistDashboard({
               <h3 className="text-xl text-white drop-shadow mb-4">
                 {text.bioTitle}
               </h3>
+
               <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                <label className="block text-white/80 drop-shadow mb-3 text-sm">
-                  {text.bioPrompt}
-                </label>
-                <input
-                  type="text"
-                  value={bioOneWord}
-                  onChange={(e) => setBioOneWord(e.target.value)}
-                  maxLength={50}
-                  placeholder={text.bioPrompt}
-                  className="w-full p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all text-center text-xl"
-                />
-                {bioOneWord && (
-                  <p className="text-white/60 text-sm mt-2 text-center">
-                    {bioOneWord.length}/50
-                  </p>
-                )}
+                <form onSubmit={handleSubmitBio} className="space-y-6">
+                  <label className="block text-white/80 drop-shadow mb-3 text-sm">
+                    {text.bioPrompt}
+                  </label>
+
+                  <textarea
+                    rows={4}
+                    onChange={(e) =>
+                      setFormData((prev: any) => ({
+                        ...prev,
+                        bio: e.target.value,
+                      }))
+                    }
+                    name="bio"
+                    value={formData.bio}
+                    maxLength={300}
+                    placeholder={text.bioPrompt}
+                    className="w-full p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg 
+           text-black placeholder:text-white/40 focus:outline-none 
+           focus:border-white/40 transition-all text-xl resize-none"
+                  />
+
+                  {bioOneWord && (
+                    <p className="text-white/60 text-sm mt-2 text-center">
+                      {bioOneWord.length}/50
+                    </p>
+                  )}
+                  {successMessage && <CustomSuccess message={successMessage} />}
+
+                  {errorMessage && <CustomAlert message={errorMessage} />}
+
+                  {/* Bouton pour valider le form */}
+                  <button
+                    type="submit"
+                    className="mt-4 cursor-pointer w-full py-3 px-4 bg-white/20 backdrop-blur-md 
+                 border border-white/30 rounded-lg text-white drop-shadow 
+                 hover:bg-white/30 transition-all"
+                  >
+                    {isLoading ? (
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                        <span>{text.updateBio}...</span>
+                      </div>
+                    ) : (
+                      text.updateBio
+                    )}
+                  </button>
+                </form>
               </div>
             </div>
 
@@ -1251,39 +2028,81 @@ export function ArtistDashboard({
                   {text.changePassword}
                 </h4>
                 <div className="space-y-4">
-                  <div>
-                    <label className="block text-white/80 drop-shadow mb-2 text-sm">
-                      {text.currentPassword}
-                    </label>
-                    <input
-                      type="password"
-                      className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-white/80 drop-shadow mb-2 text-sm">
-                      {text.newPassword}
-                    </label>
-                    <input
-                      type="password"
-                      className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-white/80 drop-shadow mb-2 text-sm">
-                      {text.confirmPassword}
-                    </label>
-                    <input
-                      type="password"
-                      className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
-                    />
-                  </div>
-                  <button
-                    onClick={() => alert("Password updated successfully!")}
-                    className="w-full py-3 px-4 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-white drop-shadow hover:bg-white/30 transition-all"
-                  >
-                    {text.updatePassword}
-                  </button>
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    <div>
+                      <label className="block text-white/80 drop-shadow mb-2 text-sm">
+                        {text.currentPassword}
+                      </label>
+                      <input
+                        name="oldPassword"
+                        type="password"
+                        value={formData.oldPassword}
+                        onChange={handleChange}
+                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
+                      />
+                      {errors.oldPassword && (
+                        <p className="text-red-500 text-sm">
+                          {errors.oldPassword}
+                        </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-white/80 drop-shadow mb-2 text-sm">
+                        {text.newPassword}
+                      </label>
+                      <input
+                        name="newPassword"
+                        type="password" // 🟢 corrigé
+                        value={formData.newPassword}
+                        onChange={handleChange}
+                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
+                      />
+                      {errors.newPassword && (
+                        <p className="text-red-500 text-sm">
+                          {errors.newPassword}
+                        </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-white/80 drop-shadow mb-2 text-sm">
+                        {text.confirmPassword}
+                      </label>
+                      <input
+                        name="confirmNewPassword"
+                        type="password" // 🟢 corrigé aussi
+                        value={formData.confirmNewPassword}
+                        onChange={handleChange}
+                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
+                      />
+                      {errors.confirmNewPassword && (
+                        <p className="text-red-500 text-sm">
+                          {errors.confirmNewPassword}
+                        </p>
+                      )}
+                    </div>
+
+                    {successMessage && (
+                      <CustomSuccess message={successMessage} />
+                    )}
+
+                    {errorMessage && <CustomAlert message={errorMessage} />}
+
+                    <button
+                      type="submit"
+                      className="cursor-pointer w-full py-3 px-4 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-white drop-shadow hover:bg-white/30 transition-all"
+                    >
+                      {isLoading ? (
+                        <div className="flex items-center justify-center gap-2">
+                          <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                          <span>{text.updatePassword}...</span>
+                        </div>
+                      ) : (
+                        text.updatePassword
+                      )}
+                    </button>
+                  </form>
                 </div>
               </div>
             </div>
@@ -1372,7 +2191,7 @@ export function ArtistDashboard({
                   <input
                     type="file"
                     accept="audio/*"
-                    onChange={handleFileSelect}
+                    onChange={handleAudioFileChange}
                     className="hidden"
                     id="file-upload"
                   />
@@ -1382,6 +2201,13 @@ export function ArtistDashboard({
                       {uploadedFile ? uploadedFile.name : text.dragDrop}
                     </p>
                   </label>
+                  {audioPreviewUrl && (
+                    <div className="mt-4">
+                      <audio controls src={audioPreviewUrl} className="w-full">
+                        Votre navigateur ne supporte pas l’élément audio.
+                      </audio>
+                    </div>
+                  )}
                 </div>
               ) : (
                 // Album/EP Title
@@ -1461,6 +2287,7 @@ export function ArtistDashboard({
                           size={32}
                           className="mx-auto mb-3 text-white/60"
                         />
+
                         <p className="text-white drop-shadow text-sm">
                           {track.file ? track.file.name : text.dragDrop}
                         </p>
@@ -1499,6 +2326,29 @@ export function ArtistDashboard({
                         placeholder={text.lyricsPlaceholder}
                         className="w-full h-24 p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all resize-none text-sm"
                       />
+                      <div className="mt-3">
+                        <label className="block text-white/80 drop-shadow mb-1 text-xs">
+                          {text.trackMood}
+                        </label>
+
+                        <select
+                          value={moodId}
+                          onChange={(e) => setMoodId(e.target.value)}
+                          className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg 
+                 text-black text-sm focus:outline-none focus:border-white/40 transition-all"
+                        >
+                          <option value="">
+                            -- {text.selectMoodPlaceholder} --
+                          </option>
+
+                          {moods &&
+                            moods.map((mood) => (
+                              <option key={mood.id} value={mood.id}>
+                                {mood.name}
+                              </option>
+                            ))}
+                        </select>
+                      </div>
 
                       {/* Accessibility Options for Track */}
                       <div className="grid grid-cols-2 gap-3 mt-3">
@@ -1576,7 +2426,6 @@ export function ArtistDashboard({
                             </div>
                           )}
                         </div>
-
                         {/* Braille File */}
                         <div>
                           <label className="block text-white/80 drop-shadow mb-1 text-xs">
@@ -1625,14 +2474,9 @@ export function ArtistDashboard({
                               <input
                                 type="file"
                                 accept=".brf,.brl,.txt"
-                                onChange={(e) => {
-                                  const file = e.target.files?.[0];
-                                  if (file) {
-                                    const newTracks = [...albumTracks];
-                                    newTracks[index].brailleFile = file;
-                                    setAlbumTracks(newTracks);
-                                  }
-                                }}
+                                onChange={(e) =>
+                                  handleBrailleFileChange(e, index)
+                                }
                                 className="hidden"
                                 id={`braille-track-${index}`}
                               />
@@ -1662,173 +2506,16 @@ export function ArtistDashboard({
                             </div>
                           )}
                         </div>
+                        Upload Video Introduction{" "}
                       </div>
                     </div>
 
                     {/* Track Credits */}
-                    <div className="grid md:grid-cols-2 gap-3">
-                      <div>
-                        <label className="block text-white/70 drop-shadow mb-2 text-sm">
-                          {text.authors}
-                        </label>
-                        <input
-                          type="text"
-                          value={track.authors}
-                          onChange={(e) => {
-                            const newTracks = [...albumTracks];
-                            newTracks[index].authors = e.target.value;
-                            setAlbumTracks(newTracks);
-                          }}
-                          className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-white/70 drop-shadow mb-2 text-sm">
-                          {text.producers}
-                        </label>
-                        <input
-                          type="text"
-                          value={track.producers}
-                          onChange={(e) => {
-                            const newTracks = [...albumTracks];
-                            newTracks[index].producers = e.target.value;
-                            setAlbumTracks(newTracks);
-                          }}
-                          className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-white/70 drop-shadow mb-2 text-sm">
-                          {text.lyricists}
-                        </label>
-                        <input
-                          type="text"
-                          value={track.lyricists}
-                          onChange={(e) => {
-                            const newTracks = [...albumTracks];
-                            newTracks[index].lyricists = e.target.value;
-                            setAlbumTracks(newTracks);
-                          }}
-                          className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-white/70 drop-shadow mb-2 text-sm">
-                          {text.mixingEngineer}
-                        </label>
-                        <input
-                          type="text"
-                          value={track.mixingEngineer}
-                          onChange={(e) => {
-                            const newTracks = [...albumTracks];
-                            newTracks[index].mixingEngineer = e.target.value;
-                            setAlbumTracks(newTracks);
-                          }}
-                          className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-white/70 drop-shadow mb-2 text-sm">
-                          {text.masteringEngineer}
-                        </label>
-                        <input
-                          type="text"
-                          value={track.masteringEngineer}
-                          onChange={(e) => {
-                            const newTracks = [...albumTracks];
-                            newTracks[index].masteringEngineer = e.target.value;
-                            setAlbumTracks(newTracks);
-                          }}
-                          className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
-                        />
-                      </div>
-                    </div>
+                    <div className="grid md:grid-cols-2 gap-3"></div>
 
                     {/* Musicians for this track */}
                     <div>
-                      <label className="block text-white/80 drop-shadow mb-2 text-sm">
-                        {text.musicians}
-                      </label>
-                      <div className="grid grid-cols-2 gap-2">
-                        <div>
-                          <label className="block text-white/60 mb-1 text-xs">
-                            {text.musiciansVocals}
-                          </label>
-                          <input
-                            type="text"
-                            value={track.musiciansVocals}
-                            onChange={(e) => {
-                              const newTracks = [...albumTracks];
-                              newTracks[index].musiciansVocals = e.target.value;
-                              setAlbumTracks(newTracks);
-                            }}
-                            className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-xs"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-white/60 mb-1 text-xs">
-                            {text.musiciansPianoKeyboards}
-                          </label>
-                          <input
-                            type="text"
-                            value={track.musiciansPianoKeyboards}
-                            onChange={(e) => {
-                              const newTracks = [...albumTracks];
-                              newTracks[index].musiciansPianoKeyboards =
-                                e.target.value;
-                              setAlbumTracks(newTracks);
-                            }}
-                            className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-xs"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-white/60 mb-1 text-xs">
-                            {text.musiciansWinds}
-                          </label>
-                          <input
-                            type="text"
-                            value={track.musiciansWinds}
-                            onChange={(e) => {
-                              const newTracks = [...albumTracks];
-                              newTracks[index].musiciansWinds = e.target.value;
-                              setAlbumTracks(newTracks);
-                            }}
-                            className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-xs"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-white/60 mb-1 text-xs">
-                            {text.musiciansPercussion}
-                          </label>
-                          <input
-                            type="text"
-                            value={track.musiciansPercussion}
-                            onChange={(e) => {
-                              const newTracks = [...albumTracks];
-                              newTracks[index].musiciansPercussion =
-                                e.target.value;
-                              setAlbumTracks(newTracks);
-                            }}
-                            className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-xs"
-                          />
-                        </div>
-                        <div className="col-span-2">
-                          <label className="block text-white/60 mb-1 text-xs">
-                            {text.musiciansStrings}
-                          </label>
-                          <input
-                            type="text"
-                            value={track.musiciansStrings}
-                            onChange={(e) => {
-                              const newTracks = [...albumTracks];
-                              newTracks[index].musiciansStrings =
-                                e.target.value;
-                              setAlbumTracks(newTracks);
-                            }}
-                            className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-xs"
-                          />
-                        </div>
-                      </div>
+                      <div className="grid grid-cols-2 gap-2"></div>
                     </div>
                   </div>
                 ))}
@@ -1882,28 +2569,28 @@ export function ArtistDashboard({
                 <h3 className="text-xl text-white drop-shadow mb-4">
                   {text.uploadArtwork}
                 </h3>
-                {artwork ? (
+
+                {artworkPreview ? (
                   <div className="relative aspect-square rounded-xl overflow-hidden bg-white/5 border-2 border-white/20">
                     <img
-                      src={URL.createObjectURL(artwork)}
+                      src={artworkPreview}
                       alt="Artwork"
                       className="w-full h-full object-cover"
                     />
                     <button
-                      onClick={() => setArtwork(null)}
-                      className="absolute top-2 right-2 bg-red-500/80 backdrop-blur-sm text-white p-2 rounded-lg hover:bg-red-600/80 transition-all"
+                      type="button"
+                      onClick={() => {
+                        setArtwork(null);
+                        setArtworkPreview("");
+                        // si tu stockes aussi l'URL dans un form (ex: coverUrl)
+                        setFormData((prev: any) => ({
+                          ...prev,
+                          coverUrl: "", // 👉 adapte le nom du champ: singleCoverUrl / albumCoverUrl / etc.
+                        }));
+                      }}
+                      className="absolute cursor-pointer top-2 right-2 bg-red-500/80 backdrop-blur-sm text-white p-2 rounded-lg hover:bg-red-600/80 transition-all"
                     >
-                      <svg
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      >
-                        <line x1="18" y1="6" x2="6" y2="18" />
-                        <line x1="6" y1="6" x2="18" y2="18" />
-                      </svg>
+                      <X size={20} />
                     </button>
                   </div>
                 ) : (
@@ -1911,10 +2598,7 @@ export function ArtistDashboard({
                     <input
                       type="file"
                       accept="image/*"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) setArtwork(file);
-                      }}
+                      onChange={handleArtwork}
                       className="hidden"
                       id="artwork-upload"
                     />
@@ -1955,17 +2639,29 @@ export function ArtistDashboard({
                 <h3 className="text-xl text-white drop-shadow mb-4">
                   {text.uploadMiniVideo}
                 </h3>
-                {miniVideo ? (
+                {miniVideoPreview ? (
                   <div className="relative aspect-square rounded-xl overflow-hidden bg-black border-2 border-white/20">
                     <video
-                      src={URL.createObjectURL(miniVideo)}
+                      src={miniVideoPreview}
                       loop
                       autoPlay
                       muted
                       className="w-full h-full object-cover"
                     />
+
                     <button
-                      onClick={() => setMiniVideo(null)}
+                      type="button"
+                      onClick={() => {
+                        setMiniVideo(null);
+                        setMiniVideoPreview("");
+                        setMiniVideoUrl(""); // URL Cloudinary reset
+
+                        // si c’est stocké dans un form global
+                        setFormData((prev: any) => ({
+                          ...prev,
+                          miniVideoUrl: "",
+                        }));
+                      }}
                       className="absolute top-2 right-2 bg-red-500/80 backdrop-blur-sm text-white p-2 rounded-lg hover:bg-red-600/80 transition-all"
                     >
                       <svg
@@ -1986,10 +2682,7 @@ export function ArtistDashboard({
                     <input
                       type="file"
                       accept="video/*"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) setMiniVideo(file);
-                      }}
+                      onChange={handleMiniVideo}
                       className="hidden"
                       id="mini-video-upload"
                     />
@@ -2036,6 +2729,27 @@ export function ArtistDashboard({
                 placeholder={text.lyricsPlaceholder}
                 className="w-full h-40 p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all resize-none"
               />
+              <div className="mt-3">
+                <label className="block text-white/80 drop-shadow mb-1 text-xs">
+                  {text.trackMood}
+                </label>
+
+                <select
+                  value={moodId}
+                  onChange={(e) => setMoodId(e.target.value)}
+                  className="cursor-pointer w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg 
+                 text-black text-sm focus:outline-none focus:border-white/40 transition-all"
+                >
+                  <option value="">-- {text.selectMoodPlaceholder} --</option>
+
+                  {moods &&
+                    moods.map((mood) => (
+                      <option key={mood.id} value={mood.id}>
+                        {mood.name}
+                      </option>
+                    ))}
+                </select>
+              </div>
 
               {/* Accessibility Options */}
               <div className="grid md:grid-cols-2 gap-4 mt-4">
@@ -2348,10 +3062,10 @@ export function ArtistDashboard({
             </div>
 
             {/* Upload Button */}
-            {uploadedFile && (
+            {!uploadedFile && (
               <button
                 onClick={handleUpload}
-                className="w-full py-4 px-6 bg-white/30 backdrop-blur-md border border-white/40 rounded-lg text-white drop-shadow hover:bg-white/40 transition-all flex items-center justify-center gap-2"
+                className="cursor-pointer w-full py-4 px-6 bg-white/30 backdrop-blur-md border border-white/40 rounded-lg text-white drop-shadow hover:bg-white/40 transition-all flex items-center justify-center gap-2"
               >
                 <Upload size={20} />
                 {text.uploadButton}

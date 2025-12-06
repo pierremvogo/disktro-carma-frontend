@@ -7,6 +7,8 @@ import { UserModuleObject as ModuleObject } from "../module";
 import { MediaModuleObject as MediaModule } from "../file/module";
 import { TagModuleObject } from "../tag/module";
 import { useRouter } from "next/navigation";
+import CustomSuccess from "@/@disktro/CustomSuccess";
+import CustomAlert from "@/@disktro/CustomAlert";
 
 // Icon components
 const User = ({ size = 24, className = "" }) => (
@@ -367,7 +369,7 @@ export function ArtistProfileSetup({
     formData.append("file", file);
 
     try {
-      const res = await MediaModule.service.uploadImageFile(formData, token!);
+      const res = await MediaModule.service.uploadImageFile(formData);
       if (res && res.url) {
         setProfileImageUrl(res.url);
         if (userId) {
@@ -439,12 +441,10 @@ export function ArtistProfileSetup({
       };
 
       const res = await ModuleObject.service.createUser(payload);
-
+      await wait();
       setSuccessMessage(res.message || "Profil artiste créé avec succès.");
       setErrorMessage("");
       setIsLoading(false);
-
-      await wait();
       router.push("/auth/confirm-email");
     } catch (err) {
       console.error(err);
@@ -752,14 +752,9 @@ export function ArtistProfileSetup({
                   </div>
                 </div>
               </div>
-              {successMessage && (
-                <p className="m-4 text-sm text-green-400">{successMessage}</p>
-              )}
-              {errorMessage && (
-                <p className="m-4 text-sm text-center text-red-400">
-                  {errorMessage}
-                </p>
-              )}
+              {successMessage && <CustomSuccess message={successMessage} />}
+
+              {errorMessage && <CustomAlert message={errorMessage} />}
 
               {/* Complete Button */}
               <div className="mt-8 flex justify-end">

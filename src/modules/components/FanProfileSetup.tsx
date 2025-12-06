@@ -318,7 +318,7 @@ export function FanProfileSetup({
     formData.append("file", file);
 
     try {
-      const res = await MediaModule.service.uploadImageFile(formData, token!);
+      const res = await MediaModule.service.uploadImageFile(formData);
       if (res && res.url) {
         setProfileImageUrl(res.url);
         if (userId) {
@@ -391,12 +391,10 @@ export function FanProfileSetup({
       };
 
       const res = await ModuleObject.service.createUser(payload);
-
+      await wait();
       setSuccessMessage(res.message || "Profil artiste créé avec succès.");
       setErrorMessage("");
       setIsLoading(false);
-
-      await wait();
       router.push("/auth/confirm-email");
     } catch (err) {
       console.error(err);
@@ -411,13 +409,14 @@ export function FanProfileSetup({
     <div
       className="fixed inset-0 w-screen h-screen bg-cover bg-center"
       style={{
-        backgroundImage: `url("/image/4ac3eed398bb68113a14d0fa5efe7a6def6f7651.png)`,
+        backgroundImage:
+          'url("/image/4ac3eed398bb68113a14d0fa5efe7a6def6f7651.png")',
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
     >
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-black/40" />
+      {/* Overlay (même que Login) */}
+      <div className="absolute inset-0 bg-black/50" />
 
       {/* Content */}
       <div className="relative w-full h-full overflow-y-auto">
@@ -429,6 +428,7 @@ export function FanProfileSetup({
                 onClick={(e) => {
                   e.preventDefault();
                   if (onSignUp) onSignUp();
+                  else onBack();
                 }}
                 className="p-2 hover:bg-white/10 cursor-pointer rounded-lg transition-all"
               >
@@ -443,6 +443,7 @@ export function FanProfileSetup({
                 </p>
               </div>
             </div>
+
             <form onSubmit={handleSubmit}>
               <div className="grid lg:grid-cols-2 gap-8">
                 {/* Profile Information Section */}
@@ -503,6 +504,8 @@ export function FanProfileSetup({
                       className="w-full px-4 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-black placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/50"
                     />
                   </div>
+
+                  {/* Email */}
                   <div>
                     <label className="block text-white drop-shadow mb-2">
                       {content.email}
@@ -556,8 +559,8 @@ export function FanProfileSetup({
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
                         className="absolute right-3 top-1/2 -translate-y-1/2 
-              p-1.5 rounded-full 
-              text-black/90 hover:text-black/100 cursor-pointer backdrop-blur-sm"
+                       p-1.5 rounded-full 
+                       text-black/90 hover:text-black/100 cursor-pointer backdrop-blur-sm"
                       >
                         {showPassword ? (
                           <EyeOff size={18} />
@@ -596,8 +599,8 @@ export function FanProfileSetup({
                           setShowConfirmPassword(!showConfirmPassword)
                         }
                         className="absolute right-3 top-1/2 -translate-y-1/2 
-                         p-1.5 rounded-full 
-                         text-black/90 hover:text-black/100 cursor-pointer backdrop-blur-sm"
+                       p-1.5 rounded-full 
+                       text-black/90 hover:text-black/100 cursor-pointer backdrop-blur-sm"
                       >
                         {showConfirmPassword ? (
                           <EyeOff size={20} />
@@ -640,6 +643,7 @@ export function FanProfileSetup({
 
                     {!twoFactorEnabled ? (
                       <button
+                        type="button"
                         onClick={handleEnableTwoFactor}
                         className="w-full cursor-pointer px-4 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-white hover:bg-white/30 transition-all"
                       >
@@ -654,6 +658,18 @@ export function FanProfileSetup({
                   </div>
                 </div>
               </div>
+
+              {/* Messages d'erreur / succès */}
+              {errorMessage && (
+                <p className="mt-4 text-sm text-center text-red-400">
+                  {errorMessage}
+                </p>
+              )}
+              {successMessage && (
+                <p className="mt-4 text-sm text-center text-green-400">
+                  {successMessage}
+                </p>
+              )}
 
               {/* Complete Button */}
               <div className="mt-8 flex justify-end">

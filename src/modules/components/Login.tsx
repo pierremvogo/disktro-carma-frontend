@@ -215,8 +215,7 @@ export function Login({
       setIsLoading(true);
       setSuccess(false);
       const res = await ModuleObject.service.loginUser({ email, password });
-      setIsLoading(false);
-      setSuccessMessage(res.message);
+
       await wait();
       localStorage.setItem(ModuleObject.localState.ACCESS_TOKEN, res.token);
       localStorage.setItem(ModuleObject.localState.USER_ID, res.user.id);
@@ -229,12 +228,14 @@ export function Login({
         ModuleObject.localState.USER_ROLE,
         JSON.stringify(res1.data.type)
       );
+      setSuccessMessage(res.message);
+      setIsLoading(false);
+      setSuccess(true);
       if (res1.data.type === "artist") {
         router.push("/dashboard/artist/select");
       } else {
         router.push("/dashboard/fan-streaming");
       }
-      setSuccess(true);
     } catch (error) {
       console.log(error);
       setErrorMessage((error as Error).message);
@@ -332,9 +333,9 @@ export function Login({
               )}
 
               {/* Demo Hint */}
-              <div className="bg-blue-500/20 border border-blue-500/40 rounded-lg p-3 text-white/80 text-xs">
+              {/* <div className="bg-blue-500/20 border border-blue-500/40 rounded-lg p-3 text-white/80 text-xs">
                 {content.demoHint}
-              </div>
+              </div> */}
 
               {/* Forgot Password Link */}
               <div className="text-right">
