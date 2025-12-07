@@ -80,6 +80,28 @@ const DollarSign = ({ size = 24, className = "" }) => (
     <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
   </svg>
 );
+const PayoutIcon = ({ size = 24, className = "" }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    {/* Carte de paiement */}
+    <rect x="3" y="5" width="18" height="14" rx="3" ry="3" />
+    {/* Bande de la carte */}
+    <line x1="3" y1="10" x2="21" y2="10" />
+    {/* Petit rond (puce ou logo) */}
+    <circle cx="9" cy="15" r="1.3" />
+    {/* Petit rectangle (zone de code) */}
+    <rect x="13" y="13.7" width="5" height="2.6" rx="0.5" />
+  </svg>
+);
 
 const Music = ({ size = 24, className = "" }) => (
   <svg
@@ -455,7 +477,6 @@ export function ArtistDashboard({
         // on garde l’URL pour la création du track
         const uploadedAudioUrl = res.url ?? res.fileName;
         setAudioUrl(uploadedAudioUrl);
-
         setSuccessMessage("Fichier audio uploadé avec succès.");
         setErrorMessage("");
       } else {
@@ -548,6 +569,9 @@ export function ArtistDashboard({
       setSuccess(false);
     }
   };
+  useEffect(() => {
+    console.log("formData updated :", formData);
+  }, [formData]);
 
   const [artworkPreview, setArtworkPreview] = useState<string>("");
 
@@ -579,7 +603,6 @@ export function ArtistDashboard({
           ...prev,
           coverUrl: res.url, // 👉 adapte le nom: singleCoverUrl / albumCoverUrl...
         }));
-
         setSuccessMessage("Artwork uploadé avec succès.");
         setSuccess(true);
         setErrorMessage("");
@@ -898,7 +921,7 @@ export function ArtistDashboard({
     }
   };
 
-  const handleMiniVideo = async (e: ChangeEvent<HTMLInputElement>) => {
+  const handleMiniVideoLoop = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -928,7 +951,7 @@ export function ArtistDashboard({
         // si tu veux aussi le stocker dans un form global :
         setFormData((prev: any) => ({
           ...prev,
-          miniVideoUrl: res.url,
+          miniVideoLoopUrl: res.url,
         }));
 
         setSuccessMessage("Mini-video uploadée avec succès.");
@@ -1069,6 +1092,7 @@ export function ArtistDashboard({
       single: "Single",
       updateBio: "",
       ep: "EP",
+      payout: "Payout",
       album: "Álbum",
       dragDrop: "Arrastra y suelta tu archivo aquí o haz clic para seleccionar",
       uploadButton: "Subir Música",
@@ -1182,6 +1206,7 @@ export function ArtistDashboard({
     },
     english: {
       title: "Artist Dashboard",
+      payout: "Payout",
       profile: "Profile",
       upload: "Upload Music",
       streams: "Streams",
@@ -1297,7 +1322,8 @@ export function ArtistDashboard({
       updatePassword: "Update Password",
       paymentSettings: "Payment Settings",
       receivePayments: "Receive Payments",
-      paymentMethodsTitle: "Payment Methods to Receive Royalties",
+      paymentMethodsTitle:
+        "Payment Methods to Receive Subscriptions and Royalties",
       bankAccount: "Bank Account",
       accountHolderName: "Account Holder Name",
       bankNameLabel: "Bank Name",
@@ -1315,6 +1341,7 @@ export function ArtistDashboard({
       selectProvider: "--Select provider--",
     },
     catalan: {
+      payout: "Payout",
       title: "Panell de l'Artista",
       profile: "Perfil",
       upload: "Pujar Música",
@@ -1419,6 +1446,7 @@ export function ArtistDashboard({
       emailNotVerified: "No verificat",
       verifyEmail: "Verificar Correu",
       resendVerification: "Reenviar Verificació",
+
       verificationSent:
         "Correu de verificació enviat! Revisa la teva safata d'entrada.",
       twoFactorAuth: "Autenticació de Dos Factors",
@@ -1786,6 +1814,9 @@ export function ArtistDashboard({
             { id: "streams", label: text.streams, icon: TrendingUp },
             { id: "subscriptions", label: text.subscriptions, icon: Users },
             { id: "royalties", label: text.royalties, icon: DollarSign },
+
+            // 👉 Nouvel onglet ajouté ici
+            { id: "payout", label: text.payout, icon: PayoutIcon },
           ].map(({ id, label, icon: Icon }) => (
             <button
               key={id}
@@ -1801,6 +1832,7 @@ export function ArtistDashboard({
             </button>
           ))}
         </div>
+
         {/* Profile Tab */}
         {activeTab === "profile" && (
           <div className="bg-white/10 backdrop-blur-md rounded-xl p-8 border border-white/20">
@@ -2287,7 +2319,6 @@ export function ArtistDashboard({
                           size={32}
                           className="mx-auto mb-3 text-white/60"
                         />
-
                         <p className="text-white drop-shadow text-sm">
                           {track.file ? track.file.name : text.dragDrop}
                         </p>
@@ -2319,9 +2350,11 @@ export function ArtistDashboard({
                       <textarea
                         value={track.lyrics}
                         onChange={(e) => {
-                          const newTracks = [...albumTracks];
-                          newTracks[index].lyrics = e.target.value;
-                          setAlbumTracks(newTracks);
+                          const lyrics = e.target.value;
+                          setFormData((prev: any) => ({
+                            ...prev,
+                            lyrics: lyrics, // 👉 adapte le nom: singleCoverUrl / albumCoverUrl...
+                          }));
                         }}
                         placeholder={text.lyricsPlaceholder}
                         className="w-full h-24 p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all resize-none text-sm"
@@ -2662,7 +2695,7 @@ export function ArtistDashboard({
                           miniVideoUrl: "",
                         }));
                       }}
-                      className="absolute top-2 right-2 bg-red-500/80 backdrop-blur-sm text-white p-2 rounded-lg hover:bg-red-600/80 transition-all"
+                      className="cursor-pointer absolute top-2 right-2 bg-red-500/80 backdrop-blur-sm text-white p-2 rounded-lg hover:bg-red-600/80 transition-all"
                     >
                       <svg
                         width="20"
@@ -2682,7 +2715,7 @@ export function ArtistDashboard({
                     <input
                       type="file"
                       accept="video/*"
-                      onChange={handleMiniVideo}
+                      onChange={handleMiniVideoLoop}
                       className="hidden"
                       id="mini-video-upload"
                     />
@@ -3788,6 +3821,7 @@ export function ArtistDashboard({
         {/* Royalties Tab */}
         {activeTab === "royalties" && (
           <div className="space-y-6">
+            {/* Royalties Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
                 <div className="flex items-center gap-2 mb-2">
@@ -3823,6 +3857,45 @@ export function ArtistDashboard({
                 </p>
               </div>
             </div>
+
+            {/* Information message pointing to payout settings */}
+
+            {/* Revenue By Track */}
+            <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
+              <h3 className="text-xl text-white drop-shadow mb-4">
+                {text.revenue} by Track
+              </h3>
+              <div className="space-y-3">
+                {mockTracks.map((track, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-4 bg-white/5 rounded-lg"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+                        <Music size={20} className="text-white" />
+                      </div>
+                      <div>
+                        <p className="text-white drop-shadow">{track.name}</p>
+                        <p className="text-white/60 text-sm">
+                          {track.streams} streams
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-xl text-white drop-shadow">
+                      {track.revenue}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Payout Tab */}
+        {activeTab === "payout" && (
+          <div className="space-y-6">
+            {/* Info / Overview */}
 
             {/* Payment Receiving Settings */}
             <div className="bg-white/10 backdrop-blur-md rounded-xl p-8 border border-white/20">
@@ -4027,40 +4100,11 @@ export function ArtistDashboard({
                     setPaymentSaved(true);
                     setTimeout(() => setPaymentSaved(false), 3000);
                   }}
-                  className="w-full px-6 py-4 bg-gradient-to-r from-green-500/40 to-emerald-500/40 backdrop-blur-md border-2 border-white/40 rounded-xl text-white hover:from-green-500/50 hover:to-emerald-500/50 hover:border-white/60 transition-all shadow-lg flex items-center justify-center gap-2"
+                  className="cursor-pointer w-full px-6 py-4 bg-gradient-to-r from-green-500/40 to-emerald-500/40 backdrop-blur-md border-2 border-white/40 rounded-xl text-white hover:from-green-500/50 hover:to-emerald-500/50 hover:border-white/60 transition-all shadow-lg flex items-center justify-center gap-2"
                 >
                   <DollarSign size={20} />
                   {text.savePaymentDetails}
                 </button>
-              </div>
-            </div>
-
-            <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
-              <h3 className="text-xl text-white drop-shadow mb-4">
-                {text.revenue} by Track
-              </h3>
-              <div className="space-y-3">
-                {mockTracks.map((track, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between p-4 bg-white/5 rounded-lg"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
-                        <Music size={20} className="text-white" />
-                      </div>
-                      <div>
-                        <p className="text-white drop-shadow">{track.name}</p>
-                        <p className="text-white/60 text-sm">
-                          {track.streams} streams
-                        </p>
-                      </div>
-                    </div>
-                    <span className="text-xl text-white drop-shadow">
-                      {track.revenue}
-                    </span>
-                  </div>
-                ))}
               </div>
             </div>
           </div>
