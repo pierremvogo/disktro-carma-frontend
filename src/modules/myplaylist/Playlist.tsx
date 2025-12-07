@@ -200,10 +200,7 @@ export default function MyPlaylist() {
       if (userRole === "artist" && file && trackTitle) {
         const formData = new FormData();
         formData.append("file", file);
-        const uploadRes = await MediaModule.service.uploadAudioFile(
-          formData,
-          token
-        );
+        const uploadRes = await MediaModule.service.uploadAudioFile(formData);
         const newTrack = {
           title: trackTitle,
           audioUrl: uploadRes.fileName,

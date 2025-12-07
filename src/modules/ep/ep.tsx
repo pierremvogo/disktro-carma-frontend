@@ -135,7 +135,7 @@ export default function EPsPage() {
     const formData = new FormData();
     formData.append("file", file);
     try {
-      const res = await MediaModule.service.uploadImageFile(formData, token!);
+      const res = await MediaModule.service.uploadImageFile(formData);
       if (res && res.fileName) {
         setForm((prev) => ({ ...prev, coverUrl: res.fileName }));
         setSuccess(true);

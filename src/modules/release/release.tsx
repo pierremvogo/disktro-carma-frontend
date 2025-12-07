@@ -83,7 +83,7 @@ export default function ReleaseCreatePage() {
     try {
       const formData = new FormData();
       formData.append("file", file);
-      const res = await MediaModule.service.uploadImageFile(formData, token!);
+      const res = await MediaModule.service.uploadImageFile(formData);
       if (res && res.fileName) {
         setForm((prev) => ({ ...prev, coverUrl: res.fileName }));
         setSuccessMessage("Image téléchargée avec succès !");
