@@ -64,7 +64,7 @@ export function UserType({
     <div className="w-full h-full flex flex-col items-center justify-center p-8">
       <button
         onClick={onBack}
-        className="absolute cursor-pointer top-8 left-8 flex items-center gap-2 text-white drop-shadow hover:opacity-70 transition-opacity"
+        className="absolute mb-5 cursor-pointer top-8 left-8 flex items-center gap-2 text-white drop-shadow hover:opacity-70 transition-opacity"
       >
         <svg
           width="20"

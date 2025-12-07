@@ -239,308 +239,303 @@ export function ScreenEmbed() {
     >
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/50" />
-      {/* Language Options and Controls - below the screen */}
-      <div className="relative z-10 flex flex-col items-center gap-3 w-full">
-        {/* Language Options */}
-        <nav
-          aria-label={
-            language === "spanish"
-              ? "Selección de idioma"
-              : language === "english"
-              ? "Language selection"
-              : "Selecció d'idioma"
-          }
-          className="w-full"
-        >
-          <div
-            className="flex flex-wrap justify-center gap-3 sm:gap-6"
-            role="group"
-          >
-            <button
-              onClick={() => changeLanguage("spanish")}
-              className={`text-white cursor-pointer drop-shadow hover:opacity-70 transition-opacity underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent rounded px-2 py-1 text-sm sm:text-base ${
-                language === "spanish" ? "opacity-100 font-bold" : "opacity-70"
-              }`}
-              aria-label="Español"
-              aria-current={language === "spanish" ? "true" : "false"}
-            >
-              Spanish
-            </button>
-            <button
-              onClick={() => changeLanguage("english")}
-              className={`text-white cursor-pointer drop-shadow hover:opacity-70 transition-opacity underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent rounded px-2 py-1 text-sm sm:text-base ${
-                language === "english" ? "opacity-100 font-bold" : "opacity-70"
-              }`}
-              aria-label="English"
-              aria-current={language === "english" ? "true" : "false"}
-            >
-              English
-            </button>
-            <button
-              onClick={() => changeLanguage("catalan")}
-              className={`text-white cursor-pointer drop-shadow hover:opacity-70 transition-opacity underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent rounded px-2 py-1 text-sm sm:text-base ${
-                language === "catalan" ? "opacity-100 font-bold" : "opacity-70"
-              }`}
-              aria-label="Català"
-              aria-current={language === "catalan" ? "true" : "false"}
-            >
-              Catalan
-            </button>
-          </div>
-        </nav>
 
-        {/* Bottom Buttons */}
-        <div className="flex flex-wrap items-center justify-center gap-3 mt-1">
-          <button
-            onClick={() => setShowQuestionnaire(true)}
-            className="flex cursor-pointer items-center gap-2 px-3 sm:px-4 py-2 bg-white/20 backdrop-blur-md border border.white/30 rounded-lg text-white text-sm sm:text-base drop-shadow hover:bg-white/30 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
+      {/* WRAPPER PRINCIPAL EN COLONNE */}
+      <div className="relative z-10 flex flex-col h-full w-full">
+        {/* Language Options and Controls */}
+        <div className="flex flex-col items-center gap-3 w-full pt-4">
+          {/* Language Options */}
+          <nav
             aria-label={
               language === "spanish"
-                ? "Entrar al cuestionario"
+                ? "Selección de idioma"
                 : language === "english"
-                ? "Enter questionnaire"
-                : "Entrar al qüestionari"
+                ? "Language selection"
+                : "Selecció d'idioma"
             }
+            className="w-full"
           >
-            Test Group
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
+            <div
+              className="flex flex-wrap justify-center gap-3 sm:gap-6"
+              role="group"
             >
-              <path d="M5 12h14M12 5l7 7-7 7" />
-            </svg>
-          </button>
+              <button
+                onClick={() => changeLanguage("spanish")}
+                className={`text-white cursor-pointer drop-shadow hover:opacity-70 transition-opacity underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent rounded px-2 py-1 text-sm sm:text-base ${
+                  language === "spanish"
+                    ? "opacity-100 font-bold"
+                    : "opacity-70"
+                }`}
+                aria-label="Español"
+                aria-current={language === "spanish" ? "true" : "false"}
+              >
+                Spanish
+              </button>
+              <button
+                onClick={() => changeLanguage("english")}
+                className={`text-white cursor-pointer drop-shadow hover:opacity-70 transition-opacity underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent rounded px-2 py-1 text-sm sm:text-base ${
+                  language === "english"
+                    ? "opacity-100 font-bold"
+                    : "opacity-70"
+                }`}
+                aria-label="English"
+                aria-current={language === "english" ? "true" : "false"}
+              >
+                English
+              </button>
+              <button
+                onClick={() => changeLanguage("catalan")}
+                className={`text-white cursor-pointer drop-shadow hover:opacity-70 transition-opacity underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent rounded px-2 py-1 text-sm sm:text-base ${
+                  language === "catalan"
+                    ? "opacity-100 font-bold"
+                    : "opacity-70"
+                }`}
+                aria-label="Català"
+                aria-current={language === "catalan" ? "true" : "false"}
+              >
+                Catalan
+              </button>
+            </div>
+          </nav>
 
-          <button
-            onClick={() => setShowUserType(true)}
-            className="flex cursor-pointer items-center gap-2 px-3 sm:px-4 py-2 bg-white/30 backdrop-blur-md border border-white/40 rounded-lg text-white text-sm sm:text-base drop-shadow hover:bg-white/40 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
-            aria-label={signUpText[language as keyof typeof signUpText]}
-          >
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
+          {/* Bottom Buttons */}
+          <div className="flex flex-wrap items-center justify-center gap-3 mt-1">
+            <button
+              onClick={() => setShowQuestionnaire(true)}
+              className="flex cursor-pointer items-center gap-2 px-3 sm:px-4 py-2 bg-white/20 backdrop-blur-md border border.white/30 rounded-lg text-white text-sm sm:text-base drop-shadow hover:bg-white/30 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
+              aria-label={
+                language === "spanish"
+                  ? "Entrar al cuestionario"
+                  : language === "english"
+                  ? "Enter questionnaire"
+                  : "Entrar al qüestionari"
+              }
             >
-              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-              <circle cx="9" cy="7" r="4" />
-              <line x1="19" y1="8" x2="19" y2="14" />
-              <line x1="22" y1="11" x2="16" y2="11" />
-            </svg>
-            {signUpText[language as keyof typeof signUpText]}
-          </button>
+              Test Group
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </button>
 
-          <button
-            onClick={() => setShowLogin(true)}
-            className="flex cursor-pointer items-center gap-2 px-3 sm:px-4 py-2 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text.white text-sm sm:text-base drop-shadow hover:bg-white/30 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
-            aria-label={loginText[language as keyof typeof loginText]}
-          >
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
+            <button
+              onClick={() => setShowUserType(true)}
+              className="flex cursor-pointer items-center gap-2 px-3 sm:px-4 py-2 bg-white/30 backdrop-blur-md border border-white/40 rounded-lg text-white text-sm sm:text-base drop-shadow hover:bg-white/40 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
+              aria-label={signUpText[language as keyof typeof signUpText]}
             >
-              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
-              <polyline points="10 17 15 12 10 7" />
-              <line x1="15" y1="12" x2="3" y2="12" />
-            </svg>
-            {loginText[language as keyof typeof loginText]}
-          </button>
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <line x1="19" y1="8" x2="19" y2="14" />
+                <line x1="22" y1="11" x2="16" y2="11" />
+              </svg>
+              {signUpText[language as keyof typeof signUpText]}
+            </button>
+
+            <button
+              onClick={() => setShowLogin(true)}
+              className="flex cursor-pointer items-center gap-2 px-3 sm:px-4 py-2 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-white text-sm sm:text-base drop-shadow hover:bg-white/30 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
+              aria-label={loginText[language as keyof typeof loginText]}
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                <polyline points="10 17 15 12 10 7" />
+                <line x1="15" y1="12" x2="3" y2="12" />
+              </svg>
+              {loginText[language as keyof typeof loginText]}
+            </button>
+          </div>
         </div>
-      </div>
-      {/* Content */}
-      <div className="relative w-full h-full overflow-y-auto flex items-center justify-center px-4 md:px-8">
-        <div className="relative w-full max-w-7xl flex flex-col items-center gap-8 md:gap-10">
-          <div className="relative w-full flex items-center justify-center">
-            {/* Left Panel - vertical background (only on large screens) */}
-            <div
-              className="hidden lg:block absolute left-0 w-64 h-full rounded-3xl overflow-hidden shadow-2xl bg-cover bg-center origin-center"
-              style={{
-                backgroundImage:
-                  'url("/image/4ac3eed398bb68113a14d0fa5efe7a6def6f7651.png")',
-                backgroundPosition: "25% 35%",
-                backgroundSize: "cover",
-                transform: "rotate(90deg)",
-              }}
-            />
 
-            {/* Right Panel - vertical background (only on large screens) */}
-            <div
-              className="hidden lg:block absolute right-0 w-64 h-full rounded-3xl overflow-hidden shadow-2xl bg-cover bg-center origin-center"
-              style={{
-                backgroundImage:
-                  'url("/image/4ac3eed398bb68113a14d0fa5efe7a6def6f7651.png")',
-                backgroundPosition: "75% 35%",
-                backgroundSize: "cover",
-                transform: "rotate(90deg)",
-              }}
-            />
+        {/* Content - PREND LE RESTE DE LA HAUTEUR */}
+        <div className="flex-1 w-full overflow-y-auto flex items-center justify-center px-4 md:px-8 pb-4">
+          <div className="relative w-full max-w-7xl flex flex-col items-center gap-8 md:gap-10">
+            <div className="relative w-full flex items-center justify-center">
+              {/* Left Panel */}
+              <div
+                className="hidden lg:block absolute left-0 w-64 h-full rounded-3xl overflow-hidden shadow-2xl bg-cover bg-center origin-center"
+                style={{
+                  backgroundImage:
+                    'url("/image/4ac3eed398bb68113a14d0fa5efe7a6def6f7651.png")',
+                  backgroundPosition: "25% 35%",
+                  backgroundSize: "cover",
+                  transform: "rotate(90deg)",
+                }}
+              />
 
-            {/* Middle Panel - Screen (responsive) */}
-            <div className="relative z-10 w-full max-w-4xl mt-8  md:mt-1 lg:mt-2">
-              <div className="w-full h-full bg-white/10  backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden border border-white/20 flex flex-col">
-                {/* Main Content Area */}
-                <div className="flex-1 relative bg-gradient-to-br from-purple-500/20 via-pink-500/20 to-blue-500/20 flex items-center justify-center p-4 sm:p-6 md:p-8">
-                  {showUserType ? (
-                    <UserType
-                      onBack={() => setShowUserType(false)}
-                      onSelectArtist={() => {
-                        setShowUserType(false);
-                        setShowArtistProfileSetup(true);
-                      }}
-                      onSelectFan={() => {
-                        setShowUserType(false);
-                        setShowFanProfileSetup(true);
-                      }}
-                      language={language}
-                      onGoToQuestionnaire={() => {
-                        setShowUserType(false);
-                        setShowQuestionnaire(true);
-                      }}
-                      onGoToWelcome={() => {
-                        setShowUserType(false);
-                      }}
-                    />
-                  ) : showQuestionnaire ? (
-                    <Questionnaire
-                      onBack={() => setShowQuestionnaire(false)}
-                      onSubmit={() => {
-                        setShowQuestionnaire(false);
-                        setShowLogin(true);
-                      }}
-                      language={language}
-                      onShowLogin={() => {
-                        setShowQuestionnaire(false);
-                        setShowLogin(true);
-                      }}
-                      onSkipToSignUp={() => {
-                        setShowQuestionnaire(false);
-                        setShowUserType(true);
-                      }}
-                    />
-                  ) : (
-                    <div className="text-center text-white space-y-4 px-2 sm:px-4">
-                      <div className="space-y-2">
-                        <h2 className="text-2xl sm:text-3xl md:text-4xl drop-shadow-lg">
-                          {messages[language]}
-                        </h2>
-                        <p className="text-sm sm:text-base md:text-lg opacity-90 drop-shadow"></p>
-                      </div>
+              {/* Right Panel */}
+              <div
+                className="hidden lg:block absolute right-0 w-64 h-full rounded-3xl overflow-hidden shadow-2xl bg-cover bg-center origin-center"
+                style={{
+                  backgroundImage:
+                    'url("/image/4ac3eed398bb68113a14d0fa5efe7a6def6f7651.png")',
+                  backgroundPosition: "75% 35%",
+                  backgroundSize: "cover",
+                  transform: "rotate(90deg)",
+                }}
+              />
 
-                      {/* Sample Content Card */}
-                      <div className="mt-6 sm:mt-8 bg-white/10 backdrop-blur-md rounded-xl p-4 sm:p-6 max-w-md mx-auto border border-white/20 relative">
-                        {/* Flèche gauche */}
-                        {canScrollLeft && (
-                          <button
-                            type="button"
-                            onClick={() => scrollByAmount(-300)}
-                            className="hidden sm:flex items-center justify-center absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 text-white p-2 rounded-full backdrop-blur-md shadow-md hover:bg-black/60 transition"
-                            aria-label="Scroll left"
-                          >
-                            ←
-                          </button>
-                        )}
-
-                        {/* Flèche droite */}
-                        {canScrollRight && (
-                          <button
-                            type="button"
-                            onClick={() => scrollByAmount(300)}
-                            className="hidden sm:flex items-center justify-center absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 text-white p-2 rounded-full backdrop-blur-md shadow-md hover:bg-black/60 transition"
-                            aria-label="Scroll right"
-                          >
-                            →
-                          </button>
-                        )}
-
-                        {/* Zone scrollable */}
-                        <div
-                          ref={mediaScrollRef}
-                          onScroll={handleMediaScroll}
-                          onMouseDown={handleMouseDown}
-                          onMouseMove={handleMouseMove}
-                          onMouseUp={handleMouseUp}
-                          onMouseLeave={handleMouseLeave}
-                          className={`
-      flex gap-4 
-      overflow-x-auto 
-      snap-x snap-mandatory 
-      pb-2 
-      no-scrollbar 
-      ${isDragging ? "cursor-grabbing" : "cursor-grab"}
-    `}
-                          style={{ scrollBehavior: "smooth" }}
-                        >
-                          {/* Slide 2 : vidéo YouTube */}
-                          {videos.map((url, index) => (
-                            <div key={index} className="min-w-full snap-center">
-                              <div className="aspect-video bg-black rounded-lg mb-3 overflow-hidden">
-                                <iframe
-                                  className="w-full h-full"
-                                  src={videos[index]}
-                                  title={`Embedded YouTube video ${index + 1}`}
-                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                  allowFullScreen
-                                />
-                              </div>
-                              <p className="text-xs sm:text-sm opacity-80 drop-shadow text-center">
-                                #{index + 1}
-                              </p>
-                            </div>
-                          ))}
-
-                          {/* Slide 1 */}
-                          {/* <div className="min-w-full snap-center">
-                            <div className="aspect-video bg-black/20 backdrop-blur-sm rounded-lg mb-3 flex items-center justify-center overflow-hidden">
-                              <ImageWithFallback
-                                src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&q=80"
-                                alt="Abstract art"
-                                className="w-full h-full object-cover rounded-lg opacity-80"
-                              />
-                            </div>
-                            <p className="text-xs sm:text-sm opacity-80 drop-shadow text-center">
-                              Artwork or hero image
-                            </p>
-                          </div> */}
-
-                          {/* Slide 3 : autre image */}
-                          <div className="min-w-full snap-center">
-                            <div className="aspect-video bg-black/20 backdrop-blur-sm rounded-lg mb-3 flex items-center justify-center overflow-hidden">
-                              <ImageWithFallback
-                                src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&q=80"
-                                alt="Second visual"
-                                className="w-full h-full object-cover rounded-lg opacity-80"
-                              />
-                            </div>
-                            <p className="text-xs sm:text-sm opacity-80 drop-shadow text-center"></p>
-                          </div>
+              {/* Middle Panel */}
+              <div className="relative z-10 w-full max-w-4xl mt-4 md:mt-2 lg:mt-2">
+                <div className="w-full h-full bg-white/10 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden border border-white/20 flex flex-col">
+                  {/* MAIN CONTENT */}
+                  <div className="flex-1 relative bg-gradient-to-br from-purple-500/20 via-pink-500/20 to-blue-500/20 flex items-center justify-center p-4 sm:p-6 md:p-8">
+                    {showUserType ? (
+                      <UserType
+                        onBack={() => setShowUserType(false)}
+                        onSelectArtist={() => {
+                          setShowUserType(false);
+                          setShowArtistProfileSetup(true);
+                        }}
+                        onSelectFan={() => {
+                          setShowUserType(false);
+                          setShowFanProfileSetup(true);
+                        }}
+                        language={language}
+                        onGoToQuestionnaire={() => {
+                          setShowUserType(false);
+                          setShowQuestionnaire(true);
+                        }}
+                        onGoToWelcome={() => {
+                          setShowUserType(false);
+                        }}
+                      />
+                    ) : showQuestionnaire ? (
+                      <Questionnaire
+                        onBack={() => setShowQuestionnaire(false)}
+                        onSubmit={() => {
+                          setShowQuestionnaire(false);
+                          setShowLogin(true);
+                        }}
+                        language={language}
+                        onShowLogin={() => {
+                          setShowQuestionnaire(false);
+                          setShowLogin(true);
+                        }}
+                        onSkipToSignUp={() => {
+                          setShowQuestionnaire(false);
+                          setShowUserType(true);
+                        }}
+                      />
+                    ) : (
+                      <div className="text-center text-white space-y-4 px-2 sm:px-4">
+                        <div className="space-y-2">
+                          <h2 className="text-2xl sm:text-3xl md:text-4xl drop-shadow-lg">
+                            {messages[language]}
+                          </h2>
                         </div>
 
-                        <p className="text-[11px] sm:text-xs opacity-70 mt-2 text-center">
-                          Drag horizontally with your cursor or swipe on mobile
-                          to explore media.
-                        </p>
+                        {/* MEDIA CARD */}
+                        <div className="mt-6 sm:mt-8 bg-white/10 backdrop-blur-md rounded-xl p-4 sm:p-6 max-w-md mx-auto border border-white/20 relative">
+                          {/* Left Arrow */}
+                          {canScrollLeft && (
+                            <button
+                              type="button"
+                              onClick={() => scrollByAmount(-300)}
+                              className="hidden sm:flex items-center justify-center absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 text-white p-2 rounded-full backdrop-blur-md shadow-md hover:bg-black/60 transition"
+                            >
+                              ←
+                            </button>
+                          )}
+
+                          {/* Right Arrow */}
+                          {canScrollRight && (
+                            <button
+                              type="button"
+                              onClick={() => scrollByAmount(300)}
+                              className="hidden sm:flex items-center justify-center absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 text-white p-2 rounded-full backdrop-blur-md shadow-md hover:bg-black/60 transition"
+                            >
+                              →
+                            </button>
+                          )}
+
+                          {/* Scrollable Zone */}
+                          <div
+                            ref={mediaScrollRef}
+                            onScroll={handleMediaScroll}
+                            onMouseDown={handleMouseDown}
+                            onMouseMove={handleMouseMove}
+                            onMouseUp={handleMouseUp}
+                            onMouseLeave={handleMouseLeave}
+                            className={`
+                              flex gap-4 
+                              overflow-x-auto 
+                              snap-x snap-mandatory 
+                              pb-2 
+                              no-scrollbar 
+                              ${isDragging ? "cursor-grabbing" : "cursor-grab"}
+                            `}
+                            style={{ scrollBehavior: "smooth" }}
+                          >
+                            {/* Videos */}
+                            {videos.map((url, index) => (
+                              <div
+                                key={index}
+                                className="min-w-full snap-center"
+                              >
+                                <div className="aspect-video bg-black rounded-lg mb-3 overflow-hidden">
+                                  <iframe
+                                    className="w-full h-full"
+                                    src={videos[index]}
+                                    title={`Embedded YouTube video ${
+                                      index + 1
+                                    }`}
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                    allowFullScreen
+                                  />
+                                </div>
+                                <p className="text-xs sm:text-sm opacity-80 drop-shadow text-center">
+                                  #{index + 1}
+                                </p>
+                              </div>
+                            ))}
+
+                            {/* Image Slide */}
+                            <div className="min-w-full snap-center">
+                              <div className="aspect-video bg-black/20 backdrop-blur-sm rounded-lg mb-3 flex items-center justify-center overflow-hidden">
+                                <ImageWithFallback
+                                  src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&q=80"
+                                  alt="Second visual"
+                                  className="w-full h-full object-cover rounded-lg opacity-80"
+                                />
+                              </div>
+                            </div>
+                          </div>
+
+                          <p className="text-[11px] sm:text-xs opacity-70 mt-2 text-center">
+                            Drag horizontally with your cursor or swipe on
+                            mobile to explore media.
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
