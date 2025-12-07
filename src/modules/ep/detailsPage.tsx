@@ -212,10 +212,7 @@ export default function DetailsPage() {
 
       // Upload du fichier
       formData.append("file", file);
-      const uploadRes = await MediaModule.service.uploadAudioFile(
-        formData,
-        token!
-      );
+      const uploadRes = await MediaModule.service.uploadAudioFile(formData);
 
       // Création du track avec la bonne durée
       const newTrack = {
