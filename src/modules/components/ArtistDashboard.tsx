@@ -9,6 +9,12 @@ import CustomSuccess from "@/@disktro/CustomSuccess";
 import CustomAlert from "@/@disktro/CustomAlert";
 import { MoodModuleObject as MoodModule } from "../mood/module";
 import { TrackModuleObject as TrackModule } from "../track/module";
+import { SingleModuleObject } from "../single/module";
+import { SingleUploadSection } from "./SingleUploadSection";
+import { AlbumUploadSection } from "./AlbumUploadSection";
+import { EpUploadSection } from "./EpUploadSection";
+import { EpModuleObject } from "../ep/module";
+import { AlbumModuleObject } from "../album/module";
 // Icon components
 const Upload = ({ size = 24, className = "" }) => (
   <svg
@@ -265,9 +271,41 @@ interface User {
   createdAt?: string;
   updatedAt?: string;
   profileImageUrl?: string;
-  videoIntroUrl?: string;
   miniVideoLoopUrl?: string;
+  lyrics?: string;
+  trackTitle?: string;
+  audioUrl?: string;
+  authors?: string;
+  producers?: string;
+  lyricists?: string;
+  coverUrl?: string;
+  musiciansVocals?: string;
+  musiciansPianoKeyboards?: string;
+  musiciansWinds?: string;
+  musiciansPercussion?: string;
+  musiciansStrings?: string;
+  moodId?: string;
+  mixingEngineer?: string;
+  masteringEngineer?: string;
+
+  // médias annexes
+  miniVideoUrl?: string;
+  videoIntroUrl?: string;
+  signLanguageVideoUrl?: string;
+  brailleFileUrl?: string;
 }
+type Single = {
+  id?: string;
+  userId?: string;
+  user?: any;
+  title: string;
+  artistId?: string;
+  tagId?: string;
+  coverFile?: File | null;
+  coverUrl?: string;
+  coverImageUrl?: string;
+  duration?: string;
+};
 type FormSetting = {
   name: string;
   surname: string;
@@ -310,6 +348,26 @@ type TrackForm = {
   lyrics?: string;
   audioUrl?: string;
 };
+type ReleaseType = "single" | "ep" | "album";
+
+type LocationStat = {
+  location: string;
+  streams: number;
+  percentage: string;
+};
+
+type TrackStat = {
+  id: string;
+  name: string;
+  type: ReleaseType;
+  totalStreams: number;
+  listenersCount?: number;
+  topLocations?: {
+    location: string;
+    streams: number;
+    percentage?: string;
+  }[];
+};
 
 export function ArtistDashboard({
   language,
@@ -342,18 +400,32 @@ export function ArtistDashboard({
   const [orangeMoneyPhone, setOrangeMoneyPhone] = useState<string>("");
   const [paymentSaved, setPaymentSaved] = useState<boolean>(false);
   const [moodId, setMoodId] = useState("");
-  const [brailleUploadError, setBrailleUploadError] = useState<string | null>(
-    null
+  // Streams global stats
+  const [totalStreams, setTotalStreams] = useState(0);
+  const [monthlyStreams, setMonthlyStreams] = useState(0);
+  const [totalTracksCount, setTotalTracksCount] = useState(0);
+  const [totalListeners, setTotalListeners] = useState(0);
+
+  // Tracks + locations
+  const [tracksStats, setTracksStats] = useState<TrackStat[]>([]);
+  const [streamsByLocation, setStreamsByLocation] = useState<LocationStat[]>(
+    []
   );
-  const [brailleUploadingTrackIndex, setBrailleUploadingTrackIndex] = useState<
-    number | null
-  >(null);
+
+  // loading/error pour la section streams (optionnel)
+  const [isStreamsLoading, setIsStreamsLoading] = useState(false);
+  const [streamsError, setStreamsError] = useState<string | null>(null);
+
+  // Si tu ne l’as pas déjà :
+  const [trackFilter, setTrackFilter] = useState<ReleaseType | "all">("all");
+  const [trackSearch, setTrackSearch] = useState("");
+
   const [file, setFile] = useState<File | null>(null);
 
   const [signLanguageVideoUrl, setSignLanguageVideoUrl] = useState<
     string | null
   >(null);
-  const [brailleFileUrl, setBrailleFileUrl] = useState<string | null>(null);
+  const [signLanguageVideoPreview, setSignLanguageVideoPreview] = useState("");
 
   // Exclusive content states
   const [exclusiveContentType, setExclusiveContentType] =
@@ -365,6 +437,8 @@ export function ArtistDashboard({
   const [exclusiveContentFile, setExclusiveContentFile] = useState<File | null>(
     null
   );
+  const [brailleFilePreview, setBrailleFilePreview] = useState<string>("");
+
   const [uploadedExclusiveContent, setUploadedExclusiveContent] = useState<
     Array<{
       id: string;
@@ -380,19 +454,6 @@ export function ArtistDashboard({
   const [signLanguageVideo, setSignLanguageVideo] = useState<File | null>(null);
   const [brailleFile, setBrailleFile] = useState<File | null>(null);
   const [trackTitle, setTrackTitle] = useState<string>("");
-  const [authors, setAuthors] = useState<string>("");
-  const [producers, setProducers] = useState<string>("");
-  const [lyricists, setLyricists] = useState<string>("");
-  const [musiciansVocals, setMusiciansVocals] = useState<string>("");
-  const [musiciansPianoKeyboards, setMusiciansPianoKeyboards] =
-    useState<string>("");
-  const [musiciansWinds, setMusiciansWinds] = useState<string>("");
-  const [musiciansPercussion, setMusiciansPercussion] = useState<string>("");
-  const [musiciansStrings, setMusiciansStrings] = useState<string>("");
-  const [mixingEngineer, setMixingEngineer] = useState<string>("");
-  const [masteringEngineer, setMasteringEngineer] = useState<string>("");
-  const [trackFilter, setTrackFilter] = useState<string>("all");
-  const [trackSearch, setTrackSearch] = useState<string>("");
   const [uploadType, setUploadType] = useState<"single" | "ep" | "album">(
     "single"
   );
@@ -435,12 +496,38 @@ export function ArtistDashboard({
     bio: "",
     email: "",
     type: "",
+    lyrics: "",
     oldPassword: "",
     videoIntroUrl: "",
     miniVideoLoopUrl: "",
     newPassword: "",
     confirmNewPassword: "",
+    trackTitle: "",
+    coverUrl: "",
+    authors: "",
+    producers: "",
+    lyricists: "",
+    moodId: "",
+    musiciansVocals: "",
+    musiciansPianoKeyboards: "",
+    musiciansWinds: "",
+    musiciansPercussion: "",
+    musiciansStrings: "",
+    mixingEngineer: "",
+    masteringEngineer: "",
+
+    // médias annexes
+    miniVideoUrl: "",
+    signLanguageVideoUrl: "",
+    brailleFileUrl: "",
   });
+  const allUploadsDone =
+    !!formData.audioUrl &&
+    !!formData.coverUrl &&
+    !!formData.miniVideoLoopUrl &&
+    !!formData.videoIntroUrl &&
+    !!formData.signLanguageVideoUrl &&
+    !!formData.brailleFileUrl;
   const [audioPreviewUrl, setAudioPreviewUrl] = useState<string | null>(null);
   const [audioUrl, setAudioUrl] = useState<string>("");
 
@@ -449,48 +536,156 @@ export function ArtistDashboard({
   const [miniVideoPreview, setMiniVideoPreview] = useState<string>("");
   const [miniVideoUrl, setMiniVideoUrl] = useState<string>("");
 
-  const handleAudioFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const [singles, setSingles] = useState<Single[]>([]);
+  useEffect(() => {
+    if (singles.length === 0) fetchSingles();
+  }, []);
 
-    setErrorMessage("");
-    setSuccessMessage("");
+  async function fetchSingles() {
+    const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
+    const userId = localStorage.getItem(ModuleObject.localState.USER_ID);
     setIsLoading(true);
-
-    // On garde le fichier en state
-    setFile(file);
-
-    // Preview local : on nettoie l’ancienne URL si besoin
-    setAudioPreviewUrl((prev) => {
-      if (prev) URL.revokeObjectURL(prev);
-      return URL.createObjectURL(file);
-    });
-
-    const formData = new FormData();
-    formData.append("file", file);
-
     try {
-      // appel backend via ton module media
-      const res = await MediaModule.service.uploadAudioFile(formData);
-
-      if (res && (res.fileName || res.url)) {
-        // on garde l’URL pour la création du track
-        const uploadedAudioUrl = res.url ?? res.fileName;
-        setAudioUrl(uploadedAudioUrl);
-        setSuccessMessage("Fichier audio uploadé avec succès.");
-        setErrorMessage("");
-      } else {
-        setErrorMessage("Erreur lors de l'upload du fichier audio.");
-      }
-    } catch (error) {
-      console.error("Erreur upload audio :", error);
-      setErrorMessage(
-        (error as Error).message || "Erreur lors de l'upload du fichier audio."
+      if (!token) return;
+      const res = await SingleModuleObject.service.getSingleByUser(
+        userId!,
+        token
       );
+      setSingles(res.singles);
+      setSuccess(true);
+    } catch (error) {
+      setErrorMessage((error as Error).message);
     } finally {
       setIsLoading(false);
     }
-  };
+  }
+
+  async function fetchStreamsData() {
+    try {
+      setIsStreamsLoading(true);
+      setStreamsError(null);
+
+      const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
+      const userId = localStorage.getItem(ModuleObject.localState.USER_ID);
+
+      if (!token || !userId) {
+        setStreamsError("Utilisateur non authentifié.");
+        return;
+      }
+
+      // On récupère singles, EPs, albums en parallèle
+      const [singlesRes, epsRes, albumsRes] = await Promise.all([
+        SingleModuleObject.service.getSingleByUser(userId, token),
+        EpModuleObject.service.getEpByUser(userId, token),
+        AlbumModuleObject.service.getAlbumByUser(userId, token),
+      ]);
+
+      const singles = singlesRes.singles ?? singlesRes.data ?? [];
+      const eps = epsRes.eps ?? epsRes.data ?? [];
+      const albums = albumsRes.albums ?? albumsRes.data ?? [];
+
+      // On mappe tout en TrackStat homogène
+      const singleStats: TrackStat[] = singles.map((s: any) => ({
+        id: s.id,
+        name: s.title,
+        type: "single",
+        totalStreams: s.streamsCount ?? 0,
+        listenersCount: s.listenersCount ?? 0,
+        topLocations: s.topLocations ?? [], // si ton backend les fournit
+      }));
+
+      const epStats: TrackStat[] = eps.map((ep: any) => ({
+        id: ep.id,
+        name: ep.title,
+        type: "ep",
+        totalStreams: ep.streamsCount ?? 0,
+        listenersCount: ep.listenersCount ?? 0,
+        topLocations: ep.topLocations ?? [],
+      }));
+
+      const albumStats: TrackStat[] = albums.map((alb: any) => ({
+        id: alb.id,
+        name: alb.title,
+        type: "album",
+        totalStreams: alb.streamsCount ?? 0,
+        listenersCount: alb.listenersCount ?? 0,
+        topLocations: alb.topLocations ?? [],
+      }));
+
+      const allTracks = [...singleStats, ...epStats, ...albumStats];
+
+      // ======= Stats globales =======
+      const totalStreamsValue = allTracks.reduce(
+        (sum, t) => sum + (t.totalStreams || 0),
+        0
+      );
+
+      const totalListenersValue = allTracks.reduce(
+        (sum, t) => sum + (t.listenersCount ?? 0),
+        0
+      );
+
+      const totalTracksValue = allTracks.length;
+
+      // Si ton backend fournit un champ monthlyStreams, adapte ici
+      const monthlyStreamsValue = allTracks.reduce(
+        (sum, t: any) => sum + (t.monthlyStreamsCount ?? 0),
+        0
+      );
+
+      // ======= Agrégation par localisation =======
+      const locationMap = new Map<string, number>();
+
+      allTracks.forEach((t) => {
+        (t.topLocations ?? []).forEach((loc) => {
+          const prev = locationMap.get(loc.location) ?? 0;
+          locationMap.set(loc.location, prev + (loc.streams ?? 0));
+        });
+      });
+
+      const totalLocStreams = Array.from(locationMap.values()).reduce(
+        (sum, v) => sum + v,
+        0
+      );
+
+      const streamsByLocationArr: LocationStat[] = Array.from(
+        locationMap.entries()
+      )
+        .map(([location, streams]) => ({
+          location,
+          streams,
+          percentage:
+            totalLocStreams > 0
+              ? `${((streams / totalLocStreams) * 100).toFixed(1)}%`
+              : "0%",
+        }))
+        .sort((a, b) => b.streams - a.streams);
+
+      // Tri des tracks par totalStreams pour le top
+      const sortedTracks = [...allTracks].sort(
+        (a, b) => b.totalStreams - a.totalStreams
+      );
+
+      // Mise à jour du state
+      setTracksStats(sortedTracks);
+      setTotalStreams(totalStreamsValue);
+      setMonthlyStreams(monthlyStreamsValue);
+      setTotalTracksCount(totalTracksValue);
+      setTotalListeners(totalListenersValue);
+      setStreamsByLocation(streamsByLocationArr);
+    } catch (error) {
+      console.error("Erreur récupération stats streams :", error);
+      setStreamsError("Erreur lors du chargement des statistiques de streams.");
+    } finally {
+      setIsStreamsLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    if (activeTab === "streams") {
+      fetchStreamsData();
+    }
+  }, [activeTab]);
 
   useEffect(() => {
     console.log("FORM DATA : ", formData);
@@ -619,14 +814,40 @@ export function ArtistDashboard({
   };
 
   // --- Ajouter un morceau ---
-  async function handleAddTrack(e: React.FormEvent) {
+  async function handleAddTrack(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setErrorMessage("");
     setSuccessMessage("");
+    console.log("HANDLE ADD TRACK ....");
+    const {
+      trackTitle,
+      authors,
+      producers,
+      lyricists,
+      coverUrl,
+      lyrics,
+      signLanguageVideoUrl,
+      brailleFileUrl,
+      musiciansVocals,
+      musiciansPianoKeyboards,
+      musiciansWinds,
+      musiciansPercussion,
+      musiciansStrings,
+      mixingEngineer,
+      masteringEngineer,
+    } = formData;
 
-    if (!file || !trackTitle || !moodId) {
+    // ✅ 1. Validation des champs obligatoires
+    if (
+      !trackTitle ||
+      !moodId ||
+      !authors ||
+      !producers ||
+      !lyricists ||
+      !lyrics
+    ) {
       setErrorMessage(
-        "Veuillez renseigner le fichier audio, le titre et le mood du morceau."
+        "Veuillez renseigner le fichier audio, le titre, le mood, les auteurs, les producteurs, les paroliers et les paroles du morceau."
       );
       return;
     }
@@ -636,58 +857,91 @@ export function ArtistDashboard({
     try {
       const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
       const userId = localStorage.getItem(UserModule.localState.USER_ID);
+
       if (!userId || !token) {
         setIsLoading(false);
         setErrorMessage("Utilisateur non authentifié.");
         return;
       }
 
-      const audioFile = file;
-      const formData = new FormData();
+      // ✅ 2. Création du SINGLE
+      const {} = formData;
 
-      const duration = await new Promise<number>((resolve, reject) => {
-        const audio = document.createElement("audio");
-        audio.src = URL.createObjectURL(audioFile);
-        audio.preload = "metadata";
-
-        audio.onloadedmetadata = () => {
-          const d = audio.duration;
-          URL.revokeObjectURL(audio.src);
-          resolve(d);
-        };
-
-        audio.onerror = () => {
-          reject(new Error("Impossible de lire le fichier audio"));
-        };
-      });
-
-      formData.append("file", audioFile);
-      const uploadRes = await MediaModule.service.uploadAudioFile(formData);
-
-      if (!uploadRes || (!uploadRes.fileName && !uploadRes.url)) {
-        throw new Error("Réponse d'upload audio invalide.");
-      }
-
-      const audioUrl = uploadRes.url ?? uploadRes.fileName;
-
-      const newTrack = {
+      const singlePayload = {
         title: trackTitle,
-        duration,
-        moodId,
+        coverUrl: coverUrl,
         userId,
-        audioUrl,
-        type: "TRACK_SINGLE" as const,
-        lyrics: lyrics || "",
-        signLanguageVideoUrl: signLanguageVideoUrl || null,
-        brailleFileUrl: brailleFileUrl || null,
+        audioUrl: audioUrl || undefined,
+        authors: authors || undefined,
+        producers: producers || undefined,
+        lyricists: lyricists || undefined,
+        musiciansVocals: musiciansVocals || undefined,
+        musiciansPianoKeyboards: musiciansPianoKeyboards || undefined,
+        musiciansWinds: musiciansWinds || undefined,
+        musiciansPercussion: musiciansPercussion || undefined,
+        musiciansStrings: musiciansStrings || undefined,
+        mixingEngineer: mixingEngineer || undefined,
+        masteringEngineer: masteringEngineer || undefined,
       };
 
-      await TrackModule.service.createTrack(newTrack, token);
+      const newSingle = await SingleModuleObject.service.createSingle(
+        singlePayload,
+        token
+      );
 
-      // ✅ RESET complet, incluant l’URL de preview
-      setTrackTitle("");
-      setMoodId("");
-      setLyrics("");
+      const singleId = (newSingle as any)?.data?.id ?? (newSingle as any)?.id;
+
+      if (!singleId) {
+        throw new Error(
+          "Impossible de récupérer l'identifiant du single créé."
+        );
+      }
+
+      // ✅ 3. Création du TRACK
+      const newTrack = {
+        type: "TRACK_SINGLE",
+        moodId,
+        audioUrl,
+        title: trackTitle || undefined,
+        userId: userId || undefined,
+        lyrics: lyrics || undefined,
+        signLanguageVideoUrl: signLanguageVideoUrl || undefined,
+        brailleFileUrl: brailleFileUrl || undefined,
+      };
+
+      const res = await TrackModule.service.createTrack(newTrack, token);
+
+      if (!res || !res.data?.id) {
+        throw new Error("Impossible de récupérer l'identifiant du track créé.");
+      }
+
+      const trackId = res.data.id;
+
+      // ✅ 4. Associer le track au single
+      await TrackModule.service.addTrackToSingle(singleId, trackId);
+
+      // ✅ 5. RESET du formulaire + audio local
+      setFormData((prev) => ({
+        ...prev,
+        trackTitle: "",
+        moodId: "",
+        audioUrl: "",
+        authors: "",
+        producers: "",
+        lyricists: "",
+        lyrics: "",
+        musiciansVocals: "",
+        musiciansPianoKeyboards: "",
+        musiciansWinds: "",
+        musiciansPercussion: "",
+        musiciansStrings: "",
+        mixingEngineer: "",
+        masteringEngineer: "",
+        signLanguageVideoUrl: "",
+        brailleFileUrl: "",
+        coverUrl: "",
+      }));
+
       setFile(null);
 
       if (audioPreviewUrl) {
@@ -695,71 +949,70 @@ export function ArtistDashboard({
         setAudioPreviewUrl(null);
       }
 
-      setSuccessMessage("Track ajouté avec succès !");
+      setSuccessMessage("Track et single créés et associés avec succès !");
     } catch (error) {
       console.error("Erreur ajout track :", error);
       setErrorMessage(
-        (error as Error).message || "Erreur lors de l'ajout du track."
+        (error as Error).message ||
+          "Erreur lors de la création du single et du track."
       );
     } finally {
       setIsLoading(false);
     }
   }
 
-  const handleBrailleFileChange = async (
-    e: ChangeEvent<HTMLInputElement>,
-    trackIndex: number
-  ) => {
+  const handleBrailleFile = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // reset erreurs et set loading pour ce track
-    setBrailleUploadError(null);
-    setBrailleUploadingTrackIndex(trackIndex);
+    const token = localStorage.getItem(MediaModule.localState.ACCESS_TOKEN);
+    const userId = localStorage.getItem(UserModule.localState.USER_ID);
 
-    // On garde le fichier en state pour l'UI (nom, etc.)
-    setAlbumTracks((prev) => {
-      const copy = [...prev];
-      copy[trackIndex] = {
-        ...copy[trackIndex],
-        brailleFile: file,
-      };
-      return copy;
+    setErrorMessage("");
+    setSuccessMessage("");
+    setIsLoading(true);
+
+    // garder le fichier en state
+    setBrailleFile(file);
+
+    // si tu veux un apercu texte un jour
+    setBrailleFilePreview((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return URL.createObjectURL(file);
     });
 
     const formData = new FormData();
     formData.append("file", file);
 
     try {
-      const userId = localStorage.getItem(UserModule.localState.USER_ID);
-      // appel backend via ton module Media
       const res = await MediaModule.service.uploadBrailleFile(formData);
 
-      if (res && res.fileName && res.url) {
-        // On stocke l'URL Cloudinary dans le track
-        setAlbumTracks((prev) => {
-          const copy = [...prev];
-          copy[trackIndex] = {
-            ...copy[trackIndex],
-            brailleFile: res.url,
-          };
-          return copy;
-        });
-        setBrailleUploadError(null);
-        await UserModule.service.updateUser(userId!, {
-          videoIntroUrl: res.url,
-        });
+      if (res && res.url) {
+        // stocker l’URL backend dans ton form global
+        setFormData((prev: any) => ({
+          ...prev,
+          brailleFileUrl: res.url,
+        }));
+
+        // synchro backend désactivée comme dans ton handler vidéo
+        // if (userId && token) {
+        //   await UserModule.service.updateUser(userId, {
+        //     brailleFileUrl: res.url,
+        //   });
+        // }
+
+        setSuccessMessage("Fichier braille uploadé avec succès.");
       } else {
-        setBrailleUploadError("Erreur lors de l'upload du fichier braille.");
+        setErrorMessage("Erreur lors de l'upload du fichier braille.");
       }
     } catch (error) {
-      console.error("Erreur upload braille :", error);
-      setBrailleUploadError(
+      console.error("Erreur upload fichier braille :", error);
+      setErrorMessage(
         (error as Error).message ||
           "Erreur lors de l'upload du fichier braille."
       );
     } finally {
-      setBrailleUploadingTrackIndex(null);
+      setIsLoading(false);
     }
   };
 
@@ -780,6 +1033,62 @@ export function ArtistDashboard({
       fetchMoods();
     }
   }, []);
+
+  const handleSignLanguageVideo = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const token = localStorage.getItem(MediaModule.localState.ACCESS_TOKEN);
+    const userId = localStorage.getItem(UserModule.localState.USER_ID);
+
+    setErrorMessage("");
+    setSuccessMessage("");
+    setIsLoading(true);
+
+    // garder le fichier en state
+    setSignLanguageVideo(file);
+
+    // preview local
+    setSignLanguageVideoPreview((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return URL.createObjectURL(file);
+    });
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await MediaModule.service.uploadVideoFile(formData);
+
+      if (res && res.url) {
+        // stocker l’URL backend dans ton form global
+        setFormData((prev: any) => ({
+          ...prev,
+          signLanguageVideoUrl: res.url,
+        }));
+
+        // éventuellement synchro côté backend user
+        // if (userId && token) {
+        //   await UserModule.service.updateUser(userId, {
+        //     signLanguageVideoUrl: res.url,
+        //   });
+        // }
+        setSuccessMessage("Vidéo en langue des signes uploadée avec succès.");
+      } else {
+        setErrorMessage(
+          "Erreur lors de l'upload de la vidéo en langue des signes."
+        );
+      }
+    } catch (error) {
+      console.error("Erreur upload vidéo langue des signes :", error);
+      setErrorMessage(
+        (error as Error).message ||
+          "Erreur lors de l'upload de la vidéo en langue des signes."
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleVideoIntro = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -1069,6 +1378,15 @@ export function ArtistDashboard({
 
   const content = {
     spanish: {
+      // ES
+      albumTracksTitle: "Pistas del álbum",
+      saveTracks: "Guardar pista",
+      savedTracksTitle: "Pistas ya guardadas",
+      noSavedTracks: "Todavía no hay pistas guardadas para este álbum.",
+      prevPage: "Anterior",
+      nextPage: "Siguiente",
+      pageLabel: "Página",
+
       title: "Panel del Artista",
       profile: "Perfil",
       upload: "Subir Música",
@@ -1205,6 +1523,16 @@ export function ArtistDashboard({
       selectProvider: "--Seleccionar proveedor--",
     },
     english: {
+      // EN
+
+      albumTracksTitle: "Album tracks",
+      saveTracks: "Save track",
+      savedTracksTitle: "Tracks already saved",
+      noSavedTracks: "No track saved for this album yet.",
+      prevPage: "Previous",
+      nextPage: "Next",
+      pageLabel: "Page",
+
       title: "Artist Dashboard",
       payout: "Payout",
       profile: "Profile",
@@ -1341,6 +1669,15 @@ export function ArtistDashboard({
       selectProvider: "--Select provider--",
     },
     catalan: {
+      // CA
+      albumTracksTitle: "Pistes de l’àlbum",
+      saveTracks: "Desar pista",
+      savedTracksTitle: "Pistes ja desades",
+      noSavedTracks: "Encara no hi ha pistes desades per a aquest àlbum.",
+      prevPage: "Anterior",
+      nextPage: "Següent",
+      pageLabel: "Pàgina",
+
       payout: "Payout",
       title: "Panell de l'Artista",
       profile: "Perfil",
@@ -1527,134 +1864,15 @@ export function ArtistDashboard({
     { name: "Ocean Waves", streams: "187,654", revenue: "$678" },
   ];
 
-  const mockTracksWithLocations = [
-    {
-      name: "Summer Vibes",
-      type: "single",
-      totalStreams: "345,678",
-      topLocations: [
-        { location: "United States", streams: "87,456", percentage: "25.3%" },
-        { location: "Spain", streams: "65,234", percentage: "18.9%" },
-        { location: "Mexico", streams: "52,345", percentage: "15.1%" },
-        { location: "Brazil", streams: "43,567", percentage: "12.6%" },
-        { location: "United Kingdom", streams: "34,567", percentage: "10.0%" },
-      ],
-    },
-    {
-      name: "Midnight Dreams",
-      type: "album",
-      totalStreams: "298,543",
-      topLocations: [
-        { location: "France", streams: "68,765", percentage: "23.0%" },
-        { location: "United States", streams: "59,876", percentage: "20.0%" },
-        { location: "Germany", streams: "47,234", percentage: "15.8%" },
-        { location: "Italy", streams: "38,543", percentage: "12.9%" },
-        { location: "Spain", streams: "29,854", percentage: "10.0%" },
-      ],
-    },
-    {
-      name: "Electric Soul",
-      type: "single",
-      totalStreams: "234,890",
-      topLocations: [
-        { location: "United Kingdom", streams: "56,234", percentage: "23.9%" },
-        { location: "Australia", streams: "42,345", percentage: "18.0%" },
-        { location: "Canada", streams: "35,432", percentage: "15.1%" },
-        { location: "United States", streams: "28,234", percentage: "12.0%" },
-        { location: "Japan", streams: "23,489", percentage: "10.0%" },
-      ],
-    },
-    {
-      name: "Ocean Waves",
-      type: "album",
-      totalStreams: "187,654",
-      topLocations: [
-        { location: "Mexico", streams: "48,765", percentage: "26.0%" },
-        { location: "Argentina", streams: "39,234", percentage: "20.9%" },
-        { location: "Colombia", streams: "28,654", percentage: "15.3%" },
-        { location: "Spain", streams: "22,543", percentage: "12.0%" },
-        { location: "Brazil", streams: "18,765", percentage: "10.0%" },
-      ],
-    },
-    {
-      name: "Neon Lights",
-      type: "single",
-      totalStreams: "156,432",
-      topLocations: [
-        { location: "Japan", streams: "39,108", percentage: "25.0%" },
-        { location: "United States", streams: "31,286", percentage: "20.0%" },
-        { location: "United Kingdom", streams: "23,465", percentage: "15.0%" },
-        { location: "Germany", streams: "18,772", percentage: "12.0%" },
-        { location: "France", streams: "15,643", percentage: "10.0%" },
-      ],
-    },
-    {
-      name: "Cosmic Journey EP",
-      type: "ep",
-      totalStreams: "198,765",
-      topLocations: [
-        { location: "Netherlands", streams: "49,691", percentage: "25.0%" },
-        { location: "Belgium", streams: "39,753", percentage: "20.0%" },
-        { location: "Germany", streams: "29,815", percentage: "15.0%" },
-        { location: "France", streams: "23,852", percentage: "12.0%" },
-        { location: "United Kingdom", streams: "19,877", percentage: "10.0%" },
-      ],
-    },
-    {
-      name: "Urban Stories",
-      type: "album",
-      totalStreams: "423,876",
-      topLocations: [
-        { location: "United States", streams: "127,163", percentage: "30.0%" },
-        { location: "Spain", streams: "84,775", percentage: "20.0%" },
-        { location: "Mexico", streams: "63,581", percentage: "15.0%" },
-        { location: "Argentina", streams: "50,865", percentage: "12.0%" },
-        { location: "Colombia", streams: "42,388", percentage: "10.0%" },
-      ],
-    },
-    {
-      name: "Sunset Boulevard",
-      type: "single",
-      totalStreams: "276,543",
-      topLocations: [
-        { location: "Spain", streams: "69,136", percentage: "25.0%" },
-        { location: "France", streams: "55,309", percentage: "20.0%" },
-        { location: "Italy", streams: "41,481", percentage: "15.0%" },
-        { location: "United States", streams: "33,185", percentage: "12.0%" },
-        { location: "Brazil", streams: "27,654", percentage: "10.0%" },
-      ],
-    },
-    {
-      name: "Midnight Sessions EP",
-      type: "ep",
-      totalStreams: "134,567",
-      topLocations: [
-        { location: "United Kingdom", streams: "33,642", percentage: "25.0%" },
-        { location: "Australia", streams: "26,913", percentage: "20.0%" },
-        { location: "Canada", streams: "20,185", percentage: "15.0%" },
-        { location: "United States", streams: "16,148", percentage: "12.0%" },
-        { location: "Ireland", streams: "13,457", percentage: "10.0%" },
-      ],
-    },
-    {
-      name: "Echoes of Tomorrow",
-      type: "album",
-      totalStreams: "312,987",
-      topLocations: [
-        { location: "Germany", streams: "78,247", percentage: "25.0%" },
-        { location: "United Kingdom", streams: "62,597", percentage: "20.0%" },
-        { location: "France", streams: "46,948", percentage: "15.0%" },
-        { location: "Netherlands", streams: "37,558", percentage: "12.0%" },
-        { location: "Belgium", streams: "31,299", percentage: "10.0%" },
-      ],
-    },
-  ];
-
-  const filteredTracks = mockTracksWithLocations
-    .filter((track) => trackFilter === "all" || track.type === trackFilter)
-    .filter((track) =>
-      track.name.toLowerCase().includes(trackSearch.toLowerCase())
-    );
+  const filteredTracks = React.useMemo(() => {
+    return tracksStats.filter((t) => {
+      const matchesType = trackFilter === "all" ? true : t.type === trackFilter;
+      const matchesSearch = trackSearch
+        ? t.name.toLowerCase().includes(trackSearch.toLowerCase())
+        : true;
+      return matchesType && matchesSearch;
+    });
+  }, [tracksStats, trackFilter, trackSearch]);
 
   const mockStreamsByLocation = [
     { location: "United States", streams: "487,234", percentage: "19.1%" },
@@ -2184,7 +2402,7 @@ export function ArtistDashboard({
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                   <button
                     onClick={() => setUploadType("single")}
-                    className={`w-full py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg border-2 text-sm sm:text-base transition-all ${
+                    className={`cursor-pointer w-full py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg border-2 text-sm sm:text-base transition-all ${
                       uploadType === "single"
                         ? "bg-white/30 border-white/60 text-white"
                         : "bg-white/10 border-white/20 text-white/70 hover:bg-white/15"
@@ -2195,7 +2413,7 @@ export function ArtistDashboard({
 
                   <button
                     onClick={() => setUploadType("ep")}
-                    className={`w-full py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg border-2 text-sm sm:text-base transition-all ${
+                    className={`cursor-pointer w-full py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg border-2 text-sm sm:text-base transition-all ${
                       uploadType === "ep"
                         ? "bg-white/30 border-white/60 text-white"
                         : "bg-white/10 border-white/20 text-white/70 hover:bg-white/15"
@@ -2206,7 +2424,7 @@ export function ArtistDashboard({
 
                   <button
                     onClick={() => setUploadType("album")}
-                    className={`w-full py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg border-2 text-sm sm:text-base transition-all ${
+                    className={`cursor-pointer w-full py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg border-2 text-sm sm:text-base transition-all ${
                       uploadType === "album"
                         ? "bg-white/30 border-white/60 text-white"
                         : "bg-white/10 border-white/20 text-white/70 hover:bg-white/15"
@@ -2218,930 +2436,46 @@ export function ArtistDashboard({
               </div>
 
               {uploadType === "single" ? (
-                // Single Upload
-                <div className="border-2 border-dashed border-white/30 rounded-xl p-12 text-center bg-white/5 hover:bg-white/10 transition-all cursor-pointer">
-                  <input
-                    type="file"
-                    accept="audio/*"
-                    onChange={handleAudioFileChange}
-                    className="hidden"
-                    id="file-upload"
-                  />
-                  <label htmlFor="file-upload" className="cursor-pointer">
-                    <Music size={48} className="mx-auto mb-4 text-white/60" />
-                    <p className="text-white drop-shadow mb-2">
-                      {uploadedFile ? uploadedFile.name : text.dragDrop}
-                    </p>
-                  </label>
-                  {audioPreviewUrl && (
-                    <div className="mt-4">
-                      <audio controls src={audioPreviewUrl} className="w-full">
-                        Votre navigateur ne supporte pas l’élément audio.
-                      </audio>
-                    </div>
-                  )}
-                </div>
+                <SingleUploadSection text={text} language={language} />
               ) : (
                 // Album/EP Title
-                <div className="mb-6">
-                  <label className="block text-white/90 drop-shadow mb-2">
-                    {uploadType === "ep" ? text.epTitle : text.albumTitle}
-                  </label>
-                  <input
-                    type="text"
-                    value={trackTitle}
-                    onChange={(e) => setTrackTitle(e.target.value)}
-                    className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
-                  />
-                </div>
+                // <div className="mb-6">
+                //   <label className="block text-white/90 drop-shadow mb-2">
+                //     {uploadType === "ep" ? text.epTitle : text.albumTitle}
+                //   </label>
+                //   <input
+                //     type="text"
+                //     value={trackTitle}
+                //     onChange={(e) => setTrackTitle(e.target.value)}
+                //     className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
+                //   />
+                // </div><>
+                <></>
               )}
             </div>
+            {uploadType === "album" && (
+              <AlbumUploadSection text={text} language={language} />
+            )}
 
-            {/* Album/EP Tracks */}
-            {(uploadType === "album" || uploadType === "ep") && (
-              <div className="space-y-6">
-                {albumTracks.map((track, index) => (
-                  <div
-                    key={index}
-                    className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/20 space-y-4"
-                  >
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-xl text-white drop-shadow">
-                        {text.trackNumber} {index + 1}
-                      </h3>
-                      {albumTracks.length > 1 && (
-                        <button
-                          onClick={() => {
-                            const newTracks = albumTracks.filter(
-                              (_, i) => i !== index
-                            );
-                            setAlbumTracks(newTracks);
-                          }}
-                          className="px-4 py-2 bg-red-500/80 backdrop-blur-sm text-white rounded-lg hover:bg-red-600/80 transition-all flex items-center gap-2"
-                        >
-                          <svg
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                          >
-                            <line x1="18" y1="6" x2="6" y2="18" />
-                            <line x1="6" y1="6" x2="18" y2="18" />
-                          </svg>
-                          {text.removeTrack}
-                        </button>
-                      )}
-                    </div>
-
-                    {/* Track Upload */}
-                    <div className="border-2 border-dashed border-white/30 rounded-xl p-8 text-center bg-white/5 hover:bg-white/10 transition-all cursor-pointer">
-                      <input
-                        type="file"
-                        accept="audio/*"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            const newTracks = [...albumTracks];
-                            newTracks[index].file = file;
-                            setAlbumTracks(newTracks);
-                          }
-                        }}
-                        className="hidden"
-                        id={`track-upload-${index}`}
-                      />
-                      <label
-                        htmlFor={`track-upload-${index}`}
-                        className="cursor-pointer"
-                      >
-                        <Music
-                          size={32}
-                          className="mx-auto mb-3 text-white/60"
-                        />
-                        <p className="text-white drop-shadow text-sm">
-                          {track.file ? track.file.name : text.dragDrop}
-                        </p>
-                      </label>
-                    </div>
-
-                    {/* Track Title */}
-                    <div>
-                      <label className="block text-white/90 drop-shadow mb-2 text-sm">
-                        {text.trackTitle}
-                      </label>
-                      <input
-                        type="text"
-                        value={track.title}
-                        onChange={(e) => {
-                          const newTracks = [...albumTracks];
-                          newTracks[index].title = e.target.value;
-                          setAlbumTracks(newTracks);
-                        }}
-                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
-                      />
-                    </div>
-
-                    {/* Track Lyrics */}
-                    <div>
-                      <label className="block text-white/90 drop-shadow mb-2 text-sm">
-                        {text.uploadLyrics}
-                      </label>
-                      <textarea
-                        value={track.lyrics}
-                        onChange={(e) => {
-                          const lyrics = e.target.value;
-                          setFormData((prev: any) => ({
-                            ...prev,
-                            lyrics: lyrics, // 👉 adapte le nom: singleCoverUrl / albumCoverUrl...
-                          }));
-                        }}
-                        placeholder={text.lyricsPlaceholder}
-                        className="w-full h-24 p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all resize-none text-sm"
-                      />
-                      <div className="mt-3">
-                        <label className="block text-white/80 drop-shadow mb-1 text-xs">
-                          {text.trackMood}
-                        </label>
-
-                        <select
-                          value={moodId}
-                          onChange={(e) => setMoodId(e.target.value)}
-                          className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg 
-                 text-black text-sm focus:outline-none focus:border-white/40 transition-all"
-                        >
-                          <option value="">
-                            -- {text.selectMoodPlaceholder} --
-                          </option>
-
-                          {moods &&
-                            moods.map((mood) => (
-                              <option key={mood.id} value={mood.id}>
-                                {mood.name}
-                              </option>
-                            ))}
-                        </select>
-                      </div>
-
-                      {/* Accessibility Options for Track */}
-                      <div className="grid grid-cols-2 gap-3 mt-3">
-                        {/* Sign Language Video */}
-                        <div>
-                          <label className="block text-white/80 drop-shadow mb-1 text-xs">
-                            {text.signLanguageVideo}
-                          </label>
-                          {track.signLanguageVideo ? (
-                            <div className="relative aspect-video rounded-lg overflow-hidden bg-black border border-white/20">
-                              <video
-                                src={URL.createObjectURL(
-                                  track.signLanguageVideo
-                                )}
-                                controls
-                                className="w-full h-full object-contain"
-                              />
-                              <button
-                                onClick={() => {
-                                  const newTracks = [...albumTracks];
-                                  newTracks[index].signLanguageVideo = null;
-                                  setAlbumTracks(newTracks);
-                                }}
-                                className="absolute top-1 right-1 bg-red-500/80 backdrop-blur-sm text-white p-1 rounded hover:bg-red-600/80 transition-all"
-                              >
-                                <svg
-                                  width="12"
-                                  height="12"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                >
-                                  <line x1="18" y1="6" x2="6" y2="18" />
-                                  <line x1="6" y1="6" x2="18" y2="18" />
-                                </svg>
-                              </button>
-                            </div>
-                          ) : (
-                            <div className="border-2 border-dashed border-white/30 rounded-lg p-3 text-center bg-white/5 hover:bg-white/10 transition-all cursor-pointer">
-                              <input
-                                type="file"
-                                accept="video/*"
-                                onChange={(e) => {
-                                  const file = e.target.files?.[0];
-                                  if (file) {
-                                    const newTracks = [...albumTracks];
-                                    newTracks[index].signLanguageVideo = file;
-                                    setAlbumTracks(newTracks);
-                                  }
-                                }}
-                                className="hidden"
-                                id={`sign-language-track-${index}`}
-                              />
-                              <label
-                                htmlFor={`sign-language-track-${index}`}
-                                className="cursor-pointer"
-                              >
-                                <svg
-                                  width="24"
-                                  height="24"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                  className="mx-auto mb-1 text-white/60"
-                                >
-                                  <path d="M9 11l3 3L22 4" />
-                                  <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
-                                </svg>
-                                <p className="text-white/70 drop-shadow text-xs">
-                                  {text.signLanguageVideoDragDrop}
-                                </p>
-                              </label>
-                            </div>
-                          )}
-                        </div>
-                        {/* Braille File */}
-                        <div>
-                          <label className="block text-white/80 drop-shadow mb-1 text-xs">
-                            {text.brailleFile}
-                          </label>
-                          {track.brailleFile ? (
-                            <div className="relative rounded-lg p-3 bg-white/10 border border-white/20 flex flex-col items-center justify-center gap-2 min-h-[80px]">
-                              <svg
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                className="text-white/80"
-                              >
-                                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
-                                <polyline points="14 2 14 8 20 8" />
-                              </svg>
-                              <span className="text-white text-xs truncate max-w-full">
-                                {track.brailleFile.name}
-                              </span>
-                              <button
-                                onClick={() => {
-                                  const newTracks = [...albumTracks];
-                                  newTracks[index].brailleFile = null;
-                                  setAlbumTracks(newTracks);
-                                }}
-                                className="bg-red-500/80 backdrop-blur-sm text-white p-1 rounded hover:bg-red-600/80 transition-all"
-                              >
-                                <svg
-                                  width="12"
-                                  height="12"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                >
-                                  <line x1="18" y1="6" x2="6" y2="18" />
-                                  <line x1="6" y1="6" x2="18" y2="18" />
-                                </svg>
-                              </button>
-                            </div>
-                          ) : (
-                            <div className="border-2 border-dashed border-white/30 rounded-lg p-3 text-center bg-white/5 hover:bg-white/10 transition-all cursor-pointer min-h-[80px] flex items-center justify-center">
-                              <input
-                                type="file"
-                                accept=".brf,.brl,.txt"
-                                onChange={(e) =>
-                                  handleBrailleFileChange(e, index)
-                                }
-                                className="hidden"
-                                id={`braille-track-${index}`}
-                              />
-                              <label
-                                htmlFor={`braille-track-${index}`}
-                                className="cursor-pointer"
-                              >
-                                <svg
-                                  width="24"
-                                  height="24"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                  className="mx-auto mb-1 text-white/60"
-                                >
-                                  <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
-                                  <polyline points="14 2 14 8 20 8" />
-                                  <circle cx="10" cy="12" r="1" />
-                                  <circle cx="14" cy="12" r="1" />
-                                  <circle cx="10" cy="16" r="1" />
-                                </svg>
-                                <p className="text-white/70 drop-shadow text-xs">
-                                  {text.brailleFileDragDrop}
-                                </p>
-                              </label>
-                            </div>
-                          )}
-                        </div>
-                        Upload Video Introduction{" "}
-                      </div>
-                    </div>
-
-                    {/* Track Credits */}
-                    <div className="grid md:grid-cols-2 gap-3"></div>
-
-                    {/* Musicians for this track */}
-                    <div>
-                      <div className="grid grid-cols-2 gap-2"></div>
-                    </div>
-                  </div>
-                ))}
-
-                {/* Add Track Button */}
-                <button
-                  onClick={() => {
-                    setAlbumTracks([
-                      ...albumTracks,
-                      {
-                        file: null,
-                        title: "",
-                        lyrics: "",
-                        signLanguageVideo: null,
-                        brailleFile: null,
-                        authors: "",
-                        producers: "",
-                        lyricists: "",
-                        musiciansVocals: "",
-                        musiciansPianoKeyboards: "",
-                        musiciansWinds: "",
-                        musiciansPercussion: "",
-                        musiciansStrings: "",
-                        mixingEngineer: "",
-                        masteringEngineer: "",
-                      },
-                    ]);
-                  }}
-                  className="w-full py-4 px-6 bg-white/20 backdrop-blur-md border-2 border-dashed border-white/40 rounded-lg text-white drop-shadow hover:bg-white/30 transition-all flex items-center justify-center gap-2"
-                >
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <line x1="12" y1="5" x2="12" y2="19" />
-                    <line x1="5" y1="12" x2="19" y2="12" />
-                  </svg>
-                  {text.addTrack}
-                </button>
-              </div>
+            {uploadType === "ep" && (
+              <EpUploadSection text={text} language={language} />
             )}
 
             {/* Additional Upload Options */}
             <div className="grid md:grid-cols-2 gap-6">
               {/* Artwork Upload */}
-              <div>
-                <h3 className="text-xl text-white drop-shadow mb-4">
-                  {text.uploadArtwork}
-                </h3>
-
-                {artworkPreview ? (
-                  <div className="relative aspect-square rounded-xl overflow-hidden bg-white/5 border-2 border-white/20">
-                    <img
-                      src={artworkPreview}
-                      alt="Artwork"
-                      className="w-full h-full object-cover"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setArtwork(null);
-                        setArtworkPreview("");
-                        // si tu stockes aussi l'URL dans un form (ex: coverUrl)
-                        setFormData((prev: any) => ({
-                          ...prev,
-                          coverUrl: "", // 👉 adapte le nom du champ: singleCoverUrl / albumCoverUrl / etc.
-                        }));
-                      }}
-                      className="absolute cursor-pointer top-2 right-2 bg-red-500/80 backdrop-blur-sm text-white p-2 rounded-lg hover:bg-red-600/80 transition-all"
-                    >
-                      <X size={20} />
-                    </button>
-                  </div>
-                ) : (
-                  <div className="border-2 border-dashed border-white/30 rounded-xl p-8 text-center bg-white/5 hover:bg-white/10 transition-all cursor-pointer aspect-square flex items-center justify-center">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleArtwork}
-                      className="hidden"
-                      id="artwork-upload"
-                    />
-                    <label
-                      htmlFor="artwork-upload"
-                      className="cursor-pointer text-center"
-                    >
-                      <svg
-                        width="48"
-                        height="48"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        className="mx-auto mb-4 text-white/60"
-                      >
-                        <rect
-                          x="3"
-                          y="3"
-                          width="18"
-                          height="18"
-                          rx="2"
-                          ry="2"
-                        />
-                        <circle cx="8.5" cy="8.5" r="1.5" />
-                        <polyline points="21 15 16 10 5 21" />
-                      </svg>
-                      <p className="text-white drop-shadow text-sm">
-                        {text.artworkDragDrop}
-                      </p>
-                    </label>
-                  </div>
-                )}
-              </div>
 
               {/* Mini Video Loop Upload */}
-              <div>
-                <h3 className="text-xl text-white drop-shadow mb-4">
-                  {text.uploadMiniVideo}
-                </h3>
-                {miniVideoPreview ? (
-                  <div className="relative aspect-square rounded-xl overflow-hidden bg-black border-2 border-white/20">
-                    <video
-                      src={miniVideoPreview}
-                      loop
-                      autoPlay
-                      muted
-                      className="w-full h-full object-cover"
-                    />
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setMiniVideo(null);
-                        setMiniVideoPreview("");
-                        setMiniVideoUrl(""); // URL Cloudinary reset
-
-                        // si c’est stocké dans un form global
-                        setFormData((prev: any) => ({
-                          ...prev,
-                          miniVideoUrl: "",
-                        }));
-                      }}
-                      className="cursor-pointer absolute top-2 right-2 bg-red-500/80 backdrop-blur-sm text-white p-2 rounded-lg hover:bg-red-600/80 transition-all"
-                    >
-                      <svg
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      >
-                        <line x1="18" y1="6" x2="6" y2="18" />
-                        <line x1="6" y1="6" x2="18" y2="18" />
-                      </svg>
-                    </button>
-                  </div>
-                ) : (
-                  <div className="border-2 border-dashed border-white/30 rounded-xl p-8 text-center bg-white/5 hover:bg-white/10 transition-all cursor-pointer aspect-square flex items-center justify-center">
-                    <input
-                      type="file"
-                      accept="video/*"
-                      onChange={handleMiniVideoLoop}
-                      className="hidden"
-                      id="mini-video-upload"
-                    />
-                    <label
-                      htmlFor="mini-video-upload"
-                      className="cursor-pointer text-center"
-                    >
-                      <svg
-                        width="48"
-                        height="48"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        className="mx-auto mb-4 text-white/60"
-                      >
-                        <polygon points="23 7 16 12 23 17 23 7" />
-                        <rect
-                          x="1"
-                          y="5"
-                          width="15"
-                          height="14"
-                          rx="2"
-                          ry="2"
-                        />
-                      </svg>
-                      <p className="text-white drop-shadow text-sm">
-                        {text.miniVideoDragDrop}
-                      </p>
-                    </label>
-                  </div>
-                )}
-              </div>
             </div>
-
-            {/* Lyrics Upload */}
-            <div>
-              <h3 className="text-xl text-white drop-shadow mb-4">
-                {text.uploadLyrics}
-              </h3>
-              <textarea
-                value={lyrics}
-                onChange={(e) => setLyrics(e.target.value)}
-                placeholder={text.lyricsPlaceholder}
-                className="w-full h-40 p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all resize-none"
-              />
-              <div className="mt-3">
-                <label className="block text-white/80 drop-shadow mb-1 text-xs">
-                  {text.trackMood}
-                </label>
-
-                <select
-                  value={moodId}
-                  onChange={(e) => setMoodId(e.target.value)}
-                  className="cursor-pointer w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg 
-                 text-black text-sm focus:outline-none focus:border-white/40 transition-all"
-                >
-                  <option value="">-- {text.selectMoodPlaceholder} --</option>
-
-                  {moods &&
-                    moods.map((mood) => (
-                      <option key={mood.id} value={mood.id}>
-                        {mood.name}
-                      </option>
-                    ))}
-                </select>
-              </div>
-
-              {/* Accessibility Options */}
-              <div className="grid md:grid-cols-2 gap-4 mt-4">
-                {/* Sign Language Video */}
-                <div>
-                  <label className="block text-white/90 drop-shadow mb-2 text-sm">
-                    {text.signLanguageVideo}
-                  </label>
-                  {signLanguageVideo ? (
-                    <div className="relative aspect-video rounded-lg overflow-hidden bg-black border-2 border-white/20">
-                      <video
-                        src={URL.createObjectURL(signLanguageVideo)}
-                        controls
-                        className="w-full h-full object-contain"
-                      />
-                      <button
-                        onClick={() => setSignLanguageVideo(null)}
-                        className="absolute top-2 right-2 bg-red-500/80 backdrop-blur-sm text-white p-2 rounded-lg hover:bg-red-600/80 transition-all"
-                      >
-                        <svg
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                        >
-                          <line x1="18" y1="6" x2="6" y2="18" />
-                          <line x1="6" y1="6" x2="18" y2="18" />
-                        </svg>
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="border-2 border-dashed border-white/30 rounded-lg p-6 text-center bg-white/5 hover:bg-white/10 transition-all cursor-pointer">
-                      <input
-                        type="file"
-                        accept="video/*"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) setSignLanguageVideo(file);
-                        }}
-                        className="hidden"
-                        id="sign-language-upload"
-                      />
-                      <label
-                        htmlFor="sign-language-upload"
-                        className="cursor-pointer"
-                      >
-                        <svg
-                          width="32"
-                          height="32"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          className="mx-auto mb-2 text-white/60"
-                        >
-                          <path d="M9 11l3 3L22 4" />
-                          <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
-                        </svg>
-                        <p className="text-white/80 drop-shadow text-xs">
-                          {text.signLanguageVideoDragDrop}
-                        </p>
-                      </label>
-                    </div>
-                  )}
-                </div>
-
-                {/* Braille File */}
-                <div>
-                  <label className="block text-white/90 drop-shadow mb-2 text-sm">
-                    {text.brailleFile}
-                  </label>
-                  {brailleFile ? (
-                    <div className="relative rounded-lg p-6 bg-white/10 border-2 border-white/20 flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <svg
-                          width="32"
-                          height="32"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          className="text-white/80"
-                        >
-                          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
-                          <polyline points="14 2 14 8 20 8" />
-                        </svg>
-                        <span className="text-white text-sm">
-                          {brailleFile.name}
-                        </span>
-                      </div>
-                      <button
-                        onClick={() => setBrailleFile(null)}
-                        className="bg-red-500/80 backdrop-blur-sm text-white p-2 rounded-lg hover:bg-red-600/80 transition-all"
-                      >
-                        <svg
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                        >
-                          <line x1="18" y1="6" x2="6" y2="18" />
-                          <line x1="6" y1="6" x2="18" y2="18" />
-                        </svg>
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="border-2 border-dashed border-white/30 rounded-lg p-6 text-center bg-white/5 hover:bg-white/10 transition-all cursor-pointer">
-                      <input
-                        type="file"
-                        accept=".brf,.brl,.txt"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) setBrailleFile(file);
-                        }}
-                        className="hidden"
-                        id="braille-upload"
-                      />
-                      <label
-                        htmlFor="braille-upload"
-                        className="cursor-pointer"
-                      >
-                        <svg
-                          width="32"
-                          height="32"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          className="mx-auto mb-2 text-white/60"
-                        >
-                          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
-                          <polyline points="14 2 14 8 20 8" />
-                          <circle cx="10" cy="12" r="1" />
-                          <circle cx="14" cy="12" r="1" />
-                          <circle cx="10" cy="16" r="1" />
-                        </svg>
-                        <p className="text-white/80 drop-shadow text-xs">
-                          {text.brailleFileDragDrop}
-                        </p>
-                      </label>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Creation Information */}
-            <div>
-              <h3 className="text-xl text-white drop-shadow mb-4">
-                {text.creationInfo}
-              </h3>
-              <div className="grid md:grid-cols-2 gap-4">
-                {/* Title */}
-                <div>
-                  <label className="block text-white/90 drop-shadow mb-2 text-sm">
-                    {text.trackTitle}
-                  </label>
-                  <input
-                    type="text"
-                    value={trackTitle}
-                    onChange={(e) => setTrackTitle(e.target.value)}
-                    className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
-                  />
-                </div>
-
-                {/* Authors */}
-                <div>
-                  <label className="block text-white/90 drop-shadow mb-2 text-sm">
-                    {text.authors}
-                  </label>
-                  <input
-                    type="text"
-                    value={authors}
-                    onChange={(e) => setAuthors(e.target.value)}
-                    className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
-                  />
-                </div>
-
-                {/* Producers */}
-                <div>
-                  <label className="block text-white/90 drop-shadow mb-2 text-sm">
-                    {text.producers}
-                  </label>
-                  <input
-                    type="text"
-                    value={producers}
-                    onChange={(e) => setProducers(e.target.value)}
-                    className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
-                  />
-                </div>
-
-                {/* Lyricists */}
-                <div>
-                  <label className="block text-white/90 drop-shadow mb-2 text-sm">
-                    {text.lyricists}
-                  </label>
-                  <input
-                    type="text"
-                    value={lyricists}
-                    onChange={(e) => setLyricists(e.target.value)}
-                    className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
-                  />
-                </div>
-
-                {/* Musicians Section */}
-                <div className="col-span-2">
-                  <label className="block text-white/90 drop-shadow mb-3">
-                    {text.musicians}
-                  </label>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white/5 backdrop-blur-sm rounded-lg p-4 border border-white/10">
-                    {/* Vocals */}
-                    <div>
-                      <label className="block text-white/70 drop-shadow mb-2 text-sm">
-                        {text.musiciansVocals}
-                      </label>
-                      <input
-                        type="text"
-                        value={musiciansVocals}
-                        onChange={(e) => setMusiciansVocals(e.target.value)}
-                        className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
-                      />
-                    </div>
-
-                    {/* Piano/Keyboards */}
-                    <div>
-                      <label className="block text-white/70 drop-shadow mb-2 text-sm">
-                        {text.musiciansPianoKeyboards}
-                      </label>
-                      <input
-                        type="text"
-                        value={musiciansPianoKeyboards}
-                        onChange={(e) =>
-                          setMusiciansPianoKeyboards(e.target.value)
-                        }
-                        className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
-                      />
-                    </div>
-
-                    {/* Winds */}
-                    <div>
-                      <label className="block text-white/70 drop-shadow mb-2 text-sm">
-                        {text.musiciansWinds}
-                      </label>
-                      <input
-                        type="text"
-                        value={musiciansWinds}
-                        onChange={(e) => setMusiciansWinds(e.target.value)}
-                        className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
-                      />
-                    </div>
-
-                    {/* Percussion */}
-                    <div>
-                      <label className="block text-white/70 drop-shadow mb-2 text-sm">
-                        {text.musiciansPercussion}
-                      </label>
-                      <input
-                        type="text"
-                        value={musiciansPercussion}
-                        onChange={(e) => setMusiciansPercussion(e.target.value)}
-                        className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
-                      />
-                    </div>
-
-                    {/* Strings */}
-                    <div className="md:col-span-2">
-                      <label className="block text-white/70 drop-shadow mb-2 text-sm">
-                        {text.musiciansStrings}
-                      </label>
-                      <input
-                        type="text"
-                        value={musiciansStrings}
-                        onChange={(e) => setMusiciansStrings(e.target.value)}
-                        className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Mixing Engineer */}
-                <div>
-                  <label className="block text-white/90 drop-shadow mb-2 text-sm">
-                    {text.mixingEngineer}
-                  </label>
-                  <input
-                    type="text"
-                    value={mixingEngineer}
-                    onChange={(e) => setMixingEngineer(e.target.value)}
-                    className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
-                  />
-                </div>
-
-                {/* Mastering Engineer */}
-                <div>
-                  <label className="block text-white/90 drop-shadow mb-2 text-sm">
-                    {text.masteringEngineer}
-                  </label>
-                  <input
-                    type="text"
-                    value={masteringEngineer}
-                    onChange={(e) => setMasteringEngineer(e.target.value)}
-                    className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Upload Button */}
-            {!uploadedFile && (
-              <button
-                onClick={handleUpload}
-                className="cursor-pointer w-full py-4 px-6 bg-white/30 backdrop-blur-md border border-white/40 rounded-lg text-white drop-shadow hover:bg-white/40 transition-all flex items-center justify-center gap-2"
-              >
-                <Upload size={20} />
-                {text.uploadButton}
-              </button>
-            )}
 
             {/* Recent Uploads */}
-            <div className="mt-8">
-              <h3 className="text-xl text-white drop-shadow mb-4">
-                Recent Uploads
-              </h3>
-              <div className="space-y-3">
-                {mockTracks.map((track, index) => (
-                  <div
-                    key={index}
-                    className="bg-white/10 backdrop-blur-sm rounded-lg p-4 flex items-center justify-between"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
-                        <Music size={20} className="text-white" />
-                      </div>
-                      <span className="text-white drop-shadow">
-                        {track.name}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <span className="text-white/80 text-sm">
-                        {track.streams} streams
-                      </span>
-                      <button className="text-white/60 hover:text-white transition-colors">
-                        <Play size={18} />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
           </div>
         )}
 
         {/* Streams Tab */}
         {activeTab === "streams" && (
           <div className="space-y-6">
+            {/* Cartes de stats globales */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
                 <div className="flex items-center gap-2 mb-2">
@@ -3151,7 +2485,7 @@ export function ArtistDashboard({
                   </h3>
                 </div>
                 <p className="text-3xl text-white drop-shadow">
-                  {mockStreams.total}
+                  {totalStreams.toLocaleString()}
                 </p>
               </div>
 
@@ -3163,7 +2497,7 @@ export function ArtistDashboard({
                   </h3>
                 </div>
                 <p className="text-3xl text-white drop-shadow">
-                  {mockStreams.monthly}
+                  {monthlyStreams.toLocaleString()}
                 </p>
               </div>
 
@@ -3173,7 +2507,7 @@ export function ArtistDashboard({
                   <h3 className="text-white/80 drop-shadow">{text.tracks}</h3>
                 </div>
                 <p className="text-3xl text-white drop-shadow">
-                  {mockStreams.tracks}
+                  {totalTracksCount}
                 </p>
               </div>
 
@@ -3185,11 +2519,19 @@ export function ArtistDashboard({
                   </h3>
                 </div>
                 <p className="text-3xl text-white drop-shadow">
-                  {mockStreams.listeners}
+                  {totalListeners.toLocaleString()}
                 </p>
               </div>
             </div>
 
+            {streamsError && <CustomAlert message={streamsError} />}
+            {isStreamsLoading && (
+              <p className="text-white/60 text-sm">
+                {/* petit loader si tu veux */}
+              </p>
+            )}
+
+            {/* Top Tracks + By Location */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Top Tracks */}
               <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
@@ -3197,9 +2539,9 @@ export function ArtistDashboard({
                   {text.topTracks}
                 </h3>
                 <div className="space-y-3">
-                  {mockTracks.map((track, index) => (
+                  {tracksStats.slice(0, 5).map((track, index) => (
                     <div
-                      key={index}
+                      key={track.id}
                       className="flex items-center justify-between p-4 bg-white/5 rounded-lg"
                     >
                       <div className="flex items-center gap-4">
@@ -3210,9 +2552,17 @@ export function ArtistDashboard({
                           {track.name}
                         </span>
                       </div>
-                      <span className="text-white/80">{track.streams}</span>
+                      <span className="text-white/80">
+                        {track.totalStreams.toLocaleString()}
+                      </span>
                     </div>
                   ))}
+                  {tracksStats.length === 0 && (
+                    <p className="text-white/60 text-sm">
+                      {text.noSavedTracks ||
+                        "No track saved for this album yet."}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -3222,14 +2572,14 @@ export function ArtistDashboard({
                   {text.byLocation}
                 </h3>
                 <div className="space-y-4">
-                  {mockStreamsByLocation.map((location, index) => (
+                  {streamsByLocation.map((location, index) => (
                     <div key={index}>
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-white drop-shadow">
                           {location.location}
                         </span>
                         <span className="text-white/80">
-                          {location.streams}
+                          {location.streams.toLocaleString()}
                         </span>
                       </div>
                       <div className="w-full bg-white/10 rounded-full h-2">
@@ -3243,6 +2593,12 @@ export function ArtistDashboard({
                       </span>
                     </div>
                   ))}
+                  {streamsByLocation.length === 0 && (
+                    <p className="text-white/60 text-sm">
+                      {/* aucun data de localisation pour l’instant */}
+                      {text.noContent || "No location data yet."}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
@@ -3261,7 +2617,7 @@ export function ArtistDashboard({
                   </label>
                   <select
                     value={trackFilter}
-                    onChange={(e) => setTrackFilter(e.target.value)}
+                    onChange={(e) => setTrackFilter(e.target.value as any)}
                     className="px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-lg text-black cursor-pointer focus:outline-none focus:border-white/40 transition-all"
                   >
                     <option value="all" className="bg-gray-800">
@@ -3287,7 +2643,7 @@ export function ArtistDashboard({
                   value={trackSearch}
                   onChange={(e) => setTrackSearch(e.target.value)}
                   placeholder={text.searchTrack}
-                  className="w-full px-4 py-3 pl-12 bg-white/10 backdrop-blur-md border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
+                  className="w-full px-4 py-3 pl-12 bg-white/10 backdrop-blur-md border border-white/20 rounded-lg text:black text-black placeholder:text-white/50 focus:outline-none focus:border:white/40 focus:border-white/40 transition-all"
                 />
                 <Search
                   className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50"
@@ -3298,7 +2654,7 @@ export function ArtistDashboard({
               <div className="max-h-[800px] overflow-y-auto space-y-6 pr-2">
                 {filteredTracks.map((track, trackIndex) => (
                   <div
-                    key={trackIndex}
+                    key={track.id}
                     className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20"
                   >
                     <div className="flex items-center justify-between mb-6">
@@ -3312,11 +2668,13 @@ export function ArtistDashboard({
                             <span className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-xs text-white/90 uppercase">
                               {track.type === "single"
                                 ? text.single
+                                : track.type === "ep"
+                                ? text.ep
                                 : text.album}
                             </span>
                           </div>
                           <p className="text-white/60 mt-1">
-                            {track.totalStreams}{" "}
+                            {track.totalStreams.toLocaleString()}{" "}
                             {text.totalStreams.toLowerCase()}
                           </p>
                         </div>
@@ -3327,7 +2685,7 @@ export function ArtistDashboard({
                       {text.locationPerTrack}
                     </h5>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {track.topLocations.map((location, locIndex) => (
+                      {(track.topLocations ?? []).map((location, locIndex) => (
                         <div
                           key={locIndex}
                           className="bg-white/5 rounded-lg p-4"
@@ -3337,20 +2695,25 @@ export function ArtistDashboard({
                               {location.location}
                             </span>
                             <span className="text-white/80">
-                              {location.streams}
+                              {location.streams.toLocaleString()}
                             </span>
                           </div>
-                          <div className="w-full bg-white/10 rounded-full h-2 mb-1">
+                          <div className="w-full bg:white/10 bg-white/10 rounded-full h-2 mb-1">
                             <div
                               className="bg-white/50 h-2 rounded-full transition-all"
-                              style={{ width: location.percentage }}
+                              style={{ width: location.percentage ?? "0%" }}
                             ></div>
                           </div>
                           <span className="text-white/60 text-sm">
-                            {location.percentage}
+                            {location.percentage ?? "0%"}
                           </span>
                         </div>
                       ))}
+                      {(track.topLocations ?? []).length === 0 && (
+                        <p className="text-white/60 text-sm">
+                          {text.noContent || "No location data for this track."}
+                        </p>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -3896,6 +3259,19 @@ export function ArtistDashboard({
         {activeTab === "payout" && (
           <div className="space-y-6">
             {/* Info / Overview */}
+            <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
+              <h2 className="text-2xl text-white drop-shadow-lg mb-3">
+                {text.payout}
+              </h2>
+              <p className="text-white/80 text-sm">
+                {language === "es" &&
+                  "Configura aquí los métodos de pago donde recibirás tus ingresos de suscripciones y royalties."}
+                {language === "en" &&
+                  "Configure here the payment methods where you will receive your subscription and royalties earnings."}
+                {language === "ca" &&
+                  "Configura aquí els mètodes de pagament on rebràs els teus ingressos de subscripcions i royalties."}
+              </p>
+            </div>
 
             {/* Payment Receiving Settings */}
             <div className="bg-white/10 backdrop-blur-md rounded-xl p-8 border border-white/20">
