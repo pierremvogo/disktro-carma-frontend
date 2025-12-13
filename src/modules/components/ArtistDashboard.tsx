@@ -15,6 +15,7 @@ import { AlbumUploadSection } from "./AlbumUploadSection";
 import { EpUploadSection } from "./EpUploadSection";
 import { EpModuleObject } from "../ep/module";
 import { AlbumModuleObject } from "../album/module";
+import { getCountryName } from "@/@disktro/utils";
 // Icon components
 const Upload = ({ size = 24, className = "" }) => (
   <svg
@@ -362,6 +363,7 @@ type TrackStat = {
   type: ReleaseType;
   totalStreams: number;
   listenersCount?: number;
+  monthlyStreamsCount?: number;
   topLocations?: {
     location: string;
     streams: number;
@@ -591,6 +593,7 @@ export function ArtistDashboard({
         type: "single",
         totalStreams: s.streamsCount ?? 0,
         listenersCount: s.listenersCount ?? 0,
+        monthlyStreamsCount: s.monthlyStreamsCount ?? 0,
         topLocations: s.topLocations ?? [], // si ton backend les fournit
       }));
 
@@ -600,6 +603,7 @@ export function ArtistDashboard({
         type: "ep",
         totalStreams: ep.streamsCount ?? 0,
         listenersCount: ep.listenersCount ?? 0,
+        monthlyStreamsCount: ep.monthlyStreamsCount ?? 0,
         topLocations: ep.topLocations ?? [],
       }));
 
@@ -609,6 +613,7 @@ export function ArtistDashboard({
         type: "album",
         totalStreams: alb.streamsCount ?? 0,
         listenersCount: alb.listenersCount ?? 0,
+        monthlyStreamsCount: alb.monthlyStreamsCount ?? 0,
         topLocations: alb.topLocations ?? [],
       }));
 
@@ -1379,6 +1384,10 @@ export function ArtistDashboard({
   const content = {
     spanish: {
       // ES
+
+      // Espagnol
+      recentSingleUploads: "Subidas recientes",
+
       albumTracksTitle: "Pistas del álbum",
       saveTracks: "Guardar pista",
       savedTracksTitle: "Pistas ya guardadas",
@@ -1521,9 +1530,73 @@ export function ArtistDashboard({
       savePaymentDetails: "Guardar Detalles de Pago",
       paymentDetailsSaved: "¡Detalles de pago guardados exitosamente!",
       selectProvider: "--Seleccionar proveedor--",
+
+      singleAudioUploadSuccess: "Archivo de audio subido correctamente.",
+      singleAudioUploadError:
+        "Se produjo un error al subir el archivo de audio.",
+      singleArtworkUploadSuccess: "Portada subida correctamente.",
+      singleArtworkUploadError: "Se produjo un error al subir la portada.",
+      singleMiniVideoUploadSuccess: "Mini vídeo subido correctamente.",
+      singleMiniVideoError: "Se produjo un error al subir el mini vídeo.",
+      singleSignLanguageVideoUploadSuccess:
+        "Vídeo en lengua de signos subido correctamente.",
+      singleSignLanguageVideoError:
+        "Se produjo un error al subir el vídeo en lengua de signos.",
+      singleBrailleUploadSuccess: "Archivo en braille subido correctamente.",
+      singleBrailleUploadError:
+        "Se produjo un error al subir el archivo en braille.",
+
+      singleRequiredFieldsError:
+        "Por favor, rellena todos los campos obligatorios (audio, portada, título, mood, autores, productores, letristas y letras).",
+
+      authUserNotAuthenticated: "Usuario no autenticado.",
+      singleIdNotFoundError: "No se pudo obtener el ID del single creado.",
+      trackIdNotFoundError: "No se pudo obtener el ID de la pista creada.",
+
+      singleCreateSuccess: "¡Single creado con éxito!",
+      singleCreateError: "Se produjo un error al crear el single y la pista.",
+
+      audioNotSupported: "Tu navegador no soporta el elemento de audio.",
+
+      noSingleUploadedYet: "Todavía no se ha subido ningún single.",
+      noAlbumUploadedYet: "Ningún álbum subido por el momento.",
     },
     english: {
       // EN
+      // Anglais
+      recentSingleUploads: "Recent Uploads",
+
+      singleAudioUploadSuccess: "Audio file uploaded successfully.",
+      singleAudioUploadError:
+        "An error occurred while uploading the audio file.",
+      singleArtworkUploadSuccess: "Artwork uploaded successfully.",
+      singleArtworkUploadError:
+        "An error occurred while uploading the artwork.",
+      singleMiniVideoUploadSuccess: "Mini video uploaded successfully.",
+      singleMiniVideoUploadError:
+        "An error occurred while uploading the mini video.",
+      singleSignLanguageVideoUploadSuccess:
+        "Sign language video uploaded successfully.",
+      singleSignLanguageVideoError:
+        "An error occurred while uploading the sign language video.",
+      singleBrailleUploadSuccess: "Braille file uploaded successfully.",
+      singleBrailleUploadError:
+        "An error occurred while uploading the braille file.",
+
+      singleRequiredFieldsError:
+        "Please fill in all required fields (audio, artwork, title, mood, authors, producers, lyricists and lyrics).",
+
+      authUserNotAuthenticated: "User not authenticated.",
+      singleIdNotFoundError: "Unable to retrieve the ID of the created single.",
+      trackIdNotFoundError: "Unable to retrieve the ID of the created track.",
+
+      singleCreateSuccess: "Single created successfully!",
+      singleCreateError:
+        "An error occurred while creating the single and the track.",
+
+      audioNotSupported: "Your browser does not support the audio element.",
+
+      noSingleUploadedYet: "No single uploaded yet.",
 
       albumTracksTitle: "Album tracks",
       saveTracks: "Save track",
@@ -1667,9 +1740,41 @@ export function ArtistDashboard({
       savePaymentDetails: "Save Payment Details",
       paymentDetailsSaved: "Payment details saved successfully!",
       selectProvider: "--Select provider--",
+      noAlbumUploadedYet: "No album uploaded yet.",
     },
     catalan: {
       // CA
+      noAlbumUploadedYet: "Cap àlbum pujat de moment.",
+      recentSingleUploads: "Càrregues recents",
+      singleAudioUploadSuccess: "Fitxer d’àudio pujat correctament.",
+      singleAudioUploadError:
+        "S’ha produït un error en pujar el fitxer d’àudio.",
+      singleArtworkUploadSuccess: "Portada pujada correctament.",
+      singleArtworkUploadError: "S’ha produït un error en pujar la portada.",
+      singleMiniVideoUploadSuccess: "Mini vídeo pujat correctament.",
+      singleMiniVideoError: "S’ha produït un error en pujar el mini vídeo.",
+      singleSignLanguageVideoUploadSuccess:
+        "Vídeo en llengua de signes pujat correctament.",
+      singleSignLanguageVideoError:
+        "S’ha produït un error en pujar el vídeo en llengua de signes.",
+      singleBrailleUploadSuccess: "Fitxer en braille pujat correctament.",
+      singleBrailleUploadError:
+        "S’ha produït un error en pujar el fitxer en braille.",
+
+      singleRequiredFieldsError:
+        "Si us plau, omple tots els camps obligatoris (àudio, portada, títol, mood, autors, productors, lletristes i lletra).",
+
+      authUserNotAuthenticated: "Usuari no autenticat.",
+      singleIdNotFoundError: "No s’ha pogut obtenir l’ID del single creat.",
+      trackIdNotFoundError: "No s’ha pogut obtenir l’ID de la pista creada.",
+
+      singleCreateSuccess: "Single creat correctament!",
+      singleCreateError: "S’ha produït un error en crear el single i la pista.",
+
+      audioNotSupported: "El teu navegador no admet l’element d’àudio.",
+
+      noSingleUploadedYet: "Encara no s’ha pujat cap single.",
+
       albumTracksTitle: "Pistes de l’àlbum",
       saveTracks: "Desar pista",
       savedTracksTitle: "Pistes ja desades",
@@ -1837,14 +1942,6 @@ export function ArtistDashboard({
   const quarterlyPrice = calculateQuarterlyPrice();
   const annualPrice = calculateAnnualPrice();
 
-  // Mock data
-  const mockStreams = {
-    total: "2,547,893",
-    monthly: "145,672",
-    tracks: 24,
-    listeners: "89,234",
-  };
-
   const mockSubscriptions = {
     total: "12,456",
     active: "11,892",
@@ -1873,22 +1970,6 @@ export function ArtistDashboard({
       return matchesType && matchesSearch;
     });
   }, [tracksStats, trackFilter, trackSearch]);
-
-  const mockStreamsByLocation = [
-    { location: "United States", streams: "487,234", percentage: "19.1%" },
-    { location: "Spain", streams: "398,567", percentage: "15.6%" },
-    { location: "Mexico", streams: "356,789", percentage: "14.0%" },
-    { location: "United Kingdom", streams: "289,456", percentage: "11.4%" },
-    { location: "France", streams: "178,234", percentage: "7.0%" },
-    { location: "Germany", streams: "165,432", percentage: "6.5%" },
-    { location: "Brazil", streams: "145,678", percentage: "5.7%" },
-    { location: "Argentina", streams: "132,456", percentage: "5.2%" },
-    { location: "Italy", streams: "112,345", percentage: "4.4%" },
-    { location: "Canada", streams: "98,765", percentage: "3.9%" },
-    { location: "Colombia", streams: "87,654", percentage: "3.4%" },
-    { location: "Japan", streams: "56,432", percentage: "2.2%" },
-    { location: "Australia", streams: "38,851", percentage: "1.5%" },
-  ];
 
   const mockSubscriptionsByLocation = [
     { location: "United States", subscribers: "2,345", percentage: "18.8%" },
@@ -2576,7 +2657,7 @@ export function ArtistDashboard({
                     <div key={index}>
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-white drop-shadow">
-                          {location.location}
+                          {getCountryName(location.location)}
                         </span>
                         <span className="text-white/80">
                           {location.streams.toLocaleString()}
@@ -2692,7 +2773,7 @@ export function ArtistDashboard({
                         >
                           <div className="flex items-center justify-between mb-2">
                             <span className="text-white drop-shadow">
-                              {location.location}
+                              {getCountryName(location.location)}
                             </span>
                             <span className="text-white/80">
                               {location.streams.toLocaleString()}
