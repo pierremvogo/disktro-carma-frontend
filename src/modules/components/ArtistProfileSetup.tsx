@@ -9,6 +9,8 @@ import { TagModuleObject } from "../tag/module";
 import { useRouter } from "next/navigation";
 import CustomSuccess from "@/@disktro/CustomSuccess";
 import CustomAlert from "@/@disktro/CustomAlert";
+import Select from "react-select";
+import countryList from "react-select-country-list";
 
 // Icon components
 const User = ({ size = 24, className = "" }) => (
@@ -190,6 +192,8 @@ export function ArtistProfileSetup({
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
   const [showVerificationCode, setShowVerificationCode] = useState(false);
   const [verificationCode, setVerificationCode] = useState("");
+  const [country, setCountry] = useState<string>(""); // code pays (ex: "FR")
+  const options = React.useMemo(() => countryList().getData(), []);
 
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
@@ -437,6 +441,7 @@ export function ArtistProfileSetup({
         bio,
         emailVerified,
         twoFactorEnabled,
+        country: country || undefined,
         profileImageUrl, // 👈 on envoie aussi l'URL de l'image uploadée
       };
 
@@ -598,6 +603,26 @@ export function ArtistProfileSetup({
                         {errors.genre}
                       </p>
                     )}
+                  </div>
+
+                  {/* Artist Country */}
+                  <div>
+                    <label className="block text-white drop-shadow mb-2">
+                      Country
+                    </label>
+                    <Select
+                      options={options}
+                      value={
+                        options.find((opt: any) => opt.value === country) ||
+                        null
+                      }
+                      onChange={(opt) =>
+                        setCountry(opt ? (opt as any).value : "")
+                      }
+                      className="text-black"
+                      classNamePrefix="react-select-country"
+                      placeholder="Select your country"
+                    />
                   </div>
 
                   {/* Email */}

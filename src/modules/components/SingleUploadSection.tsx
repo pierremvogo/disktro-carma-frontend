@@ -138,6 +138,22 @@ const Play = ({ size = 24, className = "" }) => (
     <polygon points="5 3 19 12 5 21 5 3" />
   </svg>
 );
+const Pause = ({ size = 24, className = "" }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <rect x="6" y="4" width="4" height="16" rx="1" />
+    <rect x="14" y="4" width="4" height="16" rx="1" />
+  </svg>
+);
 
 const Search = ({ size = 24, className = "" }) => (
   <svg
@@ -370,18 +386,19 @@ export function SingleUploadSection({
 
     if (!audioEl) return;
 
-    // Si on reclique sur le même et qu'il joue -> pause
-    if (currentPlayingId === singleId && !audioEl.paused) {
+    // Si on reclique sur celui en cours → pause
+    if (currentPlayingId === singleId) {
       audioEl.pause();
       setCurrentPlayingId(null);
       return;
     }
 
-    // Si un autre single joue, on le stoppe
-    if (currentPlayingId && currentPlayingId !== singleId) {
+    // Stopper l'ancien son si un autre joue
+    if (currentPlayingId) {
       const prevAudio = document.getElementById(
         `single-audio-${currentPlayingId}`
       ) as HTMLAudioElement | null;
+
       if (prevAudio) {
         prevAudio.pause();
         prevAudio.currentTime = 0;
@@ -392,21 +409,16 @@ export function SingleUploadSection({
       await audioEl.play();
       setCurrentPlayingId(singleId);
 
-      // 👉 Log du stream : une seule fois par single (dans cette session)
-      if (!loggedSingles[singleId]) {
-        const token = localStorage.getItem(
-          ModuleObject.localState.ACCESS_TOKEN
-        );
-        const trackId = singleTrackMap[singleId]; // on ne peut logguer que si on connaît le track
+      const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
+      const trackId = singleTrackMap[singleId];
 
-        if (token && trackId) {
-          await TrackStreamModuleObject.service.createTrackStream(
-            userId!,
-            trackId,
-            token
-          );
-          setLoggedSingles((prev) => ({ ...prev, [singleId]: true }));
-        }
+      // Log stream
+      if (token && trackId && userId) {
+        await TrackStreamModuleObject.service.createTrackStream(
+          userId,
+          trackId,
+          token
+        );
       }
     } catch (err) {
       console.error("Error playing audio:", err);
@@ -1147,7 +1159,7 @@ export function SingleUploadSection({
         </div>
 
         {/* Accessibilité */}
-        <div className="grid md:grid-rows-2 gap-4 mt-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
           {/* Sign Language Video */}
           <div>
             <label className="block text-white/90 drop-shadow mb-2 text-sm">
@@ -1479,7 +1491,7 @@ export function SingleUploadSection({
       <div className="mt-8">
         <div className="mt-8">
           <h3 className="text-xl text-white drop-shadow mb-4">
-            Recent Uploads
+            {text.recentSingleUploads}
           </h3>
           <div className="space-y-3">
             {singles && singles.length > 0 ? (
@@ -1537,7 +1549,11 @@ export function SingleUploadSection({
                         onClick={() => handleTogglePlaySingle(single.id)}
                         className="cursor-pointer text-white/60 hover:text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                       >
-                        <Play size={18} />
+                        {currentPlayingId === single.id ? (
+                          <Pause size={18} /> // icône pause quand ça joue
+                        ) : (
+                          <Play size={18} /> // icône play quand c’est arrêté
+                        )}
                       </button>
                     </div>
                   </div>
@@ -1545,7 +1561,7 @@ export function SingleUploadSection({
               ))
             ) : (
               <p className="text-white/60 text-sm">
-                Aucun single uploadé pour l’instant.
+                {text.noSingleUploadedYet}
               </p>
             )}
           </div>

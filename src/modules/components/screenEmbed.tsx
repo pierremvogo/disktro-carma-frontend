@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { Questionnaire } from "./Questionnaire";
 import { UserType } from "./UserType";
@@ -24,11 +24,18 @@ export function ScreenEmbed() {
   const [showLogin, setShowLogin] = useState(false);
   const [showArtistChoice, setShowArtistChoice] = useState(false);
   const [isArtist, setIsArtist] = useState(false);
-  const mediaScrollRef = React.useRef<HTMLDivElement | null>(null);
+
+  const mediaScrollRef = useRef<HTMLDivElement | null>(null);
+
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
+
   const [isDragging, setIsDragging] = useState(false);
-  const dragData = React.useRef({ startX: 0, scrollLeft: 0 });
+  const dragData = useRef({ startX: 0, scrollLeft: 0 });
+
+  // ✅ NEW: index actif + refs vidéos
+  const [activeMediaIndex, setActiveMediaIndex] = useState(0);
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
 
   // Charger la langue depuis localStorage au montage
   useEffect(() => {
@@ -46,6 +53,7 @@ export function ScreenEmbed() {
       localStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
     }
   };
+
   const updateScrollArrows = () => {
     const el = mediaScrollRef.current;
     if (!el) return;
@@ -53,8 +61,16 @@ export function ScreenEmbed() {
     setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 5);
   };
 
+  // ✅ NEW: détecter la slide active + mettre à jour les flèches
   const handleMediaScroll = () => {
     updateScrollArrows();
+
+    const el = mediaScrollRef.current;
+    if (!el) return;
+
+    // Comme chaque slide est min-w-full, on peut dériver l'index ainsi
+    const index = Math.round(el.scrollLeft / el.clientWidth);
+    setActiveMediaIndex(index);
   };
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -77,23 +93,20 @@ export function ScreenEmbed() {
     el.scrollLeft = dragData.current.scrollLeft - walk;
   };
 
-  const [videos, setVideos] = useState<string[]>([
-    "https://res.cloudinary.com/dql4qiwjg/video/upload/v1765036472/video_song/1765036469226-496598996.mp4",
-    "https://res.cloudinary.com/dql4qiwjg/video/upload/v1765037601/video_song/1765037599148-810866371.mp4",
-  ]);
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-
-  const handleMouseLeave = () => {
-    setIsDragging(false);
-  };
+  const handleMouseUp = () => setIsDragging(false);
+  const handleMouseLeave = () => setIsDragging(false);
 
   const scrollByAmount = (amount: number) => {
     const el = mediaScrollRef.current;
     if (!el) return;
     el.scrollBy({ left: amount, behavior: "smooth" });
+
+    // petit fallback: recalculer l'index après le scroll smooth
+    window.setTimeout(() => {
+      const index = Math.round(el.scrollLeft / el.clientWidth);
+      setActiveMediaIndex(index);
+      updateScrollArrows();
+    }, 250);
   };
 
   useEffect(() => {
@@ -102,6 +115,37 @@ export function ScreenEmbed() {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  // ✅ NEW: quand l’index actif change → pause toutes les vidéos + play la nouvelle
+  useEffect(() => {
+    // Pause toutes les vidéos
+    videoRefs.current.forEach((v) => {
+      if (!v) return;
+      v.pause();
+      // Optionnel: remettre au début pour éviter “son en arrière-plan”
+      // v.currentTime = 0;
+    });
+
+    // Play la vidéo active si elle existe
+    const v = videoRefs.current[activeMediaIndex];
+    if (v) {
+      // Autoplay mobile: souvent besoin de muted + playsInline
+      v.muted = true;
+      v.playsInline = true;
+
+      const p = v.play();
+      if (p && typeof (p as any).catch === "function") {
+        (p as any).catch(() => {
+          // Autoplay bloqué par le navigateur → ok, l'utilisateur cliquera play
+        });
+      }
+    }
+  }, [activeMediaIndex]);
+
+  const [videos] = useState<string[]>([
+    "https://res.cloudinary.com/dql4qiwjg/video/upload/v1765036472/video_song/1765036469226-496598996.mp4",
+    "https://res.cloudinary.com/dql4qiwjg/video/upload/v1765037601/video_song/1765037599148-810866371.mp4",
+  ]);
 
   const messages = {
     spanish: "Bienvenido a música para todos",
@@ -226,7 +270,7 @@ export function ScreenEmbed() {
     );
   }
 
-  // 🧩 EMBEDDED SCREEN (avec background image comme Login)
+  // 🧩 EMBEDDED SCREEN
   return (
     <div
       className="fixed inset-0 w-screen h-screen bg-cover bg-center"
@@ -240,11 +284,10 @@ export function ScreenEmbed() {
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/50" />
 
-      {/* WRAPPER PRINCIPAL EN COLONNE */}
+      {/* WRAPPER PRINCIPAL */}
       <div className="relative z-10 flex flex-col h-full w-full">
         {/* Language Options and Controls */}
         <div className="flex flex-col items-center gap-3 w-full pt-4">
-          {/* Language Options */}
           <nav
             aria-label={
               language === "spanish"
@@ -298,18 +341,10 @@ export function ScreenEmbed() {
             </div>
           </nav>
 
-          {/* Bottom Buttons */}
           <div className="flex flex-wrap items-center justify-center gap-3 mt-1">
             <button
               onClick={() => setShowQuestionnaire(true)}
               className="flex cursor-pointer items-center gap-2 px-3 sm:px-4 py-2 bg-white/20 backdrop-blur-md border border.white/30 rounded-lg text-white text-sm sm:text-base drop-shadow hover:bg-white/30 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
-              aria-label={
-                language === "spanish"
-                  ? "Entrar al cuestionario"
-                  : language === "english"
-                  ? "Enter questionnaire"
-                  : "Entrar al qüestionari"
-              }
             >
               Test Group
               <svg
@@ -373,7 +408,7 @@ export function ScreenEmbed() {
           </div>
         </div>
 
-        {/* Content - PREND LE RESTE DE LA HAUTEUR */}
+        {/* Content */}
         <div className="flex-1 w-full overflow-y-auto flex items-center justify-center px-4 md:px-8 pb-4">
           <div className="relative w-full max-w-7xl flex flex-col items-center gap-8 md:gap-10">
             <div className="relative w-full flex items-center justify-center">
@@ -453,23 +488,23 @@ export function ScreenEmbed() {
 
                         {/* MEDIA CARD */}
                         <div className="mt-6 sm:mt-8 bg-white/10 backdrop-blur-md rounded-xl p-4 sm:p-6 max-w-md mx-auto border border-white/20 relative">
-                          {/* Left Arrow */}
+                          {/* ✅ Arrow Left (visible mobile too) */}
                           {canScrollLeft && (
                             <button
                               type="button"
                               onClick={() => scrollByAmount(-300)}
-                              className="hidden sm:flex items-center justify-center absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 text-white p-2 rounded-full backdrop-blur-md shadow-md hover:bg-black/60 transition"
+                              className="flex items-center justify-center absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 text-white p-2 rounded-full backdrop-blur-md shadow-md hover:bg-black/60 transition"
                             >
                               ←
                             </button>
                           )}
 
-                          {/* Right Arrow */}
+                          {/* ✅ Arrow Right (visible mobile too) */}
                           {canScrollRight && (
                             <button
                               type="button"
                               onClick={() => scrollByAmount(300)}
-                              className="hidden sm:flex items-center justify-center absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 text-white p-2 rounded-full backdrop-blur-md shadow-md hover:bg-black/60 transition"
+                              className="flex items-center justify-center absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 text-white p-2 rounded-full backdrop-blur-md shadow-md hover:bg-black/60 transition"
                             >
                               →
                             </button>
@@ -493,21 +528,36 @@ export function ScreenEmbed() {
                             `}
                             style={{ scrollBehavior: "smooth" }}
                           >
-                            {/* Videos */}
+                            {/* ✅ Videos (Cloudinary MP4 => <video>) */}
                             {videos.map((url, index) => (
                               <div
                                 key={index}
                                 className="min-w-full snap-center"
                               >
                                 <div className="aspect-video bg-black rounded-lg mb-3 overflow-hidden">
-                                  <iframe
-                                    className="w-full h-full"
-                                    src={videos[index]}
-                                    title={`Embedded YouTube video ${
-                                      index + 1
-                                    }`}
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                    allowFullScreen
+                                  <video
+                                    ref={(el) => {
+                                      videoRefs.current[index] = el;
+                                    }}
+                                    className="w-full h-full object-cover"
+                                    src={url}
+                                    controls
+                                    muted
+                                    playsInline
+                                    preload="metadata"
+                                    onEnded={() => {
+                                      // auto-advance to next slide
+                                      const el = mediaScrollRef.current;
+                                      if (!el) return;
+                                      const next = Math.min(
+                                        index + 1,
+                                        videos.length - 1
+                                      );
+                                      el.scrollTo({
+                                        left: next * el.clientWidth,
+                                        behavior: "smooth",
+                                      });
+                                    }}
                                   />
                                 </div>
                                 <p className="text-xs sm:text-sm opacity-80 drop-shadow text-center">
