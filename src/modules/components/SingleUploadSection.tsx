@@ -413,13 +413,13 @@ export function SingleUploadSection({
       const trackId = singleTrackMap[singleId];
 
       // Log stream
-      if (token && trackId && userId) {
-        await TrackStreamModuleObject.service.createTrackStream(
-          userId,
-          trackId,
-          token
-        );
-      }
+      // if (token && trackId && userId) {
+      //   await TrackStreamModuleObject.service.createTrackStream(
+      //     userId,
+      //     trackId,
+      //     token
+      //   );
+      // }
     } catch (err) {
       console.error("Error playing audio:", err);
     }
