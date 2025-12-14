@@ -619,7 +619,7 @@ export function ArtistProfileSetup({
                       onChange={(opt) =>
                         setCountry(opt ? (opt as any).value : "")
                       }
-                      className="text-black"
+                      className="text-black cursor-pointer"
                       classNamePrefix="react-select-country"
                       placeholder="Select your country"
                     />

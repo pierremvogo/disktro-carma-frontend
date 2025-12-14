@@ -16,51 +16,91 @@ interface API_URLS {
   GET_SUBSCRIPTIONS: string;
   UPDATE_SUBSCRIPTION: string;
   DELETE_SUBSCRIPTION: string;
+
+  // ✅ NEW for artist dashboard
+  GET_MY_RECENT_ACTIVE_SUBSCRIBERS: string;
+  GET_MY_ACTIVE_BY_LOCATION: string;
+  GET_MY_STATS: string;
 }
 
 const API_URLS: API_URLS = {
   CREATE_SUBSCRIPTION: `${BASE_API_URL}/subscription/create`,
   GET_SUBSCRIPTION: `${BASE_API_URL}/subscription/:id`,
-  GET_SUBSCRIPTION_BY_USER: `${BASE_API_URL}/subscription/user/:id`,
-  GET_SUBSCRIPTION_BY_PLAN: `${BASE_API_URL}/subscription/plan/:id`,
+
+  // ✅ corrected param names
+  GET_SUBSCRIPTION_BY_USER: `${BASE_API_URL}/subscription/user/:userId`,
+  GET_SUBSCRIPTION_BY_PLAN: `${BASE_API_URL}/subscription/plan/:planId`,
+
   GET_SUBSCRIPTIONS: `${BASE_API_URL}/subscription`,
   UPDATE_SUBSCRIPTION: `${BASE_API_URL}/subscription/update/:id`,
   DELETE_SUBSCRIPTION: `${BASE_API_URL}/subscription/delete/:id`,
+
+  // ✅ NEW endpoints
+  GET_MY_RECENT_ACTIVE_SUBSCRIBERS: `${BASE_API_URL}/subscription/artist/me/recent`,
+  GET_MY_ACTIVE_BY_LOCATION: `${BASE_API_URL}/subscription/artist/me/by-location`,
+  GET_MY_STATS: `${BASE_API_URL}/subscription/artist/me/stats`,
 } as const;
 
 class ServiceObject {
-  static createSubscription = (info: any): Promise<any> =>
+  // Create subscription (fan subscribes)
+  static createSubscription = (info: any, token: string): Promise<any> =>
     BaseMethods.postRequest(API_URLS.CREATE_SUBSCRIPTION, info, true);
 
-  static getSubscription = (id: string): Promise<any> => {
+  static getSubscription = (id: string, token: string): Promise<any> => {
     const url = formatURL(API_URLS.GET_SUBSCRIPTION, { id });
     return BaseMethods.getRequest(url, true);
   };
 
-  static getSubscriptionByUser = (id: string): Promise<any> => {
-    const url = formatURL(API_URLS.GET_SUBSCRIPTION_BY_USER, { id });
+  static getSubscriptionByUser = (
+    userId: string,
+    token: string
+  ): Promise<any> => {
+    const url = formatURL(API_URLS.GET_SUBSCRIPTION_BY_USER, { userId });
     return BaseMethods.getRequest(url, true);
   };
 
-  static getSubscriptionByPlan = (id: string): Promise<any> => {
-    const url = formatURL(API_URLS.GET_SUBSCRIPTION_BY_PLAN, { id });
+  static getSubscriptionByPlan = (
+    planId: string,
+    token: string
+  ): Promise<any> => {
+    const url = formatURL(API_URLS.GET_SUBSCRIPTION_BY_PLAN, { planId });
     return BaseMethods.getRequest(url, true);
   };
 
-  static getSubscriptions = (): Promise<any> => {
-    return BaseMethods.getRequest(API_URLS.GET_SUBSCRIPTIONS, true);
-  };
+  static getSubscriptions = (token: string): Promise<any> =>
+    BaseMethods.getRequest(API_URLS.GET_SUBSCRIPTIONS, true, {}, token);
 
+  // ⚠️ ton backend est en PUT, mais si BaseMethods n'a pas putRequest,
+  // tu peux garder postRequest SI le backend accepte POST.
   static updateSubscription = (id: string, info: any): Promise<any> => {
     const url = formatURL(API_URLS.UPDATE_SUBSCRIPTION, { id });
     return BaseMethods.postRequest(url, info, true);
+    // ou BaseMethods.putRequest(url, info, true) si dispo
   };
 
   static deleteSubscription = (id: string): Promise<any> => {
     const url = formatURL(API_URLS.DELETE_SUBSCRIPTION, { id });
     return BaseMethods.deleteRequest(url, {}, true);
   };
+
+  // ✅ NEW - Artist dashboard
+  static getMyRecentActiveSubscribers = (
+    limit = 5,
+    token: string
+  ): Promise<any> => {
+    const url = `${
+      API_URLS.GET_MY_RECENT_ACTIVE_SUBSCRIBERS
+    }?limit=${encodeURIComponent(String(limit))}`;
+    return BaseMethods.getRequest(url, true, {}, token);
+  };
+
+  static getMyActiveSubscriptionsByLocation = (token: string): Promise<any> =>
+    BaseMethods.getRequest(API_URLS.GET_MY_ACTIVE_BY_LOCATION, true, {}, token);
+
+  static getMySubscriptionStats = (token: string): Promise<any> =>
+    BaseMethods.getRequest(API_URLS.GET_MY_STATS, true, {}, token);
 }
+
 interface LocalState {
   ACCESS_TOKEN: string;
   USER_ID: string;
