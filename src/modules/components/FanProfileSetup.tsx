@@ -6,6 +6,8 @@ import { MediaModuleObject as MediaModule } from "../file/module";
 import { wait } from "@/@disktro/utils";
 import { useRouter } from "next/navigation";
 import { Loader } from "lucide-react";
+import Select from "react-select";
+import countryList from "react-select-country-list";
 
 // Icon components
 const User = ({ size = 24, className = "" }) => (
@@ -167,6 +169,8 @@ export function FanProfileSetup({
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
   const [showVerificationCode, setShowVerificationCode] = useState(false);
   const [verificationCode, setVerificationCode] = useState("");
+  const [country, setCountry] = useState<string>(""); // code pays (ex: "FR")
+  const options = React.useMemo(() => countryList().getData(), []);
 
   const text = {
     spanish: {
@@ -502,6 +506,25 @@ export function FanProfileSetup({
                       onChange={(e) => setUsername(e.target.value)}
                       placeholder={content.usernamePlaceholder}
                       className="w-full px-4 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-black placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/50"
+                    />
+                  </div>
+                  {/* Artist Country */}
+                  <div>
+                    <label className="block text-white drop-shadow mb-2">
+                      Country
+                    </label>
+                    <Select
+                      options={options}
+                      value={
+                        options.find((opt: any) => opt.value === country) ||
+                        null
+                      }
+                      onChange={(opt) =>
+                        setCountry(opt ? (opt as any).value : "")
+                      }
+                      className="text-black cursor-pointer"
+                      classNamePrefix="react-select-country"
+                      placeholder="Select your country"
                     />
                   </div>
 

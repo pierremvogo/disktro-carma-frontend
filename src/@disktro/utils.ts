@@ -283,6 +283,21 @@ export const getBrailleFile = async (
   return "";
 };
 
+export const getDocumentFile = async (
+  documentUrl: string,
+  token: string
+): Promise<string> => {
+  if (documentUrl) {
+    const blob = await ModuleObject.service.downloadBrailleFile(
+      documentUrl,
+      token
+    );
+    const documentObjectUrl = URL.createObjectURL(blob);
+    return documentObjectUrl;
+  }
+  return "";
+};
+
 export const getUserRole = () => {
   const rawRole = localStorage.getItem(ModuleObject.localState.USER_ROLE);
   return rawRole ? rawRole.trim().toLowerCase().replace(/['"]+/g, "") : null;

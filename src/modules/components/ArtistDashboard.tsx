@@ -16,6 +16,11 @@ import { EpUploadSection } from "./EpUploadSection";
 import { EpModuleObject } from "../ep/module";
 import { AlbumModuleObject } from "../album/module";
 import { getCountryName } from "@/@disktro/utils";
+import { PlanModuleObject } from "../plan/module";
+import { SubscriptionModuleObject } from "../subscription/module";
+import { ExclusiveContentModuleObject } from "./exclusiveContent/module";
+import { RoyaltiesModuleObject } from "../royalties/module";
+import { PayoutModuleObject } from "../payout/module";
 // Icon components
 const Upload = ({ size = 24, className = "" }) => (
   <svg
@@ -370,6 +375,26 @@ type TrackStat = {
     percentage?: string;
   }[];
 };
+const ACCEPT_BY_TYPE: Record<string, string> = {
+  music: "audio/*",
+  video: "video/*",
+  photo: "image/*",
+  document: ".txt,text/plain",
+};
+
+const isValidFileForType = (type: string, file: File) => {
+  const mime = file.type; // ex "audio/mpeg"
+  const name = file.name.toLowerCase();
+
+  if (type === "music") return mime.startsWith("audio/");
+  if (type === "video") return mime.startsWith("video/");
+  if (type === "photo") return mime.startsWith("image/");
+  if (type === "document") {
+    // certains navigateurs mettent type="" pour .txt, donc on check extension aussi
+    return mime === "text/plain" || name.endsWith(".txt");
+  }
+  return false;
+};
 
 export function ArtistDashboard({
   language,
@@ -380,6 +405,17 @@ export function ArtistDashboard({
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
   const [bioOneWord, setBioOneWord] = useState<string>("");
   const [monthlyPrice, setMonthlyPrice] = useState<string>("");
+
+  const [subStats, setSubStats] = useState({
+    currency: "EUR",
+    totalRevenue: "0.00",
+    totalSubscribers: 0,
+    activeSubscribers: 0,
+    growth: "0%",
+  });
+
+  const [statsLoading, setStatsLoading] = useState(false);
+  const [statsError, setStatsError] = useState<string | null>(null);
 
   // Email and authentication states
   const [email, setEmail] = useState<string>("artist@example.com");
@@ -413,6 +449,10 @@ export function ArtistDashboard({
   const [streamsByLocation, setStreamsByLocation] = useState<LocationStat[]>(
     []
   );
+
+  const [payoutLoading, setPayoutLoading] = useState(false);
+  const [payoutSaving, setPayoutSaving] = useState(false);
+  const [payoutError, setPayoutError] = useState<string | null>(null);
 
   // loading/error pour la section streams (optionnel)
   const [isStreamsLoading, setIsStreamsLoading] = useState(false);
@@ -448,6 +488,8 @@ export function ArtistDashboard({
       title: string;
       description: string;
       uploadDate: string;
+      fileUrl: string;
+      createdAt: Date;
     }>
   >([]);
   const [artwork, setArtwork] = useState<File | null>(null);
@@ -471,6 +513,513 @@ export function ArtistDashboard({
   const [videoIntro, setVideoIntro] = useState<File | null>(null);
   const [videoIntroPreview, setVideoIntroPreview] = useState<string>("");
   const [moods, setMoods] = useState<Mood[] | null>(null);
+
+  const [quarterlyPrice, setQuarterlyPrice] = useState("");
+  const [annualPrice, setAnnualPrice] = useState("");
+
+  const [pricingLoading, setPricingLoading] = useState(false);
+  const [pricingSaving, setPricingSaving] = useState(false);
+  const [pricingError, setPricingError] = useState<string | null>(null);
+  const [pricingSaved, setPricingSaved] = useState(false);
+
+  const [exclusiveContentPreview, setExclusiveContentPreview] = useState("");
+  const [exclusiveContentUrl, setExclusiveContentUrl] = useState("");
+
+  const [isUploadingExclusive, setIsUploadingExclusive] = useState(false);
+  const [exclusiveError, setExclusiveError] = useState("");
+  const [exclusiveSuccess, setExclusiveSuccess] = useState("");
+
+  const [isExclusiveLoading, setIsExclusiveLoading] = useState(false);
+  const [isExclusiveSubmitting, setIsExclusiveSubmitting] = useState(false);
+
+  const [recentSubscribers, setRecentSubscribers] = useState<any[]>([]);
+  const [recentLoading, setRecentLoading] = useState(false);
+  const [recentError, setRecentError] = useState<string | null>(null);
+
+  const fetchMyPayoutSettings = async () => {
+    try {
+      const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
+      if (!token) return;
+
+      setPayoutLoading(true);
+      setPayoutError(null);
+
+      const res = await PayoutModuleObject.service.getMyPayoutSettings(token);
+      const data = res?.data?.data ?? res?.data ?? {};
+
+      setBankAccountHolder(data.bankAccountHolder ?? "");
+      setBankName(data.bankName ?? "");
+      setAccountNumber(data.accountNumber ?? "");
+      setRoutingNumber(data.routingNumber ?? "");
+      setSwiftCode(data.swiftCode ?? "");
+      setIban(data.iban ?? "");
+
+      setPaypalEmail(data.paypalEmail ?? "");
+      setBizumPhone(data.bizumPhone ?? "");
+      setMobileMoneyProvider(data.mobileMoneyProvider ?? "");
+      setMobileMoneyPhone(data.mobileMoneyPhone ?? "");
+      setOrangeMoneyPhone(data.orangeMoneyPhone ?? "");
+    } catch (e: any) {
+      setPayoutError(e?.message || "Failed to load payout settings");
+    } finally {
+      setPayoutLoading(false);
+    }
+  };
+
+  const handleSavePayoutSettings = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
+      if (!token) return;
+
+      setPayoutSaving(true);
+      setPayoutError(null);
+
+      const payload = {
+        bankAccountHolder,
+        bankName,
+        accountNumber,
+        routingNumber,
+        swiftCode,
+        iban,
+        paypalEmail,
+        bizumPhone,
+        mobileMoneyProvider,
+        mobileMoneyPhone,
+        orangeMoneyPhone,
+      };
+
+      await PayoutModuleObject.service.saveMyPayoutSettings(payload, token);
+
+      setPaymentSaved(true);
+      setTimeout(() => setPaymentSaved(false), 3000);
+    } catch (e: any) {
+      setPayoutError(e?.message || "Failed to save payout settings");
+    } finally {
+      setPayoutSaving(false);
+    }
+  };
+
+  // Appel quand tu ouvres l'onglet payout
+  useEffect(() => {
+    if (activeTab === "payout") {
+      fetchMyPayoutSettings();
+    }
+  }, [activeTab]);
+
+  const fetchRecentSubscribers = async (limit = 5) => {
+    const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
+    if (!token) return;
+    try {
+      setRecentLoading(true);
+      setRecentError(null);
+
+      const res =
+        await SubscriptionModuleObject.service.getMyRecentActiveSubscribers(
+          limit,
+          token
+        );
+
+      // backend: { message, data: [...] }
+      const items = res?.data?.data ?? res?.data ?? res ?? [];
+
+      setRecentSubscribers(Array.isArray(items) ? items : []);
+    } catch (e: any) {
+      setRecentError(e?.message || "Failed to load recent subscribers");
+    } finally {
+      setRecentLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === "subscriptions") {
+      fetchRecentSubscribers(5);
+    }
+  }, [activeTab]);
+
+  const fetchSubscriptionsByLocation = async () => {
+    const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
+    if (!token) return;
+    try {
+      setSubsLocLoading(true);
+      setSubsLocError(null);
+
+      const res =
+        await SubscriptionModuleObject.service.getMyActiveSubscriptionsByLocation(
+          token
+        );
+
+      // backend: { message, data: [...] }
+      const items = res?.data?.data ?? res?.data ?? res ?? [];
+      setSubsByLocation(Array.isArray(items) ? items : []);
+    } catch (e: any) {
+      setSubsLocError(e?.message || "Failed to load subscriptions by location");
+    } finally {
+      setSubsLocLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === "subscriptions") {
+      fetchSubscriptionsByLocation();
+    }
+  }, [activeTab]);
+
+  const fetchExclusiveContents = async () => {
+    const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
+    if (!token) return;
+    try {
+      setIsExclusiveLoading(true);
+      setExclusiveError("");
+
+      const artistId = localStorage.getItem(ModuleObject.localState.USER_ID);
+      if (!artistId) return;
+
+      const res =
+        await ExclusiveContentModuleObject.service.getExclusiveContentByArtist(
+          artistId,
+          token
+        );
+      // ✅ ton backend renvoie { message, contents: [...] }
+      const items = res?.data?.contents ?? res?.contents ?? [];
+
+      setUploadedExclusiveContent(items);
+    } catch (e: any) {
+      setExclusiveError(e?.message || "Failed to load exclusive contents");
+    } finally {
+      setIsExclusiveLoading(false);
+    }
+  };
+
+  const [subsByLocation, setSubsByLocation] = useState<
+    { location: string; subscribers: number; percentage: string }[]
+  >([]);
+  const [subsLocLoading, setSubsLocLoading] = useState(false);
+  const [subsLocError, setSubsLocError] = useState<string | null>(null);
+
+  const [royaltiesSummary, setRoyaltiesSummary] = useState({
+    currency: "EUR",
+    totalRoyalties: "0.00",
+    thisMonth: "0.00",
+    pending: "0.00",
+  });
+
+  const [royaltiesTracks, setRoyaltiesTracks] = useState<any[]>([]);
+
+  const [royaltiesLoading, setRoyaltiesLoading] = useState(false);
+  const [royaltiesError, setRoyaltiesError] = useState<string | null>(null);
+
+  const fetchRoyalties = async () => {
+    const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
+    if (!token) return;
+    try {
+      setRoyaltiesLoading(true);
+      setRoyaltiesError(null);
+
+      const [summaryRes, tracksRes] = await Promise.all([
+        RoyaltiesModuleObject.service.getMyRoyaltiesSummary(token),
+        RoyaltiesModuleObject.service.getMyRoyaltiesByTrack(10, token),
+      ]);
+
+      // backend: { message, data: {...} }
+      const summary = summaryRes?.data?.data ?? summaryRes?.data ?? {};
+      const tracks = tracksRes?.data?.data ?? tracksRes?.data ?? [];
+
+      setRoyaltiesSummary({
+        currency: summary.currency ?? "EUR",
+        totalRoyalties: summary.totalRoyalties ?? "0.00",
+        thisMonth: summary.thisMonth ?? "0.00",
+        pending: summary.pending ?? "0.00",
+      });
+
+      setRoyaltiesTracks(Array.isArray(tracks) ? tracks : []);
+    } catch (e: any) {
+      setRoyaltiesError(e?.message || "Failed to fetch royalties");
+    } finally {
+      setRoyaltiesLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === "royalties") {
+      fetchRoyalties();
+    }
+  }, [activeTab]);
+
+  const handleExclusiveFile = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
+    const file = e.target.files?.[0];
+    if (!file || !token) return;
+
+    setExclusiveError("");
+    setExclusiveSuccess("");
+
+    if (!isValidFileForType(exclusiveContentType, file)) {
+      setExclusiveError(
+        language === "english"
+          ? "Invalid file type for the selected content type."
+          : language === "spanish"
+          ? "Tipo de archivo inválido para el tipo de contenido seleccionado."
+          : "Tipus de fitxer invàlid per al tipus de contingut seleccionat."
+      );
+      e.target.value = "";
+      return;
+    }
+
+    setIsExclusiveSubmitting(true);
+
+    setExclusiveContentFile(file);
+
+    // preview local
+    if (exclusiveContentType !== "document") {
+      setExclusiveContentPreview((prev) => {
+        if (prev) URL.revokeObjectURL(prev);
+        return URL.createObjectURL(file);
+      });
+    } else {
+      setExclusiveContentPreview("");
+    }
+
+    const fd = new FormData();
+    fd.append("file", file);
+
+    try {
+      let res: any = null;
+
+      if (exclusiveContentType === "photo") {
+        res = await MediaModule.service.uploadImageFile(fd);
+      } else if (exclusiveContentType === "video") {
+        res = await MediaModule.service.uploadVideoFile(fd);
+      } else if (exclusiveContentType === "music") {
+        res = await MediaModule.service.uploadAudioFile(fd);
+      } else {
+        res = await MediaModule.service.uploadDocumentFile(fd);
+      }
+
+      if (res?.url) {
+        setExclusiveContentUrl(res.url);
+        setExclusiveSuccess(
+          language === "english"
+            ? "File uploaded successfully."
+            : language === "spanish"
+            ? "Archivo subido con éxito."
+            : "Fitxer pujat amb èxit."
+        );
+      } else {
+        setExclusiveError("Upload failed.");
+      }
+    } catch (err: any) {
+      setExclusiveError(err?.message || "Upload failed.");
+    } finally {
+      setIsExclusiveSubmitting(false);
+    }
+  };
+
+  const handleSubmitExclusiveContent = async () => {
+    const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
+    if (!token) return;
+    try {
+      setExclusiveError("");
+      setExclusiveSuccess("");
+
+      if (!exclusiveContentTitle.trim()) {
+        setExclusiveError("Title is required.");
+        return;
+      }
+      if (!exclusiveContentUrl) {
+        setExclusiveError("Please upload a file first.");
+        return;
+      }
+
+      setIsExclusiveSubmitting(true);
+
+      await ExclusiveContentModuleObject.service.createExclusiveContent(
+        {
+          type: exclusiveContentType,
+          title: exclusiveContentTitle.trim(),
+          description: exclusiveContentDescription?.trim() || null,
+          fileUrl: exclusiveContentUrl,
+        },
+        token
+      );
+
+      setExclusiveSuccess(
+        language === "english"
+          ? "Exclusive content published."
+          : language === "spanish"
+          ? "Contenido exclusivo publicado."
+          : "Contingut exclusiu publicat."
+      );
+
+      // reset form
+      setExclusiveContentTitle("");
+      setExclusiveContentDescription("");
+      setExclusiveContentFile(null);
+      setExclusiveContentPreview("");
+      setExclusiveContentUrl("");
+
+      await fetchExclusiveContents();
+    } catch (err: any) {
+      setExclusiveError(err?.message || "Failed to publish content.");
+    } finally {
+      setIsExclusiveSubmitting(false);
+    }
+  };
+  useEffect(() => {
+    if (activeTab === "subscriptions") {
+      fetchExclusiveContents();
+    }
+  }, [activeTab]);
+
+  const daysAgoLabel = (isoDate?: string) => {
+    if (!isoDate) return "";
+    const diffMs = Date.now() - new Date(isoDate).getTime();
+    const days = Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24)));
+
+    if (language === "spanish") return `hace ${days} días`;
+    if (language === "catalan") return `fa ${days} dies`;
+    return `${days} days ago`;
+  };
+
+  const handleDeleteExclusiveContent = async (id: string) => {
+    try {
+      setExclusiveError("");
+      await ExclusiveContentModuleObject.service.deleteExclusiveContent(id);
+      await fetchExclusiveContents();
+    } catch (err: any) {
+      setExclusiveError(err?.message || "Failed to delete content.");
+    }
+  };
+
+  // calc auto (même logique que ton UI)
+  const recalcDerivedPrices = (monthlyStr: string) => {
+    const m = Number(monthlyStr);
+    if (!monthlyStr || Number.isNaN(m)) {
+      setQuarterlyPrice("");
+      setAnnualPrice("");
+      return;
+    }
+    setQuarterlyPrice((m * 4).toFixed(2));
+    setAnnualPrice((m * 12).toFixed(2));
+  };
+
+  async function fetchSubscriptionStats() {
+    const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
+    if (!token) return;
+    try {
+      setStatsLoading(true);
+      setStatsError(null);
+
+      const res = await SubscriptionModuleObject.service.getMySubscriptionStats(
+        token
+      );
+      // ou fetch("/subscription/artist/me/stats") selon ton infra
+
+      const payload = res?.data?.data ?? res?.data ?? res;
+
+      setSubStats({
+        currency: payload.currency ?? "EUR",
+        totalRevenue: payload.totalRevenue ?? "0.00",
+        totalSubscribers: payload.totalSubscribers ?? 0,
+        activeSubscribers: payload.activeSubscribers ?? 0,
+        growth: payload.growth ?? "0%",
+      });
+    } catch (e: any) {
+      setStatsError(e?.message || "Failed to fetch subscription stats");
+    } finally {
+      setStatsLoading(false);
+    }
+  }
+  useEffect(() => {
+    if (activeTab === "subscriptions") {
+      fetchSubscriptionStats();
+    }
+  }, [activeTab]);
+
+  // quand monthly change => recalcul auto
+  useEffect(() => {
+    recalcDerivedPrices(monthlyPrice);
+  }, [monthlyPrice]);
+
+  async function fetchMyPlansPricing() {
+    const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
+    if (!token) return;
+    const res = await PlanModuleObject.service.getMyPlans(token);
+
+    // selon ton backend, ça peut être res.data.data, res.data, res.plans...
+    // Je te mets une extraction robuste :
+    const plans: any[] =
+      res?.data?.data ?? res?.data?.plans ?? res?.data ?? res?.plans ?? [];
+
+    const monthly = plans.find((p) => p.billingCycle === "monthly");
+    const quarterly = plans.find((p) => p.billingCycle === "quarterly");
+    const annual = plans.find((p) => p.billingCycle === "annual");
+
+    setMonthlyPrice(monthly?.price ? String(monthly.price) : "");
+    setQuarterlyPrice(quarterly?.price ? String(quarterly.price) : "");
+    setAnnualPrice(annual?.price ? String(annual.price) : "");
+  }
+
+  async function saveMyPricing(monthlyStr: string) {
+    const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
+    if (!token) return;
+    const monthly = Number(monthlyStr);
+
+    if (!Number.isFinite(monthly) || monthly < 0) {
+      throw new Error("Invalid monthly price");
+    }
+
+    const res = await PlanModuleObject.service.upsertMyPricing(monthly, token);
+
+    // Si ton backend renvoie directement les prix recalculés (recommandé)
+    const payload = res?.data?.data ?? res?.data ?? res;
+
+    if (payload?.monthlyPrice !== undefined) {
+      setMonthlyPrice(String(payload.monthlyPrice));
+      setQuarterlyPrice(String(payload.quarterlyPrice));
+      setAnnualPrice(String(payload.annualPrice));
+      return;
+    }
+
+    // sinon refetch pour être sûr
+    await fetchMyPlansPricing();
+  }
+
+  const handleSubmitPricing = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      setPricingSaving(true);
+      setPricingError(null);
+      setPricingSaved(false);
+
+      await saveMyPricing(monthlyPrice);
+
+      setPricingSaved(true);
+      setTimeout(() => setPricingSaved(false), 2500);
+    } catch (e: any) {
+      setPricingError(e?.message || "Failed to save pricing");
+    } finally {
+      setPricingSaving(false);
+    }
+  };
+
+  useEffect(() => {
+    // appelle-le quand tu ouvres l'onglet subscriptions
+    // si tu as activeTab dans ton composant : if (activeTab === "subscriptions") ...
+    (async () => {
+      try {
+        setPricingLoading(true);
+        setPricingError(null);
+        await fetchMyPlansPricing();
+      } catch (e: any) {
+        setPricingError(e?.message || "Failed to load pricing");
+      } finally {
+        setPricingLoading(false);
+      }
+    })();
+  }, []); // ou dépendance [activeTab]
 
   useEffect(() => {
     if (successMessage) {
@@ -1560,12 +2109,13 @@ export function ArtistDashboard({
 
       noSingleUploadedYet: "Todavía no se ha subido ningún single.",
       noAlbumUploadedYet: "Ningún álbum subido por el momento.",
+      noSubscriptions: "No hay suscripciones",
     },
     english: {
       // EN
       // Anglais
       recentSingleUploads: "Recent Uploads",
-
+      noSubscriptions: "No susbscription",
       singleAudioUploadSuccess: "Audio file uploaded successfully.",
       singleAudioUploadError:
         "An error occurred while uploading the audio file.",
@@ -1605,7 +2155,6 @@ export function ArtistDashboard({
       prevPage: "Previous",
       nextPage: "Next",
       pageLabel: "Page",
-
       title: "Artist Dashboard",
       payout: "Payout",
       profile: "Profile",
@@ -1743,6 +2292,7 @@ export function ArtistDashboard({
       noAlbumUploadedYet: "No album uploaded yet.",
     },
     catalan: {
+      noSubscriptions: "No hi ha subscripcions",
       // CA
       noAlbumUploadedYet: "Cap àlbum pujat de moment.",
       recentSingleUploads: "Càrregues recents",
@@ -1939,8 +2489,8 @@ export function ArtistDashboard({
     return (monthly * 12).toFixed(2);
   };
 
-  const quarterlyPrice = calculateQuarterlyPrice();
-  const annualPrice = calculateAnnualPrice();
+  // const quarterlyPrice = calculateQuarterlyPrice();
+  // const annualPrice = calculateAnnualPrice();
 
   const mockSubscriptions = {
     total: "12,456",
@@ -2057,7 +2607,7 @@ export function ArtistDashboard({
           {onGoToStreaming && (
             <button
               onClick={onGoToStreaming}
-              className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500/40 to-cyan-500/40 backdrop-blur-md border-2 border-white/40 rounded-xl text-white hover:from-blue-500/50 hover:to-cyan-500/50 hover:border-white/60 transition-all shadow-lg"
+              className="cursor-pointer flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500/40 to-cyan-500/40 backdrop-blur-md border-2 border-white/40 rounded-xl text-white hover:from-blue-500/50 hover:to-cyan-500/50 hover:border-white/60 transition-all shadow-lg"
             >
               <svg
                 width="20"
@@ -2816,149 +3366,207 @@ export function ArtistDashboard({
                   {text.setPriceLabel}
                 </label>
 
-                {/* Pricing Options Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                  {/* Monthly */}
-                  <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                    <h3 className="text-white drop-shadow mb-4">
-                      {text.monthly}
-                    </h3>
-                    <div className="relative">
-                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/60 text-xl">
-                        €
-                      </span>
-                      <input
-                        type="number"
-                        value={monthlyPrice}
-                        onChange={(e) => setMonthlyPrice(e.target.value)}
-                        placeholder="9.99"
-                        step="0.01"
-                        min="0"
-                        className="w-full pl-10 pr-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
-                      />
-                    </div>
-                    <p className="text-white/60 text-sm mt-2">
-                      {text.pricePerMonth}
+                <form onSubmit={handleSubmitPricing}>
+                  {/* Messages */}
+                  {pricingLoading && (
+                    <p className="text-white/70 text-sm mb-4">
+                      Loading pricing…
                     </p>
-                  </div>
+                  )}
 
-                  {/* Quarterly */}
-                  <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                    <h3 className="text-white drop-shadow mb-4">
-                      {text.quarterly}
-                    </h3>
-                    <div className="relative">
-                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/60 text-xl">
-                        €
-                      </span>
-                      <input
-                        type="text"
-                        value={quarterlyPrice}
-                        readOnly
-                        placeholder="—"
-                        className="w-full pl-10 pr-4 py-3 bg-white/5 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 cursor-not-allowed opacity-80"
-                      />
+                  {pricingError && (
+                    <div className="mb-4 p-3 bg-red-500/20 border border-red-400/40 rounded-lg">
+                      <p className="text-red-200 text-sm">{pricingError}</p>
                     </div>
-                    <p className="text-white/60 text-sm mt-2">
-                      {text.pricePerQuarter}
-                    </p>
-                    {monthlyPrice && (
-                      <p className="text-white/50 text-xs mt-1">
-                        {language === "es" && "(Calculado automáticamente)"}
-                        {language === "en" && "(Calculated automatically)"}
-                        {language === "ca" && "(Calculat automàticament)"}
+                  )}
+
+                  {pricingSaved && (
+                    <div className="mb-4 p-3 bg-green-500/20 border border-green-400/40 rounded-lg">
+                      <p className="text-green-200 text-sm">
+                        {language === "spanish"
+                          ? "Precios guardados"
+                          : language === "english"
+                          ? "Prices saved"
+                          : "Preus guardats"}
                       </p>
-                    )}
-                  </div>
-
-                  {/* Annual */}
-                  <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                    <h3 className="text-white drop-shadow mb-4">
-                      {text.annual}
-                    </h3>
-                    <div className="relative">
-                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/60 text-xl">
-                        €
-                      </span>
-                      <input
-                        type="text"
-                        value={annualPrice}
-                        readOnly
-                        placeholder="—"
-                        className="w-full pl-10 pr-4 py-3 bg-white/5 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 cursor-not-allowed opacity-80"
-                      />
                     </div>
-                    <p className="text-white/60 text-sm mt-2">
-                      {text.pricePerYear}
-                    </p>
-                    {monthlyPrice && (
-                      <p className="text-white/50 text-xs mt-1">
-                        {language === "es" && "(Calculado automáticamente)"}
-                        {language === "en" && "(Calculated automatically)"}
-                        {language === "ca" && "(Calculat automàticament)"}
-                      </p>
-                    )}
-                  </div>
-                </div>
+                  )}
 
-                {/* Save Button */}
-                {monthlyPrice && (
+                  {/* Pricing Options Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    {/* Monthly */}
+                    <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                      <h3 className="text-white drop-shadow mb-4">
+                        {text.monthly}
+                      </h3>
+                      <div className="relative">
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/60 text-xl">
+                          €
+                        </span>
+                        <input
+                          type="number"
+                          value={monthlyPrice}
+                          onChange={(e) => setMonthlyPrice(e.target.value)}
+                          placeholder="9.99"
+                          step="0.01"
+                          min="0"
+                          disabled={pricingLoading || pricingSaving}
+                          className="w-full pl-10 pr-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all disabled:opacity-60"
+                        />
+                      </div>
+                      <p className="text-white/60 text-sm mt-2">
+                        {text.pricePerMonth}
+                      </p>
+                    </div>
+
+                    {/* Quarterly */}
+                    <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                      <h3 className="text-white drop-shadow mb-4">
+                        {text.quarterly}
+                      </h3>
+                      <div className="relative">
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/60 text-xl">
+                          €
+                        </span>
+                        <input
+                          type="text"
+                          value={quarterlyPrice}
+                          readOnly
+                          placeholder="—"
+                          className="w-full pl-10 pr-4 py-3 bg-white/5 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 cursor-not-allowed opacity-80"
+                        />
+                      </div>
+                      <p className="text-white/60 text-sm mt-2">
+                        {text.pricePerQuarter}
+                      </p>
+                      {monthlyPrice && (
+                        <p className="text-white/50 text-xs mt-1">
+                          {language === "spanish" &&
+                            "(Calculado automáticamente)"}
+                          {language === "english" &&
+                            "(Calculated automatically)"}
+                          {language === "catalan" &&
+                            "(Calculat automàticament)"}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Annual */}
+                    <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                      <h3 className="text-white drop-shadow mb-4">
+                        {text.annual}
+                      </h3>
+                      <div className="relative">
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/60 text-xl">
+                          €
+                        </span>
+                        <input
+                          type="text"
+                          value={annualPrice}
+                          readOnly
+                          placeholder="—"
+                          className="w-full pl-10 pr-4 py-3 bg-white/5 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 cursor-not-allowed opacity-80"
+                        />
+                      </div>
+                      <p className="text-white/60 text-sm mt-2">
+                        {text.pricePerYear}
+                      </p>
+                      {monthlyPrice && (
+                        <p className="text-white/50 text-xs mt-1">
+                          {language === "spanish" &&
+                            "(Calculado automáticamente)"}
+                          {language === "english" &&
+                            "(Calculated automatically)"}
+                          {language === "catalan" &&
+                            "(Calculat automàticament)"}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Submit */}
                   <div className="flex justify-end">
                     <button
-                      onClick={() => {
-                        const monthly = parseFloat(monthlyPrice);
-                        const quarterly = monthly * 4;
-                        const annual = monthly * 12;
-                        const message =
-                          language === "es"
-                            ? `Precios configurados:\nMensual: €${monthly.toFixed(
-                                2
-                              )}\nTrimestral: €${quarterly.toFixed(
-                                2
-                              )}\nAnual: €${annual.toFixed(2)}`
-                            : language === "en"
-                            ? `Prices set:\nMonthly: €${monthly.toFixed(
-                                2
-                              )}\nQuarterly: €${quarterly.toFixed(
-                                2
-                              )}\nAnnual: €${annual.toFixed(2)}`
-                            : `Preus configurats:\nMensual: €${monthly.toFixed(
-                                2
-                              )}\nTrimestral: €${quarterly.toFixed(
-                                2
-                              )}\nAnual: €${annual.toFixed(2)}`;
-                        alert(message);
-                      }}
-                      className="px-8 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-white hover:bg-white/30 transition-all"
+                      type="submit"
+                      disabled={
+                        !monthlyPrice || pricingSaving || pricingLoading
+                      }
+                      className="px-8 cursor-pointer py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-white hover:bg-white/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {text.savePrice}
+                      {pricingSaving
+                        ? language === "english"
+                          ? "Saving..."
+                          : language === "spanish"
+                          ? "Guardando..."
+                          : "Desant..."
+                        : text.savePrice}
                     </button>
                   </div>
-                )}
+                </form>
 
-                {/* Info Message */}
-                {monthlyPrice && (
-                  <div className="mt-6 p-4 bg-white/5 rounded-lg border border-white/20">
-                    <p className="text-white/80 text-sm mb-2">
-                      {language === "es" &&
-                        "Los fans podrán elegir entre las opciones de suscripción que hayas configurado:"}
-                      {language === "en" &&
-                        "Fans will be able to choose from the subscription options you have configured:"}
-                      {language === "ca" &&
-                        "Els fans podran triar entre les opcions de subscripció que hagis configurat:"}
+                {(monthlyPrice || quarterlyPrice || annualPrice) && (
+                  <div className="mt-6 p-5 bg-white/5 backdrop-blur-md rounded-xl border border-white/20">
+                    {/* Title */}
+                    <p className="text-white/90 text-sm mb-4 font-medium">
+                      {language === "spanish" &&
+                        "Los fans podrán elegir entre estas opciones de suscripción:"}
+                      {language === "english" &&
+                        "Fans will be able to choose between these subscription options:"}
+                      {language === "catalan" &&
+                        "Els fans podran triar entre aquestes opcions de subscripció:"}
                     </p>
-                    <ul className="text-white/70 text-sm space-y-1 ml-4">
-                      <li>
-                        • {text.monthly}: €{monthlyPrice} {text.pricePerMonth}
-                      </li>
-                      <li>
-                        • {text.quarterly}: €{quarterlyPrice}{" "}
-                        {text.pricePerQuarter}
-                      </li>
-                      <li>
-                        • {text.annual}: €{annualPrice} {text.pricePerYear}
-                      </li>
-                    </ul>
+
+                    {/* Pricing cards */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      {/* Monthly */}
+                      <div className="bg-white/10 rounded-lg p-4 border border-white/20">
+                        <p className="text-white/60 text-xs uppercase tracking-wide mb-1">
+                          {text.monthly}
+                        </p>
+                        <p className="text-white text-2xl font-semibold">
+                          €{monthlyPrice || "—"}
+                        </p>
+                        <p className="text-white/50 text-xs mt-1">
+                          {text.pricePerMonth}
+                        </p>
+                      </div>
+
+                      {/* Quarterly */}
+                      <div className="bg-white/10 rounded-lg p-4 border border-white/20">
+                        <p className="text-white/60 text-xs uppercase tracking-wide mb-1">
+                          {text.quarterly}
+                        </p>
+                        <p className="text-white text-2xl font-semibold">
+                          €{quarterlyPrice || "—"}
+                        </p>
+                        <p className="text-white/50 text-xs mt-1">
+                          {text.pricePerQuarter}
+                        </p>
+                      </div>
+
+                      {/* Annual */}
+                      <div className="bg-white/10 rounded-lg p-4 border border-white/20">
+                        <p className="text-white/60 text-xs uppercase tracking-wide mb-1">
+                          {text.annual}
+                        </p>
+                        <p className="text-white text-2xl font-semibold">
+                          €{annualPrice || "—"}
+                        </p>
+                        <p className="text-white/50 text-xs mt-1">
+                          {text.pricePerYear}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Small helper */}
+                    <p className="text-white/40 text-xs mt-4">
+                      {language === "spanish" &&
+                        "Los precios se muestran tal como aparecerán para los fans."}
+                      {language === "english" &&
+                        "Prices are displayed exactly as fans will see them."}
+                      {language === "catalan" &&
+                        "Els preus es mostren exactament com els veuran els fans."}
+                    </p>
                   </div>
                 )}
               </div>
@@ -2972,7 +3580,9 @@ export function ArtistDashboard({
                     {text.totalRevenue}
                   </h3>
                 </div>
-                <p className="text-3xl text-white drop-shadow">€12,450</p>
+                <p className="text-3xl text-white drop-shadow">
+                  {statsLoading ? "—" : `€${subStats.totalRevenue}`}
+                </p>
               </div>
 
               <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
@@ -2983,7 +3593,7 @@ export function ArtistDashboard({
                   </h3>
                 </div>
                 <p className="text-3xl text-white drop-shadow">
-                  {mockSubscriptions.total}
+                  {statsLoading ? "—" : subStats.totalSubscribers}
                 </p>
               </div>
 
@@ -2995,7 +3605,7 @@ export function ArtistDashboard({
                   </h3>
                 </div>
                 <p className="text-3xl text-white drop-shadow">
-                  {mockSubscriptions.active}
+                  {statsLoading ? "—" : subStats.activeSubscribers}
                 </p>
               </div>
 
@@ -3005,16 +3615,39 @@ export function ArtistDashboard({
                   <h3 className="text-white/80 drop-shadow">Growth</h3>
                 </div>
                 <p className="text-3xl text-white drop-shadow">
-                  {mockSubscriptions.growth}
+                  {statsLoading ? "—" : subStats.growth}
                 </p>
               </div>
             </div>
 
+            {statsError && (
+              <div className="mt-4 p-3 bg-red-500/20 border border-red-400/40 rounded-lg">
+                <p className="text-red-200 text-sm">{statsError}</p>
+              </div>
+            )}
+
             {/* Exclusive Content Upload Section */}
             <div className="bg-white/10 backdrop-blur-md rounded-xl p-8 border border-white/20">
-              <h2 className="text-2xl text-white drop-shadow-lg mb-6">
-                {text.exclusiveContent}
-              </h2>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl text-white drop-shadow-lg">
+                  {text.exclusiveContent}
+                </h2>
+
+                <button
+                  type="button"
+                  onClick={fetchExclusiveContents}
+                  className="cursor-pointer px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white/80 hover:bg-white/20 transition-all disabled:cursor-not-allowed"
+                  disabled={isExclusiveLoading}
+                >
+                  {isExclusiveLoading
+                    ? "loading…"
+                    : language === "english"
+                    ? "Refresh"
+                    : language === "spanish"
+                    ? "Actualizar"
+                    : "Actualitzar"}
+                </button>
+              </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                 {/* Upload Form */}
@@ -3025,8 +3658,14 @@ export function ArtistDashboard({
                     </label>
                     <select
                       value={exclusiveContentType}
-                      onChange={(e) => setExclusiveContentType(e.target.value)}
-                      className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black focus:outline-none focus:border-white/40 transition-all"
+                      onChange={(e) => {
+                        setExclusiveContentType(e.target.value);
+                        // reset file when switching type
+                        setExclusiveContentFile(null);
+                        setExclusiveContentPreview("");
+                        setExclusiveContentUrl("");
+                      }}
+                      className="cursor-pointer w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black focus:outline-none focus:border-white/40 transition-all"
                     >
                       <option value="music">{text.music}</option>
                       <option value="video">{text.video}</option>
@@ -3063,69 +3702,169 @@ export function ArtistDashboard({
                     />
                   </div>
 
+                  {/* File Upload */}
                   <div>
                     <label className="block text-white drop-shadow mb-2">
                       {text.uploadFile}
                     </label>
-                    <div
-                      className="border-2 border-dashed border-white/30 rounded-lg p-8 text-center hover:border-white/50 transition-all cursor-pointer bg-white/5"
-                      onClick={() =>
-                        document
-                          .getElementById("exclusive-content-file")
-                          ?.click()
-                      }
-                    >
-                      <Upload
-                        size={32}
-                        className="text-white/60 mx-auto mb-2"
-                      />
-                      <p className="text-white/60 text-sm">
-                        {exclusiveContentFile
-                          ? exclusiveContentFile.name
-                          : text.uploadFile}
-                      </p>
-                      <input
-                        id="exclusive-content-file"
-                        type="file"
-                        onChange={(e) =>
-                          setExclusiveContentFile(e.target.files?.[0] || null)
+
+                    {exclusiveContentFile ? (
+                      <div className="bg-white/5 border border-white/20 rounded-xl p-4">
+                        {/* Preview per type */}
+                        {exclusiveContentType === "photo" &&
+                          exclusiveContentPreview && (
+                            <img
+                              src={exclusiveContentPreview}
+                              alt="Preview"
+                              className="w-full max-h-56 object-cover rounded-lg"
+                            />
+                          )}
+
+                        {exclusiveContentType === "video" &&
+                          exclusiveContentPreview && (
+                            <video
+                              src={exclusiveContentPreview}
+                              controls
+                              className="w-full max-h-56 rounded-lg"
+                            />
+                          )}
+
+                        {exclusiveContentType === "music" &&
+                          exclusiveContentPreview && (
+                            <audio
+                              src={exclusiveContentPreview}
+                              controls
+                              className="w-full"
+                            />
+                          )}
+
+                        {exclusiveContentType === "document" && (
+                          <div className="text-white/80 text-sm">
+                            <p className="font-medium">
+                              {exclusiveContentFile.name}
+                            </p>
+                            <p className="text-white/50 text-xs mt-1">
+                              TXT document
+                            </p>
+                          </div>
+                        )}
+                        {/* Alerts */}
+                        {exclusiveError && (
+                          <div className="mb-6 p-4 bg-red-500/20 border border-red-400/40 rounded-lg">
+                            <p className="text-red-200 text-sm">
+                              {exclusiveError}
+                            </p>
+                          </div>
+                        )}
+
+                        {exclusiveSuccess && (
+                          <div className="mb-6 p-4 bg-green-500/20 border border-green-400/40 rounded-lg">
+                            <p className="text-green-200 text-sm">
+                              {exclusiveSuccess}
+                            </p>
+                          </div>
+                        )}
+
+                        <div className="mt-4 flex gap-3">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setExclusiveContentFile(null);
+                              setExclusiveContentPreview("");
+                              setExclusiveContentUrl("");
+                            }}
+                            className="cursor-pointer flex-1 px-4 py-2 bg-red-500/30 border border-red-500/40 rounded-lg text-white hover:bg-red-500/40 transition-all"
+                          >
+                            {language === "english"
+                              ? "Remove"
+                              : language === "spanish"
+                              ? "Eliminar"
+                              : "Eliminar"}
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              document
+                                .getElementById("exclusive-content-file")
+                                ?.click()
+                            }
+                            className="cursor-pointer flex-1 px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white/80 hover:bg-white/20 transition-all"
+                          >
+                            {language === "english"
+                              ? "Change"
+                              : language === "spanish"
+                              ? "Cambiar"
+                              : "Canviar"}
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div
+                        className="border-2 border-dashed border-white/30 rounded-xl p-8 text-center hover:border-white/50 transition-all cursor-pointer bg-white/5"
+                        onClick={() =>
+                          document
+                            .getElementById("exclusive-content-file")
+                            ?.click()
                         }
-                        className="hidden"
-                      />
-                    </div>
+                      >
+                        <Upload
+                          size={32}
+                          className="text-white/60 mx-auto mb-2"
+                        />
+                        <p className="text-white/60 text-sm">
+                          {language === "english"
+                            ? "Click to upload"
+                            : language === "spanish"
+                            ? "Haz clic para subir"
+                            : "Fes clic per pujar"}
+                        </p>
+
+                        <input
+                          id="exclusive-content-file"
+                          type="file"
+                          accept={ACCEPT_BY_TYPE[exclusiveContentType] || "*/*"}
+                          onChange={handleExclusiveFile}
+                          className="hidden"
+                        />
+                      </div>
+                    )}
                   </div>
 
+                  {/* Submit */}
                   <button
-                    onClick={() => {
-                      if (exclusiveContentTitle && exclusiveContentFile) {
-                        const newContent = {
-                          id: Date.now().toString(),
-                          type: exclusiveContentType,
-                          title: exclusiveContentTitle,
-                          description: exclusiveContentDescription,
-                          uploadDate: new Date().toLocaleDateString(),
-                        };
-                        setUploadedExclusiveContent([
-                          ...uploadedExclusiveContent,
-                          newContent,
-                        ]);
-                        setExclusiveContentTitle("");
-                        setExclusiveContentDescription("");
-                        setExclusiveContentFile(null);
-                        alert(
-                          language === "es"
-                            ? "Contenido subido exitosamente"
-                            : language === "en"
-                            ? "Content uploaded successfully"
-                            : "Contingut pujat amb èxit"
-                        );
-                      }
-                    }}
-                    disabled={!exclusiveContentTitle || !exclusiveContentFile}
-                    className="w-full px-6 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-white hover:bg-white/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    type="button"
+                    onClick={handleSubmitExclusiveContent}
+                    disabled={
+                      isExclusiveSubmitting ||
+                      isUploadingExclusive ||
+                      !exclusiveContentTitle.trim() ||
+                      !exclusiveContentUrl
+                    }
+                    className="cursor-pointer w-full px-6 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-white hover:bg-white/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {text.uploadExclusiveContent}
+                    {isExclusiveSubmitting
+                      ? language === "english"
+                        ? "Publishing…"
+                        : language === "spanish"
+                        ? "Publicando…"
+                        : "Publicant…"
+                      : text.uploadExclusiveContent}
                   </button>
+
+                  <p className="text-white/50 text-xs">
+                    {exclusiveContentUrl
+                      ? language === "english"
+                        ? "File uploaded. Ready to publish."
+                        : language === "spanish"
+                        ? "Archivo subido. Listo para publicar."
+                        : "Fitxer pujat. Llest per publicar."
+                      : language === "english"
+                      ? "Upload a file before publishing."
+                      : language === "spanish"
+                      ? "Sube un archivo antes de publicar."
+                      : "Puja un fitxer abans de publicar."}
+                  </p>
                 </div>
 
                 {/* Uploaded Content List */}
@@ -3133,64 +3872,167 @@ export function ArtistDashboard({
                   <h3 className="text-lg text-white drop-shadow mb-4">
                     {text.uploadedContent}
                   </h3>
-                  {uploadedExclusiveContent.length === 0 ? (
+
+                  {isExclusiveLoading ? (
+                    <div className="bg-white/5 rounded-lg p-8 text-center border border-white/20">
+                      <p className="text-white/60 text-sm">Loading…</p>
+                    </div>
+                  ) : uploadedExclusiveContent.length === 0 ? (
                     <div className="bg-white/5 rounded-lg p-8 text-center border border-white/20">
                       <Music size={48} className="text-white/40 mx-auto mb-4" />
                       <p className="text-white/60">{text.noContent}</p>
                     </div>
                   ) : (
                     <div className="space-y-3">
-                      {uploadedExclusiveContent.map((content) => (
-                        <div
-                          key={content.id}
-                          className="bg-white/5 rounded-lg p-4 border border-white/20"
-                        >
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-2">
-                                {content.type === "music" && (
-                                  <Music size={16} className="text-white" />
-                                )}
-                                {content.type === "video" && (
-                                  <Video size={16} className="text-white" />
-                                )}
-                                {content.type === "photo" && (
-                                  <Image size={16} className="text-white" />
-                                )}
-                                {content.type === "document" && (
-                                  <FileText size={16} className="text-white" />
-                                )}
-                                <span className="text-white/80 text-sm uppercase">
-                                  {content.type}
-                                </span>
+                      {uploadedExclusiveContent.map((content) => {
+                        const created = content.createdAt
+                          ? new Date(content.createdAt).toLocaleDateString()
+                          : "";
+
+                        const typeLabel =
+                          content.type?.toUpperCase?.() ?? "CONTENT";
+
+                        const TypeIcon =
+                          content.type === "music"
+                            ? Music
+                            : content.type === "video"
+                            ? Video
+                            : content.type === "photo"
+                            ? Image
+                            : FileText;
+
+                        return (
+                          <div
+                            key={content.id}
+                            className="bg-white/5 rounded-xl border border-white/20 overflow-hidden hover:bg-white/10 transition-all"
+                          >
+                            {/* TOP */}
+                            <div className="p-4 flex flex-col sm:flex-row sm:items-start gap-4">
+                              {/* Thumbnail */}
+                              <div className="w-full sm:w-16 sm:h-16">
+                                <div className="w-full h-44 sm:w-16 sm:h-16 rounded-lg bg-white/10 border border-white/15 flex items-center justify-center overflow-hidden">
+                                  {content.type === "photo" &&
+                                  content.fileUrl ? (
+                                    <img
+                                      src={content.fileUrl}
+                                      alt={content.title}
+                                      className="w-full h-full object-cover"
+                                    />
+                                  ) : content.type === "video" &&
+                                    content.fileUrl ? (
+                                    <video
+                                      src={content.fileUrl}
+                                      className="w-full h-full object-cover"
+                                      muted
+                                      playsInline
+                                      preload="metadata"
+                                    />
+                                  ) : (
+                                    <TypeIcon
+                                      size={26}
+                                      className="text-white/70"
+                                    />
+                                  )}
+                                </div>
                               </div>
-                              <h4 className="text-white drop-shadow mb-1">
-                                {content.title}
-                              </h4>
-                              {content.description && (
-                                <p className="text-white/60 text-sm mb-2">
-                                  {content.description}
-                                </p>
-                              )}
-                              <p className="text-white/50 text-xs">
-                                {content.uploadDate}
-                              </p>
+
+                              {/* Content */}
+                              <div className="flex-1 min-w-0">
+                                {/* Header row */}
+                                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                                  {/* Title + meta */}
+                                  <div className="min-w-0">
+                                    <h4 className="text-white drop-shadow font-medium break-words sm:truncate">
+                                      {content.title}
+                                    </h4>
+
+                                    <div className="mt-2 flex items-center gap-2 flex-wrap">
+                                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] bg-white/10 border border-white/20 text-white/80">
+                                        <TypeIcon
+                                          size={12}
+                                          className="text-white/70"
+                                        />
+                                        {typeLabel}
+                                      </span>
+
+                                      {created && (
+                                        <span className="text-white/50 text-xs">
+                                          {language === "english"
+                                            ? `Uploaded: ${created}`
+                                            : language === "spanish"
+                                            ? `Subido: ${created}`
+                                            : `Pujat: ${created}`}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+
+                                  {/* Actions */}
+                                  <div className="flex items-center gap-2 sm:justify-end">
+                                    {content.fileUrl && (
+                                      <a
+                                        href={content.fileUrl}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="flex-1 sm:flex-none text-center px-3 py-2 rounded-lg bg-white/10 border border-white/20 text-white/80 hover:bg-white/20 hover:text-white transition-all text-xs"
+                                      >
+                                        {language === "english"
+                                          ? "Open"
+                                          : language === "spanish"
+                                          ? "Abrir"
+                                          : "Obrir"}
+                                      </a>
+                                    )}
+
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        handleDeleteExclusiveContent(content.id)
+                                      }
+                                      className="cursor-pointer p-2 rounded-lg bg-red-500/20 border border-red-400/30 text-white/80 hover:bg-red-500/30 hover:text-white transition-all"
+                                      title={
+                                        language === "english"
+                                          ? "Delete"
+                                          : language === "spanish"
+                                          ? "Eliminar"
+                                          : "Eliminar"
+                                      }
+                                    >
+                                      <X size={18} />
+                                    </button>
+                                  </div>
+                                </div>
+
+                                {/* Description */}
+                                {content.description && (
+                                  <p className="text-white/60 text-sm mt-3 line-clamp-3 sm:line-clamp-2">
+                                    {content.description}
+                                  </p>
+                                )}
+                              </div>
                             </div>
-                            <button
-                              onClick={() => {
-                                setUploadedExclusiveContent(
-                                  uploadedExclusiveContent.filter(
-                                    (c) => c.id !== content.id
-                                  )
-                                );
-                              }}
-                              className="text-white/60 hover:text-white transition-colors"
-                            >
-                              <X size={20} />
-                            </button>
+
+                            {/* BOTTOM BAR */}
+                            <div className="px-4 py-3 border-t border-white/10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs text-white/50">
+                              <span className="break-all sm:truncate">
+                                {content.fileUrl
+                                  ? content.fileUrl.replace(/^https?:\/\//, "")
+                                  : ""}
+                              </span>
+
+                              <span className="sm:ml-4 flex-shrink-0">
+                                {content.type === "music"
+                                  ? "Audio"
+                                  : content.type === "video"
+                                  ? "Video"
+                                  : content.type === "photo"
+                                  ? "Image"
+                                  : "Document"}
+                              </span>
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
                 </div>
@@ -3200,63 +4042,171 @@ export function ArtistDashboard({
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Recent Subscribers */}
               <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
-                <h3 className="text-xl text-white drop-shadow mb-4">
-                  {text.recentSubscribers}
-                </h3>
-                <div className="space-y-3">
-                  {[
-                    "Alex M.",
-                    "Sarah K.",
-                    "Mike R.",
-                    "Emma L.",
-                    "James P.",
-                  ].map((name, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between p-4 bg-white/5 rounded-lg"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                          <Users size={20} className="text-white" />
-                        </div>
-                        <span className="text-white drop-shadow">{name}</span>
-                      </div>
-                      <span className="text-white/60 text-sm">
-                        {index + 1} days ago
-                      </span>
-                    </div>
-                  ))}
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl text-white drop-shadow">
+                    {text.recentSubscribers}
+                  </h3>
+
+                  <button
+                    type="button"
+                    onClick={() => fetchRecentSubscribers(5)}
+                    className="cursor-pointer px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white/80 hover:bg-white/20 transition-all text-xs disabled:cursor-not-allowed"
+                    disabled={recentLoading}
+                  >
+                    {recentLoading
+                      ? "loading…"
+                      : language === "english"
+                      ? "Refresh"
+                      : language === "spanish"
+                      ? "Actualizar"
+                      : "Actualitzar"}
+                  </button>
                 </div>
+
+                {recentError && (
+                  <div className="mb-4 p-3 bg-red-500/20 border border-red-400/40 rounded-lg">
+                    <p className="text-red-200 text-sm">{recentError}</p>
+                  </div>
+                )}
+
+                {recentLoading ? (
+                  <div className="bg-white/5 rounded-lg p-6 text-center border border-white/20">
+                    <p className="text-white/60 text-sm">Loading…</p>
+                  </div>
+                ) : recentSubscribers.length === 0 ? (
+                  <div className="bg-white/5 rounded-lg p-6 text-center border border-white/20">
+                    <p className="text-white/60 text-sm">
+                      {text.noSubscriptions}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {recentSubscribers.map((s, index) => {
+                      const displayName =
+                        s.username?.trim?.() ||
+                        `${s.name ?? ""} ${s.surname ?? ""}`.trim() ||
+                        `Subscriber ${index + 1}`;
+
+                      return (
+                        <div
+                          key={s.subscriptionId ?? s.fanId ?? index}
+                          className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-4 bg-white/5 rounded-lg border border-white/10"
+                        >
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className="w-10 h-10 bg-white/20 rounded-full overflow-hidden flex items-center justify-center flex-shrink-0">
+                              {s.profileImageUrl ? (
+                                <img
+                                  src={s.profileImageUrl}
+                                  alt={displayName}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <Users size={20} className="text-white" />
+                              )}
+                            </div>
+
+                            <div className="min-w-0">
+                              <p className="text-white drop-shadow truncate">
+                                {displayName}
+                              </p>
+                              {s.country && (
+                                <p className="text-white/50 text-xs truncate">
+                                  {s.country}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+
+                          <span className="text-white/60 text-sm flex-shrink-0">
+                            {daysAgoLabel(s.subscribedAt)}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
 
               {/* Subscriptions by Location */}
               <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
-                <h3 className="text-xl text-white drop-shadow mb-4">
-                  {text.byLocation}
-                </h3>
-                <div className="space-y-4">
-                  {mockSubscriptionsByLocation.map((location, index) => (
-                    <div key={index}>
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-white drop-shadow">
-                          {location.location}
-                        </span>
-                        <span className="text-white/80">
-                          {location.subscribers}
-                        </span>
-                      </div>
-                      <div className="w-full bg-white/10 rounded-full h-2">
-                        <div
-                          className="bg-white/50 h-2 rounded-full transition-all"
-                          style={{ width: location.percentage }}
-                        ></div>
-                      </div>
-                      <span className="text-white/60 text-sm">
-                        {location.percentage}
-                      </span>
-                    </div>
-                  ))}
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl text-white drop-shadow">
+                    {text.byLocation}
+                  </h3>
+
+                  <button
+                    type="button"
+                    onClick={fetchSubscriptionsByLocation}
+                    className="cursor-pointer px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white/80 hover:bg-white/20 transition-all text-xs disabled:cursor-not-allowed"
+                    disabled={subsLocLoading}
+                  >
+                    {subsLocLoading
+                      ? "loading…"
+                      : language === "english"
+                      ? "Refresh"
+                      : language === "spanish"
+                      ? "Actualizar"
+                      : "Actualitzar"}
+                  </button>
                 </div>
+
+                {subsLocError && (
+                  <div className="mb-4 p-3 bg-red-500/20 border border-red-400/40 rounded-lg">
+                    <p className="text-red-200 text-sm">{subsLocError}</p>
+                  </div>
+                )}
+
+                {subsLocLoading ? (
+                  <div className="bg-white/5 rounded-lg p-6 text-center border border-white/20">
+                    <p className="text-white/60 text-sm">Loading…</p>
+                  </div>
+                ) : subsByLocation.length === 0 ? (
+                  <div className="bg-white/5 rounded-lg p-6 text-center border border-white/20">
+                    <p className="text-white/60 text-sm">
+                      {language === "english"
+                        ? "No subscriptions by location yet"
+                        : language === "spanish"
+                        ? "Aún no hay suscripciones por ubicación"
+                        : "Encara no hi ha subscripcions per ubicació"}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {subsByLocation.map((loc, index) => (
+                      <div
+                        key={`${loc.location}-${index}`}
+                        className="space-y-2"
+                      >
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="text-white drop-shadow truncate">
+                            {loc.location || "Unknown"}
+                          </span>
+                          <span className="text-white/80 flex-shrink-0">
+                            {loc.subscribers}
+                          </span>
+                        </div>
+
+                        <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden">
+                          <div
+                            className="bg-white/50 h-2 rounded-full transition-all"
+                            style={{ width: loc.percentage }}
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between text-white/60 text-sm">
+                          <span>{loc.percentage}</span>
+                          <span className="text-xs text-white/40">
+                            {language === "english"
+                              ? "Active subscribers"
+                              : language === "spanish"
+                              ? "Suscriptores activos"
+                              : "Subscriptors actius"}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -3265,6 +4215,13 @@ export function ArtistDashboard({
         {/* Royalties Tab */}
         {activeTab === "royalties" && (
           <div className="space-y-6">
+            {/* Error */}
+            {royaltiesError && (
+              <div className="p-4 bg-red-500/20 border border-red-400/40 rounded-lg">
+                <p className="text-red-200 text-sm">{royaltiesError}</p>
+              </div>
+            )}
+
             {/* Royalties Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
@@ -3275,7 +4232,9 @@ export function ArtistDashboard({
                   </h3>
                 </div>
                 <p className="text-3xl text-white drop-shadow">
-                  {mockRoyalties.total}
+                  {royaltiesLoading
+                    ? "—"
+                    : `€${royaltiesSummary.totalRoyalties}`}
                 </p>
               </div>
 
@@ -3287,7 +4246,7 @@ export function ArtistDashboard({
                   </h3>
                 </div>
                 <p className="text-3xl text-white drop-shadow">
-                  {mockRoyalties.thisMonth}
+                  {royaltiesLoading ? "—" : `€${royaltiesSummary.thisMonth}`}
                 </p>
               </div>
 
@@ -3297,41 +4256,76 @@ export function ArtistDashboard({
                   <h3 className="text-white/80 drop-shadow">Pending</h3>
                 </div>
                 <p className="text-3xl text-white drop-shadow">
-                  {mockRoyalties.pending}
+                  {royaltiesLoading ? "—" : `€${royaltiesSummary.pending}`}
                 </p>
               </div>
             </div>
 
-            {/* Information message pointing to payout settings */}
-
             {/* Revenue By Track */}
             <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
-              <h3 className="text-xl text-white drop-shadow mb-4">
-                {text.revenue} by Track
-              </h3>
-              <div className="space-y-3">
-                {mockTracks.map((track, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between p-4 bg-white/5 rounded-lg"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
-                        <Music size={20} className="text-white" />
-                      </div>
-                      <div>
-                        <p className="text-white drop-shadow">{track.name}</p>
-                        <p className="text-white/60 text-sm">
-                          {track.streams} streams
-                        </p>
-                      </div>
-                    </div>
-                    <span className="text-xl text-white drop-shadow">
-                      {track.revenue}
-                    </span>
-                  </div>
-                ))}
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl text-white drop-shadow">
+                  {text.revenue} by Track
+                </h3>
+                <button
+                  type="button"
+                  onClick={fetchRoyalties}
+                  className="cursor-pointer px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white/80 hover:bg-white/20 transition-all text-xs disabled:cursor-not-allowed"
+                  disabled={royaltiesLoading}
+                >
+                  {royaltiesLoading
+                    ? "loading…"
+                    : language === "english"
+                    ? "Refresh"
+                    : language === "spanish"
+                    ? "Actualizar"
+                    : "Actualitzar"}
+                </button>
               </div>
+
+              {royaltiesLoading ? (
+                <div className="bg-white/5 rounded-lg p-6 text-center border border-white/20">
+                  <p className="text-white/60 text-sm">Loading…</p>
+                </div>
+              ) : royaltiesTracks.length === 0 ? (
+                <div className="bg-white/5 rounded-lg p-6 text-center border border-white/20">
+                  <p className="text-white/60 text-sm">
+                    {language === "english"
+                      ? "No revenue data yet"
+                      : language === "spanish"
+                      ? "Aún no hay datos de ingresos"
+                      : "Encara no hi ha dades d'ingressos"}
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {royaltiesTracks.map((track) => (
+                    <div
+                      key={track.trackId}
+                      className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 bg-white/5 rounded-lg border border-white/10"
+                    >
+                      <div className="flex items-center gap-4 min-w-0">
+                        <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <Music size={20} className="text-white" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-white drop-shadow truncate">
+                            {track.name}
+                          </p>
+                          <p className="text-white/60 text-sm">
+                            {track.streams}{" "}
+                            {language === "english" ? "streams" : "streams"}
+                          </p>
+                        </div>
+                      </div>
+
+                      <span className="text-xl text-white drop-shadow flex-shrink-0">
+                        €{track.revenue}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -3345,36 +4339,59 @@ export function ArtistDashboard({
                 {text.payout}
               </h2>
               <p className="text-white/80 text-sm">
-                {language === "es" &&
+                {language === "spanish" &&
                   "Configura aquí los métodos de pago donde recibirás tus ingresos de suscripciones y royalties."}
-                {language === "en" &&
+                {language === "english" &&
                   "Configure here the payment methods where you will receive your subscription and royalties earnings."}
-                {language === "ca" &&
+                {language === "catalan" &&
                   "Configura aquí els mètodes de pagament on rebràs els teus ingressos de subscripcions i royalties."}
               </p>
             </div>
 
             {/* Payment Receiving Settings */}
             <div className="bg-white/10 backdrop-blur-md rounded-xl p-8 border border-white/20">
-              <h2 className="text-2xl text-white drop-shadow-lg mb-6">
-                {text.paymentMethodsTitle}
-              </h2>
+              <div className="flex items-center justify-between mb-6 gap-3">
+                <h2 className="text-2xl text-white drop-shadow-lg">
+                  {text.paymentMethodsTitle}
+                </h2>
 
-              {paymentSaved && (
-                <div className="mb-6 p-4 bg-green-500/20 backdrop-blur-sm border border-green-400/40 rounded-lg">
-                  <p className="text-green-200 drop-shadow">
-                    {text.paymentDetailsSaved}
+                <button
+                  type="button"
+                  onClick={fetchMyPayoutSettings}
+                  disabled={payoutLoading || payoutSaving}
+                  className="cursor-pointer px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white/80 hover:bg-white/20 transition-all text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {payoutLoading
+                    ? "loading…"
+                    : language === "english"
+                    ? "Refresh"
+                    : language === "spanish"
+                    ? "Actualizar"
+                    : "Actualitzar"}
+                </button>
+              </div>
+
+              {payoutLoading && (
+                <div className="mb-6 p-4 bg-white/5 border border-white/20 rounded-lg">
+                  <p className="text-white/60 text-sm">
+                    {language === "english"
+                      ? "Loading payout settings…"
+                      : language === "spanish"
+                      ? "Cargando configuración de pagos…"
+                      : "Carregant configuració de pagaments…"}
                   </p>
                 </div>
               )}
 
-              <div className="space-y-6">
+              {/* ✅ FORM */}
+              <form onSubmit={handleSavePayoutSettings} className="space-y-6">
                 {/* Bank Account Section */}
                 <div className="bg-white/5 backdrop-blur-sm rounded-lg p-6 border border-white/10">
                   <h3 className="text-xl text-white drop-shadow mb-4 flex items-center gap-2">
                     <DollarSign size={20} />
                     {text.bankAccount}
                   </h3>
+
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-white/80 drop-shadow mb-2 text-sm">
@@ -3385,9 +4402,11 @@ export function ArtistDashboard({
                         value={bankAccountHolder}
                         onChange={(e) => setBankAccountHolder(e.target.value)}
                         placeholder="John Doe"
-                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
+                        disabled={payoutLoading || payoutSaving}
+                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all disabled:opacity-60"
                       />
                     </div>
+
                     <div>
                       <label className="block text-white/80 drop-shadow mb-2 text-sm">
                         {text.bankNameLabel}
@@ -3397,9 +4416,11 @@ export function ArtistDashboard({
                         value={bankName}
                         onChange={(e) => setBankName(e.target.value)}
                         placeholder="Bank of America"
-                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
+                        disabled={payoutLoading || payoutSaving}
+                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all disabled:opacity-60"
                       />
                     </div>
+
                     <div>
                       <label className="block text-white/80 drop-shadow mb-2 text-sm">
                         {text.accountNumberLabel}
@@ -3409,9 +4430,11 @@ export function ArtistDashboard({
                         value={accountNumber}
                         onChange={(e) => setAccountNumber(e.target.value)}
                         placeholder="123456789"
-                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
+                        disabled={payoutLoading || payoutSaving}
+                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all disabled:opacity-60"
                       />
                     </div>
+
                     <div>
                       <label className="block text-white/80 drop-shadow mb-2 text-sm">
                         {text.routingNumberLabel}
@@ -3421,9 +4444,11 @@ export function ArtistDashboard({
                         value={routingNumber}
                         onChange={(e) => setRoutingNumber(e.target.value)}
                         placeholder="021000021"
-                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
+                        disabled={payoutLoading || payoutSaving}
+                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all disabled:opacity-60"
                       />
                     </div>
+
                     <div>
                       <label className="block text-white/80 drop-shadow mb-2 text-sm">
                         {text.swiftCodeLabel}
@@ -3433,9 +4458,11 @@ export function ArtistDashboard({
                         value={swiftCode}
                         onChange={(e) => setSwiftCode(e.target.value)}
                         placeholder="BOFAUS3N"
-                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
+                        disabled={payoutLoading || payoutSaving}
+                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all disabled:opacity-60"
                       />
                     </div>
+
                     <div>
                       <label className="block text-white/80 drop-shadow mb-2 text-sm">
                         {text.ibanLabel}
@@ -3445,7 +4472,8 @@ export function ArtistDashboard({
                         value={iban}
                         onChange={(e) => setIban(e.target.value)}
                         placeholder="GB29 NWBK 6016 1331 9268 19"
-                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
+                        disabled={payoutLoading || payoutSaving}
+                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all disabled:opacity-60"
                       />
                     </div>
                   </div>
@@ -3461,8 +4489,8 @@ export function ArtistDashboard({
                       ? "Digital Payment Methods"
                       : "Mètodes de Pagament Digital"}
                   </h3>
+
                   <div className="grid md:grid-cols-2 gap-4">
-                    {/* PayPal */}
                     <div>
                       <label className="block text-white/80 drop-shadow mb-2 text-sm">
                         {text.paypalEmailLabel}
@@ -3472,11 +4500,11 @@ export function ArtistDashboard({
                         value={paypalEmail}
                         onChange={(e) => setPaypalEmail(e.target.value)}
                         placeholder="artist@example.com"
-                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
+                        disabled={payoutLoading || payoutSaving}
+                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all disabled:opacity-60"
                       />
                     </div>
 
-                    {/* Bizum */}
                     <div>
                       <label className="block text-white/80 drop-shadow mb-2 text-sm">
                         {text.bizumPhoneLabel}
@@ -3486,11 +4514,11 @@ export function ArtistDashboard({
                         value={bizumPhone}
                         onChange={(e) => setBizumPhone(e.target.value)}
                         placeholder="+34 600 000 000"
-                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
+                        disabled={payoutLoading || payoutSaving}
+                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all disabled:opacity-60"
                       />
                     </div>
 
-                    {/* Mobile Money Provider */}
                     <div>
                       <label className="block text-white/80 drop-shadow mb-2 text-sm">
                         {text.mobileMoneyProviderLabel}
@@ -3498,7 +4526,8 @@ export function ArtistDashboard({
                       <select
                         value={mobileMoneyProvider}
                         onChange={(e) => setMobileMoneyProvider(e.target.value)}
-                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black focus:outline-none focus:border-white/40 transition-all"
+                        disabled={payoutLoading || payoutSaving}
+                        className="cursor-pointer w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black focus:outline-none focus:border-white/40 transition-all disabled:opacity-60"
                       >
                         <option value="" className="bg-white">
                           {text.selectProvider}
@@ -3521,7 +4550,6 @@ export function ArtistDashboard({
                       </select>
                     </div>
 
-                    {/* Mobile Money Phone */}
                     <div>
                       <label className="block text-white/80 drop-shadow mb-2 text-sm">
                         {text.mobileMoneyPhoneLabel}
@@ -3531,11 +4559,11 @@ export function ArtistDashboard({
                         value={mobileMoneyPhone}
                         onChange={(e) => setMobileMoneyPhone(e.target.value)}
                         placeholder="+233 000 000 000"
-                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
+                        disabled={payoutLoading || payoutSaving}
+                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all disabled:opacity-60"
                       />
                     </div>
 
-                    {/* Orange Money */}
                     <div className="md:col-span-2">
                       <label className="block text-white/80 drop-shadow mb-2 text-sm">
                         {text.orangeMoneyPhoneLabel}
@@ -3545,24 +4573,45 @@ export function ArtistDashboard({
                         value={orangeMoneyPhone}
                         onChange={(e) => setOrangeMoneyPhone(e.target.value)}
                         placeholder="+225 00 00 00 00"
-                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
+                        disabled={payoutLoading || payoutSaving}
+                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all disabled:opacity-60"
                       />
                     </div>
                   </div>
                 </div>
+                {/* Alerts */}
+                {payoutError && (
+                  <div className="mb-6 p-4 bg-red-500/20 backdrop-blur-sm border border-red-400/40 rounded-lg">
+                    <p className="text-red-200 drop-shadow text-sm">
+                      {payoutError}
+                    </p>
+                  </div>
+                )}
+
+                {paymentSaved && (
+                  <div className="mb-6 p-4 bg-green-500/20 backdrop-blur-sm border border-green-400/40 rounded-lg">
+                    <p className="text-green-200 drop-shadow">
+                      {text.paymentDetailsSaved}
+                    </p>
+                  </div>
+                )}
 
                 {/* Save Button */}
                 <button
-                  onClick={() => {
-                    setPaymentSaved(true);
-                    setTimeout(() => setPaymentSaved(false), 3000);
-                  }}
-                  className="cursor-pointer w-full px-6 py-4 bg-gradient-to-r from-green-500/40 to-emerald-500/40 backdrop-blur-md border-2 border-white/40 rounded-xl text-white hover:from-green-500/50 hover:to-emerald-500/50 hover:border-white/60 transition-all shadow-lg flex items-center justify-center gap-2"
+                  type="submit"
+                  disabled={payoutSaving || payoutLoading}
+                  className="cursor-pointer w-full px-6 py-4 bg-gradient-to-r from-green-500/40 to-emerald-500/40 backdrop-blur-md border-2 border-white/40 rounded-xl text-white hover:from-green-500/50 hover:to-emerald-500/50 hover:border-white/60 transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <DollarSign size={20} />
-                  {text.savePaymentDetails}
+                  {payoutSaving
+                    ? language === "english"
+                      ? "Saving…"
+                      : language === "spanish"
+                      ? "Guardando…"
+                      : "Desant…"
+                    : text.savePaymentDetails}
                 </button>
-              </div>
+              </form>
             </div>
           </div>
         )}
