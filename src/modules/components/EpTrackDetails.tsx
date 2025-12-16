@@ -9,6 +9,7 @@ import CustomSuccess from "@/@disktro/CustomSuccess";
 import { ArtistModuleObject as ModuleObject } from "../artist/module";
 import { EpModuleObject } from "../ep/module"; // 👈 import pour récupérer les tracks existants
 import { getEpTexts } from "./i18n/epTranslation";
+import { TrackStreamModuleObject } from "../trackSTreams/module";
 
 // Icônes locales
 const Music = ({ size = 24, className = "" }) => (
@@ -44,6 +45,23 @@ const Upload = ({ size = 24, className = "" }) => (
     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
     <polyline points="17 8 12 3 7 8" />
     <line x1="12" y1="3" x2="12" y2="15" />
+  </svg>
+);
+
+const Pause = ({ size = 24, className = "" }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <rect x="6" y="4" width="4" height="16" rx="1" />
+    <rect x="14" y="4" width="4" height="16" rx="1" />
   </svg>
 );
 
@@ -165,6 +183,13 @@ export default function EpTracksEditor({
   const [currentPage, setCurrentPage] = React.useState(1);
   const pageSize = 5;
   const text = getEpTexts(language);
+  const [playingTrackId, setPlayingTrackId] = React.useState<string | null>(
+    null
+  );
+
+  const [epTrackMap, setEpTrackMap] = React.useState<Record<string, string>>(
+    {}
+  );
 
   // ========== Fetch moods ==========
   React.useEffect(() => {
@@ -235,6 +260,20 @@ export default function EpTracksEditor({
       return () => clearTimeout(t);
     }
   }, [errorMessage]);
+
+  const handleLogStreams = async (trackId: string) => {
+    const userId = localStorage.getItem(ModuleObject.localState.USER_ID);
+    const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
+
+    // Log stream
+    if (token && trackId && userId) {
+      await TrackStreamModuleObject.service.createTrackStream(
+        userId,
+        trackId,
+        token
+      );
+    }
+  };
 
   // ========== Upload audio ==========
   const handleTrackAudioChange =
@@ -400,10 +439,6 @@ export default function EpTracksEditor({
         setIsLoading(false);
       }
     };
-
-  const handleAddTrackForm = () => {
-    setTracks((prev) => [...prev, makeEmptyTrack()]);
-  };
 
   const handleRemoveTrackForm = (trackId: string) => {
     setTracks((prev) => prev.filter((t) => t.id !== trackId));
@@ -677,28 +712,48 @@ export default function EpTracksEditor({
                 {text.brailleFile}
               </label>
               {track.brailleFile ? (
-                <div className="relative rounded-lg p-6 bg-white/10 border-2 border-white/20 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <FileText size={32} className="text-white/80" />
-                    <span className="text-white text-sm">
-                      {track.brailleFile.name}
-                    </span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setTracks((prev) =>
-                        prev.map((t) =>
-                          t.id === track.id
-                            ? { ...t, brailleFile: null, brailleFileUrl: "" }
-                            : t
+                <div className="relative rounded-lg p-4 sm:p-6 bg-white/10 border-2 border-white/20">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <FileText
+                        size={32}
+                        className="text-white/80 flex-shrink-0"
+                      />
+
+                      <div className="min-w-0">
+                        <span className="text-white text-sm block truncate">
+                          {track.brailleFile.name}
+                        </span>
+                        {/* Optionnel : afficher la taille */}
+                        <span className="text-white/50 text-xs block">
+                          {(track.brailleFile.size / 1024).toFixed(1)} KB
+                        </span>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setTracks((prev) =>
+                          prev.map((t) =>
+                            t.id === track.id
+                              ? { ...t, brailleFile: null, brailleFileUrl: "" }
+                              : t
+                          )
                         )
-                      )
-                    }
-                    className="cursor-pointer bg-red-500/80 backdrop-blur-sm text-white p-2 rounded-lg hover:bg-red-600/80 transition-all"
-                  >
-                    <X size={14} />
-                  </button>
+                      }
+                      className="cursor-pointer flex-shrink-0 bg-red-500/80 backdrop-blur-sm text-white px-3 py-2 rounded-lg hover:bg-red-600/80 transition-all inline-flex items-center justify-center gap-2"
+                    >
+                      <X size={14} />
+                      <span className="text-xs sm:hidden">
+                        {language === "english"
+                          ? "Remove"
+                          : language === "spanish"
+                          ? "Quitar"
+                          : "Eliminar"}
+                      </span>
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <div className="border-2 border-dashed border-white/30 rounded-lg p-6 text-center bg-white/5 hover:bg-white/10 transition-all cursor-pointer">
@@ -819,20 +874,51 @@ export default function EpTracksEditor({
                           src={t.audioUrl}
                           className="hidden"
                           onContextMenu={(e) => e.preventDefault()}
+                          onEnded={() => {
+                            // quand le son finit → repasser en Play
+                            setPlayingTrackId(null);
+                          }}
                         />
+
                         <button
                           type="button"
                           onClick={() => {
                             const audioEl = document.getElementById(
                               `saved-track-audio-${t.id}`
                             ) as HTMLAudioElement | null;
+
                             if (!audioEl) return;
-                            if (audioEl.paused) audioEl.play();
-                            else audioEl.pause();
+
+                            // Si ce track est déjà en lecture → pause
+                            if (playingTrackId === t.id) {
+                              audioEl.pause();
+                              setPlayingTrackId(null);
+                              return;
+                            }
+
+                            // Sinon → stopper le précédent
+                            if (playingTrackId) {
+                              const prevAudio = document.getElementById(
+                                `saved-track-audio-${playingTrackId}`
+                              ) as HTMLAudioElement | null;
+
+                              if (prevAudio) {
+                                prevAudio.pause();
+                                prevAudio.currentTime = 0;
+                              }
+                            }
+
+                            // Lancer celui-ci
+                            audioEl.play();
+                            setPlayingTrackId(t.id);
                           }}
                           className="cursor-pointer text-white/70 hover:text-white transition"
                         >
-                          <Play />
+                          {playingTrackId === t.id ? (
+                            <Pause size={18} />
+                          ) : (
+                            <Play size={18} />
+                          )}
                         </button>
                       </>
                     )}
