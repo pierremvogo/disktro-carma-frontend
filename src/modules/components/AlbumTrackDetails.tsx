@@ -67,6 +67,23 @@ const FileText = ({ size = 24, className = "" }) => (
   </svg>
 );
 
+const Pause = ({ size = 24, className = "" }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <rect x="6" y="4" width="4" height="16" rx="1" />
+    <rect x="14" y="4" width="4" height="16" rx="1" />
+  </svg>
+);
+
 const X = ({ size = 16, className = "" }) => (
   <svg
     width={size}
@@ -164,6 +181,10 @@ export default function AlbumTracksEditor({
   // Tracks déjà enregistrés
   const [savedTracks, setSavedTracks] = React.useState<SavedTrack[]>([]);
   const [currentPage, setCurrentPage] = React.useState(1);
+  const [currentPlayingTrackId, setCurrentPlayingTrackId] = React.useState<
+    string | null
+  >(null);
+
   const pageSize = 5;
 
   let allUploadsDone =
@@ -681,29 +702,43 @@ export default function AlbumTracksEditor({
               <label className="block text-white/90 drop-shadow mb-2 text-sm">
                 {text.brailleFile}
               </label>
+
               {track.brailleFile ? (
-                <div className="relative rounded-lg p-6 bg-white/10 border-2 border-white/20 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <FileText size={32} className="text-white/80" />
-                    <span className="text-white text-sm">
-                      {track.brailleFile.name}
-                    </span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setTracks((prev) =>
-                        prev.map((t) =>
-                          t.id === track.id
-                            ? { ...t, brailleFile: null, brailleFileUrl: "" }
-                            : t
+                <div className="relative rounded-lg p-4 sm:p-6 bg-white/10 border-2 border-white/20">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <FileText
+                        size={32}
+                        className="text-white/80 flex-shrink-0"
+                      />
+
+                      <div className="min-w-0">
+                        <span className="text-white text-sm block truncate">
+                          {track.brailleFile.name}
+                        </span>
+                        <span className="text-white/50 text-xs block">
+                          {(track.brailleFile.size / 1024).toFixed(1)} KB
+                        </span>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setTracks((prev) =>
+                          prev.map((t) =>
+                            t.id === track.id
+                              ? { ...t, brailleFile: null, brailleFileUrl: "" }
+                              : t
+                          )
                         )
-                      )
-                    }
-                    className="cursor-pointer bg-red-500/80 backdrop-blur-sm text-white p-2 rounded-lg hover:bg-red-600/80 transition-all"
-                  >
-                    <X size={14} />
-                  </button>
+                      }
+                      className="cursor-pointer flex-shrink-0 bg-red-500/80 backdrop-blur-sm text-white px-3 py-2 rounded-lg hover:bg-red-600/80 transition-all inline-flex items-center justify-center gap-2"
+                    >
+                      <X size={14} />
+                      <span className="text-xs sm:hidden">{text.remove}</span>
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <div className="border-2 border-dashed border-white/30 rounded-lg p-6 text-center bg-white/5 hover:bg-white/10 transition-all cursor-pointer">
@@ -822,20 +857,48 @@ export default function AlbumTracksEditor({
                           src={t.audioUrl}
                           className="hidden"
                           onContextMenu={(e) => e.preventDefault()}
+                          onEnded={() => setCurrentPlayingTrackId(null)} // reset quand fini
                         />
+
                         <button
                           type="button"
                           onClick={() => {
                             const audioEl = document.getElementById(
                               `saved-track-audio-${t.id}`
                             ) as HTMLAudioElement | null;
+
                             if (!audioEl) return;
-                            if (audioEl.paused) audioEl.play();
-                            else audioEl.pause();
+
+                            // 🔁 si un autre track joue, on l’arrête
+                            if (
+                              currentPlayingTrackId &&
+                              currentPlayingTrackId !== t.id
+                            ) {
+                              const prevAudio = document.getElementById(
+                                `saved-track-audio-${currentPlayingTrackId}`
+                              ) as HTMLAudioElement | null;
+
+                              if (prevAudio) {
+                                prevAudio.pause();
+                                prevAudio.currentTime = 0;
+                              }
+                            }
+
+                            if (audioEl.paused) {
+                              audioEl.play();
+                              setCurrentPlayingTrackId(t.id);
+                            } else {
+                              audioEl.pause();
+                              setCurrentPlayingTrackId(null);
+                            }
                           }}
                           className="cursor-pointer text-white/70 hover:text-white transition"
                         >
-                          <Play />
+                          {currentPlayingTrackId === t.id ? (
+                            <Pause size={18} />
+                          ) : (
+                            <Play size={18} />
+                          )}
                         </button>
                       </>
                     )}

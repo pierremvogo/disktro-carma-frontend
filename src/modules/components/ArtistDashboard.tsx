@@ -1933,10 +1933,8 @@ export function ArtistDashboard({
   const content = {
     spanish: {
       // ES
-
-      // Espagnol
       recentSingleUploads: "Subidas recientes",
-
+      remove: "Quitar",
       albumTracksTitle: "Pistas del álbum",
       saveTracks: "Guardar pista",
       savedTracksTitle: "Pistas ya guardadas",
@@ -2027,7 +2025,7 @@ export function ArtistDashboard({
       contentDescription: "Descripción",
       uploadFile: "Subir Archivo",
       uploadedContent: "Contenido Subido",
-      noContent: "Aún no has subido contenido exclusivo",
+      noContent: "Aún no has subido contenido",
       totalRoyalties: "Regalías Totales",
       thisMonth: "Este Mes",
       back: "Volver",
@@ -2114,6 +2112,7 @@ export function ArtistDashboard({
     english: {
       // EN
       // Anglais
+      remove: "Remove",
       recentSingleUploads: "Recent Uploads",
       noSubscriptions: "No susbscription",
       singleAudioUploadSuccess: "Audio file uploaded successfully.",
@@ -2237,7 +2236,7 @@ export function ArtistDashboard({
       contentDescription: "Description",
       uploadFile: "Upload File",
       uploadedContent: "Uploaded Content",
-      noContent: "You haven't uploaded exclusive content yet",
+      noContent: "You haven't uploaded content yet",
       totalRoyalties: "Total Royalties",
       thisMonth: "This Month",
       back: "Back",
@@ -2292,6 +2291,7 @@ export function ArtistDashboard({
       noAlbumUploadedYet: "No album uploaded yet.",
     },
     catalan: {
+      remove: "Eliminar",
       noSubscriptions: "No hi ha subscripcions",
       // CA
       noAlbumUploadedYet: "Cap àlbum pujat de moment.",
@@ -2416,7 +2416,7 @@ export function ArtistDashboard({
       contentDescription: "Descripció",
       uploadFile: "Pujar Arxiu",
       uploadedContent: "Contingut Pujat",
-      noContent: "Encara no has pujat contingut exclusiu",
+      noContent: "Encara no has pujat contingut",
       totalRoyalties: "Regalies Totals",
       thisMonth: "Aquest Mes",
       back: "Tornar",
@@ -3236,20 +3236,21 @@ export function ArtistDashboard({
 
             {/* Streams per Track with Locations */}
             <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <h3 className="text-2xl text-white drop-shadow">
+              {/* Header + Filter */}
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <h3 className="text-xl sm:text-2xl text-white drop-shadow">
                   {text.streamsPerTrack}
                 </h3>
 
                 {/* Filter Dropdown */}
-                <div className="flex items-center gap-3">
-                  <label className="text-white/90 drop-shadow">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                  <label className="text-white/90 drop-shadow text-sm sm:text-base">
                     {text.filterByType}:
                   </label>
                   <select
                     value={trackFilter}
                     onChange={(e) => setTrackFilter(e.target.value as any)}
-                    className="px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-lg text-black cursor-pointer focus:outline-none focus:border-white/40 transition-all"
+                    className="w-full sm:w-auto px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-lg text-black cursor-pointer focus:outline-none focus:border-white/40 transition-all"
                   >
                     <option value="all" className="bg-gray-800">
                       {text.all}
@@ -3274,7 +3275,7 @@ export function ArtistDashboard({
                   value={trackSearch}
                   onChange={(e) => setTrackSearch(e.target.value)}
                   placeholder={text.searchTrack}
-                  className="w-full px-4 py-3 pl-12 bg-white/10 backdrop-blur-md border border-white/20 rounded-lg text:black text-black placeholder:text-white/50 focus:outline-none focus:border:white/40 focus:border-white/40 transition-all"
+                  className="w-full px-4 py-3 pl-12 bg-white/10 backdrop-blur-md border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
                 />
                 <Search
                   className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50"
@@ -3282,21 +3283,27 @@ export function ArtistDashboard({
                 />
               </div>
 
-              <div className="max-h-[800px] overflow-y-auto space-y-6 pr-2">
-                {filteredTracks.map((track, trackIndex) => (
+              {/* List */}
+              <div className="max-h-[70vh] sm:max-h-[800px] overflow-y-auto space-y-4 sm:space-y-6 pr-0 sm:pr-2">
+                {filteredTracks.map((track) => (
                   <div
                     key={track.id}
-                    className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20"
+                    className="bg-white/10 backdrop-blur-md rounded-xl p-4 sm:p-6 border border-white/20"
                   >
-                    <div className="flex items-center justify-between mb-6">
-                      <div className="flex items-center gap-4">
-                        <Play size={24} className="text-white/80" />
-                        <div>
-                          <div className="flex items-center gap-3">
-                            <h4 className="text-xl text-white drop-shadow">
+                    {/* Track header */}
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-5">
+                      <div className="flex items-start gap-3 sm:gap-4 min-w-0">
+                        <div className="mt-0.5 sm:mt-1 flex-shrink-0">
+                          <Play size={22} className="text-white/80" />
+                        </div>
+
+                        <div className="min-w-0">
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                            <h4 className="text-lg sm:text-xl text-white drop-shadow font-medium break-words sm:truncate">
                               {track.name}
                             </h4>
-                            <span className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-xs text-white/90 uppercase">
+
+                            <span className="w-fit px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-[11px] sm:text-xs text-white/90 uppercase">
                               {track.type === "single"
                                 ? text.single
                                 : track.type === "ep"
@@ -3304,7 +3311,8 @@ export function ArtistDashboard({
                                 : text.album}
                             </span>
                           </div>
-                          <p className="text-white/60 mt-1">
+
+                          <p className="text-white/60 mt-1 text-sm">
                             {track.totalStreams.toLocaleString()}{" "}
                             {text.totalStreams.toLowerCase()}
                           </p>
@@ -3312,38 +3320,47 @@ export function ArtistDashboard({
                       </div>
                     </div>
 
-                    <h5 className="text-white/90 drop-shadow mb-4">
+                    {/* Location section title */}
+                    <h5 className="text-white/90 drop-shadow mb-3 sm:mb-4 text-sm sm:text-base">
                       {text.locationPerTrack}
                     </h5>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                    {/* Locations grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                       {(track.topLocations ?? []).map((location, locIndex) => (
                         <div
                           key={locIndex}
-                          className="bg-white/5 rounded-lg p-4"
+                          className="bg-white/5 rounded-lg p-4 border border-white/10"
                         >
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-white drop-shadow">
+                          <div className="flex items-center justify-between gap-3 mb-2">
+                            <span className="text-white drop-shadow truncate">
                               {getCountryName(location.location)}
                             </span>
-                            <span className="text-white/80">
+                            <span className="text-white/80 flex-shrink-0 text-sm">
                               {location.streams.toLocaleString()}
                             </span>
                           </div>
-                          <div className="w-full bg:white/10 bg-white/10 rounded-full h-2 mb-1">
+
+                          <div className="w-full bg-white/10 rounded-full h-2 mb-1 overflow-hidden">
                             <div
                               className="bg-white/50 h-2 rounded-full transition-all"
                               style={{ width: location.percentage ?? "0%" }}
-                            ></div>
+                            />
                           </div>
-                          <span className="text-white/60 text-sm">
+
+                          <span className="text-white/60 text-xs sm:text-sm">
                             {location.percentage ?? "0%"}
                           </span>
                         </div>
                       ))}
+
                       {(track.topLocations ?? []).length === 0 && (
-                        <p className="text-white/60 text-sm">
-                          {text.noContent || "No location data for this track."}
-                        </p>
+                        <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+                          <p className="text-white/60 text-sm">
+                            {text.noContent ||
+                              "No location data for this track."}
+                          </p>
+                        </div>
                       )}
                     </div>
                   </div>

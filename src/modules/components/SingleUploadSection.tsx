@@ -1498,63 +1498,68 @@ export function SingleUploadSection({
               singles.slice(0, 5).map((single) => (
                 <div
                   key={single.id}
-                  className="bg-white/10 backdrop-blur-sm rounded-lg p-4 flex items-center justify-between"
+                  className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/10 hover:bg-white/15 transition-all"
                 >
-                  {/* Infos Single (gauche) */}
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center overflow-hidden">
-                      {single.coverUrl ? (
-                        <img
-                          src={single.coverUrl}
-                          alt={single.title}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <Music size={20} className="text-white" />
-                      )}
-                    </div>
-                    <div>
-                      <span className="text-white drop-shadow">
-                        {single.title}
-                      </span>
-                      <span className="block text-white/60 text-xs">
-                        {single.authors}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Streams + bouton play (droite) */}
-                  <div className="flex items-center gap-4">
-                    <span className="text-white/80 text-sm">
-                      {/* adapte ce champ quand tu auras les streams en BDD */}
-                      {(single as any).streamsCount
-                        ? `${(single as any).streamsCount} streams`
-                        : "0 streams"}
-                    </span>
-
-                    {/* audio caché + bouton play */}
-                    <div>
-                      {single.audioUrl && (
-                        <audio
-                          id={`single-audio-${single.id}`}
-                          src={single.audioUrl}
-                          onContextMenu={(e) => e.preventDefault()}
-                          className="hidden"
-                        />
-                      )}
-
-                      <button
-                        type="button"
-                        disabled={!single.audioUrl}
-                        onClick={() => handleTogglePlaySingle(single.id)}
-                        className="cursor-pointer text-white/60 hover:text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                      >
-                        {currentPlayingId === single.id ? (
-                          <Pause size={18} /> // icône pause quand ça joue
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    {/* Infos Single */}
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-12 h-12 sm:w-10 sm:h-10 bg-white/20 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
+                        {single.coverUrl ? (
+                          <img
+                            src={single.coverUrl}
+                            alt={single.title}
+                            className="w-full h-full object-cover"
+                          />
                         ) : (
-                          <Play size={18} /> // icône play quand c’est arrêté
+                          <Music size={20} className="text-white" />
                         )}
-                      </button>
+                      </div>
+
+                      <div className="min-w-0">
+                        <span className="text-white drop-shadow font-medium truncate block">
+                          {single.title}
+                        </span>
+                        <span className="block text-white/60 text-xs truncate">
+                          {single.authors || "—"}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Streams + Play */}
+                    <div className="flex items-center justify-between sm:justify-end gap-4">
+                      <span className="text-white/80 text-sm whitespace-nowrap">
+                        {(single as any).streamsCount
+                          ? `${(single as any).streamsCount} streams`
+                          : "0 streams"}
+                      </span>
+
+                      {/* audio caché + bouton play */}
+                      <div className="flex items-center gap-2">
+                        {single.audioUrl && (
+                          <audio
+                            id={`single-audio-${single.id}`}
+                            src={single.audioUrl}
+                            onContextMenu={(e) => e.preventDefault()}
+                            className="hidden"
+                          />
+                        )}
+
+                        <button
+                          type="button"
+                          disabled={!single.audioUrl}
+                          onClick={() => handleTogglePlaySingle(single.id)}
+                          className="cursor-pointer text-white/60 hover:text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed p-2 rounded-lg bg-white/10 hover:bg-white/20"
+                          aria-label={
+                            currentPlayingId === single.id ? "Pause" : "Play"
+                          }
+                        >
+                          {currentPlayingId === single.id ? (
+                            <Pause size={18} />
+                          ) : (
+                            <Play size={18} />
+                          )}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
