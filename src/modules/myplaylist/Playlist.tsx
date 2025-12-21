@@ -217,7 +217,8 @@ export default function MyPlaylist() {
       }
       await PlaylistModule.service.addTrackToPlaylist(
         playlist.id,
-        trackIdToAdd
+        trackIdToAdd,
+        token
       );
       setTrackTitle("");
       setFile(null);

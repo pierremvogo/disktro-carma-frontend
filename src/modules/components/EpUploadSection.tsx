@@ -311,6 +311,7 @@ type EpCreationInfo = {
   slug?: string;
   duration?: number | null;
   coverUrl?: string;
+  epTitle: string;
   trackTitle: string; // titre principal / “nom de l’EP”
   authors: string;
   producers: string;
@@ -327,6 +328,7 @@ type EpCreationInfo = {
 };
 
 const initialEpCreation: EpCreationInfo = {
+  epTitle: "",
   trackTitle: "",
   authors: "",
   producers: "",
@@ -747,6 +749,7 @@ export function EpUploadSection({ language }: EpUploadSectionProps) {
       }
 
       const {
+        epTitle,
         trackTitle,
         authors,
         producers,
@@ -764,7 +767,7 @@ export function EpUploadSection({ language }: EpUploadSectionProps) {
 
       // 1️⃣ Création de l'EP
       const payload = {
-        title: trackTitle,
+        title: epTitle,
         userId,
         coverUrl,
         // ajoute ce que ton backend attend pour l'EP :
@@ -893,11 +896,11 @@ export function EpUploadSection({ language }: EpUploadSectionProps) {
             </label>
             <input
               type="text"
-              value={epCreation.trackTitle}
+              value={epCreation.epTitle}
               onChange={(e) =>
                 setEpCreation((prev) => ({
                   ...prev,
-                  trackTitle: e.target.value,
+                  epTitle: e.target.value,
                 }))
               }
               className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"

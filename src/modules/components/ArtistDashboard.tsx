@@ -935,6 +935,7 @@ export function ArtistDashboard({
   useEffect(() => {
     if (activeTab === "subscriptions") {
       fetchSubscriptionStats();
+      fetchMyPlansPricing();
     }
   }, [activeTab]);
 
@@ -1072,13 +1073,7 @@ export function ArtistDashboard({
     signLanguageVideoUrl: "",
     brailleFileUrl: "",
   });
-  const allUploadsDone =
-    !!formData.audioUrl &&
-    !!formData.coverUrl &&
-    !!formData.miniVideoLoopUrl &&
-    !!formData.videoIntroUrl &&
-    !!formData.signLanguageVideoUrl &&
-    !!formData.brailleFileUrl;
+
   const [audioPreviewUrl, setAudioPreviewUrl] = useState<string | null>(null);
   const [audioUrl, setAudioUrl] = useState<string>("");
 
@@ -1242,7 +1237,6 @@ export function ArtistDashboard({
   }, [activeTab]);
 
   useEffect(() => {
-    console.log("FORM DATA : ", formData);
     if (!formData.name) {
       fetchUser();
     }

@@ -72,6 +72,7 @@ interface LocalState {
   USER_ID: string;
   USER_DATA: string;
   USER_ROLE: string;
+  FAVORITES_KEY: string;
 }
 
 const LocalStateObjectKeys: LocalState = {
@@ -79,6 +80,7 @@ const LocalStateObjectKeys: LocalState = {
   USER_ID: "userId",
   USER_DATA: "userData",
   USER_ROLE: "userRole",
+  FAVORITES_KEY: "fan_favorite_track_ids",
 };
 
 class Module {

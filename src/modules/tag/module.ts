@@ -44,9 +44,9 @@ class ServiceObject {
     return BaseMethods.getRequest(url, true);
   };
 
-  static getArtistsByTag = (tagId: string): Promise<any> => {
+  static getArtistsByTag = (tagId: string, token: string): Promise<any> => {
     const url = formatURL(API_URLS.GET_ARTIST_BY_TAG, { tagId });
-    return BaseMethods.getRequest(url, true);
+    return BaseMethods.getRequest(url, true, {}, token);
   };
   static getAlbumsByTag = (tagId: string): Promise<any> => {
     const url = formatURL(API_URLS.GET_ALBUM_BY_TAG, { tagId });

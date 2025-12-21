@@ -1,7 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FanProfile } from "./FanProfile";
 import { UserModuleObject as ModuleObject } from "../module";
 import { useRouter } from "next/navigation";
+import { TagModuleObject } from "../tag/module";
+import { TrackModuleObject } from "../track/module";
+import { TrackStreamModuleObject } from "../trackSTreams/module";
+import { AlbumModuleObject } from "../album/module";
+import { EpModuleObject } from "../ep/module";
+import { PlaylistModuleObject } from "../myplaylist/module";
+import { ArtistModuleObject } from "../artist/module";
+import { SubscriptionModuleObject } from "../subscription/module";
 
 // Icon components
 const Music = ({ size = 24, className = "" }) => (
@@ -195,6 +203,27 @@ const FileText = ({ size = 24, className = "" }) => (
 interface FanStreamingProps {
   language: string;
 }
+type SavedTrack = {
+  id: string;
+  title: string;
+  audioUrl: string;
+  createdAt?: string;
+  signLanguageVideoUrl?: string | null;
+  brailleFileUrl?: string | null;
+  artistId?: string | null;
+  isrcCode: string | null;
+  duration: string | null;
+  lyrics: string;
+  userId: string;
+  slug: string;
+  type: string;
+};
+type DrawerType = "genre" | "mood";
+type SubscriptionStatusResponse = {
+  data?: {
+    isSubscribed: boolean;
+  };
+};
 
 export function FanStreaming({ language }: FanStreamingProps) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -212,8 +241,27 @@ export function FanStreaming({ language }: FanStreamingProps) {
   const [sortPlaylists, setSortPlaylists] = useState(false);
   const [sortArtists, setSortArtists] = useState(false);
   const [favoriteSongs, setFavoriteSongs] = useState<number[]>([]);
-  const [subscribedArtists, setSubscribedArtists] = useState<number[]>([]);
   const [showProfile, setShowProfile] = useState(false);
+
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawerType, setDrawerType] = useState<DrawerType>("genre");
+  const [drawerTitle, setDrawerTitle] = useState("");
+  const [showSignVideo, setShowSignVideo] = useState(false);
+  const [signVideoUrl, setSignVideoUrl] = useState<string | null>(null);
+
+  const [subscribedArtists, setSubscribedArtists] = useState<string[]>([]);
+  const [subscribingArtistId, setSubscribingArtistId] = useState<string | null>(
+    null
+  );
+
+  const [selectedGenreName, setSelectedGenreName] = useState<string | null>(
+    null
+  );
+  const [selectedMoodName, setSelectedMoodName] = useState<string | null>(null);
+
+  const [savedTracks, setSavedTracks] = useState<SavedTrack[]>([]);
+  const [loadingTracks, setLoadingTracks] = useState(false);
+  const [tracksError, setTracksError] = useState<string | null>(null);
 
   // Accessibility states
   const [showAccessibility, setShowAccessibility] = useState(false);
@@ -234,6 +282,441 @@ export function FanStreaming({ language }: FanStreamingProps) {
   const [focusMode, setFocusMode] = useState(false);
   const [readingGuide, setReadingGuide] = useState(false);
   const [notification, setNotification] = useState<string | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [currentPlayingTrackId, setCurrentPlayingTrackId] = useState<
+    string | null
+  >(null);
+
+  const [featuredSongs, setFeaturedSongs] = useState<any[]>([]);
+  const [featuredLoading, setFeaturedLoading] = useState(false);
+  const [featuredError, setFeaturedError] = useState<string | null>(null);
+
+  const [playlistsLoading, setPlaylistsLoading] = useState(false);
+  const [playlistsError, setPlaylistsError] = useState<string | null>(null);
+
+  const [addingToPlaylist, setAddingToPlaylist] = useState(false);
+  const [addToPlaylistError, setAddToPlaylistError] = useState<string | null>(
+    null
+  );
+
+  // Favorites (tracks complets pour l’affichage)
+  const [favoriteTrackIds, setFavoriteTrackIds] = useState<string[]>([]);
+  const [favoriteTracks, setFavoriteTracks] = useState<any[]>([]);
+  const [favLoading, setFavLoading] = useState(false);
+  const [favError, setFavError] = useState<string | null>(null);
+
+  const [creatingPlaylist, setCreatingPlaylist] = useState(false);
+  const [createPlaylistError, setCreatePlaylistError] = useState<string | null>(
+    null
+  );
+
+  const [artists, setArtists] = useState<any[]>([]);
+  const [artistsLoading, setArtistsLoading] = useState(false);
+  const [artistsError, setArtistsError] = useState<string | null>(null);
+
+  const FAVORITES_KEY = "fan_favorite_track_ids";
+
+  const loadFavoriteIds = () => {
+    try {
+      const raw = localStorage.getItem(FAVORITES_KEY);
+      const ids = raw ? (JSON.parse(raw) as string[]) : [];
+      setFavoriteTrackIds(Array.isArray(ids) ? ids : []);
+    } catch {
+      setFavoriteTrackIds([]);
+    }
+  };
+
+  const saveFavoriteIds = (ids: string[]) => {
+    localStorage.setItem(FAVORITES_KEY, JSON.stringify(ids));
+    setFavoriteTrackIds(ids);
+  };
+
+  const toggleFavorite = async (trackId: string) => {
+    const id = String(trackId);
+
+    const next = favoriteTrackIds.includes(id)
+      ? favoriteTrackIds.filter((x) => x !== id)
+      : [...favoriteTrackIds, id];
+
+    saveFavoriteIds(next);
+
+    // recharge la liste affichée
+    await fetchFavoriteTracks(next);
+  };
+
+  async function fetchArtists() {
+    try {
+      setArtistsLoading(true);
+      setArtistsError(null);
+
+      const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
+      if (!token) {
+        setArtistsError("Utilisateur non authentifié.");
+        setArtists([]);
+        return;
+      }
+
+      // ✅ exemple: ArtistModuleObject.service.getAllArtists(token)
+      const res = await ArtistModuleObject.service.getArtistsForFan(token);
+      const raw = res.data ?? [];
+
+      const mapped = raw.map((a: any) => ({
+        id: String(a.id),
+        name:
+          a.artistName ||
+          a.username ||
+          `${a.name ?? ""} ${a.surname ?? ""}`.trim() ||
+          "Artist",
+        avatar:
+          a.profileImageUrl && String(a.profileImageUrl).trim() !== ""
+            ? a.profileImageUrl
+            : "/avatar-placeholder.png",
+        genres: a.tags || "—", // tags names
+        subscribers: a.subscribersCount ?? 0,
+        activeSubscribers: a.activeSubscribers ?? 0,
+      }));
+      setSubscribedArtists(
+        mapped.filter((a: any) => a.isSubscribed).map((a: any) => String(a.id))
+      );
+
+      setArtists(mapped);
+    } catch (e) {
+      console.error("fetchArtists error:", e);
+      setArtistsError((e as Error).message);
+      setArtists([]);
+    } finally {
+      setArtistsLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    if (selectedTab === "artists") {
+      fetchArtists();
+    }
+  }, [selectedTab]);
+
+  async function fetchFavoriteTracks(ids?: string[]) {
+    try {
+      setFavLoading(true);
+      setFavError(null);
+
+      const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
+      if (!token) return;
+
+      const targetIds = ids ?? favoriteTrackIds;
+      if (!targetIds.length) {
+        setFavoriteTracks([]);
+        return;
+      }
+
+      const res = await Promise.all(
+        targetIds.map((id) => TrackModuleObject.service.getTrack(id, token))
+      );
+
+      // selon ton backend getById renvoie parfois direct track, parfois {data}
+      const tracks = res
+        .map((r: any) => r.data ?? r.track ?? r)
+        .filter(Boolean);
+
+      setFavoriteTracks(tracks);
+    } catch (e) {
+      console.error(e);
+      setFavError((e as Error).message);
+    } finally {
+      setFavLoading(false);
+    }
+  }
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    loadFavoriteIds();
+  }, []);
+
+  useEffect(() => {
+    fetchFavoriteTracks();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [favoriteTrackIds.length]); // ou [favoriteTrackIds] si tu préfères
+
+  const formatDuration = (seconds?: number | null) => {
+    if (!seconds || Number.isNaN(Number(seconds))) return "";
+    const s = Math.max(0, Math.floor(Number(seconds)));
+    const mm = String(Math.floor(s / 60)).padStart(1, "0");
+    const ss = String(s % 60).padStart(2, "0");
+    return `${mm}:${ss}`;
+  };
+
+  const formatStreams = (n?: number | null) => {
+    const v = Number(n ?? 0);
+    if (v >= 1_000_000) return `${(v / 1_000_000).toFixed(1)}M`;
+    if (v >= 1_000) return `${Math.round(v / 1_000)}K`;
+    return String(v);
+  };
+
+  async function handleCreatePlaylist() {
+    try {
+      setCreatingPlaylist(true);
+      setCreatePlaylistError(null);
+
+      const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
+      const userId = localStorage.getItem(ModuleObject.localState.USER_ID);
+
+      if (!token || !userId) {
+        setCreatePlaylistError("Utilisateur non authentifié.");
+        return;
+      }
+
+      const name = newPlaylistName.trim();
+      if (!name) {
+        setCreatePlaylistError("Le nom de la playlist est requis.");
+        return;
+      }
+
+      await PlaylistModuleObject.service.createPlaylist(
+        { nom: name, userId },
+        token
+      );
+
+      // ✅ succès
+      setShowCreatePlaylist(false);
+      setNewPlaylistName("");
+      setCreatePlaylistError(null);
+
+      await fetchUserPlaylists();
+    } catch (e: any) {
+      console.error(e);
+
+      // ✅ message plus robuste
+      const message =
+        e?.response?.data?.message || e?.message || (e as Error).message;
+
+      setCreatePlaylistError(message);
+    } finally {
+      setCreatingPlaylist(false);
+    }
+  }
+
+  useEffect(() => {
+    if (selectedTab === "mymusic") {
+      fetchUserPlaylists();
+    }
+  }, [selectedTab]);
+
+  async function fetchUserPlaylists() {
+    try {
+      setPlaylistsLoading(true);
+      setPlaylistsError(null);
+
+      const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
+      const userId = localStorage.getItem(ModuleObject.localState.USER_ID);
+
+      if (!token || !userId) {
+        setPlaylistsError("Utilisateur non authentifié.");
+        setUserPlaylists([]);
+        return;
+      }
+
+      const res = await PlaylistModuleObject.service.getPlaylistByUser(
+        userId,
+        token
+      );
+      const playlists = res.data ?? res.playlists ?? res ?? [];
+
+      setUserPlaylists(playlists);
+    } catch (error) {
+      console.error("fetchUserPlaylists error:", error);
+      setPlaylistsError((error as Error).message);
+      setUserPlaylists([]);
+    } finally {
+      setPlaylistsLoading(false);
+    }
+  }
+
+  async function openAddToPlaylist(song: any) {
+    setSelectedSongForPlaylist(song);
+    setShowAddToPlaylist(true);
+    setAddToPlaylistError(null);
+
+    // charge les playlists dès l'ouverture
+    await fetchUserPlaylists();
+  }
+
+  async function handleAddTrackToPlaylist(playlistId: string) {
+    try {
+      setAddingToPlaylist(true);
+      setAddToPlaylistError(null);
+
+      const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
+      if (!token) {
+        setAddToPlaylistError("Utilisateur non authentifié.");
+        return;
+      }
+
+      const trackId = selectedSongForPlaylist?.id;
+      if (!trackId) {
+        setAddToPlaylistError("Aucun track sélectionné.");
+        return;
+      }
+
+      // ✅ ajoute au backend
+      await PlaylistModuleObject.service.addTrackToPlaylist(
+        playlistId,
+        trackId,
+        token
+      );
+
+      // ✅ refresh playlists (optionnel mais utile si tu affiches tracks dedans)
+      await fetchUserPlaylists();
+
+      // ✅ feedback (si tu as visual notifications)
+      showNotification?.(text.addedToPlaylist ?? "Added to playlist");
+
+      // ✅ ferme modale
+      setShowAddToPlaylist(false);
+      setSelectedSongForPlaylist(null);
+    } catch (error: any) {
+      console.error("handleAddTrackToPlaylist error:", error);
+      setAddToPlaylistError((error as Error).message);
+    } finally {
+      setAddingToPlaylist(false);
+    }
+  }
+
+  const handlePlayPlaylist = async (playlist: any, startIndex = 0) => {
+    const tracks = (playlist?.tracks ?? []).filter((t: any) => t?.audioUrl);
+
+    if (!tracks.length) return;
+
+    // charge la queue + démarre
+    setQueue(tracks);
+    setQueueIndex(startIndex);
+
+    // joue le premier track (ou celui sélectionné)
+    await handlePlaySong(tracks[startIndex], tracks);
+  };
+
+  const normalizeTracksWithCover = (
+    tracks: any[],
+    coverUrl?: string,
+    artistName?: string
+  ) =>
+    (tracks || []).map((t: any) => ({
+      ...t,
+      coverUrl: t.coverUrl ?? coverUrl, // cover de l'album/ep
+      artistName: t.artistName ?? artistName ?? "", // optionnel
+    }));
+
+  async function handlePlayFeatured(song: any) {
+    try {
+      const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
+      if (!token) return;
+
+      // ✅ SINGLE => joue directement
+      if (song.collectionType === "single") {
+        // queue = [song]
+        setQueue([song]);
+        setQueueIndex(0);
+        await handlePlaySong(song, [song]);
+        return;
+      }
+
+      // ✅ EP => fetch EP + tracks
+      if (song.collectionType === "ep") {
+        const epId = song.collectionId;
+        if (!epId) return;
+
+        const res = await EpModuleObject.service.getEp(epId, token);
+        const ep = res.ep ?? res.data?.ep ?? res.data ?? {};
+
+        const epTracks = normalizeTracksWithCover(
+          ep.tracks,
+          ep.coverUrl,
+          ep.artistName
+        );
+        if (epTracks.length === 0) return;
+
+        const startIndex = epTracks.findIndex((t: any) => t.id === song.id);
+        const idx = startIndex >= 0 ? startIndex : 0;
+
+        setQueue(epTracks);
+        setQueueIndex(idx);
+        await handlePlaySong(epTracks[idx], epTracks);
+        return;
+      }
+
+      // ✅ ALBUM => fetch album + tracks
+      if (song.collectionType === "album") {
+        const albumId = song.collectionId;
+        if (!albumId) return;
+
+        const res = await AlbumModuleObject.service.getAlbum(albumId, token);
+        const album = res.album ?? res.data?.album ?? res.data ?? {};
+
+        const albumTracks = normalizeTracksWithCover(
+          album.tracks,
+          album.coverUrl,
+          album.artistName
+        );
+        if (albumTracks.length === 0) return;
+
+        const startIndex = albumTracks.findIndex((t: any) => t.id === song.id);
+        const idx = startIndex >= 0 ? startIndex : 0;
+
+        setQueue(albumTracks);
+        setQueueIndex(idx);
+        await handlePlaySong(albumTracks[idx], albumTracks);
+        return;
+      }
+
+      // fallback si jamais collectionType absent
+      setQueue([song]);
+      setQueueIndex(0);
+      await handlePlaySong(song, [song]);
+    } catch (e) {
+      console.error("handlePlayFeatured error:", e);
+    }
+  }
+
+  async function fetchFeaturedTracks() {
+    try {
+      setFeaturedLoading(true);
+      setFeaturedError(null);
+
+      const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
+      if (!token) return;
+
+      // ✅ nouveau endpoint backend
+      const res = await TrackModuleObject.service.getTopStreams(token, 6);
+      const tracks = res.tracks ?? res.data?.tracks ?? res.data ?? [];
+
+      // ✅ mapping vers le format "mockSongs"
+      const mapped = tracks.map((t: any) => ({
+        id: t.id,
+        title: t.title,
+        artist: t.artistName ?? "",
+        album: t.collectionTitle ?? "",
+        duration: formatDuration(t.duration),
+        streams: formatStreams(t.streamsCount),
+        cover: t.coverUrl ?? "/placeholder.png",
+        audioUrl: t.audioUrl,
+        lyrics: t.lyrics ?? null,
+        signLanguageVideoUrl: t.signLanguageVideoUrl ?? null,
+        brailleFileUrl: t.brailleFileUrl ?? null,
+
+        // ✅ CRITIQUE pour ouvrir la bonne queue
+        collectionType: t.collectionType, // 'single' | 'ep' | 'album'
+        collectionId: t.collectionId, // id de l'album/ep/single
+      }));
+
+      setFeaturedSongs(mapped);
+    } catch (e) {
+      console.error(e);
+      setFeaturedError("Erreur lors du chargement des tracks en vedette.");
+    } finally {
+      setFeaturedLoading(false);
+    }
+  }
+  useEffect(() => {
+    fetchFeaturedTracks();
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -283,6 +766,19 @@ export function FanStreaming({ language }: FanStreamingProps) {
   const router = useRouter();
   const [isArtist, setIsArtist] = useState(false);
 
+  const stopPreviousAudio = (prevTrackId: string | null) => {
+    if (!prevTrackId) return;
+
+    const prevAudio = document.getElementById(
+      `fan-audio-${prevTrackId}`
+    ) as HTMLAudioElement | null;
+
+    if (prevAudio) {
+      prevAudio.pause();
+      prevAudio.currentTime = 0;
+    }
+  };
+
   // Show notification helper
   const showNotification = (message: string) => {
     if (visualNotifications) {
@@ -296,8 +792,226 @@ export function FanStreaming({ language }: FanStreamingProps) {
     localStorage.removeItem(ModuleObject.localState.USER_ID);
     localStorage.removeItem(ModuleObject.localState.USER_DATA);
     localStorage.removeItem(ModuleObject.localState.USER_ROLE);
+    localStorage.removeItem(ModuleObject.localState.FAVORITES_KEY);
     router.push("/home");
   };
+
+  const [newReleases, setNewReleases] = useState<any[]>([]);
+  const [newReleasesLoading, setNewReleasesLoading] = useState(false);
+  const [newReleasesError, setNewReleasesError] = useState<string | null>(null);
+
+  // const formatDuration = (seconds?: number | null) => {
+  //   if (seconds === null || seconds === undefined) return "";
+  //   const s = Math.max(0, Math.floor(Number(seconds)));
+  //   const mm = String(Math.floor(s / 60));
+  //   const ss = String(s % 60).padStart(2, "0");
+  //   return `${mm}:${ss}`;
+  // };
+
+  async function fetchNewReleases() {
+    try {
+      setNewReleasesLoading(true);
+      setNewReleasesError(null);
+
+      const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
+      if (!token) return;
+
+      const res = await TrackModuleObject.service.getNewReleases(token, 12);
+      const tracks = res.tracks ?? res.data?.tracks ?? res.data ?? [];
+
+      // mapping pour correspondre à ton UI (mockSongs-like)
+      const mapped = tracks.map((t: any) => ({
+        id: t.id,
+        title: t.title,
+        artist: t.artistName ?? t.userId ?? "",
+        album: t.collectionTitle ?? "",
+
+        duration: formatDuration(t.duration),
+        cover: t.coverUrl ?? "/placeholder.png",
+
+        audioUrl: t.audioUrl,
+        lyrics: t.lyrics ?? null,
+        signLanguageVideoUrl: t.signLanguageVideoUrl ?? null,
+        brailleFileUrl: t.brailleFileUrl ?? null,
+
+        // pour le player auto (single/ep/album)
+        collectionType: t.collectionType,
+        collectionId: t.collectionId,
+        createdAt: t.createdAt,
+      }));
+
+      setNewReleases(mapped);
+    } catch (e) {
+      console.error(e);
+      setNewReleasesError("Erreur lors du chargement des nouveautés.");
+    } finally {
+      setNewReleasesLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    fetchNewReleases();
+  }, []);
+
+  const handleNextFromQueue = async () => {
+    if (queue.length === 0) return;
+
+    const nextIndex = queueIndex + 1;
+    if (nextIndex >= queue.length) {
+      setIsPlaying(false);
+      setCurrentPlayingTrackId(null);
+      return;
+    }
+
+    setQueueIndex(nextIndex);
+    await handlePlaySong(queue[nextIndex], queue);
+  };
+
+  const handlePrevFromQueue = async () => {
+    if (queue.length === 0) return;
+
+    const audio = audioRef.current;
+    if (audio && audio.currentTime > 3) {
+      audio.currentTime = 0;
+      return;
+    }
+
+    const prevIndex = queueIndex - 1;
+    if (prevIndex < 0) return;
+
+    setQueueIndex(prevIndex);
+    await handlePlaySong(queue[prevIndex], queue);
+  };
+
+  const handlePlaySong = async (song: any, list?: any[]) => {
+    const userId = localStorage.getItem(ModuleObject.localState.USER_ID);
+    const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
+
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const trackId = song.id;
+
+    // ✅ set queue si on passe une liste (album/EP)
+    if (list && Array.isArray(list) && list.length > 0) {
+      const idx = list.findIndex((t) => t.id === trackId);
+      setQueue(list);
+      setQueueIndex(idx >= 0 ? idx : 0);
+    } else {
+      setQueue([song]);
+      setQueueIndex(0);
+    }
+
+    // ✅ toggle pause si on reclique sur le même track
+    if (currentPlayingTrackId === trackId && !audio.paused) {
+      audio.pause();
+      setIsPlaying(false);
+      setCurrentPlayingTrackId(null);
+      return;
+    }
+
+    // ✅ update UI
+    setCurrentSong(song);
+    setIsPlaying(true);
+
+    try {
+      // ✅ charger la source
+      if (audio.src !== song.audioUrl) {
+        audio.src = song.audioUrl;
+      }
+
+      // ✅ autoplay next quand fini
+      audio.onended = () => {
+        handleNextFromQueue();
+      };
+
+      await audio.play();
+      setCurrentPlayingTrackId(trackId);
+
+      // ✅ Log stream (anti-spam déjà géré backend)
+      if (token && userId && trackId) {
+        try {
+          await TrackStreamModuleObject.service.createTrackStream(
+            userId,
+            trackId,
+            token
+          );
+        } catch (e) {
+          console.warn("Stream logging failed:", e);
+        }
+      }
+    } catch (err) {
+      console.error("Error playing audio:", err);
+      setIsPlaying(false);
+      setCurrentPlayingTrackId(null);
+    }
+  };
+
+  // const handlePlaySong = async (song: any) => {
+  //   const userId = localStorage.getItem(ModuleObject.localState.USER_ID);
+  //   const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
+
+  //   const trackId = song.id;
+  //   const audioEl = document.getElementById(
+  //     `fan-audio-${trackId}`
+  //   ) as HTMLAudioElement | null;
+
+  //   if (!audioEl) return;
+
+  //   // ✅ Si on reclique sur le track en cours -> pause
+  //   if (currentPlayingTrackId === trackId) {
+  //     audioEl.pause();
+  //     setCurrentPlayingTrackId(null);
+  //     setIsPlaying(false);
+  //     // setCurrentSong(null);
+  //     return;
+  //   }
+
+  //   // ✅ Stopper l’ancien si un autre joue
+  //   if (currentPlayingTrackId) {
+  //     const prevAudio = document.getElementById(
+  //       `fan-audio-${currentPlayingTrackId}`
+  //     ) as HTMLAudioElement | null;
+
+  //     if (prevAudio) {
+  //       prevAudio.pause();
+  //       prevAudio.currentTime = 0;
+  //     }
+  //   }
+
+  //   // ✅ Met à jour ton UI player
+  //   console.log("CURRENT SONG : ", song);
+  //   setCurrentSong(song);
+  //   setIsPlaying(true);
+
+  //   try {
+  //     // Assure la source (au cas où)
+  //     if (song.audioUrl && audioEl.src !== song.audioUrl) {
+  //       audioEl.src = song.audioUrl;
+  //     }
+
+  //     await audioEl.play();
+  //     setCurrentPlayingTrackId(trackId);
+
+  //     // ✅ Log stream (au moment du play)
+  //     // (optionnel) éviter double log si l’utilisateur spam-click: tu peux ajouter un cooldown
+  //     if (token && userId && trackId) {
+  //       try {
+  //         await TrackStreamModuleObject.service.createTrackStream(
+  //           userId,
+  //           trackId,
+  //           token
+  //         );
+  //       } catch (e) {
+  //         console.warn("Stream logging failed:", e);
+  //       }
+  //     }
+  //   } catch (err) {
+  //     console.error("Error playing audio:", err);
+  //     setIsPlaying(false);
+  //     setCurrentPlayingTrackId(null);
+  //   }
+  // };
 
   const content = {
     spanish: {
@@ -538,6 +1252,233 @@ export function FanStreaming({ language }: FanStreamingProps) {
 
   const text = content[language as keyof typeof content];
 
+  function closeDrawer() {
+    setDrawerOpen(false);
+    setDrawerTitle("");
+    setTracksError(null);
+    setLoadingTracks(false);
+  }
+
+  const [queue, setQueue] = useState<any[]>([]); // liste des tracks en cours
+  const [queueIndex, setQueueIndex] = useState<number>(-1);
+
+  const [volume, setVolume] = useState(0.8); // 0..1
+  const [isMuted, setIsMuted] = useState(false);
+
+  const loadQueueAndPlay = (tracks: any[], startIndex = 0) => {
+    setQueue(tracks);
+    setQueueIndex(startIndex);
+    setCurrentSong(tracks[startIndex] ?? null);
+    setIsPlaying(true);
+  };
+
+  const playFromList = (tracks: any[], trackId: string) => {
+    const idx = tracks.findIndex((t) => t.id === trackId);
+    loadQueueAndPlay(tracks, Math.max(idx, 0));
+  };
+
+  useEffect(() => {
+    if (!audioRef.current) return;
+    audioRef.current.volume = isMuted ? 0 : volume;
+  }, [volume, isMuted]);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio || !currentSong?.audioUrl) return;
+
+    audio.src = currentSong.audioUrl;
+
+    if (isPlaying) {
+      audio.play().catch((e) => console.error("Audio play error:", e));
+    }
+  }, [currentSong]);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    if (isPlaying) {
+      audio.play().catch((e) => console.error("Audio play error:", e));
+    } else {
+      audio.pause();
+    }
+  }, [isPlaying]);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const onEnded = () => {
+      handleNext();
+    };
+
+    audio.addEventListener("ended", onEnded);
+    return () => audio.removeEventListener("ended", onEnded);
+  }, [queue, queueIndex]);
+
+  const handleNext = () => {
+    if (queue.length === 0) return;
+
+    const nextIndex = queueIndex + 1;
+    if (nextIndex >= queue.length) {
+      // Option A: stop à la fin
+      setIsPlaying(false);
+      return;
+
+      // Option B: loop
+      // nextIndex = 0;
+    }
+
+    setQueueIndex(nextIndex);
+    setCurrentSong(queue[nextIndex]);
+    setIsPlaying(true);
+  };
+
+  const handlePrev = () => {
+    if (queue.length === 0) return;
+
+    // si le track est déjà avancé > 3 sec -> revenir au début
+    const audio = audioRef.current;
+    if (audio && audio.currentTime > 3) {
+      audio.currentTime = 0;
+      return;
+    }
+
+    const prevIndex = queueIndex - 1;
+    if (prevIndex < 0) {
+      // Option A: rester au début
+      setQueueIndex(0);
+      setCurrentSong(queue[0]);
+      setIsPlaying(true);
+      return;
+
+      // Option B: loop vers le dernier
+      // prevIndex = queue.length - 1;
+    }
+
+    setQueueIndex(prevIndex);
+    setCurrentSong(queue[prevIndex]);
+    setIsPlaying(true);
+  };
+
+  const toggleMute = () => setIsMuted((m) => !m);
+
+  async function handleSelectGenre(selectedName: string) {
+    try {
+      const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
+      if (!token) return;
+
+      setDrawerOpen(true);
+      setDrawerType("genre");
+      setDrawerTitle(`Genre: ${selectedName}`);
+      setSelectedGenreName(selectedName);
+      setSelectedMoodName(null);
+
+      setLoadingTracks(true);
+      setTracksError(null);
+      setSavedTracks([]);
+
+      const res = await TrackModuleObject.service.getTracksByGenreName(
+        selectedName,
+        token
+      );
+
+      const tracksRaw = res.tracks ?? res.data?.tracks ?? res.data ?? [];
+
+      const tracksFromApi: SavedTrack[] = tracksRaw.map((t: any) => ({
+        id: t.id,
+        title: t.title,
+        audioUrl: t.audioUrl,
+        createdAt: t.createdAt,
+        signLanguageVideoUrl: t.signLanguageVideoUrl,
+        brailleFileUrl: t.brailleFileUrl,
+        artistId: t.userId ?? t.artistId ?? null,
+        isrcCode: t.isrcCode,
+        duration: t.duration,
+        lyrics: t.lyrics,
+        userId: t.userId,
+        slug: t.slug,
+        type: t.type,
+      }));
+
+      const uniqueTracks = Array.from(
+        new Map(tracksFromApi.map((t) => [t.id, t])).values()
+      );
+
+      setSavedTracks(uniqueTracks);
+    } catch (error: any) {
+      console.error("Erreur chargement tracks par genre:", error);
+      setTracksError(error?.message ?? "Erreur lors du chargement des tracks.");
+      setSavedTracks([]);
+    } finally {
+      setLoadingTracks(false);
+    }
+  }
+
+  async function handleSelectMood(selectedName: string) {
+    try {
+      const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
+      if (!token) return;
+
+      setDrawerOpen(true);
+      setDrawerType("mood");
+      setDrawerTitle(`Mood: ${selectedName}`);
+      setSelectedMoodName(selectedName);
+      setSelectedGenreName(null);
+
+      setLoadingTracks(true);
+      setTracksError(null);
+      setSavedTracks([]);
+
+      const res = await TrackModuleObject.service.getTracksByMoodName(
+        selectedName,
+        token
+      );
+
+      const tracksRaw = res.tracks ?? res.data?.tracks ?? res.data ?? [];
+
+      const tracksFromApi: SavedTrack[] = tracksRaw.map((t: any) => ({
+        id: t.id,
+        title: t.title,
+        audioUrl: t.audioUrl,
+        createdAt: t.createdAt,
+        signLanguageVideoUrl: t.signLanguageVideoUrl,
+        brailleFileUrl: t.brailleFileUrl,
+        artistId: t.userId ?? t.artistId ?? null,
+        isrcCode: t.isrcCode,
+        duration: t.duration,
+        lyrics: t.lyrics,
+        userId: t.userId,
+        slug: t.slug,
+        type: t.type,
+      }));
+
+      const uniqueTracks = Array.from(
+        new Map(tracksFromApi.map((t) => [t.id, t])).values()
+      );
+
+      setSavedTracks(uniqueTracks);
+    } catch (error: any) {
+      console.error("Erreur chargement tracks par mood:", error);
+      setTracksError(error?.message ?? "Erreur lors du chargement des tracks.");
+      setSavedTracks([]);
+    } finally {
+      setLoadingTracks(false);
+    }
+  }
+
+  async function openGenreDrawer(genreName: string) {
+    setDrawerOpen(true);
+    setDrawerTitle(`Genre: ${genreName}`);
+    await handleSelectGenre(genreName);
+  }
+
+  async function openMoodDrawer(moodName: string) {
+    setDrawerOpen(true);
+    setDrawerTitle(`Mood: ${moodName}`);
+    await handleSelectMood(moodName);
+  }
+
   // Mock data for songs
   const mockSongs = [
     {
@@ -742,25 +1683,6 @@ Underneath the shining star`,
     },
   ];
 
-  const handlePlaySong = (song: any) => {
-    if (currentSong?.id === song.id) {
-      setIsPlaying(!isPlaying);
-    } else {
-      setCurrentSong(song);
-      setIsPlaying(true);
-    }
-  };
-
-  const toggleFavorite = (songId: number) => {
-    if (favoriteSongs.includes(songId)) {
-      setFavoriteSongs(favoriteSongs.filter((id) => id !== songId));
-      showNotification(text.removedFromFavorites);
-    } else {
-      setFavoriteSongs([...favoriteSongs, songId]);
-      showNotification(text.addedToFavorites);
-    }
-  };
-
   const getFavoriteSongsList = () => {
     return mockSongs.filter((song) => favoriteSongs.includes(song.id));
   };
@@ -832,24 +1754,75 @@ Underneath the shining star`,
     },
   ];
 
-  const toggleSubscription = (artistId: number) => {
-    if (subscribedArtists.includes(artistId)) {
-      setSubscribedArtists(subscribedArtists.filter((id) => id !== artistId));
-    } else {
-      setSubscribedArtists([...subscribedArtists, artistId]);
-      showNotification(text.subscribed);
+  async function toggleSubscription(artistId: string) {
+    try {
+      const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
+      if (!token) return;
+
+      setSubscribingArtistId(artistId);
+
+      const isSubscribed = subscribedArtists.includes(String(artistId));
+
+      if (isSubscribed) {
+        await SubscriptionModuleObject.service.unsubscribe(
+          String(artistId),
+          token
+        );
+        setSubscribedArtists((prev) =>
+          prev.filter((id) => id !== String(artistId))
+        );
+      } else {
+        // option: price/months selon ton business
+        await SubscriptionModuleObject.service.subscribe(
+          String(artistId),
+          token,
+          { months: 1, price: 0 }
+        );
+        setSubscribedArtists((prev) => [...prev, String(artistId)]);
+      }
+    } catch (e) {
+      console.error("toggleSubscription error:", e);
+    } finally {
+      setSubscribingArtistId(null);
     }
-  };
+  }
+
+  async function requireSubscription(artistId: string): Promise<boolean> {
+    const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
+    if (!token) return false;
+
+    // ✅ déjà abonné côté state
+    if (subscribedArtists.includes(String(artistId))) return true;
+
+    const res = (await SubscriptionModuleObject.service.getStatus(
+      String(artistId),
+      token
+    )) as SubscriptionStatusResponse;
+
+    const ok = Boolean(res?.data?.isSubscribed);
+
+    if (ok) {
+      setSubscribedArtists((prev) =>
+        prev.includes(String(artistId)) ? prev : [...prev, String(artistId)]
+      );
+    }
+
+    return ok;
+  }
 
   const getSubscribedArtistsList = () => {
-    return mockArtists.filter((artist) =>
-      subscribedArtists.includes(artist.id)
+    if (!Array.isArray(artists) || artists.length === 0) return [];
+    return artists.filter((artist: any) =>
+      subscribedArtists.includes(String(artist.id))
     );
   };
 
   const getGiftsForSubscribedArtists = () => {
-    return exclusiveGifts.filter((gift) =>
-      subscribedArtists.includes(gift.artistId)
+    if (!Array.isArray(exclusiveGifts) || exclusiveGifts.length === 0)
+      return [];
+
+    return exclusiveGifts.filter((gift: any) =>
+      subscribedArtists.includes(String(gift.artistId))
     );
   };
 
@@ -1011,7 +1984,7 @@ Underneath the shining star`,
             {text.back}
           </button>
         )}
-        <div className="flex items-center justify-between p-6">
+        <div className="flex items-center justify-between p-2">
           <h1 className="text-2xl text-white drop-shadow-lg">{text.title}</h1>
           <div className="flex items-center gap-2 ml-auto">
             {/* PROFILE BUTTON */}
@@ -1139,7 +2112,7 @@ Underneath the shining star`,
       </div>
 
       {/* Main Content */}
-      <div className="absolute top-50 left-0 right-0 bottom-32 overflow-y-auto px-6 pb-6">
+      <div className="absolute top-[120px] left-0 right-0 bottom-32 overflow-y-auto px-6 pb-6">
         {/* Search Bar */}
         <div className="mb-8 max-w-2xl mx-auto">
           <div className="relative">
@@ -1161,7 +2134,7 @@ Underneath the shining star`,
         {selectedTab === "discover" && (
           <div className="space-y-8 max-w-6xl mx-auto">
             {/* Browse by Genre Section */}
-            <div>
+            {/* <div>
               <h2 className="text-2xl text-white drop-shadow-lg mb-4">
                 {language === "spanish" && "Explorar por Género"}
                 {language === "english" && "Browse by Genre"}
@@ -1278,17 +2251,28 @@ Underneath the shining star`,
                     color: "from-zinc-500/40 to-gray-500/40",
                   },
                 ].map((genre) => (
-                  <div
+                  <button
                     key={genre.name}
-                    className={`bg-gradient-to-br ${genre.color} backdrop-blur-md rounded-2xl p-6 border border-white/20 hover:scale-105 transition-all cursor-pointer flex items-center justify-center min-h-[120px]`}
+                    onClick={() => openGenreDrawer(genre.name)}
+                    className={`
+        bg-gradient-to-br ${genre.color}
+        backdrop-blur-md rounded-2xl p-6
+        border border-white/20
+        hover:scale-105 transition-all
+        cursor-pointer
+        flex items-center justify-center
+        min-h-[120px]
+        focus:outline-none focus:ring-2 focus:ring-white/40
+      `}
+                    aria-label={`Browse genre ${genre.name}`}
                   >
                     <h3 className="text-white drop-shadow text-center">
                       {genre.name}
                     </h3>
-                  </div>
+                  </button>
                 ))}
               </div>
-            </div>
+            </div> */}
 
             {/* Browse by Mood Section */}
             <div>
@@ -1380,15 +2364,24 @@ Underneath the shining star`,
                     color: "from-amber-400/40 to-yellow-400/40",
                   },
                 ].map((mood) => (
-                  <div
+                  <button
                     key={mood.name}
-                    className={`bg-gradient-to-br ${mood.color} backdrop-blur-md rounded-2xl p-6 border border-white/20 hover:scale-105 transition-all cursor-pointer`}
+                    onClick={() => openMoodDrawer(mood.name)}
+                    className={`
+        bg-gradient-to-br ${mood.color}
+        backdrop-blur-md rounded-2xl p-6
+        border border-white/20
+        hover:scale-105 transition-all
+        cursor-pointer
+        focus:outline-none focus:ring-2 focus:ring-white/40
+      `}
+                    aria-label={`Browse mood ${mood.name}`}
                   >
                     <div className="text-center">
                       <div className="text-4xl mb-3">{mood.emoji}</div>
                       <h3 className="text-white drop-shadow">{mood.name}</h3>
                     </div>
-                  </div>
+                  </button>
                 ))}
               </div>
             </div>
@@ -1398,41 +2391,69 @@ Underneath the shining star`,
               <h2 className="text-2xl text-white drop-shadow-lg mb-4">
                 {text.featured}
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {mockSongs.slice(0, 3).map((song) => (
-                  <div
-                    key={song.id}
-                    className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 hover:bg-white/15 transition-all"
-                  >
-                    <div className="aspect-square bg-white/5 rounded-xl mb-4 overflow-hidden">
-                      <img
-                        src={song.cover}
-                        alt={song.title}
-                        className="w-full h-full object-cover"
-                      />
+
+              {featuredLoading ? (
+                <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 text-white/70 text-center">
+                  Loading...
+                </div>
+              ) : featuredError ? (
+                <div className="bg-red-500/10 backdrop-blur-md rounded-2xl p-6 border border-red-500/20 text-white/80 text-center">
+                  {featuredError}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {featuredSongs.slice(0, 3).map((song: any) => (
+                    <div
+                      key={song.id}
+                      className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 hover:bg-white/15 transition-all"
+                    >
+                      <div className="aspect-square bg-white/5 rounded-xl mb-4 overflow-hidden">
+                        <img
+                          src={song.cover ?? "/placeholder.png"}
+                          alt={song.title}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+
+                      <h3 className="text-white drop-shadow mb-1">
+                        {song.title}
+                      </h3>
+
+                      <p className="text-white/60 text-sm mb-2">
+                        {song.artist}
+                        {song.album ? ` • ${song.album}` : ""}
+                      </p>
+
+                      <div className="flex items-center justify-between">
+                        <span className="text-white/50 text-xs">
+                          {song.streams} {text.streams}
+                        </span>
+
+                        <button
+                          onClick={() => handlePlayFeatured(song)}
+                          className="cursor-pointer p-2 bg-white/20 backdrop-blur-sm rounded-full hover:bg-white/30 transition-all"
+                          aria-label={
+                            isPlaying && currentSong?.id === song.id
+                              ? text.pause
+                              : text.play
+                          }
+                          title={
+                            isPlaying && currentSong?.id === song.id
+                              ? text.pause
+                              : text.play
+                          }
+                        >
+                          {isPlaying && currentSong?.id === song.id ? (
+                            <Pause size={20} className="text-white" />
+                          ) : (
+                            <Play size={20} className="text-white" />
+                          )}
+                        </button>
+                      </div>
                     </div>
-                    <h3 className="text-white drop-shadow mb-1">
-                      {song.title}
-                    </h3>
-                    <p className="text-white/60 text-sm mb-2">{song.artist}</p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-white/50 text-xs">
-                        {song.streams} {text.streams}
-                      </span>
-                      <button
-                        onClick={() => handlePlaySong(song)}
-                        className="p-2 bg-white/20 backdrop-blur-sm rounded-full hover:bg-white/30 transition-all"
-                      >
-                        {isPlaying && currentSong?.id === song.id ? (
-                          <Pause size={20} className="text-white" />
-                        ) : (
-                          <Play size={20} className="text-white" />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* New Releases */}
@@ -1440,82 +2461,108 @@ Underneath the shining star`,
               <h2 className="text-2xl text-white drop-shadow-lg mb-4">
                 {text.newReleases}
               </h2>
+
               <div className="space-y-3">
-                {mockSongs.map((song) => (
-                  <div
-                    key={song.id}
-                    className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 hover:bg-white/15 transition-all"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="w-16 h-16 bg-white/5 rounded-lg overflow-hidden flex-shrink-0">
-                        <img
-                          src={song.cover}
-                          alt={song.title}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="text-white drop-shadow truncate">
-                          {song.title}
-                        </h4>
-                        <p className="text-white/60 text-sm truncate">
-                          {song.artist} • {song.album}
-                        </p>
-                      </div>
+                {newReleasesLoading ? (
+                  <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 text-white/70 text-sm">
+                    Loading...
+                  </div>
+                ) : newReleasesError ? (
+                  <div className="bg-red-500/10 backdrop-blur-md rounded-xl p-4 border border-red-500/20 text-white/80 text-sm">
+                    {newReleasesError}
+                  </div>
+                ) : (
+                  (newReleases ?? []).map((song: any) => (
+                    <div
+                      key={song.id}
+                      className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 hover:bg-white/15 transition-all"
+                    >
                       <div className="flex items-center gap-4">
-                        <span className="text-white/60 text-sm">
-                          {song.duration}
-                        </span>
-                        <button
-                          onClick={() => handlePlaySong(song)}
-                          className="p-3 bg-white/20 backdrop-blur-sm rounded-full hover:bg-white/30 transition-all"
-                        >
-                          {isPlaying && currentSong?.id === song.id ? (
-                            <Pause size={18} className="text-white" />
-                          ) : (
-                            <Play size={18} className="text-white" />
-                          )}
-                        </button>
-                        <button
-                          onClick={() => toggleFavorite(song.id)}
-                          className="p-3 hover:bg-white/10 rounded-full transition-all"
-                          title={text.addToFavorites}
-                        >
-                          <Heart
-                            size={18}
-                            className={`${
-                              favoriteSongs.includes(song.id)
-                                ? "text-red-400 fill-red-400"
-                                : "text-white"
-                            }`}
+                        <div className="w-16 h-16 bg-white/5 rounded-lg overflow-hidden flex-shrink-0">
+                          <img
+                            src={song.cover ?? "/placeholder.png"}
+                            alt={song.title}
+                            className="w-full h-full object-cover"
                           />
-                        </button>
-                        <button
-                          onClick={() => {
-                            setSelectedSongForPlaylist(song);
-                            setShowAddToPlaylist(true);
-                          }}
-                          className="p-3 hover:bg-white/10 rounded-full transition-all"
-                          title={text.addToPlaylist}
-                        >
-                          <svg
-                            width="18"
-                            height="18"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
+                        </div>
+
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-white drop-shadow truncate">
+                            {song.title}
+                          </h4>
+                          <p className="text-white/60 text-sm truncate">
+                            {song.artist} • {song.album}
+                          </p>
+                        </div>
+
+                        <div className="flex items-center gap-4">
+                          <span className="text-white/60 text-sm">
+                            {song.duration}
+                          </span>
+
+                          {/* ✅ Nouveau handler : le Player choisit single/ep/album et charge la bonne queue */}
+                          <button
+                            onClick={() => handlePlayFeatured(song)}
+                            className="cursor-pointer p-3 bg-white/20 backdrop-blur-sm rounded-full hover:bg-white/30 transition-all"
+                            aria-label={
+                              isPlaying && currentSong?.id === song.id
+                                ? text.pause
+                                : text.play
+                            }
+                            title={
+                              isPlaying && currentSong?.id === song.id
+                                ? text.pause
+                                : text.play
+                            }
                           >
-                            <line x1="12" y1="5" x2="12" y2="19" />
-                            <line x1="5" y1="12" x2="19" y2="12" />
-                          </svg>
-                        </button>
+                            {isPlaying && currentSong?.id === song.id ? (
+                              <Pause size={18} className="text-white" />
+                            ) : (
+                              <Play size={18} className="text-white" />
+                            )}
+                          </button>
+
+                          <button
+                            onClick={() => toggleFavorite(song.id)}
+                            className="cursor-pointer p-3 hover:bg-white/10 rounded-full transition-all"
+                            title={text.addToFavorites}
+                          >
+                            <Heart
+                              size={18}
+                              className={`${
+                                favoriteTrackIds.includes(String(song.id))
+                                  ? "text-red-400 fill-red-400"
+                                  : "text-white"
+                              }`}
+                            />
+                          </button>
+
+                          {/* ✅ Nouveau handler : ouvre modal + fetch playlists user + ajout track backend */}
+                          <button
+                            onClick={() => openAddToPlaylist(song)}
+                            className="cursor-pointer p-3 hover:bg-white/10 rounded-full transition-all"
+                            title={text.addToPlaylist}
+                            aria-label={text.addToPlaylist}
+                          >
+                            <svg
+                              width="18"
+                              height="18"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <line x1="12" y1="5" x2="12" y2="19" />
+                              <line x1="5" y1="12" x2="19" y2="12" />
+                            </svg>
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
             </div>
           </div>
@@ -1529,6 +2576,7 @@ Underneath the shining star`,
               <h2 className="text-2xl text-white drop-shadow-lg">
                 {text.artists}
               </h2>
+
               <button
                 onClick={() => setSortArtists(!sortArtists)}
                 className={`px-4 py-2 rounded-lg text-white text-sm transition-all ${
@@ -1552,50 +2600,73 @@ Underneath the shining star`,
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {(sortArtists
-                ? [...mockArtists].sort((a, b) => a.name.localeCompare(b.name))
-                : mockArtists
-              ).map((artist) => (
-                <div
-                  key={artist.id}
-                  className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 hover:bg-white/15 transition-all text-center"
-                >
-                  <div className="w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden bg-white/5">
-                    <img
-                      src={artist.avatar}
-                      alt={artist.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <h3 className="text-white drop-shadow mb-2">{artist.name}</h3>
-                  <p className="text-white/60 text-sm mb-1">{artist.genres}</p>
-                  <p className="text-white/50 text-xs mb-4">
-                    {artist.subscribers} {text.subscribers}
-                  </p>
-                  <button
-                    onClick={() => toggleSubscription(artist.id)}
-                    className={`w-full px-4 py-2 backdrop-blur-sm rounded-lg text-white transition-all flex items-center justify-center gap-2 ${
-                      subscribedArtists.includes(artist.id)
-                        ? "bg-white/30 border border-white/40"
-                        : "bg-white/20 hover:bg-white/30"
-                    }`}
+            {/* Loading / Error / Grid */}
+            {artistsLoading ? (
+              <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20 text-white/70 text-center">
+                Loading artists...
+              </div>
+            ) : artistsError ? (
+              <div className="bg-red-500/10 backdrop-blur-md rounded-xl p-6 border border-red-500/20 text-white/80 text-center">
+                {artistsError}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {(sortArtists
+                  ? [...artists].sort((a: any, b: any) =>
+                      String(a.name ?? "").localeCompare(String(b.name ?? ""))
+                    )
+                  : artists
+                ).map((artist: any) => (
+                  <div
+                    key={artist.id}
+                    className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 hover:bg-white/15 transition-all text-center"
                   >
-                    <Star
-                      size={16}
-                      className={
+                    <div className="w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden bg-white/5">
+                      <img
+                        src={artist.avatar ?? "/avatar-placeholder.png"}
+                        alt={artist.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+
+                    <h3 className="text-white drop-shadow mb-2">
+                      {artist.name}
+                    </h3>
+
+                    <p className="text-white/60 text-sm mb-1">
+                      {artist.genres && String(artist.genres).trim() !== ""
+                        ? artist.genres
+                        : "—"}
+                    </p>
+
+                    <p className="text-white/50 text-xs mb-4">
+                      {artist.subscribers ?? 0} {text.subscribers}
+                    </p>
+
+                    <button
+                      onClick={() => toggleSubscription(artist.id)}
+                      className={`w-full px-4 py-2 backdrop-blur-sm rounded-lg text-white transition-all flex items-center justify-center gap-2 ${
                         subscribedArtists.includes(artist.id)
-                          ? "fill-white"
-                          : ""
-                      }
-                    />
-                    {subscribedArtists.includes(artist.id)
-                      ? text.subscribed
-                      : text.subscribe}
-                  </button>
-                </div>
-              ))}
-            </div>
+                          ? "bg-white/30 border border-white/40"
+                          : "bg-white/20 hover:bg-white/30"
+                      }`}
+                    >
+                      <Star
+                        size={16}
+                        className={
+                          subscribedArtists.includes(artist.id)
+                            ? "fill-white"
+                            : ""
+                        }
+                      />
+                      {subscribedArtists.includes(artist.id)
+                        ? text.subscribed
+                        : text.subscribe}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
@@ -1617,12 +2688,12 @@ Underneath the shining star`,
                       {text.favorites}
                     </h3>
                     <p className="text-white/60">
-                      {favoriteSongs.length} {text.songs}
+                      {favoriteTrackIds.length} {text.songs}
                     </p>
                   </div>
                 </div>
 
-                {favoriteSongs.length > 0 ? (
+                {favoriteTrackIds.length > 0 ? (
                   <div className="space-y-2">
                     {getFavoriteSongsList().map((song) => (
                       <div
@@ -1659,7 +2730,7 @@ Underneath the shining star`,
                             )}
                           </button>
                           <button
-                            onClick={() => toggleFavorite(song.id)}
+                            onClick={() => toggleFavorite(String(song.id))}
                             className="p-2 hover:bg-white/10 rounded-full transition-all"
                           >
                             <Heart
@@ -1703,7 +2774,7 @@ Underneath the shining star`,
                 {userPlaylists.length > 0 && (
                   <button
                     onClick={() => setSortPlaylists(!sortPlaylists)}
-                    className={`px-4 py-2 rounded-lg text-white text-sm transition-all ${
+                    className={`cursor-pointer px-4 py-2 rounded-lg text-white text-sm transition-all ${
                       sortPlaylists
                         ? "bg-white/20"
                         : "bg-white/10 hover:bg-white/15"
@@ -1727,7 +2798,7 @@ Underneath the shining star`,
                 )}
                 <button
                   onClick={() => setShowCreatePlaylist(true)}
-                  className="px-4 py-2 bg-white/20 rounded-lg text-white hover:bg-white/30 transition-all text-sm flex items-center gap-2"
+                  className="cursor-pointer px-4 py-2 bg-white/20 rounded-lg text-white hover:bg-white/30 transition-all text-sm flex items-center gap-2"
                 >
                   <svg
                     width="16"
@@ -1750,55 +2821,58 @@ Underneath the shining star`,
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {(sortPlaylists
                   ? [...userPlaylists].sort((a, b) =>
-                      a.name.localeCompare(b.name)
+                      a.nom.localeCompare(b.nom)
                     )
                   : userPlaylists
                 ).map((playlist) => (
                   <div
                     key={playlist.id}
+                    onClick={() => handlePlayPlaylist(playlist, 0)}
                     className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 hover:bg-white/15 transition-all cursor-pointer"
                   >
                     <div className="aspect-square bg-gradient-to-br from-purple-500/30 to-pink-500/30 rounded-xl mb-4 flex items-center justify-center">
                       <Music size={64} className="text-white/60" />
                     </div>
                     <h3 className="text-white drop-shadow mb-2">
-                      {playlist.name}
+                      {playlist.nom}
                     </h3>
                     <p className="text-white/60 text-sm">
-                      {playlist.songs.length} {text.songs}
+                      {playlist.tracks?.length ?? 0} {text.songs}
                     </p>
 
                     {/* Show songs in playlist */}
-                    {playlist.songs.length > 0 && (
+                    {(playlist.tracks?.length ?? 0) > 0 && (
                       <div className="mt-4 space-y-2">
-                        {playlist.songs.slice(0, 3).map((song: any) => (
+                        {playlist.tracks.slice(0, 3).map((track: any) => (
                           <div
-                            key={song.id}
+                            key={track.id}
                             className="flex items-center gap-2"
                           >
                             <div className="w-8 h-8 bg-white/5 rounded overflow-hidden flex-shrink-0">
                               <img
-                                src={song.cover}
-                                alt={song.title}
+                                src={track.coverUrl ?? "/placeholder.png"}
+                                alt={track.title}
                                 className="w-full h-full object-cover"
                               />
                             </div>
+
                             <div className="flex-1 min-w-0">
                               <p className="text-white/80 text-xs truncate">
-                                {song.title}
+                                {track.title}
                               </p>
                             </div>
                           </div>
                         ))}
-                        {playlist.songs.length > 3 && (
+
+                        {(playlist.tracks?.length ?? 0) > 3 && (
                           <p className="text-white/50 text-xs">
-                            +{playlist.songs.length - 3} más
+                            +{(playlist.tracks?.length ?? 0) - 3} más
                           </p>
                         )}
                       </div>
                     )}
 
-                    {playlist.songs.length === 0 && (
+                    {playlist.tracks?.length === 0 && (
                       <p className="text-white/50 text-sm mt-4 italic">
                         {text.noSongs}
                       </p>
@@ -1824,7 +2898,7 @@ Underneath the shining star`,
                 </p>
                 <button
                   onClick={() => setShowCreatePlaylist(true)}
-                  className="px-6 py-3 bg-white/20 rounded-lg text-white hover:bg-white/30 transition-all inline-flex items-center gap-2"
+                  className="cursor-pointer px-6 py-3 bg-white/20 rounded-lg text-white hover:bg-white/30 transition-all inline-flex items-center gap-2"
                 >
                   <svg
                     width="20"
@@ -1994,7 +3068,7 @@ Underneath the shining star`,
                         {text.subscribedOn}: {new Date().toLocaleDateString()}
                       </p>
                       <button
-                        onClick={() => toggleSubscription(artist.id)}
+                        onClick={() => toggleSubscription(String(artist.id))}
                         className="w-full px-4 py-2 bg-red-500/30 backdrop-blur-sm rounded-lg text-white hover:bg-red-500/40 transition-all flex items-center justify-center gap-2 border border-red-500/40"
                       >
                         <svg
@@ -2135,47 +3209,85 @@ Underneath the shining star`,
 
       {/* Create Playlist Modal */}
       {showCreatePlaylist && (
-        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-40">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[90] p-4">
           <div className="bg-black/80 backdrop-blur-xl rounded-2xl border border-white/20 p-8 max-w-md w-full mx-4">
-            <h3 className="text-xl text-white drop-shadow mb-6">
-              {text.createPlaylist}
-            </h3>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl text-white drop-shadow">
+                {text.createPlaylist}
+              </h3>
+
+              <button
+                onClick={() => {
+                  setShowCreatePlaylist(false);
+                  setNewPlaylistName("");
+                  setCreatePlaylistError(null);
+                }}
+                className="cursor-pointer p-2 rounded-lg hover:bg-white/10 text-white/80"
+                aria-label="Close"
+              >
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Error */}
+            {createPlaylistError && (
+              <div className="mb-4 text-sm text-red-200 bg-red-500/10 border border-red-500/20 rounded-lg p-3">
+                {createPlaylistError}
+              </div>
+            )}
+
             <input
               type="text"
               value={newPlaylistName}
               onChange={(e) => setNewPlaylistName(e.target.value)}
               placeholder={text.playlistName}
               className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all mb-6"
+              disabled={creatingPlaylist}
             />
+
             <div className="flex gap-4">
               <button
                 onClick={() => {
                   setShowCreatePlaylist(false);
                   setNewPlaylistName("");
+                  setCreatePlaylistError(null);
                 }}
-                className="flex-1 px-4 py-3 bg-white/10 rounded-lg text-white hover:bg-white/20 transition-all"
+                disabled={creatingPlaylist}
+                className={`cursor-pointer flex-1 px-4 py-3 rounded-lg text-white transition-all ${
+                  creatingPlaylist
+                    ? "bg-white/10 opacity-60 cursor-not-allowed"
+                    : "bg-white/10 hover:bg-white/20"
+                }`}
               >
                 {text.cancel}
               </button>
+
               <button
-                onClick={() => {
-                  if (newPlaylistName.trim()) {
-                    setUserPlaylists([
-                      ...userPlaylists,
-                      {
-                        id: Date.now(),
-                        name: newPlaylistName,
-                        songs: [],
-                        createdAt: new Date(),
-                      },
-                    ]);
-                    setNewPlaylistName("");
-                    setShowCreatePlaylist(false);
-                  }
-                }}
-                className="flex-1 px-4 py-3 bg-white/20 rounded-lg text-white hover:bg-white/30 transition-all"
+                onClick={handleCreatePlaylist}
+                disabled={creatingPlaylist || !newPlaylistName.trim()}
+                className={`cursor-pointer flex-1 px-4 py-3 rounded-lg text-white transition-all ${
+                  creatingPlaylist || !newPlaylistName.trim()
+                    ? "bg-white/10 opacity-60 cursor-not-allowed"
+                    : "bg-white/20 hover:bg-white/30"
+                }`}
               >
-                {text.create}
+                {creatingPlaylist
+                  ? language === "english"
+                    ? "Creating..."
+                    : language === "spanish"
+                    ? "Creando..."
+                    : "Creant..."
+                  : text.create}
               </button>
             </div>
           </div>
@@ -2184,17 +3296,40 @@ Underneath the shining star`,
 
       {/* Add to Playlist Modal */}
       {showAddToPlaylist && selectedSongForPlaylist && (
-        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-40">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[90] p-4">
           <div className="bg-black/80 backdrop-blur-xl rounded-2xl border border-white/20 p-8 max-w-md w-full mx-4 max-h-[80vh] overflow-y-auto">
-            <h3 className="text-xl text-white drop-shadow mb-6">
-              {text.addToPlaylist}
-            </h3>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl text-white drop-shadow">
+                {text.addToPlaylist}
+              </h3>
+              <button
+                onClick={() => {
+                  setShowAddToPlaylist(false);
+                  setSelectedSongForPlaylist(null);
+                  setAddToPlaylistError(null);
+                }}
+                className="cursor-pointer p-2 rounded-lg hover:bg-white/10 text-white/80"
+                aria-label="Close"
+              >
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
 
             {/* Song preview */}
             <div className="flex items-center gap-3 mb-6 p-3 bg-white/10 rounded-lg">
               <div className="w-12 h-12 bg-white/5 rounded overflow-hidden flex-shrink-0">
                 <img
-                  src={selectedSongForPlaylist.cover}
+                  src={selectedSongForPlaylist.cover ?? "/placeholder.png"}
                   alt={selectedSongForPlaylist.title}
                   className="w-full h-full object-cover"
                 />
@@ -2204,73 +3339,93 @@ Underneath the shining star`,
                   {selectedSongForPlaylist.title}
                 </p>
                 <p className="text-white/60 text-xs truncate">
-                  {selectedSongForPlaylist.artist}
+                  {selectedSongForPlaylist.artist ??
+                    selectedSongForPlaylist.artistName ??
+                    selectedSongForPlaylist.userId ??
+                    ""}
                 </p>
               </div>
             </div>
 
-            {/* Playlists list */}
+            {/* Error */}
+            {addToPlaylistError && (
+              <div className="mb-4 text-sm text-red-200 bg-red-500/10 border border-red-500/20 rounded-lg p-3">
+                {addToPlaylistError}
+              </div>
+            )}
+
+            {/* Playlists list (backend) */}
             <div className="space-y-2 mb-6">
-              {userPlaylists.map((playlist) => {
-                const isInPlaylist = playlist.songs.some(
-                  (s: any) => s.id === selectedSongForPlaylist.id
-                );
-                return (
+              {playlistsLoading ? (
+                <div className="text-white/70 text-sm bg-white/10 border border-white/15 rounded-lg p-3">
+                  Loading playlists...
+                </div>
+              ) : playlistsError ? (
+                <div className="text-white/70 text-sm bg-white/10 border border-white/15 rounded-lg p-3">
+                  {playlistsError}
+                </div>
+              ) : userPlaylists.length === 0 ? (
+                <div className="text-white/60 text-sm bg-white/10 border border-white/15 rounded-lg p-3 text-center">
+                  {language === "spanish" && "No tienes playlists aún"}
+                  {language === "english" && "You don't have any playlists yet"}
+                  {language === "catalan" && "Encara no tens playlists"}
+                </div>
+              ) : (
+                userPlaylists.map((playlist: any) => (
                   <button
                     key={playlist.id}
-                    onClick={() => {
-                      if (!isInPlaylist) {
-                        setUserPlaylists(
-                          userPlaylists.map((p) =>
-                            p.id === playlist.id
-                              ? {
-                                  ...p,
-                                  songs: [...p.songs, selectedSongForPlaylist],
-                                }
-                              : p
-                          )
-                        );
-                      }
-                    }}
-                    className={`w-full p-3 rounded-lg text-left transition-all ${
-                      isInPlaylist
-                        ? "bg-white/20 text-white/50 cursor-not-allowed"
+                    onClick={() => handleAddTrackToPlaylist(playlist.id)}
+                    disabled={addingToPlaylist}
+                    className={`cursor-pointer w-full p-3 rounded-lg text-left transition-all ${
+                      addingToPlaylist
+                        ? "bg-white/10 text-white/60 cursor-not-allowed"
                         : "bg-white/10 hover:bg-white/20 text-white"
                     }`}
-                    disabled={isInPlaylist}
                   >
                     <div className="flex items-center justify-between">
-                      <span>{playlist.name}</span>
-                      {isInPlaylist && (
-                        <svg
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                        >
-                          <polyline points="20 6 9 17 4 12" />
-                        </svg>
+                      <span className="truncate">
+                        {playlist.nom ?? playlist.name}
+                      </span>
+                      {addingToPlaylist && (
+                        <span className="text-xs text-white/50">...</span>
                       )}
                     </div>
+
                     <span className="text-xs text-white/50">
-                      {playlist.songs.length} {text.songs}
+                      {playlist.tracks?.length ?? playlist.songs?.length ?? 0}{" "}
+                      {text.songs}
                     </span>
                   </button>
-                );
-              })}
+                ))
+              )}
             </div>
 
-            <button
-              onClick={() => {
-                setShowAddToPlaylist(false);
-                setSelectedSongForPlaylist(null);
-              }}
-              className="w-full px-4 py-3 bg-white/20 rounded-lg text-white hover:bg-white/30 transition-all"
-            >
-              {text.cancel}
-            </button>
+            <div className="flex gap-3">
+              <button
+                onClick={async () => {
+                  await fetchUserPlaylists();
+                }}
+                disabled={playlistsLoading}
+                className={`cursor-pointer flex-1 px-4 py-3 rounded-lg text-white transition-all ${
+                  playlistsLoading
+                    ? "bg-white/10 cursor-not-allowed"
+                    : "bg-white/20 hover:bg-white/30"
+                }`}
+              >
+                Refresh
+              </button>
+
+              <button
+                onClick={() => {
+                  setShowAddToPlaylist(false);
+                  setSelectedSongForPlaylist(null);
+                  setAddToPlaylistError(null);
+                }}
+                className="cursor-pointer flex-1 px-4 py-3 bg-white/20 rounded-lg text-white hover:bg-white/30 transition-all"
+              >
+                {text.cancel}
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -2830,7 +3985,14 @@ Underneath the shining star`,
 
       {/* Lyrics Panel */}
       {showLyrics && currentSong && (
-        <div className="fixed inset-x-0 bottom-24 sm:bottom-28 z-30 px-3 sm:px-4 md:px-6">
+        <div
+          className={`fixed inset-x-0 z-[85] px-3 sm:px-4 md:px-6 ${
+            // sur mobile on monte plus haut pour ne pas masquer le player
+            currentSong
+              ? "bottom-[160px] sm:bottom-28"
+              : "bottom-24 sm:bottom-28"
+          }`}
+        >
           <div className="mx-auto w-full max-w-md sm:max-w-lg bg-black/70 backdrop-blur-xl rounded-2xl border border-white/20 overflow-hidden shadow-2xl">
             {/* Header */}
             <div className="p-3 sm:p-4 border-b border-white/10 flex items-center justify-between gap-2">
@@ -2839,7 +4001,8 @@ Underneath the shining star`,
               </h3>
               <button
                 onClick={() => setShowLyrics(false)}
-                className="text-white/60 hover:text-white transition-colors flex-shrink-0"
+                className="text-white/60 hover:text-white transition-colors flex-shrink-0 cursor-pointer"
+                aria-label="Close lyrics"
               >
                 <svg
                   width="18"
@@ -2858,11 +4021,11 @@ Underneath the shining star`,
             </div>
 
             {/* Toggle between Text and Sign Language */}
-            {currentSong.signLanguageVideo && (
+            {currentSong.signLanguageVideoUrl && (
               <div className="flex p-2 border-b border-white/10 gap-2">
                 <button
                   onClick={() => setLyricsViewMode("text")}
-                  className={`flex-1 py-1.5 sm:py-2 px-2 sm:px-3 rounded-lg text-xs sm:text-sm transition-all ${
+                  className={`cursor-pointer flex-1 py-1.5 sm:py-2 px-2 sm:px-3 rounded-lg text-xs sm:text-sm transition-all ${
                     lyricsViewMode === "text"
                       ? "bg-white/20 text-white"
                       : "text-white/60 hover:bg-white/10"
@@ -2871,9 +4034,10 @@ Underneath the shining star`,
                   <FileText size={14} className="inline mr-1 sm:mr-2" />
                   {text.textLyrics}
                 </button>
+
                 <button
                   onClick={() => setLyricsViewMode("sign")}
-                  className={`flex-1 py-1.5 sm:py-2 px-2 sm:px-3 rounded-lg text-xs sm:text-sm transition-all ${
+                  className={`cursor-pointer flex-1 py-1.5 sm:py-2 px-2 sm:px-3 rounded-lg text-xs sm:text-sm transition-all ${
                     lyricsViewMode === "sign"
                       ? "bg-white/20 text-white"
                       : "text-white/60 hover:bg-white/10"
@@ -2899,7 +4063,7 @@ Underneath the shining star`,
             )}
 
             {/* Content Area */}
-            <div className="p-4 sm:p-6 overflow-y-auto max-h-[55vh] sm:max-h-[60vh]">
+            <div className="p-4 sm:p-6 overflow-y-auto max-h-[45vh] sm:max-h-[60vh]">
               {lyricsViewMode === "text" ? (
                 // Text Lyrics
                 <div className="text-white/80 text-xs sm:text-sm leading-relaxed space-y-3 sm:space-y-4">
@@ -2928,6 +4092,32 @@ Underneath the shining star`,
                         "No hi ha lletres disponibles per aquesta cançó"}
                     </p>
                   )}
+
+                  {/* Braille file link (optionnel) */}
+                  {currentSong.brailleFileUrl && (
+                    <a
+                      href={currentSong.brailleFileUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-2 mt-2 text-white/80 text-xs px-3 py-2 rounded-lg bg-white/10 hover:bg-white/15 border border-white/10 transition-all"
+                    >
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      >
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14 2 14 8 20 8" />
+                      </svg>
+                      {language === "spanish" && "Abrir archivo Braille"}
+                      {language === "english" && "Open Braille file"}
+                      {language === "catalan" && "Obrir fitxer Braille"}
+                    </a>
+                  )}
+
                   <p className="text-white/40 text-[10px] sm:text-xs italic mt-4 sm:mt-6">
                     {language === "spanish" &&
                       "Las letras se proporcionan solo con fines educativos"}
@@ -2940,10 +4130,10 @@ Underneath the shining star`,
               ) : (
                 // Sign Language Video
                 <div>
-                  {currentSong.signLanguageVideo ? (
+                  {currentSong.signLanguageVideoUrl ? (
                     <div className="relative aspect-video rounded-lg overflow-hidden bg-black border border-white/20">
                       <video
-                        src={currentSong.signLanguageVideo}
+                        src={currentSong.signLanguageVideoUrl}
                         controls
                         className="w-full h-full object-contain"
                       />
@@ -2958,6 +4148,7 @@ Underneath the shining star`,
                         "No hi ha vídeo en llengua de signes disponible"}
                     </p>
                   )}
+
                   <p className="text-white/40 text-[10px] sm:text-xs italic mt-3 sm:mt-4">
                     {language === "spanish" &&
                       "Video en lenguaje de signos proporcionado por el artista"}
@@ -2976,12 +4167,16 @@ Underneath the shining star`,
       {/* Player Bar */}
       {currentSong && (
         <div className="absolute bottom-0 left-0 right-0 z-20 bg-black/40 backdrop-blur-xl border-t border-white/10">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-6 p-3 sm:p-4 md:p-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-6 p-3 sm:p-4 md:p-6">
             {/* Song Info */}
             <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0 order-1 md:order-none">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white/5 rounded-lg overflow-hidden flex-shrink-0">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/5 rounded-lg overflow-hidden flex-shrink-0">
                 <img
-                  src={currentSong.cover}
+                  src={
+                    currentSong.coverUrl ??
+                    currentSong.cover ??
+                    "/placeholder.png"
+                  }
                   alt={currentSong.title}
                   className="w-full h-full object-cover"
                 />
@@ -2991,7 +4186,10 @@ Underneath the shining star`,
                   {currentSong.title}
                 </h4>
                 <p className="text-white/60 text-xs sm:text-sm truncate">
-                  {currentSong.artist}
+                  {currentSong.artistName ??
+                    currentSong.artist ??
+                    currentSong.userId ??
+                    ""}
                 </p>
               </div>
             </div>
@@ -2999,21 +4197,18 @@ Underneath the shining star`,
             {/* Player Controls */}
             <div className="flex items-center justify-center gap-4 sm:gap-6 order-0 md:order-none">
               <button
-                className={`text-white/80 hover:text-white ${animationClasses} ${buttonSizeClasses}`}
+                onClick={handlePrevFromQueue}
+                className={`text-white/80 hover:text-white cursor-pointer ${animationClasses} ${buttonSizeClasses}`}
                 aria-label="Previous"
               >
                 <SkipBack size={largerTargets ? 32 : 22} />
               </button>
+
               <button
-                onClick={() => setIsPlaying(!isPlaying)}
-                className={`
-            ${buttonSizeClasses}
-            ${animationClasses}
-            flex items-center justify-center
-            p-3 sm:p-4 
-            bg-white/20 backdrop-blur-sm 
-            rounded-full hover:bg-white/30
-          `}
+                onClick={() =>
+                  currentSong && handlePlaySong(currentSong, queue)
+                }
+                className={`${buttonSizeClasses} ${animationClasses} cursor-pointer flex items-center justify-center p-3 sm:p-4 bg-white/20 backdrop-blur-sm rounded-full hover:bg-white/30`}
                 aria-label={isPlaying ? text.pause : text.play}
               >
                 {isPlaying ? (
@@ -3025,70 +4220,356 @@ Underneath the shining star`,
                   <Play size={largerTargets ? 36 : 26} className="text-white" />
                 )}
               </button>
+
               <button
-                className={`text-white/80 hover:text-white ${animationClasses} ${buttonSizeClasses}`}
+                onClick={handleNextFromQueue}
+                className={`text-white/80 hover:text-white cursor-pointer ${animationClasses} ${buttonSizeClasses}`}
                 aria-label="Next"
               >
                 <SkipForward size={largerTargets ? 32 : 22} />
               </button>
             </div>
 
-            {/* Volume & Duration */}
+            {/* Volume & Actions */}
             <div className="flex flex-wrap items-center gap-2 sm:gap-3 md:gap-4 flex-1 justify-between md:justify-end order-2">
               <span className="text-white/60 text-xs sm:text-sm">
-                {currentSong.duration}
+                {currentSong.duration ?? ""}
               </span>
 
-              {textToSpeech && (
-                <span className="text-[10px] sm:text-xs bg-white/20 px-2 py-1 rounded text-white/80 flex items-center gap-1">
-                  <svg
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    className="inline-block"
-                  >
-                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
-                  </svg>
-                  TTS
-                </span>
-              )}
-
               <div className="flex items-center gap-2 sm:gap-3">
+                {/* Lyrics */}
                 <button
-                  onClick={() => setShowLyrics(!showLyrics)}
-                  className={`
-              text-white/80 hover:text-white 
-              ${animationClasses} ${buttonSizeClasses}
-              ${showLyrics ? "text-white" : ""}
-            `}
+                  onClick={() => {
+                    setLyricsViewMode("text");
+                    setShowLyrics(true);
+                  }}
+                  className={`text-white/80 hover:text-white cursor-pointer ${animationClasses} ${buttonSizeClasses}`}
                   title={text.lyrics}
                   aria-label={text.lyrics}
                 >
                   <FileText size={largerTargets ? 28 : 22} />
                 </button>
 
+                {/* Volume */}
                 <button
-                  className={`text-white/80 hover:text-white ${animationClasses} ${buttonSizeClasses}`}
+                  onClick={toggleMute}
+                  className={`text-white/80 hover:text-white cursor-pointer ${animationClasses} ${buttonSizeClasses}`}
                   aria-label="Volume"
+                  title={isMuted ? "Unmute" : "Mute"}
                 >
                   <Volume2 size={largerTargets ? 28 : 22} />
                 </button>
 
+                {/* Slider */}
+                <input
+                  type="range"
+                  min={0}
+                  max={1}
+                  step={0.01}
+                  value={isMuted ? 0 : volume}
+                  onChange={(e) => {
+                    setIsMuted(false);
+                    setVolume(Number(e.target.value));
+                  }}
+                  className="w-24 accent-white"
+                  aria-label="Volume slider"
+                />
+
+                {/* Like */}
                 <button
-                  className={`text-white/80 hover:text-white ${animationClasses} ${buttonSizeClasses}`}
+                  onClick={() => toggleFavorite(currentSong.id)}
+                  className={`text-white/80 hover:text-white cursor-pointer ${animationClasses} ${buttonSizeClasses}`}
                   aria-label={text.addToFavorites}
+                  title={text.addToFavorites}
                 >
-                  <Heart size={largerTargets ? 28 : 22} />
+                  <Heart
+                    size={18}
+                    className={`${
+                      favoriteTrackIds.includes(String(currentSong.id))
+                        ? "text-red-400 fill-red-400"
+                        : "text-white"
+                    }`}
+                  />
                 </button>
               </div>
             </div>
           </div>
         </div>
       )}
+
+      {/* ===================== DRAWER (Genre/Mood Results) ===================== */}
+      {drawerOpen && (
+        <div className="fixed inset-0 z-[40]">
+          {/* Backdrop */}
+          <button
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={closeDrawer}
+            aria-label="Close drawer"
+          />
+
+          {/* Drawer */}
+          <aside
+            className="
+        absolute right-0 top-0 h-full w-full sm:w-[560px]
+        bg-black/85 backdrop-blur-xl
+        border-l border-white/20
+        shadow-2xl
+        flex flex-col
+      "
+            role="dialog"
+            aria-modal="true"
+            aria-label="Tracks drawer"
+          >
+            {/* Header */}
+            <div className="sticky top-0 z-10 bg-black/70 backdrop-blur-xl border-b border-white/15">
+              <div className="p-4 flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-white/60 text-xs">
+                    {drawerType === "genre" ? "Genre" : "Mood"}
+                  </p>
+                  <h3 className="text-white text-lg font-semibold truncate">
+                    {drawerTitle}
+                  </h3>
+                </div>
+
+                <button
+                  onClick={closeDrawer}
+                  className="p-2 rounded-lg hover:bg-white/10 text-white/80 cursor-pointer"
+                  aria-label="Close"
+                >
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Mini toolbar */}
+              <div className="px-4 pb-4 flex items-center justify-between gap-3">
+                <div className="text-white/50 text-xs">
+                  {loadingTracks
+                    ? "Loading..."
+                    : `${savedTracks.length} track(s)`}
+                </div>
+
+                <button
+                  onClick={() => {
+                    // refresh selon le type du drawer
+                    if (drawerType === "genre" && selectedGenreName) {
+                      handleSelectGenre(selectedGenreName);
+                    }
+                    if (drawerType === "mood" && selectedMoodName) {
+                      handleSelectMood(selectedMoodName);
+                    }
+                  }}
+                  disabled={loadingTracks}
+                  className={`px-3 py-2 rounded-lg cursor-pointer text-xs text-white transition-all border border-white/15
+              ${
+                loadingTracks
+                  ? "opacity-50 cursor-not-allowed"
+                  : "bg-white/10 hover:bg-white/15"
+              }
+            `}
+                >
+                  Refresh
+                </button>
+              </div>
+            </div>
+
+            {/* Body */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-3">
+              {/* Loading state */}
+              {loadingTracks && (
+                <div className="bg-white/10 border border-white/15 rounded-xl p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-3 h-3 rounded-full bg-white/60 animate-pulse" />
+                    <p className="text-white/70 text-sm">
+                      Chargement des tracks...
+                    </p>
+                  </div>
+
+                  <div className="mt-4 space-y-3">
+                    {[...Array(5)].map((_, idx) => (
+                      <div
+                        key={idx}
+                        className="h-16 rounded-lg bg-white/5 animate-pulse"
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Error state */}
+              {!loadingTracks && tracksError && (
+                <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4">
+                  <p className="text-white/90 text-sm font-semibold">
+                    Erreur de chargement
+                  </p>
+                  <p className="text-white/70 text-sm mt-1">{tracksError}</p>
+
+                  <button
+                    onClick={() => {
+                      if (drawerType === "genre" && selectedGenreName) {
+                        handleSelectGenre(selectedGenreName);
+                      }
+                      if (drawerType === "mood" && selectedMoodName) {
+                        handleSelectMood(selectedMoodName);
+                      }
+                    }}
+                    className="cursor-pointer mt-4 px-4 py-2 rounded-lg bg-white/15 hover:bg-white/25 text-white text-sm transition-all"
+                  >
+                    Réessayer
+                  </button>
+                </div>
+              )}
+
+              {/* Empty state */}
+              {!loadingTracks && !tracksError && savedTracks.length === 0 && (
+                <div className="bg-white/10 border border-white/15 rounded-xl p-8 text-center">
+                  <p className="text-white/80 font-semibold">
+                    Aucun track trouvé
+                  </p>
+                  <p className="text-white/60 text-sm mt-2">
+                    Essaie un autre {drawerType === "genre" ? "genre" : "mood"}.
+                  </p>
+                </div>
+              )}
+
+              {/* Tracks list */}
+              {!loadingTracks &&
+                !tracksError &&
+                savedTracks.map((song: any) => {
+                  const isCurrent = currentSong?.id === song.id;
+                  const playing = isPlaying && isCurrent;
+
+                  return (
+                    <div
+                      key={song.id}
+                      className="bg-white/10 hover:bg-white/15 border border-white/15 rounded-xl p-3 flex items-start gap-3 transition-all"
+                    >
+                      {/* Cover placeholder */}
+                      <div className="w-12 h-12 bg-white/5 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center text-white/40 mt-1">
+                        <svg
+                          width="20"
+                          height="20"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        >
+                          <path d="M9 18V5l12-2v13" />
+                          <circle cx="6" cy="18" r="3" />
+                          <circle cx="18" cy="16" r="3" />
+                        </svg>
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <p className="text-white truncate">{song.title}</p>
+
+                        <p className="text-white/60 text-xs truncate">
+                          {song.artistName ??
+                            song.artist ??
+                            song.userId ??
+                            song.artistId ??
+                            ""}
+                        </p>
+
+                        {/* Accessibility + links */}
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          <button
+                            onClick={() => setShowLyrics(!showLyrics)}
+                            className={`
+                                        text-white/80 hover:text-white cursor-pointer 
+                                        ${animationClasses} ${buttonSizeClasses}
+                                        ${showLyrics ? "text-white" : ""}
+                                      `}
+                            title={text.lyrics}
+                            aria-label={text.lyrics}
+                          >
+                            <FileText size={largerTargets ? 28 : 22} />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Controls */}
+                      <div className="flex items-center gap-2 pt-1">
+                        <button
+                          onClick={() => handlePlaySong(song)}
+                          className="cursor-pointer p-3 bg-white/15 hover:bg-white/25 rounded-full transition-all"
+                          aria-label={playing ? "Pause" : "Play"}
+                          title={playing ? "Pause" : "Play"}
+                        >
+                          {playing ? (
+                            <svg
+                              width="18"
+                              height="18"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              className="text-white"
+                            >
+                              <rect x="6" y="4" width="4" height="16" />
+                              <rect x="14" y="4" width="4" height="16" />
+                            </svg>
+                          ) : (
+                            <svg
+                              width="18"
+                              height="18"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              className="text-white"
+                            >
+                              <polygon points="5 3 19 12 5 21 5 3" />
+                            </svg>
+                          )}
+                        </button>
+                      </div>
+                      <audio
+                        id={`fan-audio-${song.id}`}
+                        src={song.audioUrl}
+                        preload="none"
+                      />
+                    </div>
+                  );
+                })}
+            </div>
+
+            {/* Footer */}
+            <div className="p-4 border-t border-white/15 bg-black/70 backdrop-blur-xl flex items-center justify-between gap-3">
+              <button
+                onClick={closeDrawer}
+                className="px-4 py-2 cursor-pointer rounded-lg bg-white/10 hover:bg-white/15 text-white transition-all"
+              >
+                Close
+              </button>
+
+              <button
+                onClick={() => {
+                  setSavedTracks([]);
+                  setTracksError(null);
+                  setSelectedGenreName(null);
+                  setSelectedMoodName(null);
+                  closeDrawer();
+                }}
+                className="cursor-pointer px-4 py-2 rounded-lg bg-white/20 hover:bg-white/30 text-white transition-all"
+              >
+                Clear
+              </button>
+            </div>
+          </aside>
+        </div>
+      )}
+      <audio ref={audioRef} preload="none" />
     </div>
   );
 }

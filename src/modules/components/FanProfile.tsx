@@ -1,5 +1,7 @@
-import React, { useState } from "react";
-
+import React, { ChangeEvent, useEffect, useState } from "react";
+import { UserModuleObject as UserModule } from "../module";
+import { getImageFile } from "@/@disktro/utils";
+import { MediaModuleObject as MediaModule } from "../file/module";
 // Icon components
 const User = ({ size = 24, className = "" }) => (
   <svg
@@ -143,13 +145,14 @@ interface FanProfileProps {
   language: string;
 }
 
+type AccountErrors = {
+  name?: string;
+  email?: string;
+  profilePicture?: string;
+};
+
 export function FanProfile({ onBack, language }: FanProfileProps) {
   const [activeTab, setActiveTab] = useState("account");
-
-  // Account states
-  const [name, setName] = useState("John Doe");
-  const [email, setEmail] = useState("john.doe@example.com");
-  const [profilePicture, setProfilePicture] = useState<File | null>(null);
 
   // Password states
   const [currentPassword, setCurrentPassword] = useState("");
@@ -214,6 +217,8 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
     spanish: {
       title: "Mi Perfil",
       back: "Volver",
+      saving: "...",
+      updating: "...",
       account: "Cuenta",
       password: "Contraseña",
       payment: "Pago",
@@ -255,6 +260,8 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
       emailAddress: "Correo Electrónico",
     },
     english: {
+      saving: "Saving...",
+      updating: "Updating...",
       title: "My Profile",
       back: "Back",
       account: "Account",
@@ -298,6 +305,8 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
       emailAddress: "Email Address",
     },
     catalan: {
+      saving: "...",
+      updating: "...",
       title: "El Meu Perfil",
       back: "Tornar",
       account: "Compte",
@@ -342,44 +351,278 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
     },
   };
 
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    type: "FAN",
+    profileImageUrl: "",
+  });
+
+  const [profilePicturePreview, setProfilePicturePreview] =
+    useState<string>("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const [errors, setErrors] = useState<AccountErrors>({});
+  const [successMessage, setSuccessMessage] = useState("");
+
+  type PasswordErrors = {
+    currentPassword?: string;
+    newPassword?: string;
+    confirmPassword?: string;
+  };
+
+  const [passwordErrors, setPasswordErrors] = useState<PasswordErrors>({});
+
+  const [isLoadingPassword, setIsLoadingPassword] = useState(false);
+  const [successPassword, setSuccessPassword] = useState(false);
+  const [successPasswordMessage, setSuccessPasswordMessage] = useState("");
+  const [errorPasswordMessage, setErrorPasswordMessage] = useState("");
+
+  // Account states
+  const [name, setName] = useState(formData.name);
+  const [email, setEmail] = useState(formData.email);
+  const [profilePicture, setProfilePicture] = useState<File | null>(null);
+
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => {
+        setSuccessMessage("");
+      }, 5000); // 10 secondes
+
+      return () => clearTimeout(timer); // cleanup
+    }
+  }, [successMessage]);
+
+  useEffect(() => {
+    if (errorMessage) {
+      const timer = setTimeout(() => {
+        setErrorMessage("");
+      }, 5000); // 10 secondes
+
+      return () => clearTimeout(timer); // cleanup
+    }
+  }, [errorMessage]);
+
   const content = text[language as keyof typeof text] || text.english;
 
-  const handleSaveAccount = () => {
-    alert(
-      language === "spanish"
-        ? "Cuenta actualizada exitosamente"
-        : language === "english"
-        ? "Account updated successfully"
-        : "Compte actualitzat amb èxit"
-    );
+  const handleUpdatePassword = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+
+    const userId = localStorage.getItem(UserModule.localState.USER_ID);
+    if (!userId) return;
+
+    const newErrors: PasswordErrors = {};
+
+    // 🔐 1. Current obligatoire
+    if (!currentPassword) {
+      newErrors.currentPassword = "Please enter your current password";
+    }
+
+    // 🔐 2. New obligatoire + min 8
+    if (!newPassword) {
+      newErrors.newPassword = "Please enter your new password";
+    } else if (newPassword.length < 8) {
+      newErrors.newPassword = "Password must be at least 8 characters long";
+    }
+
+    // 🔐 3. Confirm obligatoire + match
+    if (!confirmPassword) {
+      newErrors.confirmPassword = "Please confirm your new password";
+    } else if (newPassword !== confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match";
+    }
+
+    setPasswordErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) return;
+
+    setIsLoadingPassword(true);
+    setSuccessPassword(false);
+    setSuccessMessage("");
+    setErrorMessage("");
+
+    try {
+      const payload = {
+        oldPassword: currentPassword,
+        newPassword,
+        confirmNewPassword: confirmPassword, // si ton backend attend ce nom
+      };
+
+      await UserModule.service.updateUser(userId, payload);
+
+      setSuccessPassword(true);
+      setSuccessMessage("Password updated successfully.");
+      setErrorMessage("");
+
+      // reset fields
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+
+      fetchUser?.();
+    } catch (error) {
+      setSuccessPassword(false);
+      setErrorMessage((error as Error).message);
+    } finally {
+      setIsLoadingPassword(false);
+    }
   };
 
-  const handleUpdatePassword = () => {
-    if (newPassword !== confirmPassword) {
-      alert(
-        language === "spanish"
-          ? "Las contraseñas no coinciden"
-          : language === "english"
-          ? "Passwords do not match"
-          : "Les contrasenyes no coincideixen"
-      );
-      return;
+  const handleSubmitAccount = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const userId = localStorage.getItem(UserModule.localState.USER_ID);
+    const token = localStorage.getItem(UserModule.localState.ACCESS_TOKEN);
+    if (!userId || !token) return;
+
+    const newErrors: AccountErrors = {};
+
+    // ✅ validations
+    const trimmedName = name.trim();
+    const trimmedEmail = email.trim();
+
+    if (!trimmedName) {
+      newErrors.name = "Please enter your name";
+    } else if (trimmedName.length < 2) {
+      newErrors.name = "Name must be at least 2 characters";
     }
-    if (newPassword.length < 8) {
-      alert(content.passwordRequirements);
-      return;
+
+    if (!trimmedEmail) {
+      newErrors.email = "Please enter your email";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      newErrors.email = "Please enter a valid email address";
     }
-    alert(
-      language === "spanish"
-        ? "Contraseña actualizada exitosamente"
-        : language === "english"
-        ? "Password updated successfully"
-        : "Contrasenya actualitzada amb èxit"
-    );
-    setCurrentPassword("");
-    setNewPassword("");
-    setConfirmPassword("");
+
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) return;
+
+    setSuccess(false);
+    setErrorMessage("");
+    setSuccessMessage("");
+    setIsLoading(true);
+
+    try {
+      // ✅ payload fan account (sans image car tu l'as déjà gérée ailleurs)
+      const payload = {
+        name: trimmedName,
+        email: trimmedEmail,
+      };
+
+      await UserModule.service.updateUser(userId, payload);
+
+      setSuccess(true);
+      setSuccessMessage("Profil mis à jour avec succès.");
+      fetchUser?.(); // resync si tu veux
+    } catch (error) {
+      setErrorMessage((error as Error).message);
+      setSuccess(false);
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+  const handleProfilePicture = async (e: ChangeEvent<HTMLInputElement>) => {
+    const token = localStorage.getItem(MediaModule.localState.ACCESS_TOKEN);
+    const file = e.target.files?.[0];
+
+    if (!file) return;
+
+    setErrorMessage("");
+    setSuccess(false);
+    setIsLoading(true);
+
+    // On garde le fichier en state si besoin
+    setProfilePicture(file);
+    // Preview local
+    setProfilePicturePreview(URL.createObjectURL(file));
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await MediaModule.service.uploadImageFile(formData);
+      const userId = localStorage.getItem(UserModule.localState.USER_ID);
+      if (res && res.fileName) {
+        // On stocke le nom de fichier / url dans le form
+        setFormData((prev: any) => ({
+          ...prev,
+          profileImageUrl: res.url, // 👉 adapte le nom du champ si nécessaire
+        }));
+        if (res && res.url) {
+          setSuccessMessage("Image uploadée avec succès.");
+          await UserModule.service.updateUser(userId!, {
+            profileImageUrl: res.url,
+          });
+          setSuccess(true);
+          setIsLoading(false);
+          setErrorMessage("");
+        } else {
+          setErrorMessage("Erreur lors de l'upload de l'image.");
+        }
+        setSuccess(true);
+        setIsLoading(false);
+        setErrorMessage("");
+      } else {
+        setErrorMessage("Erreur lors de l'upload de l'image.");
+        setIsLoading(false);
+      }
+    } catch (error) {
+      setErrorMessage((error as Error).message);
+      setIsLoading(false);
+      setSuccess(false);
+    }
+  };
+
+  const fetchUser = async () => {
+    const token = localStorage.getItem(UserModule.localState.ACCESS_TOKEN);
+    const userId = localStorage.getItem(UserModule.localState.USER_ID);
+    if (!userId || !token) return;
+
+    try {
+      setIsLoading(true);
+      setSuccess(false);
+      setErrorMessage("");
+
+      const user = await UserModule.service.getUser(userId);
+
+      // ✅ Fan: on garde uniquement les champs utiles pour l'onglet Account
+      setFormData((prev) => ({
+        ...prev,
+        name: user.data.name ?? "",
+        email: user.data.email ?? "",
+        type: user.data.type, // si tu l'utilises côté fan
+        profileImageUrl: user.data.profileImageUrl ?? "", // URL backend
+      }));
+
+      // ✅ Preview image de profil (si URL backend)
+      if (user.data.profileImageUrl) {
+        const imageObjectUrl = await getImageFile(
+          user.data.profileImageUrl,
+          token
+        );
+        setProfilePicturePreview(imageObjectUrl);
+      } else {
+        setProfilePicturePreview("");
+      }
+
+      setIsLoading(false);
+      setSuccess(true);
+      setErrorMessage("");
+    } catch (error) {
+      setErrorMessage((error as Error).message);
+      setIsLoading(false);
+      setSuccess(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!formData.name) {
+      fetchUser();
+    }
+  }, []);
 
   const handleSavePayment = () => {
     let newMethod: any = null;
@@ -550,7 +793,7 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
     <div className="w-full h-full overflow-y-auto p-8  bg-gradient-to-br from-slate-900 via-purple-900 to-black">
       <button
         onClick={onBack}
-        className="flex items-center gap-2 text-white drop-shadow hover:opacity-70 transition-opacity mb-6"
+        className="cursor-pointer flex items-center gap-2 text-white drop-shadow hover:opacity-70 transition-opacity mb-6"
       >
         <svg
           width="20"
@@ -582,7 +825,7 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
             <button
               key={id}
               onClick={() => setActiveTab(id)}
-              className={`flex items-center gap-2 px-6 py-3 rounded-lg transition-all whitespace-nowrap ${
+              className={`cursor-pointer flex items-center gap-2 px-6 py-3 rounded-lg transition-all whitespace-nowrap ${
                 activeTab === id
                   ? "bg-white/30 backdrop-blur-md border-2 border-white/50"
                   : "bg-white/10 backdrop-blur-md border-2 border-white/20 hover:bg-white/20"
@@ -601,17 +844,34 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
               {content.accountInfo}
             </h2>
 
-            <div className="space-y-6">
+            {/* Alerts */}
+            {(successMessage || errorMessage) && (
+              <div className="mb-6">
+                {successMessage && (
+                  <div className="p-4 rounded-lg border border-green-300/40 bg-green-500/10 text-green-100">
+                    {successMessage}
+                  </div>
+                )}
+                {errorMessage && (
+                  <div className="p-4 rounded-lg border border-red-300/40 bg-red-500/10 text-red-100 mt-3">
+                    {errorMessage}
+                  </div>
+                )}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmitAccount} className="space-y-6">
               {/* Profile Picture */}
               <div>
                 <label className="block text-white drop-shadow mb-3">
                   {content.profilePicture}
                 </label>
+
                 <div className="flex items-center gap-4">
                   <div className="w-24 h-24 rounded-full bg-white/5 flex items-center justify-center overflow-hidden">
-                    {profilePicture ? (
+                    {profilePicturePreview ? (
                       <img
-                        src={URL.createObjectURL(profilePicture)}
+                        src={profilePicturePreview}
                         alt="Profile"
                         className="w-full h-full object-cover"
                       />
@@ -619,23 +879,28 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
                       <User size={40} className="text-white/40" />
                     )}
                   </div>
+
                   <div>
                     <input
                       type="file"
                       accept="image/*"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) setProfilePicture(file);
-                      }}
+                      onChange={handleProfilePicture}
                       className="hidden"
                       id="profile-picture-upload"
                     />
+
                     <label
                       htmlFor="profile-picture-upload"
                       className="cursor-pointer px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg text-white hover:bg-white/30 transition-all inline-block"
                     >
                       {content.uploadPicture}
                     </label>
+
+                    {errors.profilePicture && (
+                      <p className="text-red-300 text-sm mt-2">
+                        {errors.profilePicture}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -647,11 +912,14 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
                 </label>
                 <input
                   type="text"
-                  value={name}
+                  value={name || formData.name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder={content.name}
                   className="w-full p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
                 />
+                {errors.name && (
+                  <p className="text-red-300 text-sm mt-2">{errors.name}</p>
+                )}
               </div>
 
               {/* Email */}
@@ -661,22 +929,28 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
                 </label>
                 <input
                   type="email"
-                  value={email}
+                  value={email || formData.email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder={content.email}
                   className="w-full p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
                 />
+                {errors.email && (
+                  <p className="text-red-300 text-sm mt-2">{errors.email}</p>
+                )}
               </div>
 
               {/* Save Button */}
               <button
-                onClick={handleSaveAccount}
-                className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-purple-500/40 to-pink-500/40 backdrop-blur-md border-2 border-white/40 rounded-xl text-white hover:from-purple-500/50 hover:to-pink-500/50 hover:border-white/60 transition-all shadow-lg"
+                type="submit"
+                disabled={isLoading}
+                className="w-full flex cursor-pointer items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-purple-500/40 to-pink-500/40 backdrop-blur-md border-2 border-white/40 rounded-xl text-white hover:from-purple-500/50 hover:to-pink-500/50 hover:border-white/60 transition-all shadow-lg disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 <Save size={20} />
-                {content.saveChanges}
+                {isLoading
+                  ? content.saving ?? "Saving..."
+                  : content.saveChanges}
               </button>
-            </div>
+            </form>
           </div>
         )}
 
@@ -687,7 +961,23 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
               {content.changePassword}
             </h2>
 
-            <div className="space-y-6">
+            {/* Alerts */}
+            {(successMessage || errorMessage) && (
+              <div className="mb-6">
+                {successMessage && (
+                  <div className="p-4 rounded-lg border border-green-300/40 bg-green-500/10 text-green-100">
+                    {successMessage}
+                  </div>
+                )}
+                {errorMessage && (
+                  <div className="p-4 rounded-lg border border-red-300/40 bg-red-500/10 text-red-100 mt-3">
+                    {errorMessage}
+                  </div>
+                )}
+              </div>
+            )}
+
+            <form onSubmit={handleUpdatePassword} className="space-y-6">
               {/* Current Password */}
               <div>
                 <label className="block text-white drop-shadow mb-3">
@@ -699,12 +989,12 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
                     placeholder={content.currentPassword}
-                    className="w-full p-4 pr-12 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
+                    className="w-full px-4 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-black placeholder-white/40 focus:outline-none focus:ring-2"
                   />
                   <button
                     type="button"
                     onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-white/60 hover:text-white/80 transition-colors"
+                    className="cursor-pointer absolute right-4 top-1/2 -translate-y-1/2 text-black transition-colors"
                   >
                     {showCurrentPassword ? (
                       <EyeOff size={20} />
@@ -713,6 +1003,11 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
                     )}
                   </button>
                 </div>
+                {passwordErrors.currentPassword && (
+                  <p className="text-red-300 text-sm mt-2">
+                    {passwordErrors.currentPassword}
+                  </p>
+                )}
               </div>
 
               {/* New Password */}
@@ -731,11 +1026,16 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
                   <button
                     type="button"
                     onClick={() => setShowNewPassword(!showNewPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-white/60 hover:text-white/80 transition-colors"
+                    className="cursor-pointer absolute right-4 top-1/2 -translate-y-1/2 text-black transition-colors"
                   >
                     {showNewPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
                 </div>
+                {passwordErrors.newPassword && (
+                  <p className="text-red-300 text-sm mt-2">
+                    {passwordErrors.newPassword}
+                  </p>
+                )}
               </div>
 
               {/* Confirm Password */}
@@ -754,7 +1054,7 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-white/60 hover:text-white/80 transition-colors"
+                    className="cursor-pointer absolute right-4 top-1/2 -translate-y-1/2 text-black transition-colors"
                   >
                     {showConfirmPassword ? (
                       <EyeOff size={20} />
@@ -763,6 +1063,11 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
                     )}
                   </button>
                 </div>
+                {passwordErrors.confirmPassword && (
+                  <p className="text-red-300 text-sm mt-2">
+                    {passwordErrors.confirmPassword}
+                  </p>
+                )}
               </div>
 
               <p className="text-white/60 text-sm">
@@ -771,13 +1076,16 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
 
               {/* Update Button */}
               <button
-                onClick={handleUpdatePassword}
-                className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-blue-500/40 to-cyan-500/40 backdrop-blur-md border-2 border-white/40 rounded-xl text-white hover:from-blue-500/50 hover:to-cyan-500/50 hover:border-white/60 transition-all shadow-lg"
+                type="submit"
+                disabled={isLoadingPassword}
+                className="cursor-pointer w-full flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-blue-500/40 to-cyan-500/40 backdrop-blur-md border-2 border-white/40 rounded-xl text-white hover:from-blue-500/50 hover:to-cyan-500/50 hover:border-white/60 transition-all shadow-lg disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 <Lock size={20} />
-                {content.updatePassword}
+                {isLoadingPassword
+                  ? content.updating ?? "Updating..."
+                  : content.updatePassword}
               </button>
-            </div>
+            </form>
           </div>
         )}
 
