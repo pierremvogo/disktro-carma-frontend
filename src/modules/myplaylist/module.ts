@@ -41,13 +41,14 @@ class ServiceObject {
 
   static addTrackToPlaylist = (
     playlistId: string,
-    trackId: string
+    trackId: string,
+    token: string
   ): Promise<any> => {
     const url = formatURL(API_URLS.ADD_TRACK_TO_PLAYLIST, {
       playlistId,
       trackId,
     });
-    return BaseMethods.postRequest(url, {}, true);
+    return BaseMethods.postRequest(url, {}, true, {}, token);
   };
 
   static getPlaylistByUser = (userId: string, token: string): Promise<any> => {

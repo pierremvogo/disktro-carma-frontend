@@ -11,6 +11,7 @@ import CustomSuccess from "@/@disktro/CustomSuccess";
 import CustomAlert from "@/@disktro/CustomAlert";
 import Select from "react-select";
 import countryList from "react-select-country-list";
+import { ArtistModuleObject } from "../artist/module";
 
 // Icon components
 const User = ({ size = 24, className = "" }) => (
@@ -206,6 +207,7 @@ export function ArtistProfileSetup({
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
 
   const text = {
     spanish: {
@@ -400,11 +402,11 @@ export function ArtistProfileSetup({
     setErrorMessage("");
     setSuccessMessage("");
     setIsLoading(true);
-    setErrors({}); // reset previous errors
-    const newErrors: { [key: string]: string } = {};
-    if (!artistName || !realName || !genre || !bio) {
+    setErrors({});
+
+    if (!artistName || !realName || selectedTagIds.length === 0 || !bio) {
       setErrorMessage(
-        "Veuillez remplir tous les champs du profil (nom d'artiste, nom réel, genre, bio)."
+        "Veuillez remplir tous les champs du profil (nom d'artiste, nom réel, genres, bio)."
       );
       setIsLoading(false);
       return;
@@ -437,25 +439,26 @@ export function ArtistProfileSetup({
         type: "artist",
         artistName,
         realName,
-        genre,
         bio,
         emailVerified,
         twoFactorEnabled,
         country: country || undefined,
-        profileImageUrl, // 👈 on envoie aussi l'URL de l'image uploadée
+        profileImageUrl,
+
+        // ✅ NEW
+        tagIds: selectedTagIds,
       };
 
       const res = await ModuleObject.service.createUser(payload);
+
       await wait();
       setSuccessMessage(res.message || "Profil artiste créé avec succès.");
       setErrorMessage("");
-      setIsLoading(false);
       router.push("/auth/confirm-email");
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      setErrorMessage(
-        (err as Error).message || "Erreur lors de l'inscription."
-      );
+      setErrorMessage(err?.message || "Erreur lors de l'inscription.");
+    } finally {
       setIsLoading(false);
     }
   };
@@ -574,29 +577,41 @@ export function ArtistProfileSetup({
                     />
                   </div>
 
-                  {/* Music Genre */}
+                  {/* Music Genres (multi) */}
                   <div>
                     <label className="block text-white drop-shadow mb-2">
                       {content.genre}
                     </label>
 
                     <select
+                      multiple
                       className={`w-full border cursor-pointer ${
                         errors?.genre ? "border-red-500" : "border-white/30"
-                      } rounded px-3 py-3  backdrop-blur-md 
-       placeholder-white/40 focus:outline-none focus:ring-2 ${
-         errors?.genre ? "focus:ring-red-500" : "focus:ring-white/50"
-       }`}
-                      value={genre}
-                      onChange={(e) => setGenre(e.target.value)}
+                      } rounded px-3 py-3 backdrop-blur-md placeholder-white/40 focus:outline-none focus:ring-2 ${
+                        errors?.genre
+                          ? "focus:ring-red-500"
+                          : "focus:ring-white/50"
+                      }`}
+                      value={selectedTagIds}
+                      onChange={(e) => {
+                        const values = Array.from(e.target.selectedOptions).map(
+                          (o) => o.value
+                        );
+                        setSelectedTagIds(values);
+                      }}
                     >
-                      <option value="">-- Select a genre --</option>
                       {tags.map((tag) => (
                         <option key={tag.id} value={tag.id}>
                           {tag.name}
                         </option>
                       ))}
                     </select>
+
+                    <p className="text-white/50 text-xs mt-2">
+                      {language === "english"
+                        ? "Hold Ctrl (Windows) or Cmd (Mac) to select multiple."
+                        : "Maintiens Ctrl (Windows) ou Cmd (Mac) pour sélectionner plusieurs."}
+                    </p>
 
                     {errors?.genre && (
                       <p className="text-red-400 text-sm mt-1">

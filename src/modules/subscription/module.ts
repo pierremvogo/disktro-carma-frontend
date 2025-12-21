@@ -21,6 +21,10 @@ interface API_URLS {
   GET_MY_RECENT_ACTIVE_SUBSCRIBERS: string;
   GET_MY_ACTIVE_BY_LOCATION: string;
   GET_MY_STATS: string;
+
+  GET_STATUS: string;
+  SUBSCRIBE: string;
+  UNSUBSCRIBE: string;
 }
 
 const API_URLS: API_URLS = {
@@ -39,6 +43,10 @@ const API_URLS: API_URLS = {
   GET_MY_RECENT_ACTIVE_SUBSCRIBERS: `${BASE_API_URL}/subscription/artist/me/recent`,
   GET_MY_ACTIVE_BY_LOCATION: `${BASE_API_URL}/subscription/artist/me/by-location`,
   GET_MY_STATS: `${BASE_API_URL}/subscription/artist/me/stats`,
+
+  GET_STATUS: `${BASE_API_URL}/subscription/artist/:artistId/status`,
+  SUBSCRIBE: `${BASE_API_URL}/subscription/artist/:artistId/subscribe`,
+  UNSUBSCRIBE: `${BASE_API_URL}/subscription/artist/:artistId/unsubscribe`,
 } as const;
 
 class ServiceObject {
@@ -65,6 +73,21 @@ class ServiceObject {
   ): Promise<any> => {
     const url = formatURL(API_URLS.GET_SUBSCRIPTION_BY_PLAN, { planId });
     return BaseMethods.getRequest(url, true);
+  };
+
+  static getStatus = (artistId: string, token: string) => {
+    const url = formatURL(API_URLS.GET_STATUS, { artistId });
+    return BaseMethods.getRequest(url, true, {}, token);
+  };
+
+  static subscribe = (artistId: string, token: string, body: any = {}) => {
+    const url = formatURL(API_URLS.SUBSCRIBE, { artistId });
+    return BaseMethods.postRequest(url, body, true, {}, token);
+  };
+
+  static unsubscribe = (artistId: string, token: string) => {
+    const url = formatURL(API_URLS.UNSUBSCRIBE, { artistId });
+    return BaseMethods.postRequest(url, {}, true, {}, token);
   };
 
   static getSubscriptions = (token: string): Promise<any> =>

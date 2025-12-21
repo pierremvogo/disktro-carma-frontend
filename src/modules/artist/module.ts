@@ -17,6 +17,7 @@ interface API_URLS {
   GET_ARTIST_BY_SLUG: string;
   UPDATE_ARTIST: string;
   DELETE_ARTIST: string;
+  GET_ARTISTS_FOR_FAN: string;
 }
 
 const API_URLS: API_URLS = {
@@ -28,6 +29,7 @@ const API_URLS: API_URLS = {
   GET_ARTIST_BY_SLUG: `${BASE_API_URL}/artists/getBySlug/:slug`,
   UPDATE_ARTIST: `${BASE_API_URL}/artists/:id`,
   DELETE_ARTIST: `${BASE_API_URL}/artists/:id`,
+  GET_ARTISTS_FOR_FAN: `${BASE_API_URL}/users/artist-fan/getAll`,
 } as const;
 
 class ServiceObject {
@@ -51,6 +53,14 @@ class ServiceObject {
   static getArtistByTag = (id: string): Promise<any> => {
     const url = formatURL(API_URLS.GET_ARTIST_BY_TAG, { id });
     return BaseMethods.getRequest(url, true);
+  };
+  static getArtistsForFan = (token: string): Promise<any> => {
+    return BaseMethods.getRequest(
+      API_URLS.GET_ARTISTS_FOR_FAN,
+      true,
+      {},
+      token
+    );
   };
 
   static getArtistBySlug = (slug: string): Promise<any> => {

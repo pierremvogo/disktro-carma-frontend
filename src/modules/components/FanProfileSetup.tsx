@@ -391,6 +391,7 @@ export function FanProfileSetup({
         bio,
         emailVerified,
         twoFactorEnabled,
+        country: country || undefined,
         profileImageUrl, // 👈 on envoie aussi l'URL de l'image uploadée
       };
 
