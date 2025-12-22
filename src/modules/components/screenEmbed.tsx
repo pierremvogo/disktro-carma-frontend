@@ -274,12 +274,12 @@ export function ScreenEmbed() {
   return (
     <div
       className="fixed inset-0 w-screen h-screen bg-cover bg-center"
-      // style={{
-      //   backgroundImage:
-      //     'url("/image/4ac3eed398bb68113a14d0fa5efe7a6def6f7651.png")',
-      //   backgroundSize: "cover",
-      //   backgroundPosition: "center",
-      // }}
+      style={{
+        backgroundImage:
+          'url("/image/4ac3eed398bb68113a14d0fa5efe7a6def6f7651.png")',
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
     >
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/50" />
@@ -415,25 +415,25 @@ export function ScreenEmbed() {
               {/* Left Panel */}
               <div
                 className="hidden lg:block absolute left-0 w-64 h-full rounded-3xl overflow-hidden shadow-2xl bg-cover bg-center origin-center"
-                style={{
-                  backgroundImage:
-                    'url("/image/4ac3eed398bb68113a14d0fa5efe7a6def6f7651.png")',
-                  backgroundPosition: "25% 35%",
-                  backgroundSize: "cover",
-                  transform: "rotate(90deg)",
-                }}
+                // style={{
+                //   backgroundImage:
+                //     'url("/image/4ac3eed398bb68113a14d0fa5efe7a6def6f7651.png")',
+                //   backgroundPosition: "25% 35%",
+                //   backgroundSize: "cover",
+                //   transform: "rotate(90deg)",
+                // }}
               />
 
               {/* Right Panel */}
               <div
                 className="hidden lg:block absolute right-0 w-64 h-full rounded-3xl overflow-hidden shadow-2xl bg-cover bg-center origin-center"
-                style={{
-                  backgroundImage:
-                    'url("/image/4ac3eed398bb68113a14d0fa5efe7a6def6f7651.png")',
-                  backgroundPosition: "75% 35%",
-                  backgroundSize: "cover",
-                  transform: "rotate(90deg)",
-                }}
+                // style={{
+                //   backgroundImage:
+                //     'url("/image/4ac3eed398bb68113a14d0fa5efe7a6def6f7651.png")',
+                //   backgroundPosition: "75% 35%",
+                //   backgroundSize: "cover",
+                //   transform: "rotate(90deg)",
+                // }}
               />
 
               {/* Middle Panel */}
