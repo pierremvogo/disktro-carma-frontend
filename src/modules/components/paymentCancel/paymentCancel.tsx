@@ -114,7 +114,7 @@ export default function PaymentCancelPage() {
             {/* Actions */}
             <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
               <button
-                onClick={() => router.push("dashboard/fan-streaming")}
+                onClick={() => router.push("/dashboard/fan-streaming")}
                 className="w-full cursor-pointer px-6 py-4 bg-white/20 backdrop-blur-md border-2 border-white/30 rounded-xl text-white hover:bg-white/30 hover:border-white/50 transition-all shadow-lg"
               >
                 Back to streaming
