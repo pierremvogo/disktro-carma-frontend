@@ -873,18 +873,16 @@ export function FanStreaming({ language }: FanStreamingProps) {
   };
 
   const handleConfirmSubscription = async () => {
-    if (!selectedArtistForSubscription) return;
+    if (!selectedArtistForSubscription) throw new Error("No artist selected");
+
     const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
-    if (!token) {
-      alert("Not authenticated");
-      return;
-    }
-    if (!selectedPlanId) {
-      alert("Please select a plan.");
-      return;
-    }
+    if (!token) throw new Error("Not authenticated");
+
+    if (!selectedPlanId) throw new Error("Please select a plan.");
+
     try {
       setCheckoutLoading(true);
+
       const res =
         await StripeModuleObject.service.createSubscriptionCheckoutSession(
           {
@@ -893,13 +891,14 @@ export function FanStreaming({ language }: FanStreamingProps) {
           },
           token
         );
+
       const url = res?.data?.url ?? res?.url;
       if (!url) throw new Error("Stripe checkout url not returned");
-      // ✅ redirect to Stripe Checkout
-      window.location.href = url;
+
+      window.location.href = url; // ✅ redirect
     } catch (e: any) {
-      console.error(e);
-      alert((e as Error).message ?? "Checkout failed");
+      // IMPORTANT: rethrow pour que la modale puisse remettre isSubmitting=false
+      throw new Error((e as Error).message ?? "Checkout failed");
     } finally {
       setCheckoutLoading(false);
     }
