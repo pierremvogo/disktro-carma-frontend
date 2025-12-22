@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 type SubscriptionModalProps = {
   language: string;
@@ -7,7 +7,7 @@ type SubscriptionModalProps = {
   showSubscriptionModal: boolean;
   selectedArtistForSubscription: any | null;
 
-  handleConfirmSubscription: () => void;
+  handleConfirmSubscription: () => Promise<void> | void; // ✅ accepte async
   onClose: () => void;
 
   artistPlans: any[];
@@ -36,15 +36,36 @@ const CheckCircle2 = ({ size = 16, className = "" }) => (
   </svg>
 );
 
+const Spinner = ({ size = 18, className = "" }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    className={className}
+    fill="none"
+  >
+    <circle
+      cx="12"
+      cy="12"
+      r="10"
+      stroke="currentColor"
+      strokeWidth="3"
+      opacity="0.25"
+    />
+    <path
+      d="M22 12a10 10 0 0 1-10 10"
+      stroke="currentColor"
+      strokeWidth="3"
+      strokeLinecap="round"
+    />
+  </svg>
+);
+
 function formatPrice(p: any) {
-  // p.price peut être number/string/decimal drizzle
   const value = typeof p?.price === "string" ? p.price : String(p?.price ?? "");
   const currency = (p?.currency ?? "EUR").toUpperCase();
-
-  // si price déjà "9.99" -> "€9.99"
   const symbol =
     currency === "EUR" ? "€" : currency === "USD" ? "$" : `${currency} `;
-
   return `${symbol}${value}`;
 }
 
@@ -52,21 +73,9 @@ function cycleLabel(language: string, billingCycle?: string) {
   const v = String(billingCycle ?? "").toLowerCase();
 
   const map = {
-    english: {
-      monthly: "/month",
-      quarterly: "/3 months",
-      annual: "/year",
-    },
-    spanish: {
-      monthly: "/mes",
-      quarterly: "/3 meses",
-      annual: "/año",
-    },
-    catalan: {
-      monthly: "/mes",
-      quarterly: "/3 mesos",
-      annual: "/any",
-    },
+    english: { monthly: "/month", quarterly: "/3 months", annual: "/year" },
+    spanish: { monthly: "/mes", quarterly: "/3 meses", annual: "/año" },
+    catalan: { monthly: "/mes", quarterly: "/3 mesos", annual: "/any" },
   } as const;
 
   const dict = map[language as keyof typeof map] ?? map.english;
@@ -112,9 +121,7 @@ function getDefaultFeatures(language: string, plan: any) {
         : ["Annual billing", "Best yearly price"]
       : [];
 
-  // si ton backend envoie des features, on les utilise
   const backendFeatures = Array.isArray(plan?.features) ? plan.features : null;
-
   return backendFeatures?.length ? backendFeatures : [...base, ...extra];
 }
 
@@ -131,7 +138,12 @@ export function SubscriptionModal({
   selectedPlanId,
   setSelectedPlanId,
 }: SubscriptionModalProps) {
-  if (!showSubscriptionModal || !selectedArtistForSubscription) return null;
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // ✅ reset loading si on ferme / change d’artiste / ré-ouvre
+  useEffect(() => {
+    if (!showSubscriptionModal) setIsSubmitting(false);
+  }, [showSubscriptionModal]);
 
   const title =
     language === "spanish"
@@ -142,10 +154,16 @@ export function SubscriptionModal({
 
   const subtitle =
     language === "spanish"
-      ? `Elige un plan para suscribirte a ${selectedArtistForSubscription.name}`
+      ? `Elige un plan para suscribirte a ${
+          selectedArtistForSubscription?.name ?? ""
+        }`
       : language === "catalan"
-      ? `Tria un pla per subscriure't a ${selectedArtistForSubscription.name}`
-      : `Choose a plan to subscribe to ${selectedArtistForSubscription.name}`;
+      ? `Tria un pla per subscriure't a ${
+          selectedArtistForSubscription?.name ?? ""
+        }`
+      : `Choose a plan to subscribe to ${
+          selectedArtistForSubscription?.name ?? ""
+        }`;
 
   const choosePlan =
     language === "spanish"
@@ -161,6 +179,13 @@ export function SubscriptionModal({
       ? "Continuar amb el pagament"
       : "Continue to payment";
 
+  const confirmingLabel =
+    language === "spanish"
+      ? "Redirigiendo…"
+      : language === "catalan"
+      ? "Redirigint…"
+      : "Redirecting…";
+
   const selectingHint =
     language === "spanish"
       ? "Selecciona un plan para continuar."
@@ -175,9 +200,27 @@ export function SubscriptionModal({
       ? "No hi ha plans disponibles"
       : "No plans available";
 
+  if (!showSubscriptionModal || !selectedArtistForSubscription) return null;
+
+  const canSubmit =
+    !!selectedPlanId && !plansLoading && !plansError && !isSubmitting;
+
+  const onConfirmClick = async () => {
+    if (!canSubmit) return;
+    try {
+      setIsSubmitting(true);
+
+      // ✅ important : handleConfirmSubscription redirige (window.location.href)
+      // donc on ne verra pas forcément le "finally", mais c’est ok.
+      await Promise.resolve(handleConfirmSubscription());
+    } catch (e) {
+      console.error(e);
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[90] p-4">
-      {/* ✅ largeur augmentée */}
       <div className="bg-black/80 backdrop-blur-xl rounded-3xl border border-white/20 p-8 w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto shadow-2xl">
         {/* Header */}
         <div className="flex items-start justify-between gap-4 mb-6">
@@ -187,9 +230,15 @@ export function SubscriptionModal({
           </div>
 
           <button
-            onClick={onClose}
-            className="text-white/60 hover:text-white transition-colors flex-shrink-0"
+            onClick={() => {
+              if (isSubmitting) return; // évite de fermer pendant redirect
+              onClose();
+            }}
+            className={`text-white/60 hover:text-white transition-colors flex-shrink-0 ${
+              isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+            }`}
             aria-label="Close"
+            disabled={isSubmitting}
           >
             <svg
               width="26"
@@ -231,10 +280,17 @@ export function SubscriptionModal({
                   <button
                     key={p.id}
                     type="button"
-                    onClick={() => setSelectedPlanId(String(p.id))}
+                    onClick={() => {
+                      if (isSubmitting) return;
+                      setSelectedPlanId(String(p.id));
+                    }}
+                    disabled={isSubmitting}
                     className={[
-                      "text-left rounded-2xl border p-6 transition-all cursor-pointer",
+                      "text-left rounded-2xl border p-6 transition-all",
                       "bg-white/10 hover:bg-white/15",
+                      isSubmitting
+                        ? "cursor-not-allowed opacity-70"
+                        : "cursor-pointer",
                       isSelected
                         ? "border-white/40 ring-2 ring-white/30"
                         : "border-white/15",
@@ -250,7 +306,6 @@ export function SubscriptionModal({
                         </p>
                       </div>
 
-                      {/* Badge sélection */}
                       <div
                         className={[
                           "px-3 py-1 rounded-full text-xs border",
@@ -322,7 +377,6 @@ export function SubscriptionModal({
           )}
         </div>
 
-        {/* Hint */}
         {!plansLoading && !plansError && (
           <p className="text-white/50 text-xs mb-6">{selectingHint}</p>
         )}
@@ -331,19 +385,30 @@ export function SubscriptionModal({
         <div className="flex flex-col sm:flex-row gap-4">
           <button
             type="button"
-            onClick={onClose}
-            className="flex-1 px-5 py-3 bg-white/10 rounded-xl text-white hover:bg-white/20 transition-all border border-white/15"
+            onClick={() => {
+              if (isSubmitting) return;
+              onClose();
+            }}
+            disabled={isSubmitting}
+            className="flex-1 px-5 py-3 bg-white/10 rounded-xl text-white hover:bg-white/20 transition-all border border-white/15 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {text.cancel}
           </button>
 
           <button
             type="button"
-            onClick={handleConfirmSubscription}
-            disabled={!selectedPlanId || plansLoading || !!plansError}
+            onClick={onConfirmClick}
+            disabled={!canSubmit}
             className="flex-1 px-5 py-3 bg-white/25 rounded-xl text-white hover:bg-white/35 transition-all border border-white/25 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {confirmLabel}
+            {isSubmitting ? (
+              <span className="flex items-center justify-center gap-2">
+                <Spinner size={18} className="text-white animate-spin" />
+                <span>{confirmingLabel}</span>
+              </span>
+            ) : (
+              confirmLabel
+            )}
           </button>
         </div>
       </div>
