@@ -231,7 +231,7 @@ export function Questionnaire({
               {text.ageRange}
             </label>
             <div className="flex gap-1.5">
-              {["-18", "-22", "-30", "-50", "+50"].map((range) => (
+              {["-18", "-22", "-25", "-30", "-50", "+50"].map((range) => (
                 <button
                   key={range}
                   type="button"
