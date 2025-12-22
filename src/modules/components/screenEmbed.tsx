@@ -274,12 +274,12 @@ export function ScreenEmbed() {
   return (
     <div
       className="fixed inset-0 w-screen h-screen bg-cover bg-center"
-      style={{
-        backgroundImage:
-          'url("/image/4ac3eed398bb68113a14d0fa5efe7a6def6f7651.png")',
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}
+      // style={{
+      //   backgroundImage:
+      //     'url("/image/4ac3eed398bb68113a14d0fa5efe7a6def6f7651.png")',
+      //   backgroundSize: "cover",
+      //   backgroundPosition: "center",
+      // }}
     >
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/50" />
