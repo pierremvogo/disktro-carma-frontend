@@ -610,7 +610,9 @@ export function ArtistProfileSetup({
                     <p className="text-white/50 text-2xl mt-2">
                       {language === "english"
                         ? "Hold Ctrl (Windows) or Cmd (Mac) to select multiple."
-                        : "Maintiens Ctrl (Windows) ou Cmd (Mac) pour sélectionner plusieurs."}
+                        : language === "spanish"
+                        ? "Mantén pulsada la tecla Ctrl (Windows) o Cmd (Mac) para seleccionar varios elementos."
+                        : "Mantén premuda la tecla Ctrl (Windows) o Cmd (Mac) per seleccionar diversos elements."}
                     </p>
 
                     {errors?.genre && (
