@@ -18,6 +18,7 @@ interface API_URLS {
   // ✅ NEW (pricing UI)
   GET_MY_PLANS: string;
   UPSERT_MY_PRICING: string;
+  GET_PLANS_BY_ARTIST: string;
 }
 
 const API_URLS: API_URLS = {
@@ -26,6 +27,7 @@ const API_URLS: API_URLS = {
   GET_PLANS: `${BASE_API_URL}/plan`,
   UPDATE_PLAN: `${BASE_API_URL}/plan/update/:id`,
   DELETE_PLAN: `${BASE_API_URL}/plan/delete/:id`,
+  GET_PLANS_BY_ARTIST: `${BASE_API_URL}/plan/artist/:artistId`,
 
   // ✅ endpoints backend à ajouter (ou déjà ajoutés) :
   GET_MY_PLANS: `${BASE_API_URL}/plan/artist/me`,
@@ -57,6 +59,11 @@ class ServiceObject {
   static deletePlan = (id: string): Promise<any> => {
     const url = formatURL(API_URLS.DELETE_PLAN, { id });
     return BaseMethods.deleteRequest(url, {}, true);
+  };
+
+  static getPlansByArtist = (artistId: string, token: string) => {
+    const url = formatURL(API_URLS.GET_PLANS_BY_ARTIST, { artistId });
+    return BaseMethods.getRequest(url, true, {}, token);
   };
 
   // ✅ NEW: Get plans for logged-in artist

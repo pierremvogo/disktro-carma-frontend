@@ -10,6 +10,10 @@ import { EpModuleObject } from "../ep/module";
 import { PlaylistModuleObject } from "../myplaylist/module";
 import { ArtistModuleObject } from "../artist/module";
 import { SubscriptionModuleObject } from "../subscription/module";
+import { EditorPlaylistModuleObject } from "./editorPlaylist/module";
+import { SubscriptionModal } from "./subscriptionModal";
+import { PlanModuleObject } from "../plan/module";
+import { StripeModuleObject } from "./stripe/module";
 
 // Icon components
 const Music = ({ size = 24, className = "" }) => (
@@ -314,6 +318,19 @@ export function FanStreaming({ language }: FanStreamingProps) {
   const [artistsLoading, setArtistsLoading] = useState(false);
   const [artistsError, setArtistsError] = useState<string | null>(null);
 
+  const [editorPlaylists, setEditorPlaylists] = useState<any[]>([]);
+  const [editorPlaylistsLoading, setEditorPlaylistsLoading] = useState(false);
+  const [editorPlaylistsError, setEditorPlaylistsError] = useState<
+    string | null
+  >(null);
+
+  const [artistPlans, setArtistPlans] = useState<any[]>([]);
+  const [plansLoading, setPlansLoading] = useState(false);
+  const [plansError, setPlansError] = useState<string>("");
+
+  const [selectedPlanId, setSelectedPlanId] = useState<string>("");
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
+
   const FAVORITES_KEY = "fan_favorite_track_ids";
 
   const loadFavoriteIds = () => {
@@ -580,6 +597,129 @@ export function FanStreaming({ language }: FanStreamingProps) {
     }
   }
 
+  async function fetchEditorPlaylists() {
+    try {
+      setEditorPlaylistsLoading(true);
+      setEditorPlaylistsError(null);
+
+      const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
+      if (!token) {
+        setEditorPlaylistsError("Utilisateur non authentifié.");
+        setEditorPlaylists([]);
+        return;
+      }
+
+      const locale =
+        language === "spanish" ? "es" : language === "catalan" ? "ca" : "en";
+
+      const res: any =
+        await EditorPlaylistModuleObject.service.getEditorPlaylists(
+          token,
+          locale,
+          20
+        );
+      const raw = res.data ?? [];
+
+      const mapped = raw.map((p: any) => ({
+        id: String(p.id),
+        name: p.name,
+        description: p.description ?? "",
+        cover: p.coverUrl ?? "/placeholder.png",
+        songCount: p.songCount ?? p.tracks?.length ?? 0,
+        songs: (p.tracks ?? []).map((t: any) => ({
+          ...t,
+          id: String(t.id),
+          title: t.title,
+          artist: t.artistName ?? t.userId ?? "",
+          cover: t.coverUrl ?? p.coverUrl ?? "/placeholder.png",
+        })),
+      }));
+
+      setEditorPlaylists(mapped);
+    } catch (e: any) {
+      console.error(e);
+      setEditorPlaylistsError(e?.message ?? "Erreur lors du chargement.");
+      setEditorPlaylists([]);
+    } finally {
+      setEditorPlaylistsLoading(false);
+    }
+  }
+  const handlePlayEditorPlaylist = async (playlist: any) => {
+    const tracks = (playlist.songs ?? []).filter((t: any) => t.audioUrl);
+    if (!tracks.length) return;
+
+    setQueue(tracks);
+    setQueueIndex(0);
+    await handlePlaySong(tracks[0], tracks);
+  };
+
+  // Subscription + payment UI
+  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+  const [selectedArtistForSubscription, setSelectedArtistForSubscription] =
+    useState<any | null>(null);
+
+  const [paymentOption, setPaymentOption] = useState<"card" | "paypal">("card");
+  const [cardNumber, setCardNumber] = useState("");
+  const [cardHolder, setCardHolder] = useState("");
+  const [cardExpiry, setCardExpiry] = useState("");
+  const [cardCvc, setCardCvc] = useState("");
+  const [paypalEmail, setPaypalEmail] = useState("");
+
+  const startSubscription = async (artist: any) => {
+    setSelectedArtistForSubscription(artist);
+    setShowSubscriptionModal(true);
+
+    setArtistPlans([]);
+    setSelectedPlanId("");
+    setPlansError("");
+
+    const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
+    if (!token) {
+      setPlansError("Utilisateur non authentifié.");
+      return;
+    }
+
+    try {
+      setPlansLoading(true);
+
+      const res: any = await PlanModuleObject.service.getPlansByArtist(
+        String(artist.id),
+        token
+      );
+
+      const plans = res.data ?? [];
+      // filtre actifs + tri (monthly -> quarterly -> annual)
+      const order = { monthly: 1, quarterly: 2, annual: 3 } as any;
+
+      const normalized = plans
+        .filter((p: any) => p.active)
+        .sort(
+          (a: any, b: any) =>
+            (order[a.billingCycle] ?? 99) - (order[b.billingCycle] ?? 99)
+        );
+
+      setArtistPlans(normalized);
+
+      // sélection par défaut: monthly si existe, sinon 1er
+      const defaultPlan =
+        normalized.find((p: any) => p.billingCycle === "monthly") ??
+        normalized[0];
+
+      if (defaultPlan?.id) setSelectedPlanId(String(defaultPlan.id));
+    } catch (e: any) {
+      console.error(e);
+      setPlansError(e?.message ?? "Erreur lors du chargement des plans.");
+    } finally {
+      setPlansLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedTab === "editorplaylists") {
+      fetchEditorPlaylists();
+    }
+  }, [selectedTab]);
+
   const handlePlayPlaylist = async (playlist: any, startIndex = 0) => {
     const tracks = (playlist?.tracks ?? []).filter((t: any) => t?.audioUrl);
 
@@ -591,6 +731,39 @@ export function FanStreaming({ language }: FanStreamingProps) {
 
     // joue le premier track (ou celui sélectionné)
     await handlePlaySong(tracks[startIndex], tracks);
+  };
+
+  const handleConfirmSubscription = async () => {
+    if (!selectedArtistForSubscription) return;
+    const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
+    if (!token) {
+      alert("Not authenticated");
+      return;
+    }
+    if (!selectedPlanId) {
+      alert("Please select a plan.");
+      return;
+    }
+    try {
+      setCheckoutLoading(true);
+      const res =
+        await StripeModuleObject.service.createSubscriptionCheckoutSession(
+          {
+            artistId: String(selectedArtistForSubscription.id),
+            planId: String(selectedPlanId),
+          },
+          token
+        );
+      const url = res?.data?.url ?? res?.url;
+      if (!url) throw new Error("Stripe checkout url not returned");
+      // ✅ redirect to Stripe Checkout
+      window.location.href = url;
+    } catch (e: any) {
+      console.error(e);
+      alert(e?.message ?? "Checkout failed");
+    } finally {
+      setCheckoutLoading(false);
+    }
   };
 
   const normalizeTracksWithCover = (
@@ -1568,84 +1741,84 @@ Underneath the shining star`,
   ];
 
   // Mock data for editor's playlists
-  const editorPlaylists = [
-    {
-      id: "ed1",
-      name:
-        language === "spanish"
-          ? "Viaje Sonoro"
-          : language === "english"
-          ? "Sonic Journey"
-          : "Viatge Sonor",
-      description:
-        language === "spanish"
-          ? "Las mejores pistas para explorar nuevos sonidos"
-          : language === "english"
-          ? "The best tracks to explore new sounds"
-          : "Les millors pistes per explorar nous sons",
-      cover:
-        "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&q=80",
-      songCount: 24,
-      songs: [mockSongs[0], mockSongs[2], mockSongs[4]],
-    },
-    {
-      id: "ed2",
-      name:
-        language === "spanish"
-          ? "Energía Urbana"
-          : language === "english"
-          ? "Urban Energy"
-          : "Energia Urbana",
-      description:
-        language === "spanish"
-          ? "Ritmos de la ciudad que inspiran"
-          : language === "english"
-          ? "City rhythms that inspire"
-          : "Ritmes de la ciutat que inspiren",
-      cover:
-        "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&q=80",
-      songCount: 18,
-      songs: [mockSongs[1], mockSongs[3], mockSongs[5]],
-    },
-    {
-      id: "ed3",
-      name:
-        language === "spanish"
-          ? "Naturaleza Serena"
-          : language === "english"
-          ? "Serene Nature"
-          : "Naturalesa Serena",
-      description:
-        language === "spanish"
-          ? "Melodías inspiradas en la naturaleza"
-          : language === "english"
-          ? "Melodies inspired by nature"
-          : "Melodies inspirades en la naturalesa",
-      cover:
-        "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=400&q=80",
-      songCount: 30,
-      songs: [mockSongs[2], mockSongs[4]],
-    },
-    {
-      id: "ed4",
-      name:
-        language === "spanish"
-          ? "Estrellas Nocturnas"
-          : language === "english"
-          ? "Night Stars"
-          : "Estrelles Nocturnes",
-      description:
-        language === "spanish"
-          ? "Música para las noches mágicas"
-          : language === "english"
-          ? "Music for magical nights"
-          : "Música per les nits màgiques",
-      cover:
-        "https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=400&q=80",
-      songCount: 22,
-      songs: [mockSongs[0], mockSongs[3]],
-    },
-  ];
+  // const editorPlaylists = [
+  //   {
+  //     id: "ed1",
+  //     name:
+  //       language === "spanish"
+  //         ? "Viaje Sonoro"
+  //         : language === "english"
+  //         ? "Sonic Journey"
+  //         : "Viatge Sonor",
+  //     description:
+  //       language === "spanish"
+  //         ? "Las mejores pistas para explorar nuevos sonidos"
+  //         : language === "english"
+  //         ? "The best tracks to explore new sounds"
+  //         : "Les millors pistes per explorar nous sons",
+  //     cover:
+  //       "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&q=80",
+  //     songCount: 24,
+  //     songs: [mockSongs[0], mockSongs[2], mockSongs[4]],
+  //   },
+  //   {
+  //     id: "ed2",
+  //     name:
+  //       language === "spanish"
+  //         ? "Energía Urbana"
+  //         : language === "english"
+  //         ? "Urban Energy"
+  //         : "Energia Urbana",
+  //     description:
+  //       language === "spanish"
+  //         ? "Ritmos de la ciudad que inspiran"
+  //         : language === "english"
+  //         ? "City rhythms that inspire"
+  //         : "Ritmes de la ciutat que inspiren",
+  //     cover:
+  //       "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&q=80",
+  //     songCount: 18,
+  //     songs: [mockSongs[1], mockSongs[3], mockSongs[5]],
+  //   },
+  //   {
+  //     id: "ed3",
+  //     name:
+  //       language === "spanish"
+  //         ? "Naturaleza Serena"
+  //         : language === "english"
+  //         ? "Serene Nature"
+  //         : "Naturalesa Serena",
+  //     description:
+  //       language === "spanish"
+  //         ? "Melodías inspiradas en la naturaleza"
+  //         : language === "english"
+  //         ? "Melodies inspired by nature"
+  //         : "Melodies inspirades en la naturalesa",
+  //     cover:
+  //       "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=400&q=80",
+  //     songCount: 30,
+  //     songs: [mockSongs[2], mockSongs[4]],
+  //   },
+  //   {
+  //     id: "ed4",
+  //     name:
+  //       language === "spanish"
+  //         ? "Estrellas Nocturnas"
+  //         : language === "english"
+  //         ? "Night Stars"
+  //         : "Estrelles Nocturnes",
+  //     description:
+  //       language === "spanish"
+  //         ? "Música para las noches mágicas"
+  //         : language === "english"
+  //         ? "Music for magical nights"
+  //         : "Música per les nits màgiques",
+  //     cover:
+  //       "https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=400&q=80",
+  //     songCount: 22,
+  //     songs: [mockSongs[0], mockSongs[3]],
+  //   },
+  // ];
 
   // Mock data for artists
   const mockArtists = [
@@ -1809,6 +1982,10 @@ Underneath the shining star`,
 
     return ok;
   }
+
+  const openSubscribeModal = (artist: any) => {
+    startSubscription(artist);
+  };
 
   const getSubscribedArtistsList = () => {
     if (!Array.isArray(artists) || artists.length === 0) return [];
@@ -2644,7 +2821,12 @@ Underneath the shining star`,
                     </p>
 
                     <button
-                      onClick={() => toggleSubscription(artist.id)}
+                      onClick={
+                        () =>
+                          subscribedArtists.includes(String(artist.id))
+                            ? toggleSubscription(String(artist.id)) // unsubscribe
+                            : startSubscription(artist) // open payment options
+                      }
                       className={`w-full px-4 py-2 backdrop-blur-sm rounded-lg text-white transition-all flex items-center justify-center gap-2 ${
                         subscribedArtists.includes(artist.id)
                           ? "bg-white/30 border border-white/40"
@@ -2921,74 +3103,159 @@ Underneath the shining star`,
         {/* Editor's Playlists Tab */}
         {selectedTab === "editorplaylists" && (
           <div className="max-w-6xl mx-auto space-y-6">
-            <h2 className="text-2xl text-white drop-shadow-lg">
-              {text.editorPlaylists}
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {editorPlaylists.map((playlist) => (
-                <div
-                  key={playlist.id}
-                  className="bg-white/10 backdrop-blur-md rounded-2xl overflow-hidden border border-white/20 hover:bg-white/15 transition-all"
-                >
-                  <div className="aspect-video bg-white/5 overflow-hidden">
-                    <img
-                      src={playlist.cover}
-                      alt={playlist.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="p-6">
-                    <h3 className="text-white drop-shadow mb-2">
-                      {playlist.name}
-                    </h3>
-                    <p className="text-white/60 text-sm mb-4">
-                      {playlist.description}
-                    </p>
-                    <p className="text-white/50 text-xs mb-4">
-                      {playlist.songCount} {text.songs}
-                    </p>
+            {/* Header */}
+            <div className="flex items-center justify-between gap-3">
+              <h2 className="text-2xl text-white drop-shadow-lg">
+                {text.editorPlaylists}
+              </h2>
 
-                    {/* Preview songs */}
-                    <div className="space-y-2 mb-4">
-                      {playlist.songs.map((song: any) => (
-                        <div key={song.id} className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-white/5 rounded overflow-hidden flex-shrink-0">
-                            <img
-                              src={song.cover}
-                              alt={song.title}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-white/90 text-sm truncate">
-                              {song.title}
-                            </p>
-                            <p className="text-white/50 text-xs truncate">
-                              {song.artist}
-                            </p>
-                          </div>
-                          <button
-                            onClick={() => handlePlaySong(song)}
-                            className="p-2 hover:bg-white/10 rounded-full transition-all"
-                          >
-                            {isPlaying && currentSong?.id === song.id ? (
-                              <Pause size={16} className="text-white" />
-                            ) : (
-                              <Play size={16} className="text-white" />
-                            )}
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-
-                    <button className="w-full px-4 py-2 bg-white/20 backdrop-blur-sm rounded-lg text-white hover:bg-white/30 transition-all flex items-center justify-center gap-2">
-                      <Play size={16} />
-                      {text.play}
-                    </button>
-                  </div>
-                </div>
-              ))}
+              <button
+                type="button"
+                onClick={fetchEditorPlaylists}
+                disabled={editorPlaylistsLoading}
+                className="px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white/80 hover:bg-white/20 transition-all text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {editorPlaylistsLoading
+                  ? "loading…"
+                  : language === "english"
+                  ? "Refresh"
+                  : language === "spanish"
+                  ? "Actualizar"
+                  : "Actualitzar"}
+              </button>
             </div>
+
+            {/* LOADING */}
+            {editorPlaylistsLoading && (
+              <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20 text-white/70 text-center">
+                {language === "english"
+                  ? "Loading editor playlists…"
+                  : language === "spanish"
+                  ? "Cargando playlists editoriales…"
+                  : "Carregant playlists editorials…"}
+              </div>
+            )}
+
+            {/* ERROR */}
+            {!editorPlaylistsLoading && editorPlaylistsError && (
+              <div className="bg-red-500/10 backdrop-blur-md rounded-xl p-6 border border-red-500/20 text-white/80 text-center">
+                {editorPlaylistsError}
+              </div>
+            )}
+
+            {/* EMPTY STATE */}
+            {!editorPlaylistsLoading &&
+              !editorPlaylistsError &&
+              (editorPlaylists?.length ?? 0) === 0 && (
+                <div className="bg-white/10 backdrop-blur-md rounded-xl p-10 border border-white/20 text-center">
+                  <p className="text-white/80 text-lg font-semibold mb-2">
+                    {language === "english"
+                      ? "No editor playlists yet"
+                      : language === "spanish"
+                      ? "Aún no hay playlists editoriales"
+                      : "Encara no hi ha playlists editorials"}
+                  </p>
+
+                  <p className="text-white/60 text-sm max-w-md mx-auto">
+                    {language === "english"
+                      ? "Our editorial team is working on curated playlists. Check back soon!"
+                      : language === "spanish"
+                      ? "Nuestro equipo editorial está preparando playlists seleccionadas. ¡Vuelve pronto!"
+                      : "El nostre equip editorial està preparant playlists seleccionades. Torna aviat!"}
+                  </p>
+                </div>
+              )}
+
+            {/* LIST */}
+            {!editorPlaylistsLoading &&
+              !editorPlaylistsError &&
+              (editorPlaylists?.length ?? 0) > 0 && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {editorPlaylists.map((playlist: any) => (
+                    <div
+                      key={playlist.id}
+                      className="bg-white/10 backdrop-blur-md rounded-2xl overflow-hidden border border-white/20 hover:bg-white/15 transition-all"
+                    >
+                      <div className="aspect-video bg-white/5 overflow-hidden">
+                        <img
+                          src={playlist.cover ?? "/placeholder.png"}
+                          alt={playlist.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+
+                      <div className="p-6">
+                        <h3 className="text-white drop-shadow mb-2">
+                          {playlist.name}
+                        </h3>
+
+                        <p className="text-white/60 text-sm mb-4">
+                          {playlist.description}
+                        </p>
+
+                        <p className="text-white/50 text-xs mb-4">
+                          {playlist.songCount} {text.songs}
+                        </p>
+
+                        {/* Preview songs */}
+                        <div className="space-y-2 mb-4">
+                          {(playlist.songs ?? [])
+                            .slice(0, 5)
+                            .map((song: any) => (
+                              <div
+                                key={song.id}
+                                className="flex items-center gap-3"
+                              >
+                                <div className="w-10 h-10 bg-white/5 rounded overflow-hidden flex-shrink-0">
+                                  <img
+                                    src={song.cover ?? "/placeholder.png"}
+                                    alt={song.title}
+                                    className="w-full h-full object-cover"
+                                  />
+                                </div>
+
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-white/90 text-sm truncate">
+                                    {song.title}
+                                  </p>
+                                  <p className="text-white/50 text-xs truncate">
+                                    {song.artist}
+                                  </p>
+                                </div>
+
+                                <button
+                                  onClick={() =>
+                                    handlePlaySong(song, playlist.songs)
+                                  }
+                                  className="p-2 hover:bg-white/10 rounded-full transition-all"
+                                  aria-label={
+                                    isPlaying && currentSong?.id === song.id
+                                      ? text.pause
+                                      : text.play
+                                  }
+                                >
+                                  {isPlaying && currentSong?.id === song.id ? (
+                                    <Pause size={16} className="text-white" />
+                                  ) : (
+                                    <Play size={16} className="text-white" />
+                                  )}
+                                </button>
+                              </div>
+                            ))}
+                        </div>
+
+                        <button
+                          onClick={() => handlePlayEditorPlaylist(playlist)}
+                          className="w-full px-4 py-2 bg-white/20 backdrop-blur-sm rounded-lg text-white hover:bg-white/30 transition-all flex items-center justify-center gap-2"
+                        >
+                          <Play size={16} />
+                          {text.play}
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
           </div>
         )}
 
@@ -3429,7 +3696,39 @@ Underneath the shining star`,
           </div>
         </div>
       )}
-
+      <SubscriptionModal
+        language={language}
+        text={text}
+        showSubscriptionModal={showSubscriptionModal}
+        selectedArtistForSubscription={selectedArtistForSubscription}
+        paymentOption={paymentOption}
+        setPaymentOption={setPaymentOption}
+        cardNumber={cardNumber}
+        setCardNumber={setCardNumber}
+        cardHolder={cardHolder}
+        setCardHolder={setCardHolder}
+        cardExpiry={cardExpiry}
+        setCardExpiry={setCardExpiry}
+        cardCvc={cardCvc}
+        setCardCvc={setCardCvc}
+        paypalEmail={paypalEmail}
+        setPaypalEmail={setPaypalEmail}
+        handleConfirmSubscription={handleConfirmSubscription}
+        artistPlans={artistPlans}
+        plansLoading={plansLoading}
+        plansError={plansError}
+        selectedPlanId={selectedPlanId}
+        setSelectedPlanId={setSelectedPlanId}
+        onClose={() => {
+          setShowSubscriptionModal(false);
+          setSelectedArtistForSubscription(null);
+          setCardNumber("");
+          setCardHolder("");
+          setCardExpiry("");
+          setCardCvc("");
+          setPaypalEmail("");
+        }}
+      />
       {/* Accessibility Panel */}
       {showAccessibility && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
