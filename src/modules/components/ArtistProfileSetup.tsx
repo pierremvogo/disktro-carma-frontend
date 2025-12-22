@@ -607,7 +607,7 @@ export function ArtistProfileSetup({
                       ))}
                     </select>
 
-                    <p className="text-white/50 text-xs mt-2">
+                    <p className="text-white/50 text-2xl mt-2">
                       {language === "english"
                         ? "Hold Ctrl (Windows) or Cmd (Mac) to select multiple."
                         : "Maintiens Ctrl (Windows) ou Cmd (Mac) pour sélectionner plusieurs."}
