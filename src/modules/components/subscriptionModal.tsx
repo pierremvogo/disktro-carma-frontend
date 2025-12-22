@@ -208,7 +208,7 @@ export function SubscriptionModal({
                 type="text"
                 value={cardNumber}
                 onChange={(e) => setCardNumber(e.target.value)}
-                className="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-white/40"
+                className="w-full p-3 bg-white border border-white/20 rounded-lg text-black focus:outline-none focus:border-white/40"
                 placeholder="•••• •••• •••• ••••"
               />
             </div>
@@ -224,7 +224,7 @@ export function SubscriptionModal({
                 type="text"
                 value={cardHolder}
                 onChange={(e) => setCardHolder(e.target.value)}
-                className="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-white/40"
+                className="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-black  focus:outline-none focus:border-white/40"
                 placeholder="Name Surname"
               />
             </div>
@@ -241,7 +241,7 @@ export function SubscriptionModal({
                   type="text"
                   value={cardExpiry}
                   onChange={(e) => setCardExpiry(e.target.value)}
-                  className="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-white/40"
+                  className="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-black  focus:outline-none focus:border-white/40"
                   placeholder="MM/YY"
                 />
               </div>
@@ -252,7 +252,7 @@ export function SubscriptionModal({
                   type="password"
                   value={cardCvc}
                   onChange={(e) => setCardCvc(e.target.value)}
-                  className="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-white/40"
+                  className="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-black  focus:outline-none focus:border-white/40"
                   placeholder="•••"
                 />
               </div>
@@ -271,7 +271,7 @@ export function SubscriptionModal({
               type="email"
               value={paypalEmail}
               onChange={(e) => setPaypalEmail(e.target.value)}
-              className="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-white/40"
+              className="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-black  focus:outline-none focus:border-white/40"
               placeholder="you@example.com"
             />
           </div>
