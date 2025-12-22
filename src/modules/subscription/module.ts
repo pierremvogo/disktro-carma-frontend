@@ -56,7 +56,7 @@ class ServiceObject {
 
   static getSubscription = (id: string, token: string): Promise<any> => {
     const url = formatURL(API_URLS.GET_SUBSCRIPTION, { id });
-    return BaseMethods.getRequest(url, true);
+    return BaseMethods.getRequest(url, true, {}, token);
   };
 
   static getSubscriptionByUser = (
@@ -64,7 +64,7 @@ class ServiceObject {
     token: string
   ): Promise<any> => {
     const url = formatURL(API_URLS.GET_SUBSCRIPTION_BY_USER, { userId });
-    return BaseMethods.getRequest(url, true);
+    return BaseMethods.getRequest(url, true, {}, token);
   };
 
   static getSubscriptionByPlan = (
@@ -72,7 +72,7 @@ class ServiceObject {
     token: string
   ): Promise<any> => {
     const url = formatURL(API_URLS.GET_SUBSCRIPTION_BY_PLAN, { planId });
-    return BaseMethods.getRequest(url, true);
+    return BaseMethods.getRequest(url, true, {}, token);
   };
 
   static getStatus = (artistId: string, token: string) => {
