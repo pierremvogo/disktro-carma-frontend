@@ -64,7 +64,7 @@ export default function PaymentSuccessPage() {
 
         // Auto-redirect (2.5s)
         setTimeout(() => {
-          router.push("/fan/streaming?tab=dashboard"); // ✅ ouvre directement Dashboard
+          router.push("/fan/streaming?tab=dashboard&sub=success");
         }, 2500);
       } catch (e: any) {
         console.error(e);

@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { FanProfile } from "./FanProfile";
 import { UserModuleObject as ModuleObject } from "../module";
-import { useRouter } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
+
 import { TagModuleObject } from "../tag/module";
 import { TrackModuleObject } from "../track/module";
 import { TrackStreamModuleObject } from "../trackSTreams/module";
@@ -14,7 +15,6 @@ import { EditorPlaylistModuleObject } from "./editorPlaylist/module";
 import { SubscriptionModal } from "./subscriptionModal";
 import { PlanModuleObject } from "../plan/module";
 import { StripeModuleObject } from "./stripe/module";
-import { useSearchParams } from "next/navigation";
 
 // Icon components
 const Music = ({ size = 24, className = "" }) => (
@@ -336,7 +336,24 @@ export function FanStreaming({ language }: FanStreamingProps) {
 
   useEffect(() => {
     const tab = searchParams.get("tab");
-    if (tab) setSelectedTab(tab); // "dashboard", "artists", "discover", etc.
+    const sub = searchParams.get("sub");
+
+    if (tab) {
+      setSelectedTab(tab); // ex: "dashboard"
+    }
+
+    if (sub === "success") {
+      setNotification("✅ Abonnement activé avec succès !");
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    const sub = searchParams.get("sub");
+    if (sub === "success") {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("sub");
+      window.history.replaceState({}, "", url.toString());
+    }
   }, [searchParams]);
 
   const FAVORITES_KEY = "fan_favorite_track_ids";

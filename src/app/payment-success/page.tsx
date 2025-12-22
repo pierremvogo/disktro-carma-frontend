@@ -1,8 +1,10 @@
 import PaymentSuccessPage from "@/modules/components/paymentSuccess/paymentSuccess";
-import React from "react";
+import React, { Suspense } from "react";
 
 const page = () => {
-  return <PaymentSuccessPage />;
+  <Suspense fallback={<div className="p-6 text-white">Chargement…</div>}>
+    <PaymentSuccessPage />
+  </Suspense>;
 };
 
 export default page;
