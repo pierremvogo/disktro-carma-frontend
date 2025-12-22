@@ -560,7 +560,7 @@ export function ArtistDashboard({
       setMobileMoneyPhone(data.mobileMoneyPhone ?? "");
       setOrangeMoneyPhone(data.orangeMoneyPhone ?? "");
     } catch (e: any) {
-      setPayoutError(e?.message || "Failed to load payout settings");
+      setPayoutError((e as Error).message || "Failed to load payout settings");
     } finally {
       setPayoutLoading(false);
     }
@@ -1224,7 +1224,7 @@ export function ArtistDashboard({
       setStreamsByLocation(streamsByLocationArr);
     } catch (error) {
       console.error("Erreur récupération stats streams :", error);
-      setStreamsError("Erreur lors du chargement des statistiques de streams.");
+      setStreamsError((error as Error).message);
     } finally {
       setIsStreamsLoading(false);
     }
@@ -1500,10 +1500,7 @@ export function ArtistDashboard({
       setSuccessMessage("Track et single créés et associés avec succès !");
     } catch (error) {
       console.error("Erreur ajout track :", error);
-      setErrorMessage(
-        (error as Error).message ||
-          "Erreur lors de la création du single et du track."
-      );
+      setErrorMessage((error as Error).message);
     } finally {
       setIsLoading(false);
     }
@@ -1555,10 +1552,7 @@ export function ArtistDashboard({
       }
     } catch (error) {
       console.error("Erreur upload fichier braille :", error);
-      setErrorMessage(
-        (error as Error).message ||
-          "Erreur lors de l'upload du fichier braille."
-      );
+      setErrorMessage((error as Error).message);
     } finally {
       setIsLoading(false);
     }
@@ -1572,7 +1566,7 @@ export function ArtistDashboard({
       setMoods(res.data);
       console.log("MY MOOD : ", res.data);
     } catch (error) {
-      console.error("Erreur récupération des moods :", error);
+      console.error((error as Error).message);
     }
   }
 
@@ -1629,10 +1623,7 @@ export function ArtistDashboard({
       }
     } catch (error) {
       console.error("Erreur upload vidéo langue des signes :", error);
-      setErrorMessage(
-        (error as Error).message ||
-          "Erreur lors de l'upload de la vidéo en langue des signes."
-      );
+      setErrorMessage((error as Error).message);
     } finally {
       setIsLoading(false);
     }
@@ -1684,9 +1675,7 @@ export function ArtistDashboard({
       }
     } catch (error) {
       console.error("Erreur upload vidéo intro :", error);
-      setErrorMessage(
-        (error as Error).message || "Erreur lors de l'upload de la vidéo."
-      );
+      setErrorMessage((error as Error).message);
     } finally {
       setIsLoading(false);
     }
