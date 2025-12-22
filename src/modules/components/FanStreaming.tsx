@@ -332,6 +332,13 @@ export function FanStreaming({ language }: FanStreamingProps) {
   const [selectedPlanId, setSelectedPlanId] = useState<string>("");
   const [checkoutLoading, setCheckoutLoading] = useState(false);
 
+  // Dashboard (subscriptions backend)
+  const [mySubscriptions, setMySubscriptions] = useState<any[]>([]);
+  const [subscriptionsLoading, setSubscriptionsLoading] = useState(false);
+  const [subscriptionsError, setSubscriptionsError] = useState<string | null>(
+    null
+  );
+
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -612,6 +619,81 @@ export function FanStreaming({ language }: FanStreamingProps) {
     // charge les playlists dès l'ouverture
     await fetchUserPlaylists();
   }
+  async function fetchMySubscriptionsDashboard() {
+    try {
+      setSubscriptionsLoading(true);
+      setSubscriptionsError(null);
+
+      const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
+      const userId = localStorage.getItem(ModuleObject.localState.USER_ID);
+
+      if (!token || !userId) {
+        setSubscriptionsError("Utilisateur non authentifié.");
+        setMySubscriptions([]);
+        return;
+      }
+
+      const res = await SubscriptionModuleObject.service.getSubscriptionByUser(
+        userId,
+        token
+      );
+
+      const subs = res.data ?? [];
+      setMySubscriptions(subs);
+
+      // ✅ dériver subscribedArtists depuis backend (actifs seulement)
+      const now = new Date();
+      const activeArtistIds = subs
+        .filter((s: any) => {
+          if (s.status !== "active") return false;
+          const end = s.endDate ? new Date(s.endDate) : null;
+          return !end || end > now;
+        })
+        .map((s: any) => String(s.artistId));
+
+      setSubscribedArtists(Array.from(new Set(activeArtistIds)));
+    } catch (e: any) {
+      console.error(e);
+      setSubscriptionsError(
+        (e as Error).message ?? "Erreur lors du chargement des abonnements."
+      );
+      setMySubscriptions([]);
+    } finally {
+      setSubscriptionsLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    if (selectedTab === "dashboard") {
+      fetchMySubscriptionsDashboard();
+    }
+  }, [selectedTab]);
+
+  const getSubscribedArtistsListFromSubs = () => {
+    if (!Array.isArray(mySubscriptions) || mySubscriptions.length === 0)
+      return [];
+    if (!Array.isArray(artists) || artists.length === 0) return [];
+
+    const activeArtistIds = new Set(
+      mySubscriptions
+        .filter((s: any) => s.status === "active")
+        .map((s: any) => String(s.artistId))
+    );
+
+    return artists.filter((a: any) => activeArtistIds.has(String(a.id)));
+  };
+
+  const getGiftsForSubscribedArtistsFromSubs = () => {
+    const activeIds = new Set(
+      mySubscriptions
+        .filter((s: any) => s.status === "active")
+        .map((s: any) => String(s.artistId))
+    );
+
+    return exclusiveGifts.filter((gift: any) =>
+      activeIds.has(String(gift.artistId))
+    );
+  };
 
   async function handleAddTrackToPlaylist(playlistId: string) {
     try {
@@ -3319,109 +3401,179 @@ Underneath the shining star`,
         {/* Dashboard Tab */}
         {selectedTab === "dashboard" && (
           <div className="max-w-6xl mx-auto space-y-8">
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-gradient-to-br from-purple-500/40 to-pink-500/40 backdrop-blur-md rounded-2xl p-6 border border-white/20">
-                <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
-                    <Star size={32} className="text-white" />
-                  </div>
-                  <div>
-                    <p className="text-white/60 text-sm">
-                      {text.totalSubscriptions}
-                    </p>
-                    <p className="text-3xl text-white drop-shadow">
-                      {subscribedArtists.length}
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-gradient-to-br from-blue-500/40 to-cyan-500/40 backdrop-blur-md rounded-2xl p-6 border border-white/20">
-                <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
-                    <svg
-                      width="32"
-                      height="32"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      className="text-white"
-                    >
-                      <path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6" />
-                      <polyline points="7 3 12 8 17 3" />
-                      <polyline points="12 8 12 21" />
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="text-white/60 text-sm">{text.totalGifts}</p>
-                    <p className="text-3xl text-white drop-shadow">
-                      {getGiftsForSubscribedArtists().length}
-                    </p>
-                  </div>
-                </div>
-              </div>
+            {/* Header actions */}
+            <div className="flex items-center justify-between gap-3">
+              <h2 className="text-2xl text-white drop-shadow-lg">
+                {text.dashboard}
+              </h2>
+
+              <button
+                onClick={fetchMySubscriptionsDashboard}
+                disabled={subscriptionsLoading}
+                className="px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white/80 hover:bg-white/20 transition-all text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {subscriptionsLoading
+                  ? "loading…"
+                  : language === "english"
+                  ? "Refresh"
+                  : language === "spanish"
+                  ? "Actualizar"
+                  : "Actualitzar"}
+              </button>
             </div>
+
+            {/* Loading/Error */}
+            {subscriptionsLoading && (
+              <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20 text-white/70">
+                {language === "english"
+                  ? "Loading subscriptions…"
+                  : language === "spanish"
+                  ? "Cargando suscripciones…"
+                  : "Carregant subscripcions…"}
+              </div>
+            )}
+
+            {!subscriptionsLoading && subscriptionsError && (
+              <div className="bg-red-500/10 backdrop-blur-md rounded-xl p-6 border border-red-500/20 text-white/80">
+                {subscriptionsError}
+              </div>
+            )}
+
+            {/* Stats Cards */}
+            {!subscriptionsLoading && !subscriptionsError && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-gradient-to-br from-purple-500/40 to-pink-500/40 backdrop-blur-md rounded-2xl p-6 border border-white/20">
+                  <div className="flex items-center gap-4">
+                    <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
+                      <Star size={32} className="text-white" />
+                    </div>
+                    <div>
+                      <p className="text-white/60 text-sm">
+                        {text.totalSubscriptions}
+                      </p>
+                      <p className="text-3xl text-white drop-shadow">
+                        {
+                          mySubscriptions.filter(
+                            (s: any) => s.status === "active"
+                          ).length
+                        }
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-gradient-to-br from-blue-500/40 to-cyan-500/40 backdrop-blur-md rounded-2xl p-6 border border-white/20">
+                  <div className="flex items-center gap-4">
+                    <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
+                      <svg
+                        width="32"
+                        height="32"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        className="text-white"
+                      >
+                        <path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6" />
+                        <polyline points="7 3 12 8 17 3" />
+                        <polyline points="12 8 12 21" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-white/60 text-sm">{text.totalGifts}</p>
+                      <p className="text-3xl text-white drop-shadow">
+                        {getGiftsForSubscribedArtistsFromSubs().length}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* My Subscriptions */}
             <div>
               <h2 className="text-2xl text-white drop-shadow-lg mb-4">
                 {text.mySubscriptions}
               </h2>
-              {getSubscribedArtistsList().length > 0 ? (
+
+              {!subscriptionsLoading &&
+              !subscriptionsError &&
+              mySubscriptions.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {getSubscribedArtistsList().map((artist) => (
-                    <div
-                      key={artist.id}
-                      className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 hover:bg-white/15 transition-all"
-                    >
-                      <div className="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden bg-white/5">
-                        <img
-                          src={artist.avatar}
-                          alt={artist.name}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <h3 className="text-white drop-shadow mb-2 text-center">
-                        {artist.name}
-                      </h3>
-                      <p className="text-white/60 text-sm mb-1 text-center">
-                        {artist.genres}
-                      </p>
-                      <p className="text-white/50 text-xs mb-4 text-center">
-                        {text.subscribedOn}: {new Date().toLocaleDateString()}
-                      </p>
-                      <button
-                        onClick={() => toggleSubscription(String(artist.id))}
-                        className="w-full px-4 py-2 bg-red-500/30 backdrop-blur-sm rounded-lg text-white hover:bg-red-500/40 transition-all flex items-center justify-center gap-2 border border-red-500/40"
-                      >
-                        <svg
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
+                  {mySubscriptions
+                    .filter((s: any) => s.status === "active")
+                    .map((sub: any) => {
+                      const artist = artists.find(
+                        (a: any) => String(a.id) === String(sub.artistId)
+                      );
+
+                      return (
+                        <div
+                          key={sub.id}
+                          className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 hover:bg-white/15 transition-all"
                         >
-                          <line x1="18" y1="6" x2="6" y2="18" />
-                          <line x1="6" y1="6" x2="18" y2="18" />
-                        </svg>
-                        {text.unsubscribe}
-                      </button>
-                    </div>
-                  ))}
+                          <div className="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden bg-white/5">
+                            <img
+                              src={artist?.avatar ?? "/avatar-placeholder.png"}
+                              alt={artist?.name ?? "Artist"}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+
+                          <h3 className="text-white drop-shadow mb-2 text-center">
+                            {artist?.name ?? "Artist"}
+                          </h3>
+
+                          <p className="text-white/60 text-sm mb-1 text-center">
+                            {artist?.genres ?? "—"}
+                          </p>
+
+                          <p className="text-white/50 text-xs mb-4 text-center">
+                            {text.subscribedOn}:{" "}
+                            {sub.startDate
+                              ? new Date(sub.startDate).toLocaleDateString()
+                              : new Date(
+                                  sub.createdAt ?? Date.now()
+                                ).toLocaleDateString()}
+                          </p>
+
+                          <button
+                            onClick={() =>
+                              toggleSubscription(String(sub.artistId))
+                            }
+                            className="w-full px-4 py-2 bg-red-500/30 backdrop-blur-sm rounded-lg text-white hover:bg-red-500/40 transition-all flex items-center justify-center gap-2 border border-red-500/40"
+                          >
+                            <svg
+                              width="16"
+                              height="16"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                            >
+                              <line x1="18" y1="6" x2="6" y2="18" />
+                              <line x1="6" y1="6" x2="18" y2="18" />
+                            </svg>
+                            {text.unsubscribe}
+                          </button>
+                        </div>
+                      );
+                    })}
                 </div>
               ) : (
-                <div className="bg-white/10 backdrop-blur-md rounded-2xl p-12 border border-white/20 text-center">
-                  <Star size={64} className="text-white/30 mx-auto mb-4" />
-                  <p className="text-white/60 mb-4">{text.noSubscriptions}</p>
-                  <button
-                    onClick={() => setSelectedTab("artists")}
-                    className="px-6 py-3 bg-white/20 backdrop-blur-sm rounded-lg text-white hover:bg-white/30 transition-all"
-                  >
-                    {text.exploreArtists}
-                  </button>
-                </div>
+                !subscriptionsLoading &&
+                !subscriptionsError && (
+                  <div className="bg-white/10 backdrop-blur-md rounded-2xl p-12 border border-white/20 text-center">
+                    <Star size={64} className="text-white/30 mx-auto mb-4" />
+                    <p className="text-white/60 mb-4">{text.noSubscriptions}</p>
+                    <button
+                      onClick={() => setSelectedTab("artists")}
+                      className="px-6 py-3 bg-white/20 backdrop-blur-sm rounded-lg text-white hover:bg-white/30 transition-all"
+                    >
+                      {text.exploreArtists}
+                    </button>
+                  </div>
+                )
               )}
             </div>
 
@@ -3430,9 +3582,12 @@ Underneath the shining star`,
               <h2 className="text-2xl text-white drop-shadow-lg mb-4">
                 {text.exclusiveGifts}
               </h2>
-              {getGiftsForSubscribedArtists().length > 0 ? (
+
+              {!subscriptionsLoading &&
+              !subscriptionsError &&
+              getGiftsForSubscribedArtistsFromSubs().length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {getGiftsForSubscribedArtists().map((gift) => (
+                  {getGiftsForSubscribedArtistsFromSubs().map((gift: any) => (
                     <div
                       key={gift.id}
                       className="bg-white/10 backdrop-blur-md rounded-2xl overflow-hidden border border-white/20 hover:bg-white/15 transition-all"
@@ -3483,9 +3638,11 @@ Underneath the shining star`,
                             )}
                           </div>
                         </div>
+
                         <p className="text-white/60 text-sm mb-4">
                           {gift.description}
                         </p>
+
                         <button
                           className={`w-full px-4 py-2 backdrop-blur-sm rounded-lg text-white transition-all ${
                             gift.claimed
@@ -3501,30 +3658,33 @@ Underneath the shining star`,
                   ))}
                 </div>
               ) : (
-                <div className="bg-white/10 backdrop-blur-md rounded-2xl p-12 border border-white/20 text-center">
-                  <svg
-                    width="64"
-                    height="64"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    className="text-white/30 mx-auto mb-4"
-                  >
-                    <path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6" />
-                    <polyline points="7 3 12 8 17 3" />
-                    <polyline points="12 8 12 21" />
-                  </svg>
-                  <p className="text-white/60 mb-4">{text.noGifts}</p>
-                  <p className="text-white/50 text-sm">
-                    {language === "spanish" &&
-                      "Suscríbete a tus artistas favoritos para recibir regalos exclusivos"}
-                    {language === "english" &&
-                      "Subscribe to your favorite artists to receive exclusive gifts"}
-                    {language === "catalan" &&
-                      "Subscriu-te als teus artistes favorits per rebre regals exclusius"}
-                  </p>
-                </div>
+                !subscriptionsLoading &&
+                !subscriptionsError && (
+                  <div className="bg-white/10 backdrop-blur-md rounded-2xl p-12 border border-white/20 text-center">
+                    <svg
+                      width="64"
+                      height="64"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      className="text-white/30 mx-auto mb-4"
+                    >
+                      <path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6" />
+                      <polyline points="7 3 12 8 17 3" />
+                      <polyline points="12 8 12 21" />
+                    </svg>
+                    <p className="text-white/60 mb-4">{text.noGifts}</p>
+                    <p className="text-white/50 text-sm">
+                      {language === "spanish" &&
+                        "Suscríbete a tus artistas favoritos para recibir regalos exclusivos"}
+                      {language === "english" &&
+                        "Subscribe to your favorite artists to receive exclusive gifts"}
+                      {language === "catalan" &&
+                        "Subscriu-te als teus artistes favorits per rebre regals exclusius"}
+                    </p>
+                  </div>
+                )
               )}
             </div>
           </div>

@@ -129,7 +129,7 @@ export default function PaymentSuccessPage() {
 
         // Auto-redirect (2.5s)
         redirectTimer = setTimeout(() => {
-          router.push("dashboard/fan-streaming?tab=dashboard&sub=success");
+          router.push("/dashboard/fan-streaming?tab=dashboard&sub=success");
         }, 2500);
       } catch (e: any) {
         console.error(e);
@@ -242,7 +242,7 @@ export default function PaymentSuccessPage() {
               </button>
 
               <button
-                onClick={() => router.push("dashboard/fan-streaming")}
+                onClick={() => router.push("/dashboard/fan-streaming")}
                 className="w-full cursor-pointer px-6 py-4 bg-white/30 backdrop-blur-md border-2 border-white/40 rounded-xl text-white hover:bg-white/40 hover:border-white/60 transition-all shadow-lg"
               >
                 Continue listening
