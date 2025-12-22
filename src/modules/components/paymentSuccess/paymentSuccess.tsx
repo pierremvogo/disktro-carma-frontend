@@ -1,12 +1,90 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { StripeModuleObject } from "../stripe/module";
-import { SubscriptionModuleObject } from "@/modules/subscription/module"; // adapte le chemin
 import { UserModuleObject as ModuleObject } from "@/modules/module"; // adapte si besoin
 
 type Status = "idle" | "processing" | "success" | "error";
+
+// Simple icon components (même esprit que ton Login)
+const CheckCircle = ({ size = 24, className = "" }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+    <polyline points="22 4 12 14.01 9 11.01" />
+  </svg>
+);
+
+const AlertTriangle = ({ size = 24, className = "" }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+    <line x1="12" y1="9" x2="12" y2="13" />
+    <line x1="12" y1="17" x2="12.01" y2="17" />
+  </svg>
+);
+
+const Loader = ({ size = 20, className = "" }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    className={className}
+    fill="none"
+  >
+    <circle
+      cx="12"
+      cy="12"
+      r="10"
+      stroke="currentColor"
+      strokeWidth="3"
+      opacity="0.25"
+    />
+    <path
+      d="M22 12a10 10 0 0 1-10 10"
+      stroke="currentColor"
+      strokeWidth="3"
+      strokeLinecap="round"
+    />
+  </svg>
+);
+
+const Music = ({ size = 24, className = "" }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <path d="M9 18V5l12-2v13" />
+    <circle cx="6" cy="18" r="3" />
+    <circle cx="18" cy="16" r="3" />
+  </svg>
+);
 
 export default function PaymentSuccessPage() {
   const router = useRouter();
@@ -21,6 +99,8 @@ export default function PaymentSuccessPage() {
   const [message, setMessage] = useState<string>("");
 
   useEffect(() => {
+    let redirectTimer: any;
+
     async function run() {
       if (!sessionId) {
         setStatus("error");
@@ -39,23 +119,8 @@ export default function PaymentSuccessPage() {
       setMessage("Finalizing your subscription…");
 
       try {
-        /**
-         * ✅ OPTIONNEL (recommandé) :
-         * Si tu ajoutes un endpoint backend pour vérifier la session checkout (session_id),
-         * tu peux l’appeler ici pour améliorer l’UX et être certain.
-         *
-         * Exemple: GET /stripe/checkout/session/:sessionId
-         * -> renvoie { paid: true, artistId, planId, subscriptionId }
-         *
-         * Pour l'instant, on ne dépend PAS de ça car le webhook crée la subscription.
-         */
-
-        // 👉 Petit délai pour laisser le webhook écrire en DB (Render/Stripe parfois > 1s)
+        // Petit délai pour laisser le webhook écrire en DB
         await new Promise((r) => setTimeout(r, 1500));
-
-        // ✅ Refresh local subscription state (si tu as la liste d'artistes, tu peux refetch)
-        // Ici on fait un ping simple: rien à faire côté backend si tout est webhook-driven.
-        // Tu peux aussi appeler un endpoint "GET /subscription/user/:userId" si utile.
 
         setStatus("success");
         setMessage(
@@ -63,8 +128,8 @@ export default function PaymentSuccessPage() {
         );
 
         // Auto-redirect (2.5s)
-        setTimeout(() => {
-          router.push("/fan/streaming?tab=dashboard&sub=success");
+        redirectTimer = setTimeout(() => {
+          router.push("dashboard/fan-streaming?tab=dashboard&sub=success");
         }, 2500);
       } catch (e: any) {
         console.error(e);
@@ -76,60 +141,123 @@ export default function PaymentSuccessPage() {
     }
 
     run();
+
+    return () => {
+      if (redirectTimer) clearTimeout(redirectTimer);
+    };
   }, [sessionId, router]);
 
+  const header = {
+    idle: {
+      title: "Preparing…",
+      icon: <Music className="text-white" size={28} />,
+    },
+    processing: {
+      title: "Processing…",
+      icon: <Loader className="text-white animate-spin" size={22} />,
+    },
+    success: {
+      title: "Success",
+      icon: <CheckCircle className="text-green-300" size={26} />,
+    },
+    error: {
+      title: "Payment issue",
+      icon: <AlertTriangle className="text-red-300" size={26} />,
+    },
+  }[status];
+
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-purple-900 via-pink-900 to-blue-900 p-6">
-      <div className="w-full max-w-lg bg-black/70 backdrop-blur-xl border border-white/20 rounded-2xl p-8 shadow-2xl">
-        <div className="flex items-center gap-3 mb-4">
-          {status === "processing" && (
-            <div className="w-3 h-3 rounded-full bg-white/70 animate-pulse" />
-          )}
-          {status === "success" && (
-            <div className="w-3 h-3 rounded-full bg-green-400" />
-          )}
-          {status === "error" && (
-            <div className="w-3 h-3 rounded-full bg-red-400" />
-          )}
+    <div
+      className="fixed inset-0 w-screen h-screen bg-cover bg-center"
+      style={{
+        backgroundImage:
+          'url("/image/4ac3eed398bb68113a14d0fa5efe7a6def6f7651.png")',
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-black/50" />
 
-          <h1 className="text-white text-xl font-semibold">
-            {status === "processing"
-              ? "Processing…"
-              : status === "success"
-              ? "Success"
-              : "Payment issue"}
-          </h1>
-        </div>
+      {/* Content */}
+      <div className="relative w-full h-full overflow-y-auto flex items-center justify-center p-6">
+        <div className="w-full max-w-lg mt-10">
+          <div className="bg-white/10 backdrop-blur-md rounded-3xl border border-white/20 p-8 shadow-2xl">
+            {/* Header */}
+            <div className="flex items-center justify-center gap-3 mb-6">
+              <div className="p-2 rounded-2xl bg-white/10 border border-white/15">
+                {header.icon}
+              </div>
+              <div className="text-center">
+                <h1 className="text-3xl text-white drop-shadow-lg">
+                  {header.title}
+                </h1>
+                <p className="text-white/70 drop-shadow mt-1">
+                  {status === "processing"
+                    ? "We’re confirming your payment with Stripe."
+                    : status === "success"
+                    ? "You can continue to your dashboard."
+                    : status === "error"
+                    ? "We couldn’t confirm the payment."
+                    : "Loading…"}
+                </p>
+              </div>
+            </div>
 
-        <p className="text-white/70 text-sm mb-6">{message}</p>
+            {/* Message */}
+            <div
+              className={[
+                "rounded-2xl border p-4 text-sm",
+                status === "success"
+                  ? "bg-green-500/15 border-green-500/30 text-white"
+                  : status === "error"
+                  ? "bg-red-500/15 border-red-500/30 text-white"
+                  : "bg-white/10 border-white/15 text-white",
+              ].join(" ")}
+            >
+              <p className="text-white/90">{message}</p>
+              {status === "processing" && (
+                <div className="mt-3 flex items-center gap-2 text-white/70 text-xs">
+                  <div className="w-2 h-2 rounded-full bg-white/60 animate-pulse" />
+                  <span>Please don’t close this page.</span>
+                </div>
+              )}
+            </div>
 
-        <div className="bg-white/10 border border-white/15 rounded-xl p-4 text-xs text-white/70">
-          <div className="flex items-center justify-between gap-3">
-            <span className="text-white/60">Session</span>
-            <span className="truncate">{sessionId ?? "—"}</span>
+            {/* Session */}
+            <div className="mt-6 bg-white/10 border border-white/15 rounded-2xl p-4 text-xs text-white/70">
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-white/60">Session</span>
+                <span className="truncate max-w-[70%]">{sessionId ?? "—"}</span>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <button
+                onClick={() => router.push("/home")}
+                className="w-full cursor-pointer px-6 py-4 bg-white/20 backdrop-blur-md border-2 border-white/30 rounded-xl text-white hover:bg-white/30 hover:border-white/50 transition-all shadow-lg"
+              >
+                Go to Home
+              </button>
+
+              <button
+                onClick={() => router.push("dashboard/fan-streaming")}
+                className="w-full cursor-pointer px-6 py-4 bg-white/30 backdrop-blur-md border-2 border-white/40 rounded-xl text-white hover:bg-white/40 hover:border-white/60 transition-all shadow-lg"
+              >
+                Continue listening
+              </button>
+            </div>
+
+            {/* Secondary links */}
+            <div className="text-center pt-4 mt-6 border-t border-white/20">
+              <p className="mt-2 text-[11px] text-white/50">
+                If your subscription does not appear immediately, wait a few
+                seconds and refresh.
+              </p>
+            </div>
           </div>
         </div>
-
-        <div className="mt-6 flex gap-3">
-          <button
-            onClick={() => router.push("/home")}
-            className="flex-1 px-4 py-3 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-all"
-          >
-            Go to Home
-          </button>
-
-          <button
-            onClick={() => router.push("/fan/streaming")}
-            className="flex-1 px-4 py-3 rounded-lg bg-white/20 hover:bg-white/30 text-white transition-all"
-          >
-            Continue listening
-          </button>
-        </div>
-
-        <p className="mt-4 text-[11px] text-white/50">
-          If your subscription does not appear immediately, wait a few seconds
-          and refresh.
-        </p>
       </div>
     </div>
   );

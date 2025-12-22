@@ -348,6 +348,38 @@ export function FanStreaming({ language }: FanStreamingProps) {
   }, [searchParams]);
 
   useEffect(() => {
+    const tab = searchParams.get("tab");
+    const sub = searchParams.get("sub");
+
+    // ✅ normalisation des valeurs possibles
+    const normalizeTab = (t: string) => {
+      const v = t.toLowerCase().trim();
+      if (v === "artist" || v === "artists") return "artists";
+      if (v === "my-music" || v === "mymusic" || v === "music")
+        return "mymusic";
+      if (v === "editor" || v === "editorplaylists") return "editorplaylists";
+      if (v === "dash" || v === "dashboard") return "dashboard";
+      if (v === "discover" || v === "home") return "discover";
+      return v;
+    };
+
+    if (tab) {
+      setSelectedTab(normalizeTab(tab));
+    }
+
+    // ✅ Notifications subscription
+    if (sub === "success") {
+      setNotification("✅ Abonnement activé avec succès !");
+    }
+
+    if (sub === "retry") {
+      setNotification("ℹ️ Choisis un artiste pour relancer ton abonnement.");
+      // optionnel: forcer l’onglet artistes au cas où
+      setSelectedTab("artists");
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
     const sub = searchParams.get("sub");
     if (sub === "success") {
       const url = new URL(window.location.href);
