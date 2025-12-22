@@ -14,6 +14,7 @@ import { EditorPlaylistModuleObject } from "./editorPlaylist/module";
 import { SubscriptionModal } from "./subscriptionModal";
 import { PlanModuleObject } from "../plan/module";
 import { StripeModuleObject } from "./stripe/module";
+import { useSearchParams } from "next/navigation";
 
 // Icon components
 const Music = ({ size = 24, className = "" }) => (
@@ -330,6 +331,13 @@ export function FanStreaming({ language }: FanStreamingProps) {
 
   const [selectedPlanId, setSelectedPlanId] = useState<string>("");
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const tab = searchParams.get("tab");
+    if (tab) setSelectedTab(tab); // "dashboard", "artists", "discover", etc.
+  }, [searchParams]);
 
   const FAVORITES_KEY = "fan_favorite_track_ids";
 
