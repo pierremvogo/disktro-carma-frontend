@@ -760,7 +760,7 @@ export function FanStreaming({ language }: FanStreamingProps) {
       window.location.href = url;
     } catch (e: any) {
       console.error(e);
-      alert(e?.message ?? "Checkout failed");
+      alert((e as Error).message ?? "Checkout failed");
     } finally {
       setCheckoutLoading(false);
     }
