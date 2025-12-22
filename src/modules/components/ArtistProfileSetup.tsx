@@ -611,8 +611,8 @@ export function ArtistProfileSetup({
                       {language === "english"
                         ? "Hold Ctrl (Windows) or Cmd (Mac) to select multiple."
                         : language === "spanish"
-                        ? "Mantén pulsada la tecla Ctrl (Windows) o Cmd (Mac) para seleccionar varios elementos."
-                        : "Mantén premuda la tecla Ctrl (Windows) o Cmd (Mac) per seleccionar diversos elements."}
+                        ? "Mantén pulsada la tecla Ctrl (Windows) o Cmd (Mac) para seleccionar varios généros."
+                        : "Mantén premuda la tecla Ctrl (Windows) o Cmd (Mac) per seleccionar diversos gèneres."}
                     </p>
 
                     {errors?.genre && (
