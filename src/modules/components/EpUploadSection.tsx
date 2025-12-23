@@ -353,7 +353,7 @@ type EpUploadSectionProps = {
   language: string;
 };
 
-export function EpUploadSection({ language }: EpUploadSectionProps) {
+export function EpUploadSection({ text, language }: EpUploadSectionProps) {
   // ==========
   // State EP
   // ==========
@@ -378,7 +378,6 @@ export function EpUploadSection({ language }: EpUploadSectionProps) {
       lyrics: "",
     },
   ]);
-  const text = getEpTexts(language);
   const [epToDelete, setEpToDelete] = React.useState<EpCreationInfo | null>(
     null
   );
