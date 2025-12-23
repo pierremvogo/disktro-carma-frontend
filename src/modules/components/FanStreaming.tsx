@@ -4757,7 +4757,7 @@ Underneath the shining star`,
             {/* Song Info */}
             <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0 order-1 md:order-none">
               {/* Décalage pour l’icône d’accessibilité */}
-              <div className="ml-1  sm:ml-30 w-10 h-10 sm:w-12 sm:h-12 bg-white/5 rounded-lg overflow-hidden flex-shrink-0">
+              <div className="ml-1  sm:ml-35 w-10 h-10 sm:w-12 sm:h-12 bg-white/5 rounded-lg overflow-hidden flex-shrink-0">
                 <img
                   src={
                     currentSong.coverUrl ??
