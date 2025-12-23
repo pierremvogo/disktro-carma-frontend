@@ -15,6 +15,7 @@ import { EditorPlaylistModuleObject } from "./editorPlaylist/module";
 import { SubscriptionModal } from "./subscriptionModal";
 import { PlanModuleObject } from "../plan/module";
 import { StripeModuleObject } from "./stripe/module";
+import { FlutterwaveModuleObject } from "./flutterwave/module";
 
 // Icon components
 const Music = ({ size = 24, className = "" }) => (
@@ -893,7 +894,53 @@ export function FanStreaming({ language }: FanStreamingProps) {
     await handlePlaySong(tracks[startIndex], tracks);
   };
 
-  const handleConfirmSubscription = async () => {
+  const handleConfirmSubscriptionFlutterwave = async () => {
+    if (!selectedArtistForSubscription) throw new Error("No artist selected");
+
+    const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
+    if (!token) throw new Error("Not authenticated");
+
+    if (!selectedPlanId) throw new Error("Please select a plan.");
+
+    // ✅ Récupérer les infos fan
+    const userData = localStorage.getItem(ModuleObject.localState.USER_DATA);
+    if (!userData) throw new Error("User data missing");
+    const user = JSON.parse(userData);
+    const email = user.email;
+    const phone = "698114902";
+    if (!email || !phone) throw new Error("User email or phone missing");
+
+    // ✅ Récupérer le plan pour connaître le montant
+    const selectedPlan = artistPlans.find((p) => p.id === selectedPlanId);
+    if (!selectedPlan) throw new Error("Plan not found");
+    const amount = selectedPlan.price;
+
+    try {
+      setCheckoutLoading(true);
+
+      const res = await FlutterwaveModuleObject.service.initializeSubscription(
+        {
+          artistId: String(selectedArtistForSubscription.id),
+          planId: String(selectedPlanId),
+          email,
+          phone,
+          amount,
+        },
+        token
+      );
+
+      const paymentUrl = res?.data?.redirectUrl ?? res?.data?.link ?? res?.url;
+      if (!paymentUrl) throw new Error("Flutterwave payment url not returned");
+
+      window.location.href = paymentUrl;
+    } catch (e: any) {
+      throw new Error(e?.message ?? "Flutterwave checkout failed");
+    } finally {
+      setCheckoutLoading(false);
+    }
+  };
+
+  const handleConfirmSubscriptionStripe = async () => {
     if (!selectedArtistForSubscription) throw new Error("No artist selected");
 
     const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
@@ -2226,7 +2273,20 @@ Underneath the shining star`,
       {/* Accessibility Floating Button */}
       <button
         onClick={() => setShowAccessibility(true)}
-        className={`fixed bottom-6 left-6 z-40 bg-white/20 backdrop-blur-md rounded-full p-4 border border-white/30 hover:bg-white/30 ${animationClasses} shadow-xl ${buttonSizeClasses}`}
+        className={`
+    fixed bottom-6
+    right-6 sm:right-auto
+    sm:left-6
+    z-40
+    
+    bg-white/20 backdrop-blur-md
+    rounded-full p-4
+    border border-white/30
+    hover:bg-white/30
+    shadow-xl
+    ${animationClasses}
+    ${buttonSizeClasses}
+  `}
         aria-label={text.accessibility}
         title={text.accessibility}
       >
@@ -3938,7 +3998,10 @@ Underneath the shining star`,
         text={text}
         showSubscriptionModal={showSubscriptionModal}
         selectedArtistForSubscription={selectedArtistForSubscription}
-        handleConfirmSubscription={handleConfirmSubscription}
+        handleConfirmSubscriptionStripe={handleConfirmSubscriptionStripe}
+        handleConfirmSubscriptionFlutterwave={
+          handleConfirmSubscriptionFlutterwave
+        }
         artistPlans={artistPlans}
         plansLoading={plansLoading}
         plansError={plansError}
@@ -4694,7 +4757,7 @@ Underneath the shining star`,
             {/* Song Info */}
             <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0 order-1 md:order-none">
               {/* Décalage pour l’icône d’accessibilité */}
-              <div className="ml-20 w-10 h-10 sm:w-12 sm:h-12 bg-white/5 rounded-lg overflow-hidden flex-shrink-0">
+              <div className="ml-1  sm:ml-20 w-10 h-10 sm:w-12 sm:h-12 bg-white/5 rounded-lg overflow-hidden flex-shrink-0">
                 <img
                   src={
                     currentSong.coverUrl ??
@@ -4718,59 +4781,67 @@ Underneath the shining star`,
 
                 {/* Progress Bar */}
                 {/* Progress Bar */}
-                <div className="w-full h-2 md:h-2.5 bg-white/20 rounded mt-2">
-                  <div
-                    className="h-2 md:h-2.5 bg-white rounded"
-                    style={{
-                      width: `${
-                        duration
-                          ? Math.min((currentTime / duration) * 100, 100)
-                          : 0
-                      }%`,
-                    }}
-                  ></div>
-                </div>
               </div>
             </div>
 
             {/* Player Controls */}
-            <div className="flex items-center justify-center gap-4 sm:gap-6 order-0 md:order-none">
-              <button
-                onClick={handlePrevFromQueue}
-                className={`text-white/80 hover:text-white cursor-pointer ${animationClasses} ${buttonSizeClasses}`}
-                aria-label="Previous"
-              >
-                <SkipBack size={largerTargets ? 32 : 22} />
-              </button>
+            <div className="w-full flex flex-col gap-3 order-0 md:order-none ml-1 sm:ml-50">
+              {/* Controls (centrés) */}
+              <div className="flex items-center justify-center gap-4 sm:gap-6">
+                <button
+                  onClick={handlePrevFromQueue}
+                  className={`text-white/80 hover:text-white cursor-pointer ${animationClasses} ${buttonSizeClasses}`}
+                  aria-label="Previous"
+                >
+                  <SkipBack size={largerTargets ? 32 : 22} />
+                </button>
 
-              <button
-                onClick={() =>
-                  currentSong && handlePlaySong(currentSong, queue)
-                }
-                className={`${buttonSizeClasses} ${animationClasses} cursor-pointer flex items-center justify-center p-3 sm:p-4 bg-white/20 backdrop-blur-sm rounded-full hover:bg-white/30`}
-                aria-label={isPlaying ? text.pause : text.play}
-              >
-                {isPlaying ? (
-                  <Pause
-                    size={largerTargets ? 36 : 26}
-                    className="text-white"
+                <button
+                  onClick={() =>
+                    currentSong && handlePlaySong(currentSong, queue)
+                  }
+                  className={`${buttonSizeClasses} ${animationClasses} cursor-pointer flex items-center justify-center p-3 sm:p-4 bg-white/20 backdrop-blur-sm rounded-full hover:bg-white/30`}
+                  aria-label={isPlaying ? text.pause : text.play}
+                >
+                  {isPlaying ? (
+                    <Pause
+                      size={largerTargets ? 36 : 26}
+                      className="text-white"
+                    />
+                  ) : (
+                    <Play
+                      size={largerTargets ? 36 : 26}
+                      className="text-white"
+                    />
+                  )}
+                </button>
+
+                <button
+                  onClick={handleNextFromQueue}
+                  className={`text-white/80 hover:text-white cursor-pointer ${animationClasses} ${buttonSizeClasses}`}
+                  aria-label="Next"
+                >
+                  <SkipForward size={largerTargets ? 32 : 22} />
+                </button>
+              </div>
+
+              {/* Progress bar (pleine largeur du player) */}
+              <div className="w-full px-4">
+                <div className="w-full h-1 bg-white/20 rounded">
+                  <div
+                    className="h-1 bg-white rounded transition-all duration-200"
+                    style={{
+                      width: duration
+                        ? `${Math.min((currentTime / duration) * 100, 100)}%`
+                        : "0%",
+                    }}
                   />
-                ) : (
-                  <Play size={largerTargets ? 36 : 26} className="text-white" />
-                )}
-              </button>
-
-              <button
-                onClick={handleNextFromQueue}
-                className={`text-white/80 hover:text-white cursor-pointer ${animationClasses} ${buttonSizeClasses}`}
-                aria-label="Next"
-              >
-                <SkipForward size={largerTargets ? 32 : 22} />
-              </button>
+                </div>
+              </div>
             </div>
 
             {/* Volume & Actions */}
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3 md:gap-4 flex-1 justify-between md:justify-end order-2">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 justify-center md:gap-4 flex-1 justify-between md:justify-end order-2">
               <span className="text-white/60 text-xs sm:text-sm">
                 {currentSong.duration ?? ""}
               </span>
