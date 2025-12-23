@@ -1502,23 +1502,22 @@ export function SingleUploadSection({
           {successMessage && <CustomSuccess message={successMessage} />}
           {errorMessage && <CustomAlert message={errorMessage} />}
 
-          {allUploadsDone && (
-            <button
-              type="submit"
-              className="cursor-pointer w-full py-4 px-6 bg-white/30 backdrop-blur-md border border-white/40 rounded-lg text-white drop-shadow hover:bg-white/40 transition-all flex items-center justify-center gap-2"
-            >
-              <Upload size={20} />
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="cursor-pointer disabled:cursor-not-allowed w-full py-4 px-6 bg-white/30 backdrop-blur-md border border-white/40 rounded-lg text-white drop-shadow hover:bg-white/40 transition-all flex items-center justify-center gap-2"
+          >
+            <Upload size={20} />
 
-              {isLoading ? (
-                <div className="flex items-center justify-center gap-2">
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                  <span>{text.uploadButton}...</span>
-                </div>
-              ) : (
-                text.uploadButton
-              )}
-            </button>
-          )}
+            {isLoading && !allUploadsDone ? (
+              <div className="flex items-center justify-center gap-2">
+                <div className="w-5 h-5 border-2   border-white/30 border-t-white rounded-full animate-spin"></div>
+                <span>{text.uploadButton}...</span>
+              </div>
+            ) : (
+              text.uploadButton
+            )}
+          </button>
         </form>
       </div>
       <div className="mt-8">
