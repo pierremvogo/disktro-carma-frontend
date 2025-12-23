@@ -481,6 +481,41 @@ export function ArtistDashboard({
   );
   const [brailleFilePreview, setBrailleFilePreview] = useState<string>("");
 
+  // Ajoute ces states en haut du composant
+  const [isDraggingPic, setIsDraggingPic] = useState(false);
+  const [isDraggingVideo, setIsDraggingVideo] = useState(false);
+
+  // Petits helpers
+  const preventDefaults = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDropProfile = (e: React.DragEvent<HTMLDivElement>) => {
+    preventDefaults(e);
+    setIsDraggingPic(false);
+
+    const file = e.dataTransfer.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) return;
+
+    // Utilise la même logique que handleProfilePicture
+    const fakeEvent = { target: { files: [file] } } as any;
+    handleProfilePicture(fakeEvent);
+  };
+
+  const handleDropVideo = (e: React.DragEvent<HTMLDivElement>) => {
+    preventDefaults(e);
+    setIsDraggingVideo(false);
+
+    const file = e.dataTransfer.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("video/")) return;
+
+    const fakeEvent = { target: { files: [file] } } as any;
+    handleVideoIntro(fakeEvent);
+  };
+
   const [uploadedExclusiveContent, setUploadedExclusiveContent] = useState<
     Array<{
       id: string;
@@ -2702,7 +2737,25 @@ export function ArtistDashboard({
                     </button>
                   </div>
                 ) : (
-                  <div className="border-2 border-dashed border-white/30 rounded-xl p-12 text-center bg-white/5 hover:bg-white/10 transition-all cursor-pointer aspect-square flex items-center justify-center">
+                  <div
+                    onDragEnter={(e) => {
+                      preventDefaults(e);
+                      setIsDraggingPic(true);
+                    }}
+                    onDragOver={preventDefaults}
+                    onDragLeave={(e) => {
+                      preventDefaults(e);
+                      setIsDraggingPic(false);
+                    }}
+                    onDrop={handleDropProfile}
+                    className={`border-2 border-dashed rounded-xl p-12 text-center transition-all cursor-pointer aspect-square flex items-center justify-center
+                    ${
+                      isDraggingPic
+                        ? "border-white/80 bg-white/15"
+                        : "border-white/30 bg-white/5 hover:bg-white/10"
+                    }
+                  `}
+                  >
                     <input
                       type="file"
                       accept="image/*"
@@ -2782,7 +2835,25 @@ export function ArtistDashboard({
                     </button>
                   </div>
                 ) : (
-                  <div className="border-2 border-dashed border-white/30 rounded-xl p-12 text-center bg-white/5 hover:bg-white/10 transition-all cursor-pointer aspect-square flex items-center justify-center">
+                  <div
+                    onDragEnter={(e) => {
+                      preventDefaults(e);
+                      setIsDraggingVideo(true);
+                    }}
+                    onDragOver={preventDefaults}
+                    onDragLeave={(e) => {
+                      preventDefaults(e);
+                      setIsDraggingVideo(false);
+                    }}
+                    onDrop={handleDropVideo}
+                    className={`border-2 border-dashed rounded-xl p-12 text-center transition-all cursor-pointer aspect-square flex items-center justify-center
+                    ${
+                      isDraggingVideo
+                        ? "border-white/80 bg-white/15"
+                        : "border-white/30 bg-white/5 hover:bg-white/10"
+                    }
+                  `}
+                  >
                     <input
                       type="file"
                       accept="video/*"

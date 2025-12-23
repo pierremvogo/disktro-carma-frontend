@@ -1,4 +1,8 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
+
+type ConfirmResult =
+  | { ok: true; message?: string }
+  | { ok: false; message: string };
 
 type SubscriptionModalProps = {
   language: string;
@@ -7,7 +11,8 @@ type SubscriptionModalProps = {
   showSubscriptionModal: boolean;
   selectedArtistForSubscription: any | null;
 
-  handleConfirmSubscription: () => Promise<void> | void; // ✅ accepte async
+  // ✅ Option A: le parent peut retourner un résultat OU throw
+  handleConfirmSubscription: () => Promise<void | ConfirmResult> | void;
   onClose: () => void;
 
   artistPlans: any[];
@@ -125,6 +130,53 @@ function getDefaultFeatures(language: string, plan: any) {
   return backendFeatures?.length ? backendFeatures : [...base, ...extra];
 }
 
+function getUiText(language: string) {
+  const t = {
+    english: {
+      title: "Subscription",
+      choosePlan: "Choose a plan",
+      continue: "Continue to payment",
+      redirecting: "Redirecting…",
+      selectingHint: "Select a plan to continue.",
+      noPlans: "No plans available",
+      selected: "Selected",
+      choose: "Choose",
+      selectThis: "Select this plan",
+      // messages
+      genericError: "Checkout failed",
+      beforeRedirect: "Redirecting to payment…",
+    },
+    spanish: {
+      title: "Suscripción",
+      choosePlan: "Elige un plan",
+      continue: "Continuar con el pago",
+      redirecting: "Redirigiendo…",
+      selectingHint: "Selecciona un plan para continuar.",
+      noPlans: "No hay planes disponibles",
+      selected: "Seleccionado",
+      choose: "Elegir",
+      selectThis: "Elegir este plan",
+      genericError: "Error al iniciar el pago",
+      beforeRedirect: "Redirigiendo al pago…",
+    },
+    catalan: {
+      title: "Subscripció",
+      choosePlan: "Tria un pla",
+      continue: "Continuar amb el pagament",
+      redirecting: "Redirigint…",
+      selectingHint: "Selecciona un pla per continuar.",
+      noPlans: "No hi ha plans disponibles",
+      selected: "Seleccionat",
+      choose: "Triar",
+      selectThis: "Triar aquest pla",
+      genericError: "Error en iniciar el pagament",
+      beforeRedirect: "Redirigint al pagament…",
+    },
+  } as const;
+
+  return t[language as keyof typeof t] ?? t.english;
+}
+
 export function SubscriptionModal({
   language,
   text,
@@ -140,17 +192,20 @@ export function SubscriptionModal({
 }: SubscriptionModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // ✅ reset loading si on ferme / change d’artiste / ré-ouvre
+  // ✅ messages
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  // ✅ reset state when modal closes / reopens
   useEffect(() => {
-    if (!showSubscriptionModal) setIsSubmitting(false);
+    if (!showSubscriptionModal) {
+      setIsSubmitting(false);
+      setSuccessMessage("");
+      setErrorMessage("");
+    }
   }, [showSubscriptionModal]);
 
-  const title =
-    language === "spanish"
-      ? "Suscripción"
-      : language === "catalan"
-      ? "Subscripció"
-      : "Subscription";
+  const ui = getUiText(language);
 
   const subtitle =
     language === "spanish"
@@ -165,41 +220,6 @@ export function SubscriptionModal({
           selectedArtistForSubscription?.name ?? ""
         }`;
 
-  const choosePlan =
-    language === "spanish"
-      ? "Elige un plan"
-      : language === "catalan"
-      ? "Tria un pla"
-      : "Choose a plan";
-
-  const confirmLabel =
-    language === "spanish"
-      ? "Continuar con el pago"
-      : language === "catalan"
-      ? "Continuar amb el pagament"
-      : "Continue to payment";
-
-  const confirmingLabel =
-    language === "spanish"
-      ? "Redirigiendo…"
-      : language === "catalan"
-      ? "Redirigint…"
-      : "Redirecting…";
-
-  const selectingHint =
-    language === "spanish"
-      ? "Selecciona un plan para continuar."
-      : language === "catalan"
-      ? "Selecciona un pla per continuar."
-      : "Select a plan to continue.";
-
-  const noPlansLabel =
-    language === "spanish"
-      ? "No hay planes disponibles"
-      : language === "catalan"
-      ? "No hi ha plans disponibles"
-      : "No plans available";
-
   if (!showSubscriptionModal || !selectedArtistForSubscription) return null;
 
   const canSubmit =
@@ -207,14 +227,36 @@ export function SubscriptionModal({
 
   const onConfirmClick = async () => {
     if (!canSubmit) return;
+
     try {
       setIsSubmitting(true);
+      setSuccessMessage("");
+      setErrorMessage("");
 
-      // ✅ important : handleConfirmSubscription redirige (window.location.href)
-      // donc on ne verra pas forcément le "finally", mais c’est ok.
-      await Promise.resolve(handleConfirmSubscription());
-    } catch (e) {
-      console.error(e);
+      // ✅ (optionnel) message avant redirect
+      setSuccessMessage(ui.beforeRedirect);
+
+      const res = await Promise.resolve(handleConfirmSubscription());
+
+      // ✅ si le parent retourne un résultat structuré
+      if (res && typeof res === "object" && "ok" in res) {
+        if (res.ok) {
+          if (res.message) setSuccessMessage(res.message);
+          // si pas de redirect, tu peux remettre isSubmitting=false
+          setIsSubmitting(false);
+        } else {
+          setErrorMessage(res.message);
+          setSuccessMessage("");
+          setIsSubmitting(false);
+        }
+        return;
+      }
+
+      // ✅ si la fonction ne retourne rien (comme ton cas avec redirect)
+      // on laisse le spinner: la page va changer
+    } catch (e: any) {
+      setSuccessMessage("");
+      setErrorMessage(e?.message || ui.genericError);
       setIsSubmitting(false);
     }
   };
@@ -225,7 +267,7 @@ export function SubscriptionModal({
         {/* Header */}
         <div className="flex items-start justify-between gap-4 mb-6">
           <div className="min-w-0">
-            <h3 className="text-2xl text-white drop-shadow mb-1">{title}</h3>
+            <h3 className="text-2xl text-white drop-shadow mb-1">{ui.title}</h3>
             <p className="text-white/60 text-sm">{subtitle}</p>
           </div>
 
@@ -256,7 +298,7 @@ export function SubscriptionModal({
 
         {/* Plan selector */}
         <div className="mb-6">
-          <p className="text-white/80 text-sm mb-3">{choosePlan}</p>
+          <p className="text-white/80 text-sm mb-3">{ui.choosePlan}</p>
 
           {plansLoading ? (
             <div className="text-white/60 text-sm bg-white/10 border border-white/20 rounded-2xl p-4">
@@ -268,7 +310,7 @@ export function SubscriptionModal({
             </div>
           ) : !artistPlans?.length ? (
             <div className="text-white/70 text-sm bg-white/10 border border-white/20 rounded-2xl p-6 text-center">
-              {noPlansLabel}
+              {ui.noPlans}
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -283,6 +325,9 @@ export function SubscriptionModal({
                     onClick={() => {
                       if (isSubmitting) return;
                       setSelectedPlanId(String(p.id));
+                      // ✅ reset messages on plan change (optionnel)
+                      setErrorMessage("");
+                      setSuccessMessage("");
                     }}
                     disabled={isSubmitting}
                     className={[
@@ -314,17 +359,7 @@ export function SubscriptionModal({
                             : "bg-white/10 border-white/15 text-white/70",
                         ].join(" ")}
                       >
-                        {isSelected
-                          ? language === "spanish"
-                            ? "Seleccionado"
-                            : language === "catalan"
-                            ? "Seleccionat"
-                            : "Selected"
-                          : language === "spanish"
-                          ? "Elegir"
-                          : language === "catalan"
-                          ? "Triar"
-                          : "Choose"}
+                        {isSelected ? ui.selected : ui.choose}
                       </div>
                     </div>
 
@@ -363,11 +398,7 @@ export function SubscriptionModal({
                             : "bg-white/15 border-white/15 text-white/80",
                         ].join(" ")}
                       >
-                        {language === "spanish"
-                          ? "Elegir este plan"
-                          : language === "catalan"
-                          ? "Triar aquest pla"
-                          : "Select this plan"}
+                        {ui.selectThis}
                       </div>
                     </div>
                   </button>
@@ -377,8 +408,19 @@ export function SubscriptionModal({
           )}
         </div>
 
+        {/* Hint */}
         {!plansLoading && !plansError && (
-          <p className="text-white/50 text-xs mb-6">{selectingHint}</p>
+          <p className="text-white/50 text-xs mb-4">{ui.selectingHint}</p>
+        )}
+
+        {/* ✅ Success / Error messages (comme ton Login) */}
+        {successMessage && (
+          <p className="mb-4 text-sm text-green-400">{successMessage}</p>
+        )}
+        {errorMessage && (
+          <p className="mb-4 text-sm text-center text-red-400">
+            {errorMessage}
+          </p>
         )}
 
         {/* Actions */}
@@ -404,10 +446,10 @@ export function SubscriptionModal({
             {isSubmitting ? (
               <span className="flex items-center justify-center gap-2">
                 <Spinner size={18} className="text-white animate-spin" />
-                <span>{confirmingLabel}</span>
+                <span>{ui.redirecting}</span>
               </span>
             ) : (
-              confirmLabel
+              ui.continue
             )}
           </button>
         </div>
