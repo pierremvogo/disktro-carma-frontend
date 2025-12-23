@@ -339,6 +339,8 @@ export function FanStreaming({ language }: FanStreamingProps) {
     null
   );
 
+  const [currentTime, setCurrentTime] = useState(0);
+
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -511,6 +513,25 @@ export function FanStreaming({ language }: FanStreamingProps) {
     if (typeof window === "undefined") return;
     loadFavoriteIds();
   }, []);
+
+  // Mettre à jour la progress bar en temps réel
+  const [duration, setDuration] = useState(0);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const updateTime = () => setCurrentTime(audio.currentTime);
+    const updateDuration = () => setDuration(audio.duration || 0);
+
+    audio.addEventListener("timeupdate", updateTime);
+    audio.addEventListener("loadedmetadata", updateDuration);
+
+    return () => {
+      audio.removeEventListener("timeupdate", updateTime);
+      audio.removeEventListener("loadedmetadata", updateDuration);
+    };
+  }, [currentSong]);
 
   useEffect(() => {
     fetchFavoriteTracks();
@@ -2427,7 +2448,7 @@ Underneath the shining star`,
       </div>
 
       {/* Main Content */}
-      <div className="absolute top-[120px] left-0 right-0 bottom-32 overflow-y-auto px-6 pb-6">
+      <div className="absolute sm:top-[150px] top-[150px] mt-5 left-0 right-0 bottom-32 overflow-y-auto px-6 pb-6">
         {/* Search Bar */}
         <div className="mb-8 max-w-2xl mx-auto">
           <div className="relative">
@@ -4667,13 +4688,13 @@ Underneath the shining star`,
         </div>
       )}
 
-      {/* Player Bar */}
       {currentSong && (
         <div className="absolute bottom-0 left-0 right-0 z-20 bg-black/40 backdrop-blur-xl border-t border-white/10">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-6 p-3 sm:p-4 md:p-6">
             {/* Song Info */}
             <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0 order-1 md:order-none">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/5 rounded-lg overflow-hidden flex-shrink-0">
+              {/* Décalage pour l’icône d’accessibilité */}
+              <div className="ml-20 w-10 h-10 sm:w-12 sm:h-12 bg-white/5 rounded-lg overflow-hidden flex-shrink-0">
                 <img
                   src={
                     currentSong.coverUrl ??
@@ -4684,7 +4705,7 @@ Underneath the shining star`,
                   className="w-full h-full object-cover"
                 />
               </div>
-              <div className="min-w-0">
+              <div className="min-w-2.5">
                 <h4 className="text-white drop-shadow text-sm sm:text-base truncate">
                   {currentSong.title}
                 </h4>
@@ -4694,6 +4715,21 @@ Underneath the shining star`,
                     currentSong.userId ??
                     ""}
                 </p>
+
+                {/* Progress Bar */}
+                {/* Progress Bar */}
+                <div className="w-full h-2 md:h-2.5 bg-white/20 rounded mt-2">
+                  <div
+                    className="h-2 md:h-2.5 bg-white rounded"
+                    style={{
+                      width: `${
+                        duration
+                          ? Math.min((currentTime / duration) * 100, 100)
+                          : 0
+                      }%`,
+                    }}
+                  ></div>
+                </div>
               </div>
             </div>
 

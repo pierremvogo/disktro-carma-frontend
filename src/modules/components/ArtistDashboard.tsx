@@ -3477,10 +3477,16 @@ export function ArtistDashboard({
                         <input
                           type="number"
                           value={monthlyPrice}
-                          onChange={(e) => setMonthlyPrice(e.target.value)}
-                          placeholder="9.99"
+                          onChange={(e) => {
+                            let value = parseFloat(e.target.value);
+                            if (value < 1) value = 1; // Minimum
+                            if (value > 5) value = 5; // Maximum
+                            setMonthlyPrice(value.toString());
+                          }}
+                          placeholder="1.00"
                           step="0.01"
-                          min="0"
+                          min="1"
+                          max="5"
                           disabled={pricingLoading || pricingSaving}
                           className="w-full pl-10 pr-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all disabled:opacity-60"
                         />

@@ -913,7 +913,7 @@ export function EpUploadSection({ language }: EpUploadSectionProps) {
               </h3>
 
               {artworkPreview ? (
-                <div className="relative aspect-square rounded-xl overflow-hidden bgwhite/5 border-2 border-white/20">
+                <div className="relative aspect-square rounded-xl overflow-hidden bg-white/5 border-2 border-white/20">
                   <img
                     src={artworkPreview}
                     alt="Artwork"
@@ -932,7 +932,17 @@ export function EpUploadSection({ language }: EpUploadSectionProps) {
                   </button>
                 </div>
               ) : (
-                <div className="border-2 border-dashed border-white/30 rounded-xl p-8 text-center bgwhite/5 hover:bg-white/10 transition-all cursor-pointer aspect-square flex items-center justify-center">
+                <div
+                  className="border-2 border-dashed border-white/30 rounded-xl p-8 text-center bg-white/5 hover:bg-white/10 transition-all cursor-pointer aspect-square flex items-center justify-center"
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    const file = e.dataTransfer.files[0];
+                    if (file && file.type.startsWith("image/")) {
+                      handleArtwork({ target: { files: [file] } } as any);
+                    }
+                  }}
+                >
                   <input
                     type="file"
                     accept="image/*"
