@@ -551,27 +551,64 @@ export default function AlbumTracksEditor({
             </div>
 
             {/* Upload audio */}
-            <div className="border-2 border-dashed border-white/30 rounded-xl p-8 text-center bg-white/5 hover:bg-white/10 transition-all cursor-pointer">
-              <input
-                type="file"
-                accept="audio/*"
-                onChange={handleTrackAudioChange(track.id)}
-                className="hidden"
-                id={`album-track-upload-${track.id}`}
-              />
-              <label
-                htmlFor={`album-track-upload-${track.id}`}
-                className="cursor-pointer"
-              >
-                <Music size={32} className="mx-auto mb-3 text-white/60" />
-                <p className="text-white drop-shadow text-sm">
-                  {track.audioFile
-                    ? track.audioFile.name
-                    : track.audioUrlPreview
-                    ? track.audioUrlPreview
-                    : text.dragDrop}
-                </p>
-              </label>
+            <div className="relative">
+              {track.audioFile || track.audioUrlPreview ? (
+                <div className="relative rounded-xl overflow-hidden bg-white/5 border-2 border-white/20 p-6">
+                  <audio
+                    controls
+                    src={track.audioUrlPreview}
+                    className="w-full"
+                  >
+                    Votre navigateur ne supporte pas l’élément audio.
+                  </audio>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleTrackAudioChange(track.id)({
+                        target: { files: [] },
+                      } as any);
+                    }}
+                    className="absolute top-2 right-2 bg-red-500/80 backdrop-blur-sm text-white p-2 rounded-lg hover:bg-red-600/80 transition-all"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+              ) : (
+                <div
+                  className="border-2 border-dashed border-white/30 rounded-xl p-8 text-center bg-white/5 hover:bg-white/10 transition-all cursor-pointer"
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    const file = e.dataTransfer.files[0];
+                    if (file && file.type.startsWith("audio/")) {
+                      handleTrackAudioChange(track.id)({
+                        target: { files: [file] },
+                      } as any);
+                    }
+                  }}
+                >
+                  <input
+                    type="file"
+                    accept="audio/*"
+                    onChange={handleTrackAudioChange(track.id)}
+                    className="hidden"
+                    id={`album-track-upload-${track.id}`}
+                  />
+                  <label
+                    htmlFor={`album-track-upload-${track.id}`}
+                    className="cursor-pointer"
+                  >
+                    <Music size={32} className="mx-auto mb-3 text-white/60" />
+                    <p className="text-white drop-shadow text-sm">
+                      {track.audioFile
+                        ? (track.audioFile as File).name
+                        : track.audioUrlPreview
+                        ? track.audioUrlPreview
+                        : text.dragDrop}
+                    </p>
+                  </label>
+                </div>
+              )}
             </div>
 
             {/* Titre piste */}

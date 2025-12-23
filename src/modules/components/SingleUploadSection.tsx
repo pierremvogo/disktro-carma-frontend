@@ -974,25 +974,48 @@ export function SingleUploadSection({
   return (
     <div className="space-y-8">
       {/* 1. Upload audio single */}
-      <div className="border-2 border-dashed border-white/30 rounded-xl p-12 text-center bg-white/5 hover:bg-white/10 transition-all cursor-pointer">
-        <input
-          type="file"
-          accept="audio/*"
-          onChange={handleAudioFileChange}
-          className="hidden"
-          id="single-audio-upload"
-        />
-        <label htmlFor="single-audio-upload" className="cursor-pointer">
-          <Music size={48} className="mx-auto mb-4 text-white/60" />
-          <p className="text-white drop-shadow mb-2">
-            {audioFile ? audioFile.name : text.dragDrop}
-          </p>
-        </label>
-        {audioPreviewUrl && (
-          <div className="mt-4">
+      <div className="relative">
+        {audioPreviewUrl ? (
+          <div className="relative rounded-xl overflow-hidden bg-white/5 border-2 border-white/20 p-6">
             <audio controls src={audioPreviewUrl} className="w-full">
               Votre navigateur ne supporte pas l’élément audio.
             </audio>
+            <button
+              type="button"
+              onClick={() => {
+                setAudioFile(null);
+                setAudioPreviewUrl("");
+              }}
+              className="absolute top-2 right-2 bg-red-500/80 backdrop-blur-sm text-white p-2 rounded-lg hover:bg-red-600/80 transition-all"
+            >
+              <X size={20} />
+            </button>
+          </div>
+        ) : (
+          <div
+            className="border-2 border-dashed border-white/30 rounded-xl p-12 text-center bg-white/5 hover:bg-white/10 transition-all cursor-pointer"
+            onDrop={(e) => {
+              e.preventDefault();
+              const file = e.dataTransfer.files[0];
+              if (file && file.type.startsWith("audio/")) {
+                handleAudioFileChange({ target: { files: [file] } } as any);
+              }
+            }}
+            onDragOver={(e) => e.preventDefault()}
+          >
+            <input
+              type="file"
+              accept="audio/*"
+              onChange={handleAudioFileChange}
+              className="hidden"
+              id="single-audio-upload"
+            />
+            <label htmlFor="single-audio-upload" className="cursor-pointer">
+              <Music size={48} className="mx-auto mb-4 text-white/60" />
+              <p className="text-white drop-shadow mb-2 text-sm">
+                {text.dragDrop}
+              </p>
+            </label>
           </div>
         )}
       </div>
@@ -1006,7 +1029,7 @@ export function SingleUploadSection({
           </h3>
 
           {artworkPreview ? (
-            <div className="relative aspect-square rounded-xl overflow-hidden bgwhite/5 border-2 border-white/20">
+            <div className="relative aspect-square rounded-xl overflow-hidden bg-white/5 border-2 border-white/20">
               <img
                 src={artworkPreview}
                 alt="Artwork"
@@ -1025,7 +1048,17 @@ export function SingleUploadSection({
               </button>
             </div>
           ) : (
-            <div className="border-2 border-dashed border-white/30 rounded-xl p-8 text-center bgwhite/5 hover:bg-white/10 transition-all cursor-pointer aspect-square flex items-center justify-center">
+            <div
+              className="border-2 border-dashed border-white/30 rounded-xl p-8 text-center bg-white/5 hover:bg-white/10 transition-all cursor-pointer aspect-square flex items-center justify-center"
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={(e) => {
+                e.preventDefault();
+                const file = e.dataTransfer.files[0];
+                if (file && file.type.startsWith("image/")) {
+                  handleArtwork({ target: { files: [file] } } as any);
+                }
+              }}
+            >
               <input
                 type="file"
                 accept="image/*"
