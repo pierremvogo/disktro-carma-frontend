@@ -533,6 +533,7 @@ export function EpUploadSection({ text, language }: EpUploadSectionProps) {
         setCoverUrl(res.url);
       } else {
       }
+      setIsLoading(false);
     } catch (error) {
       setErrorMessage(text.errors.generic);
     } finally {
@@ -688,8 +689,8 @@ export function EpUploadSection({ text, language }: EpUploadSectionProps) {
       }
       setArtworkPreview("");
       setCoverUrl("");
-
       setSuccessMessage(text.epCreatedSuccess);
+      setIsLoading(false);
     } catch (error) {
       console.error("Erreur création EP :", error);
       setErrorMessage(text.errors.generic);
@@ -798,7 +799,7 @@ export function EpUploadSection({ text, language }: EpUploadSectionProps) {
           {/* Creation Information EP */}
           <div className="mt-8">
             <h3 className="text-xl text-white drop-shadow mb-4">
-              {text.creationInfo}
+              {text.creationInfoEp}
             </h3>
             <form onSubmit={handleAddEp} className="space-y-6">
               <div className="grid md:grid-cols-2 gap-4">
@@ -1015,17 +1016,18 @@ export function EpUploadSection({ text, language }: EpUploadSectionProps) {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="cursor-pointer w-full py-4 px-6 bg-white/30 backdrop-blur-md border border-white/40 rounded-lg text-white drop-shadow hover:bg-white/40 transition-all flex items-center justify-center gap-2"
+                className="disabled:cursor-not-allowed cursor-pointer w-full py-4 px-6 bg-white/30 backdrop-blur-md border border-white/40 rounded-lg text-white drop-shadow hover:bg-white/40 transition-all flex items-center justify-center gap-2"
               >
-                <Upload size={20} />
-
-                {isLoading && !allUploadsDone ? (
+                {isLoading ? (
                   <div className="flex items-center justify-center gap-2">
-                    <div className="disabled:cursor-not-allowed w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                    <span>{text.uploadButton}...</span>
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    <span>{text.uploadButtonEp}...</span>
                   </div>
                 ) : (
-                  text.uploadButton
+                  <>
+                    <Upload size={20} />
+                    {text.uploadButtonEp}
+                  </>
                 )}
               </button>
             </form>

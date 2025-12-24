@@ -515,6 +515,7 @@ export function SingleUploadSection({
         setAudioUrl(uploadedAudioUrl);
       } else {
       }
+      setIsLoading(false);
     } catch (error) {
       console.error("Erreur upload audio :", error);
       setErrorMessage(text.errors.generic);
@@ -549,6 +550,7 @@ export function SingleUploadSection({
         setCoverUrl(res.url);
       } else {
       }
+      setIsLoading(false);
     } catch (error) {
       setErrorMessage(text.errors.generic);
     } finally {
@@ -582,6 +584,7 @@ export function SingleUploadSection({
         setMiniVideoLoopUrl(res.url);
       } else {
       }
+      setIsLoading(false);
     } catch (error) {
       console.error("Erreur upload mini-video :", error);
       setErrorMessage(text.errors.generic);
@@ -618,6 +621,7 @@ export function SingleUploadSection({
         setSignLanguageVideoUrl(res.url);
       } else {
       }
+      setIsLoading(false);
     } catch (error) {
       console.error("Erreur upload vidéo langue des signes :", error);
       setErrorMessage(text.errors.generic);
@@ -648,6 +652,7 @@ export function SingleUploadSection({
         setBrailleFileUrl(res.url);
       } else {
       }
+      setIsLoading(false);
     } catch (error) {
       console.error("Erreur upload fichier braille :", error);
       setErrorMessage(text.errors.generic);
@@ -659,7 +664,7 @@ export function SingleUploadSection({
   // ==========
   // allUploadsDone => contrôle du bouton Upload
   // ==========
-  const allUploadsDone =
+  let allUploadsDone =
     !!audioUrl && !!coverUrl && !!signLanguageVideoUrl && !!brailleFileUrl;
 
   // ==========
@@ -800,8 +805,9 @@ export function SingleUploadSection({
 
       setBrailleFile(null);
       setBrailleFileUrl("");
-
+      setSuccessMessage(text.epUploadSuccess);
       fetchSingles();
+      setIsLoading(false);
     } catch (error) {
       console.error("Erreur ajout track :", error);
       setErrorMessage(text.errors.generic);
@@ -828,7 +834,7 @@ export function SingleUploadSection({
                 setAudioFile(null);
                 setAudioPreviewUrl("");
               }}
-              className="absolute top-2 right-2 bg-red-500/80 backdrop-blur-sm text-white p-2 rounded-lg hover:bg-red-600/80 transition-all"
+              className="cursor-pointer absolute top-0 right-0 bg-red-500/80 backdrop-blur-sm text-white p-2 rounded-lg hover:bg-red-600/80 transition-all"
             >
               <X size={20} />
             </button>
@@ -1129,7 +1135,7 @@ export function SingleUploadSection({
       {/* 4. Creation Information */}
       <div>
         <h3 className="text-xl text-white drop-shadow mb-4">
-          {text.creationInfo}
+          {text.creationInfoSingle}
         </h3>
         <form onSubmit={handleAddTrack} className="space-y-6">
           <div className="grid md:grid-cols-2 gap-4">
@@ -1349,15 +1355,16 @@ export function SingleUploadSection({
             disabled={isLoading}
             className="cursor-pointer disabled:cursor-not-allowed w-full py-4 px-6 bg-white/30 backdrop-blur-md border border-white/40 rounded-lg text-white drop-shadow hover:bg-white/40 transition-all flex items-center justify-center gap-2"
           >
-            <Upload size={20} />
-
-            {isLoading && !allUploadsDone ? (
+            {isLoading ? (
               <div className="flex items-center justify-center gap-2">
                 <div className="w-5 h-5 border-2   border-white/30 border-t-white rounded-full animate-spin"></div>
-                <span>{text.uploadButton}...</span>
+                <span>{text.uploadButtonSingle}...</span>
               </div>
             ) : (
-              text.uploadButton
+              <>
+                <Upload size={20} />
+                {text.uploadButtonSingle}
+              </>
             )}
           </button>
         </form>

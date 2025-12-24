@@ -532,188 +532,20 @@ export function AlbumUploadSection({
 
       if (res && res.url) {
         setCoverUrl(res.url);
-        setSuccessMessage("Artwork uploadé avec succès.");
       } else {
-        setErrorMessage("Erreur lors de l'upload de l'artwork.");
       }
+      setIsLoading(false);
     } catch (error) {
       setErrorMessage(text.errors.generic);
     } finally {
       setIsLoading(false);
     }
   };
-  const handleTrackAudioChange =
-    (trackId: string) => async (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-
-      setErrorMessage("");
-      setSuccessMessage("");
-      setIsLoading(true);
-      setTracks((prev) =>
-        prev.map((t) =>
-          t.id === trackId
-            ? {
-                ...t,
-                audioFile: file,
-              }
-            : t
-        )
-      );
-      const fd = new FormData();
-      fd.append("file", file);
-
-      try {
-        const res = await MediaModule.service.uploadAudioFile(fd);
-
-        if (res && (res.fileName || res.url)) {
-          const uploadedAudioUrl = res.url ?? res.fileName;
-          setAudioUrl(uploadedAudioUrl);
-          setTracks((prev) =>
-            prev.map((t) =>
-              t.id === trackId
-                ? {
-                    ...t,
-                    audioFile: file,
-                    audioUrl: uploadedAudioUrl || "",
-                  }
-                : t
-            )
-          );
-
-          setSuccessMessage("Fichier audio de la piste uploadé avec succès.");
-        } else {
-          setErrorMessage("Erreur lors de l'upload du fichier audio.");
-        }
-      } catch (error) {
-        console.error("Erreur upload audio ALBUM :", error);
-        setErrorMessage(text.errors.generic);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-  // ==========
-  // Upload vidéo langue des signes par piste
-  // ==========
-  const handleTrackSignLanguage =
-    (trackId: string) => async (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-
-      setErrorMessage("");
-      setSuccessMessage("");
-      setIsLoading(true);
-
-      setTracks((prev) =>
-        prev.map((t) =>
-          t.id === trackId
-            ? {
-                ...t,
-                signLanguageVideoFile: file,
-              }
-            : t
-        )
-      );
-
-      const fd = new FormData();
-      fd.append("file", file);
-
-      try {
-        const res = await MediaModule.service.uploadVideoFile(fd);
-
-        if (res && res.url) {
-          const previewUrl = URL.createObjectURL(file);
-          setSignLanguageVideoUrl(res.url);
-          setTracks((prev) =>
-            prev.map((t) =>
-              t.id === trackId
-                ? {
-                    ...t,
-                    signLanguageVideoFile: file,
-                    signLanguageVideoPreview: previewUrl,
-                    signLanguageVideoUrl: res.url,
-                  }
-                : t
-            )
-          );
-
-          setSuccessMessage(
-            "Vidéo en langue des signes de la piste uploadée avec succès."
-          );
-        } else {
-          setErrorMessage(
-            "Erreur lors de l'upload de la vidéo en langue des signes."
-          );
-        }
-      } catch (error) {
-        console.error("Erreur upload vidéo langue des signes ALBUM :", error);
-        setErrorMessage(text.errors.generic);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-  // ==========
-  // Upload braille global (pour l’ALBUM)
-  // ==========
-  const handleBrailleFile =
-    (trackId: string) => async (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-
-      setErrorMessage("");
-      setSuccessMessage("");
-      setIsLoading(true);
-
-      setBrailleFile(file);
-      setTracks((prev) =>
-        prev.map((t) =>
-          t.id === trackId
-            ? {
-                ...t,
-                brailleFile: file,
-              }
-            : t
-        )
-      );
-      const fd = new FormData();
-      fd.append("file", file);
-
-      try {
-        const res = await MediaModule.service.uploadBrailleFile(fd);
-
-        if (res && res.url) {
-          setBrailleFileUrl(res.url);
-          setTracks((prev) =>
-            prev.map((t) =>
-              t.id === trackId
-                ? {
-                    ...t,
-                    brailleFileUrl: res.url,
-                  }
-                : t
-            )
-          );
-          setSuccessMessage("Fichier braille uploadé avec succès.");
-        } else {
-          setErrorMessage("Erreur lors de l'upload du fichier braille.");
-        }
-      } catch (error) {
-        console.error("Erreur upload fichier braille ALBUM :", error);
-        setErrorMessage(text.errors.generic);
-      } finally {
-        setIsLoading(false);
-      }
-    };
 
   // ==========
   // allUploadsDone : chaque piste doit avoir un audioUrl
   // ==========
   const allUploadsDone = !!coverUrl;
-  // ==========
-  // handleAddTrack ALBUM
-  // ==========
 
   const handleAddAlbum = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -721,9 +553,7 @@ export function AlbumUploadSection({
     setSuccessMessage("");
 
     if (!allUploadsDone) {
-      setErrorMessage(
-        "Veuillez compléter les fichiers audio, les paroles et le mood avant de continuer."
-      );
+      setErrorMessage(text.completeAudioLyricsMood);
       return;
     }
 
@@ -735,7 +565,7 @@ export function AlbumUploadSection({
 
       if (!userId || !token) {
         setIsLoading(false);
-        setErrorMessage("Utilisateur non authentifié.");
+        setErrorMessage(text.unauthenticatedUser);
         return;
       }
 
@@ -760,7 +590,6 @@ export function AlbumUploadSection({
         title: trackTitle,
         userId,
         coverUrl,
-        // ajoute ce que ton backend attend pour l'ALBUM :
         brailleFileUrl: brailleFileUrl || undefined,
         authors: authors || undefined,
         producers: producers || undefined,
@@ -772,7 +601,6 @@ export function AlbumUploadSection({
         musiciansStrings: musiciansStrings || undefined,
         mixingEngineer: mixingEngineer || undefined,
         masteringEngineer: masteringEngineer || undefined,
-        // tu peux aussi ajouter une description, etc.
       };
 
       const newAlbum = await AlbumModuleObject.service.createAlbum(
@@ -783,21 +611,16 @@ export function AlbumUploadSection({
       const albumId = (newAlbum as any)?.data?.id ?? (newAlbum as any)?.id;
 
       if (!albumId) {
-        throw new Error(
-          "Impossible de récupérer l'identifiant de l'ALBUM créé."
-        );
+        throw new Error(text.errors.generic);
       }
 
       // 2️⃣ Création des tracks + association à l’ALBUM
       for (const track of tracks) {
-        if (!track.audioUrl) {
-          console.warn("Track sans audioUrl, ignoré :", track);
-          continue;
-        }
+        if (!track.audioUrl) continue;
 
         const newTrackPayload = {
-          type: "TRACK_ALBUM", // adapte si ton backend attend autre chose
-          moodId: (track as any).moodId || moodId, // si tu as moodId par piste, sinon moodId global
+          type: "TRACK_ALBUM",
+          moodId: (track as any).moodId || moodId,
           audioUrl: track.audioUrl,
           title: track.title || trackTitle,
           userId,
@@ -812,18 +635,14 @@ export function AlbumUploadSection({
         );
 
         if (!res || !res.data?.id) {
-          throw new Error(
-            "Impossible de récupérer l'identifiant d'un track créé pour l'ALBUM."
-          );
+          throw new Error(text.errors.generic);
         }
 
         const trackId = res.data.id;
-
-        // Associer le track à l’ALBUM
         await TrackModule.service.addTrackToAlbum(albumId, trackId);
       }
 
-      // 3️⃣ Re-fetch des ALBUMs si tu as une liste à jour
+      // 3️⃣ Re-fetch des ALBUMs si tu as une liste
       if (typeof fetchALBUMs === "function") {
         await fetchALBUMs();
       }
@@ -859,13 +678,11 @@ export function AlbumUploadSection({
       setBrailleFileUrl("");
 
       setArtworkFile(null);
-      if (artworkPreview) {
-        URL.revokeObjectURL(artworkPreview);
-      }
+      if (artworkPreview) URL.revokeObjectURL(artworkPreview);
       setArtworkPreview("");
       setCoverUrl("");
-
-      setSuccessMessage("ALBUM et pistes créés et associés avec succès !");
+      setIsLoading(false);
+      setSuccessMessage(text.albumCreatedSuccess);
     } catch (error) {
       console.error("Erreur création ALBUM :", error);
       setErrorMessage(text.errors.generic);
@@ -974,7 +791,7 @@ export function AlbumUploadSection({
           {/* Creation Information ALBUM */}
           <div className="mt-8">
             <h3 className="text-xl text-white drop-shadow mb-4">
-              {text.creationInfo}
+              {text.creationInfoAlbum}
             </h3>
             <form onSubmit={handleAddAlbum} className="space-y-6">
               <div className="grid md:grid-cols-2 gap-4">
@@ -1188,23 +1005,22 @@ export function AlbumUploadSection({
               {successMessage && <CustomSuccess message={successMessage} />}
               {errorMessage && <CustomAlert message={errorMessage} />}
 
-              {allUploadsDone && (
-                <button
-                  type="submit"
-                  className="cursor-pointer w-full py-4 px-6 bg-white/30 backdrop-blur-md border border-white/40 rounded-lg text-white drop-shadow hover:bg-white/40 transition-all flex items-center justify-center gap-2"
-                >
-                  <Upload size={20} />
-
-                  {isLoading ? (
-                    <div className="flex items-center justify-center gap-2">
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                      <span>{text.uploadButton}...</span>
-                    </div>
-                  ) : (
-                    text.uploadButton
-                  )}
-                </button>
-              )}
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="disabled:cursor-not-allowed cursor-pointer w-full py-4 px-6 bg-white/30 backdrop-blur-md border border-white/40 rounded-lg text-white drop-shadow hover:bg-white/40 transition-all flex items-center justify-center gap-2"
+              >
+                {isLoading ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    <span>{text.uploadButtonAlbum}...</span>
+                  </div>
+                ) : (
+                  <>
+                    <Upload size={20} /> {text.uploadButtonAlbum}
+                  </>
+                )}
+              </button>
             </form>
           </div>
           {/* Recent ALBUM Uploads */}
