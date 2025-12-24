@@ -142,6 +142,11 @@ export default function ResetPasswordForm({
   /* ================= HANDLER ================= */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Récupérer la langue dans localStorage
+    const language =
+      (typeof window !== "undefined" &&
+        localStorage.getItem("disktro_language")) ||
+      "english";
 
     if (!token || !password || !confirmPassword) {
       setErrorMessage(text.errors.empty);
@@ -158,7 +163,11 @@ export default function ResetPasswordForm({
       setErrorMessage("");
       setSuccessMessage("");
 
-      const res = await ModuleObject.service.resetPassword(token, password);
+      const res = await ModuleObject.service.resetPassword(
+        token,
+        password,
+        language
+      );
       await wait();
 
       setSuccess(true);
