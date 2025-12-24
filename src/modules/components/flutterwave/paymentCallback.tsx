@@ -6,6 +6,7 @@ import { FlutterwaveModuleObject as ModuleObject } from "./module";
 
 type Status = "idle" | "processing" | "success" | "error";
 
+/* ================= ICONS ================= */
 const CheckCircle = ({ size = 24, className = "" }) => (
   <svg
     width={size}
@@ -66,6 +67,7 @@ const Loader = ({ size = 20, className = "" }) => (
   </svg>
 );
 
+/* ================= COMPONENT ================= */
 export default function FlutterwaveCallbackPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -77,87 +79,140 @@ export default function FlutterwaveCallbackPage() {
   const [status, setStatus] = useState<Status>("idle");
   const [message, setMessage] = useState<string>("");
 
+  const [language, setLanguage] = useState<"english" | "spanish" | "catalan">(
+    "english"
+  );
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const stored = localStorage.getItem("disktro_language");
+    if (stored === "english" || stored === "spanish" || stored === "catalan") {
+      setLanguage(stored);
+    }
+  }, []);
+
+  const content = {
+    english: {
+      headers: {
+        idle: "Preparing…",
+        processing: "Processing…",
+        success: "Success",
+        error: "Payment issue",
+      },
+      messages: {
+        confirming: "Confirming your payment…",
+        success: "Payment successful! Your subscription is now active.",
+        error: "Something went wrong or payment was cancelled.",
+      },
+      actions: {
+        home: "Go to Home",
+        dashboard: "Continue listening",
+      },
+    },
+    spanish: {
+      headers: {
+        idle: "Preparando…",
+        processing: "Procesando…",
+        success: "Éxito",
+        error: "Problema con el pago",
+      },
+      messages: {
+        confirming: "Confirmando tu pago…",
+        success: "¡Pago exitoso! Tu suscripción está activa.",
+        error: "Algo salió mal o el pago fue cancelado.",
+      },
+      actions: {
+        home: "Ir al inicio",
+        dashboard: "Continuar escuchando",
+      },
+    },
+    catalan: {
+      headers: {
+        idle: "Preparant…",
+        processing: "Processant…",
+        success: "Èxit",
+        error: "Problema amb el pagament",
+      },
+      messages: {
+        confirming: "Confirmant el teu pagament…",
+        success: "Pagament correcte! La teva subscripció està activa.",
+        error:
+          "Alguna cosa ha anat malament o el pagament ha estat cancel·lat.",
+      },
+      actions: {
+        home: "Anar a l'inici",
+        dashboard: "Continuar escoltant",
+      },
+    },
+  };
+
+  const text = content[language] || content.english;
+
   useEffect(() => {
     let redirectTimer: any;
 
     async function run() {
       if (!txRef || !statusParam) {
         setStatus("error");
-        setMessage("Missing payment reference or status.");
+        setMessage(text.messages.error);
         return;
       }
 
       const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
       if (!token) {
         setStatus("error");
-        setMessage("Not authenticated. Please log in.");
+        setMessage(text.messages.error);
         return;
       }
 
       setStatus("processing");
-      setMessage("Confirming your payment…");
+      setMessage(text.messages.confirming);
 
       try {
-        // ⚡ Appel backend pour vérifier le paiement via tx_ref
         const res = await ModuleObject.service.verifyFlutterwavePayment(
           { txRef, flwRef: flwRef ?? "" },
           token
         );
+
         if (res?.data?.status === "success") {
           setStatus("success");
-          setMessage("Payment successful! Your subscription is now active.");
-        } else {
-          setStatus("error");
-          setMessage(res?.data?.message ?? "Payment failed or cancelled.");
-        }
+          setMessage(text.messages.success);
 
-        // Auto-redirect après succès
-        if (res?.data?.status === "success") {
           redirectTimer = setTimeout(() => {
             router.push("/dashboard/fan-streaming?tab=dashboard&sub=success");
           }, 2500);
+        } else {
+          setStatus("error");
+          setMessage(res?.data?.message ?? text.messages.error);
         }
       } catch (e: any) {
         console.error(e);
         setStatus("error");
-        setMessage(
-          e?.message ?? "Something went wrong while confirming your payment."
-        );
+        setMessage(e?.message ?? text.messages.error);
       }
     }
 
     run();
-
     return () => {
       if (redirectTimer) clearTimeout(redirectTimer);
     };
-  }, [txRef, flwRef, statusParam, router]);
+  }, [txRef, flwRef, statusParam, router, text.messages]);
 
-  const header = {
-    idle: {
-      title: "Preparing…",
-      icon: <Loader className="text-white animate-spin" size={24} />,
-    },
-    processing: {
-      title: "Processing…",
-      icon: <Loader className="text-white animate-spin" size={24} />,
-    },
-    success: {
-      title: "Success",
-      icon: <CheckCircle className="text-green-300" size={24} />,
-    },
-    error: {
-      title: "Payment issue",
-      icon: <AlertTriangle className="text-red-300" size={24} />,
-    },
+  const headerIcon = {
+    idle: <Loader className="text-white animate-spin" size={24} />,
+    processing: <Loader className="text-white animate-spin" size={24} />,
+    success: <CheckCircle className="text-green-300" size={24} />,
+    error: <AlertTriangle className="text-red-300" size={24} />,
   }[status];
 
   return (
     <div className="fixed inset-0 w-screen h-screen bg-black flex items-center justify-center p-6">
       <div className="bg-white/10 backdrop-blur-md rounded-3xl border border-white/20 p-8 shadow-2xl w-full max-w-lg text-center">
         <div className="flex flex-col items-center gap-3 mb-6">
-          {header.icon}
-          <h1 className="text-3xl text-white drop-shadow-lg">{header.title}</h1>
+          {headerIcon}
+          <h1 className="text-3xl text-white drop-shadow-lg">
+            {text.headers[status]}
+          </h1>
           <p className="text-white/70 drop-shadow">{message}</p>
         </div>
 
@@ -166,13 +221,13 @@ export default function FlutterwaveCallbackPage() {
             onClick={() => router.push("/home")}
             className="w-full px-6 py-4 bg-white/20 rounded-xl text-white hover:bg-white/30 transition-all"
           >
-            Go to Home
+            {text.actions.home}
           </button>
           <button
             onClick={() => router.push("/dashboard/fan-streaming")}
             className="w-full px-6 py-4 bg-white/30 rounded-xl text-white hover:bg-white/40 transition-all"
           >
-            Continue listening
+            {text.actions.dashboard}
           </button>
         </div>
       </div>

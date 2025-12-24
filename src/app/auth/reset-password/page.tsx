@@ -1,8 +1,28 @@
+"use client";
 import ResetPasswordForm from "@/modules/auth/resetPassword";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
-const page = ({ searchParams }: { searchParams: { token?: string } }) => {
-  return <ResetPasswordForm initialToken={searchParams.token || ""} />;
+type Language = "english" | "spanish" | "catalan";
+
+const Page = ({ searchParams }: { searchParams: { token?: string } }) => {
+  const [language, setLanguage] = useState<Language>("english");
+
+  useEffect(() => {
+    const storedLanguage = localStorage.getItem(
+      "disktro_language"
+    ) as Language | null;
+
+    if (storedLanguage) {
+      setLanguage(storedLanguage);
+    }
+  }, []);
+
+  return (
+    <ResetPasswordForm
+      initialToken={searchParams.token || ""}
+      language={language}
+    />
+  );
 };
 
-export default page;
+export default Page;

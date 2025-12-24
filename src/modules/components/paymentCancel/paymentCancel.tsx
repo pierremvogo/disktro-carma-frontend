@@ -1,10 +1,9 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 
-// Icons (même style que payment-success)
+/* ================= ICONS ================= */
 const XCircle = ({ size = 24, className = "" }) => (
   <svg
     width={size}
@@ -41,6 +40,7 @@ const Music = ({ size = 24, className = "" }) => (
   </svg>
 );
 
+/* ================= COMPONENT ================= */
 export default function PaymentCancelPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -50,18 +50,86 @@ export default function PaymentCancelPage() {
     [searchParams]
   );
 
-  const [message, setMessage] = useState(
-    "Your payment was cancelled. No charges were made."
+  const [language, setLanguage] = useState<"english" | "spanish" | "catalan">(
+    "english"
   );
 
   useEffect(() => {
-    // Tu peux ajouter ici du tracking / analytics si besoin
-    if (!sessionId) {
-      setMessage(
-        "Your payment was cancelled. No charges were made to your account."
-      );
+    if (typeof window === "undefined") return;
+    const stored = localStorage.getItem("disktro_language");
+    if (stored === "english" || stored === "spanish" || stored === "catalan") {
+      setLanguage(stored);
     }
-  }, [sessionId]);
+  }, []);
+
+  /* ================= TRANSLATIONS ================= */
+  const content = {
+    english: {
+      headers: {
+        title: "Payment cancelled",
+        subtitle: "You stopped the checkout process",
+      },
+      messages: {
+        main: "Your payment was cancelled. No charges were made.",
+        safeRetry: "You can safely retry the payment at any time.",
+        noCharges: "No charges were made to your account.",
+      },
+      actions: {
+        dashboard: "Back to streaming",
+        retry: "Retry payment",
+      },
+      misc: {
+        session: "Session",
+      },
+    },
+    spanish: {
+      headers: {
+        title: "Pago cancelado",
+        subtitle: "Has detenido el proceso de pago",
+      },
+      messages: {
+        main: "Tu pago fue cancelado. No se realizaron cargos.",
+        safeRetry:
+          "Puedes reintentar el pago de manera segura en cualquier momento.",
+        noCharges: "No se realizaron cargos en tu cuenta.",
+      },
+      actions: {
+        dashboard: "Volver a streaming",
+        retry: "Reintentar pago",
+      },
+      misc: {
+        session: "Sesión",
+      },
+    },
+    catalan: {
+      headers: {
+        title: "Pagament cancel·lat",
+        subtitle: "Has aturat el procés de compra",
+      },
+      messages: {
+        main: "El teu pagament ha estat cancel·lat. No s'han realitzat càrrecs.",
+        safeRetry: "Pots tornar a intentar el pagament en qualsevol moment.",
+        noCharges: "No s'han fet càrrecs al teu compte.",
+      },
+      actions: {
+        dashboard: "Tornar a streaming",
+        retry: "Tornar a pagar",
+      },
+      misc: {
+        session: "Sessió",
+      },
+    },
+  };
+
+  const text = content[language] || content.english;
+
+  const [message, setMessage] = useState(text.messages.main);
+
+  useEffect(() => {
+    if (!sessionId) {
+      setMessage(text.messages.main);
+    }
+  }, [sessionId, text.messages.main]);
 
   return (
     <div
@@ -69,14 +137,10 @@ export default function PaymentCancelPage() {
       style={{
         backgroundImage:
           'url("/image/4ac3eed398bb68113a14d0fa5efe7a6def6f7651.png")',
-        backgroundSize: "cover",
-        backgroundPosition: "center",
       }}
     >
-      {/* Overlay */}
       <div className="absolute inset-0 bg-black/50" />
 
-      {/* Content */}
       <div className="relative w-full h-full overflow-y-auto flex items-center justify-center p-6">
         <div className="w-full max-w-lg mt-10">
           <div className="bg-white/10 backdrop-blur-md rounded-3xl border border-white/20 p-8 shadow-2xl">
@@ -87,10 +151,10 @@ export default function PaymentCancelPage() {
               </div>
               <div className="text-center">
                 <h1 className="text-3xl text-white drop-shadow-lg">
-                  Payment cancelled
+                  {text.headers.title}
                 </h1>
                 <p className="text-white/70 drop-shadow mt-1">
-                  You stopped the checkout process
+                  {text.headers.subtitle}
                 </p>
               </div>
             </div>
@@ -99,14 +163,14 @@ export default function PaymentCancelPage() {
             <div className="rounded-2xl border border-red-500/30 bg-red-500/15 p-4 text-sm text-white">
               <p className="text-white/90">{message}</p>
               <p className="mt-2 text-white/70 text-xs">
-                You can safely retry the payment at any time.
+                {text.messages.safeRetry}
               </p>
             </div>
 
             {/* Session */}
             <div className="mt-6 bg-white/10 border border-white/15 rounded-2xl p-4 text-xs text-white/70">
               <div className="flex items-center justify-between gap-3">
-                <span className="text-white/60">Session</span>
+                <span className="text-white/60">{text.misc.session}</span>
                 <span className="truncate max-w-[70%]">{sessionId ?? "—"}</span>
               </div>
             </div>
@@ -117,7 +181,7 @@ export default function PaymentCancelPage() {
                 onClick={() => router.push("/dashboard/fan-streaming")}
                 className="w-full cursor-pointer px-6 py-4 bg-white/20 backdrop-blur-md border-2 border-white/30 rounded-xl text-white hover:bg-white/30 hover:border-white/50 transition-all shadow-lg"
               >
-                Back to streaming
+                {text.actions.dashboard}
               </button>
 
               <button
@@ -126,14 +190,14 @@ export default function PaymentCancelPage() {
                 }
                 className="w-full cursor-pointer px-6 py-4 bg-white/30 backdrop-blur-md border-2 border-white/40 rounded-xl text-white hover:bg-white/40 hover:border-white/60 transition-all shadow-lg"
               >
-                Retry payment
+                {text.actions.retry}
               </button>
             </div>
 
             {/* Footer */}
             <div className="text-center pt-4 mt-6 border-t border-white/20">
               <p className="mt-2 text-[11px] text-white/50">
-                No charges were made to your account.
+                {text.messages.noCharges}
               </p>
             </div>
           </div>

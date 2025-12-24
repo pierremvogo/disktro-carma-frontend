@@ -450,6 +450,12 @@ export function ArtistProfileSetup({
     setIsLoading(true);
     setErrors({});
 
+    // Récupérer la langue dans localStorage
+    const language =
+      (typeof window !== "undefined" &&
+        localStorage.getItem("disktro_language")) ||
+      "english";
+
     if (!artistName || !realName || selectedTagIds.length === 0 || !bio) {
       setErrorMessage(content.text.error.fillAllProfileFields);
       setIsLoading(false);
@@ -488,7 +494,7 @@ export function ArtistProfileSetup({
         twoFactorEnabled,
         country: country || undefined,
         profileImageUrl,
-
+        language,
         // ✅ NEW
         tagIds: selectedTagIds,
       };
