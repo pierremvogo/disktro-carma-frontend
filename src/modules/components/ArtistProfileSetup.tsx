@@ -208,6 +208,14 @@ export function ArtistProfileSetup({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
+  const [isDraggingPic, setIsDraggingPic] = useState(false);
+  const [isDraggingVideo, setIsDraggingVideo] = useState(false);
+
+  // Petits helpers
+  const preventDefaults = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
 
   const text = {
     spanish: {
@@ -246,6 +254,19 @@ export function ArtistProfileSetup({
       passwordMismatch: "Las contraseñas no coinciden",
       completeSetup: "Completar Configuración",
       back: "Volver",
+      text: {
+        error: {
+          fillAllProfileFields:
+            "Por favor complete todos los campos del perfil (nombre artístico, nombre real, género, biografía).",
+          enterEmail: "Por favor ingrese una dirección de correo electrónico.",
+          passwordMinLength: "La contraseña debe tener al menos 8 caracteres.",
+          passwordsDontMatch: "Las contraseñas no coinciden.",
+          generic: "Ocurrió un error. Por favor, inténtelo de nuevo.",
+        },
+        success: {
+          profileCreated: "Perfil de artista creado con éxito.",
+        },
+      },
     },
     english: {
       title: "Set Up Your Artist Profile",
@@ -283,6 +304,19 @@ export function ArtistProfileSetup({
       passwordMismatch: "Passwords do not match",
       completeSetup: "Complete Setup",
       back: "Back",
+      text: {
+        error: {
+          fillAllProfileFields:
+            "Please fill in all profile fields (artist name, real name, genre, bio).",
+          enterEmail: "Please enter an email address.",
+          passwordMinLength: "Password must be at least 8 characters long.",
+          passwordsDontMatch: "Passwords do not match.",
+          generic: "An error occurred. Please try again.",
+        },
+        success: {
+          profileCreated: "Artist profile created successfully.",
+        },
+      },
     },
     catalan: {
       title: "Configura El Teu Perfil d'Artista",
@@ -321,6 +355,19 @@ export function ArtistProfileSetup({
       passwordMismatch: "Les contrasenyes no coincideixen",
       completeSetup: "Completar Configuració",
       back: "Tornar",
+      text: {
+        error: {
+          fillAllProfileFields:
+            "Si us plau, ompliu tots els camps del perfil (nom artístic, nom real, gènere, biografia).",
+          enterEmail: "Si us plau, introduïu una adreça de correu electrònic.",
+          passwordMinLength: "La contrasenya ha de tenir almenys 8 caràcters.",
+          passwordsDontMatch: "Les contrasenyes no coincideixen.",
+          generic: "S'ha produït un error. Si us plau, torneu-ho a intentar.",
+        },
+        success: {
+          profileCreated: "Perfil d'artista creat amb èxit.",
+        },
+      },
     },
   };
 
@@ -387,7 +434,6 @@ export function ArtistProfileSetup({
         setIsLoading(false);
         setErrorMessage("");
       } else {
-        setErrorMessage("Erreur lors de l'upload de l'image.");
         setIsLoading(false);
       }
     } catch (error) {
@@ -405,27 +451,25 @@ export function ArtistProfileSetup({
     setErrors({});
 
     if (!artistName || !realName || selectedTagIds.length === 0 || !bio) {
-      setErrorMessage(
-        "Veuillez remplir tous les champs du profil (nom d'artiste, nom réel, genres, bio)."
-      );
+      setErrorMessage(content.text.error.fillAllProfileFields);
       setIsLoading(false);
       return;
     }
 
     if (!email) {
-      setErrorMessage("Veuillez saisir une adresse email.");
+      setErrorMessage(content.text.error.enterEmail);
       setIsLoading(false);
       return;
     }
 
     if (!passwordValid) {
-      setErrorMessage("Le mot de passe doit contenir au moins 8 caractères.");
+      setErrorMessage(content.text.error.passwordMinLength);
       setIsLoading(false);
       return;
     }
 
     if (!passwordsMatch) {
-      setErrorMessage("Les mots de passe ne correspondent pas.");
+      setErrorMessage(content.text.error.passwordsDontMatch);
       setIsLoading(false);
       return;
     }
@@ -452,12 +496,12 @@ export function ArtistProfileSetup({
       const res = await ModuleObject.service.createUser(payload);
 
       await wait();
-      setSuccessMessage(res.message || "Profil artiste créé avec succès.");
       setErrorMessage("");
+      setSuccessMessage(content.text.success.profileCreated);
       router.push("/auth/confirm-email");
     } catch (err: any) {
       console.error(err);
-      setErrorMessage(err?.message || "Erreur lors de l'inscription.");
+      setErrorMessage((err as Error).message);
     } finally {
       setIsLoading(false);
     }
@@ -503,7 +547,7 @@ export function ArtistProfileSetup({
             {/* Messages globaux */}
 
             <form onSubmit={handleSubmit}>
-              <div className="grid lg:grid-cols-2 gap-8">
+              <div className="grid lg:grid-cols-2 gap-8 mb-5">
                 {/* Profile Information Section */}
                 <div className="space-y-6">
                   <h2 className="text-2xl text-white drop-shadow-lg flex items-center gap-2">
@@ -527,7 +571,31 @@ export function ArtistProfileSetup({
 
                     <div
                       onClick={() => fileInputRef.current?.click()}
-                      className="aspect-square max-w-xs border-2 border-dashed border-white/30 rounded-xl bg-white/5 hover:bg-white/10 transition-all cursor-pointer flex items-center justify-center overflow-hidden"
+                      onDragEnter={(e) => {
+                        e.preventDefault();
+                        setIsDraggingPic(true);
+                      }}
+                      onDragOver={(e) => e.preventDefault()} // nécessaire pour autoriser le drop
+                      onDragLeave={(e) => {
+                        e.preventDefault();
+                        setIsDraggingPic(false);
+                      }}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        setIsDraggingPic(false);
+                        const file = e.dataTransfer.files[0];
+                        if (file && file.type.startsWith("image/")) {
+                          handleImageChange({
+                            target: { files: [file] },
+                          } as any);
+                        }
+                      }}
+                      className={`aspect-square max-w-xs border-2 border-dashed rounded-xl p-4 text-center transition-all cursor-pointer flex items-center justify-center overflow-hidden
+      ${
+        isDraggingPic
+          ? "border-white/80 bg-white/15"
+          : "border-white/30 bg-white/5 hover:bg-white/10"
+      }`}
                     >
                       {previewUrl ? (
                         <img
@@ -587,7 +655,7 @@ export function ArtistProfileSetup({
                       multiple
                       className={`w-full border cursor-pointer ${
                         errors?.genre ? "border-red-500" : "border-white/30"
-                      } rounded px-3 py-3 backdrop-blur-md placeholder-white/40 focus:outline-none focus:ring-2 ${
+                      } rounded px-3 py-3 backdrop-blur-md text-black  focus:outline-none focus:ring-2 ${
                         errors?.genre
                           ? "focus:ring-red-500"
                           : "focus:ring-white/50"
@@ -759,7 +827,7 @@ export function ArtistProfileSetup({
                   </div>
 
                   {/* Two-Factor Authentication */}
-                  <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
+                  {/* <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
                     <div className="flex items-center justify-between mb-4">
                       <div>
                         <div className="flex items-center gap-2 mb-1">
@@ -791,7 +859,7 @@ export function ArtistProfileSetup({
                         {content.enabled}
                       </div>
                     )}
-                  </div>
+                  </div> */}
                 </div>
               </div>
               {successMessage && <CustomSuccess message={successMessage} />}

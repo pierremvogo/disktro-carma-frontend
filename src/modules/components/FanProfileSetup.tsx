@@ -8,6 +8,8 @@ import { useRouter } from "next/navigation";
 import { Loader } from "lucide-react";
 import Select from "react-select";
 import countryList from "react-select-country-list";
+import CustomSuccess from "@/@disktro/CustomSuccess";
+import CustomAlert from "@/@disktro/CustomAlert";
 
 // Icon components
 const User = ({ size = 24, className = "" }) => (
@@ -172,6 +174,28 @@ export function FanProfileSetup({
   const [country, setCountry] = useState<string>(""); // code pays (ex: "FR")
   const options = React.useMemo(() => countryList().getData(), []);
 
+  const [isDraggingPic, setIsDraggingPic] = useState(false);
+  const [isDraggingVideo, setIsDraggingVideo] = useState(false);
+
+  // Petits helpers
+  const preventDefaults = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDropProfile = (e: React.DragEvent<HTMLDivElement>) => {
+    preventDefaults(e);
+    setIsDraggingPic(false);
+
+    const file = e.dataTransfer.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) return;
+
+    // Utilise la même logique que handleProfilePicture
+    const fakeEvent = { target: { files: [file] } } as any;
+    handleImageChange(fakeEvent);
+  };
+
   const text = {
     spanish: {
       title: "Configura Tu Perfil de Fan",
@@ -206,8 +230,29 @@ export function FanProfileSetup({
       passwordMismatch: "Las contraseñas no coinciden",
       completeSetup: "Completar Configuración",
       back: "Volver",
+      errors: {
+        generic: "Algo salió mal. Por favor, inténtalo de nuevo más tarde.",
+      },
+      text: {
+        error: {
+          fillAllProfileFields:
+            "Por favor complete todos los campos del perfil.",
+          enterEmail: "Por favor ingrese una dirección de correo electrónico.",
+          passwordMinLength: "La contraseña debe tener al menos 8 caracteres.",
+          passwordsDontMatch: "Las contraseñas no coinciden.",
+          generic: "Ocurrió un error. Por favor, inténtelo de nuevo.",
+        },
+        success: {
+          profileCreated: "Perfil de artista creado con éxito.",
+        },
+      },
     },
     english: {
+      errors: {
+        generic: "Something went wrong. Please try again later.",
+      },
+      noAlbumUploadedYet: "No album uploaded yet.",
+
       title: "Set Up Your Fan Profile",
       subtitle: "Complete your information to start enjoying music",
       profileInfo: "Profile Information",
@@ -239,8 +284,36 @@ export function FanProfileSetup({
       passwordMismatch: "Passwords do not match",
       completeSetup: "Complete Setup",
       back: "Back",
+      text: {
+        error: {
+          fillAllProfileFields: "Please fill in all profile fields.",
+          enterEmail: "Please enter an email address.",
+          passwordMinLength: "Password must be at least 8 characters long.",
+          passwordsDontMatch: "Passwords do not match.",
+          generic: "An error occurred. Please try again.",
+        },
+        success: {
+          profileCreated: "Artist profile created successfully.",
+        },
+      },
     },
     catalan: {
+      text: {
+        error: {
+          fillAllProfileFields: "Si us plau, ompliu tots els camps del perfil.",
+          enterEmail: "Si us plau, introduïu una adreça de correu electrònic.",
+          passwordMinLength: "La contrasenya ha de tenir almenys 8 caràcters.",
+          passwordsDontMatch: "Les contrasenyes no coincideixen.",
+          generic: "S'ha produït un error. Si us plau, torneu-ho a intentar.",
+        },
+        success: {
+          profileCreated: "Perfil d'artista creat amb èxit.",
+        },
+      },
+      errors: {
+        generic:
+          "Alguna cosa ha anat malament. Si us plau, torna-ho a provar més tard.",
+      },
       title: "Configura El Teu Perfil de Fan",
       subtitle:
         "Completa la teva informació per començar a gaudir de la música",
@@ -334,11 +407,10 @@ export function FanProfileSetup({
         setIsLoading(false);
         setErrorMessage("");
       } else {
-        setErrorMessage("Erreur lors de l'upload de l'image.");
         setIsLoading(false);
       }
     } catch (error) {
-      setErrorMessage((error as Error).message);
+      setErrorMessage(content.errors.generic);
       setIsLoading(false);
       setSuccess(false);
     }
@@ -352,27 +424,25 @@ export function FanProfileSetup({
     setErrors({}); // reset previous errors
     const newErrors: { [key: string]: string } = {};
     if (!username || !bio) {
-      setErrorMessage(
-        "Veuillez remplir tous les champs du profil (nom d'artiste, nom réel, genre, bio)."
-      );
+      setErrorMessage(content.text.error.fillAllProfileFields);
       setIsLoading(false);
       return;
     }
 
     if (!email) {
-      setErrorMessage("Veuillez saisir une adresse email.");
+      setErrorMessage(content.text.error.enterEmail);
       setIsLoading(false);
       return;
     }
 
     if (!passwordValid) {
-      setErrorMessage("Le mot de passe doit contenir au moins 8 caractères.");
+      setErrorMessage(content.text.error.passwordMinLength);
       setIsLoading(false);
       return;
     }
 
     if (!passwordsMatch) {
-      setErrorMessage("Les mots de passe ne correspondent pas.");
+      setErrorMessage(content.text.error.passwordsDontMatch);
       setIsLoading(false);
       return;
     }
@@ -397,15 +467,13 @@ export function FanProfileSetup({
 
       const res = await ModuleObject.service.createUser(payload);
       await wait();
-      setSuccessMessage(res.message || "Profil artiste créé avec succès.");
+      setSuccessMessage(content.text.success.profileCreated);
       setErrorMessage("");
       setIsLoading(false);
       router.push("/auth/confirm-email");
     } catch (err) {
       console.error(err);
-      setErrorMessage(
-        (err as Error).message || "Erreur lors de l'inscription."
-      );
+      setErrorMessage(content.errors.generic);
       setIsLoading(false);
     }
   };
@@ -450,7 +518,7 @@ export function FanProfileSetup({
             </div>
 
             <form onSubmit={handleSubmit}>
-              <div className="grid lg:grid-cols-2 gap-8">
+              <div className="grid lg:grid-cols-2 gap-8 mb-5">
                 {/* Profile Information Section */}
                 <div className="space-y-6">
                   <h2 className="text-2xl text-white drop-shadow-lg flex items-center gap-2">
@@ -464,18 +532,42 @@ export function FanProfileSetup({
                       {content.profilePicture}
                     </label>
 
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleImageChange}
-                    />
-
                     <div
                       onClick={() => fileInputRef.current?.click()}
-                      className="aspect-square max-w-xs border-2 border-dashed border-white/30 rounded-xl bg-white/5 hover:bg-white/10 transition-all cursor-pointer flex items-center justify-center overflow-hidden"
+                      onDragEnter={(e) => {
+                        e.preventDefault();
+                        setIsDraggingPic(true);
+                      }}
+                      onDragOver={(e) => e.preventDefault()}
+                      onDragLeave={(e) => {
+                        e.preventDefault();
+                        setIsDraggingPic(false);
+                      }}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        setIsDraggingPic(false);
+                        const file = e.dataTransfer.files[0];
+                        if (file && file.type.startsWith("image/")) {
+                          handleImageChange({
+                            target: { files: [file] },
+                          } as any);
+                        }
+                      }}
+                      className={`aspect-square max-w-xs border-2 border-dashed rounded-xl p-4 text-center transition-all cursor-pointer flex items-center justify-center overflow-hidden
+      ${
+        isDraggingPic
+          ? "border-white/80 bg-white/15"
+          : "border-white/30 bg-white/5 hover:bg-white/10"
+      }`}
                     >
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleImageChange}
+                      />
+
                       {previewUrl ? (
                         <img
                           src={previewUrl}
@@ -647,7 +739,7 @@ export function FanProfileSetup({
                   </div>
 
                   {/* Two-Factor Authentication */}
-                  <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
+                  {/* <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
                     <div className="flex items-center justify-between mb-4">
                       <div>
                         <div className="flex items-center gap-2 mb-1">
@@ -679,21 +771,14 @@ export function FanProfileSetup({
                         {content.enabled}
                       </div>
                     )}
-                  </div>
+                  </div> */}
                 </div>
               </div>
 
               {/* Messages d'erreur / succès */}
-              {errorMessage && (
-                <p className="mt-4 text-sm text-center text-red-400">
-                  {errorMessage}
-                </p>
-              )}
-              {successMessage && (
-                <p className="mt-4 text-sm text-center text-green-400">
-                  {successMessage}
-                </p>
-              )}
+              {successMessage && <CustomSuccess message={successMessage} />}
+
+              {errorMessage && <CustomAlert message={errorMessage} />}
 
               {/* Complete Button */}
               <div className="mt-8 flex justify-end">

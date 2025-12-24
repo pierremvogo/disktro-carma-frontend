@@ -449,7 +449,7 @@ export function EpUploadSection({ text, language }: EpUploadSectionProps) {
       const epList = res.data ?? res.eps ?? [];
       setEPs(epList);
     } catch (error) {
-      setErrorMessage((error as Error).message);
+      setErrorMessage(text.errors.generic);
     } finally {
       setIsLoading(false);
     }
@@ -472,10 +472,10 @@ export function EpUploadSection({ text, language }: EpUploadSectionProps) {
     try {
       await EpModuleObject.service.deleteEp(epToDelete.id!);
       setEPs((prev) => prev.filter((e) => e.id !== epToDelete.id));
-      setSuccessMessage("EP supprimé avec succès.");
+      setSuccessMessage(text.epDeletedSuccess);
       fetchEPs();
     } catch (error) {
-      setErrorMessage("Erreur lors de la suppression de l'EP.");
+      setErrorMessage(text.errors.generic);
     } finally {
       setIsLoading(false);
       setIsDeleteModalOpen(false);
@@ -531,189 +531,14 @@ export function EpUploadSection({ text, language }: EpUploadSectionProps) {
 
       if (res && res.url) {
         setCoverUrl(res.url);
-        setSuccessMessage("Artwork uploadé avec succès.");
       } else {
-        setErrorMessage("Erreur lors de l'upload de l'artwork.");
       }
     } catch (error) {
-      setErrorMessage((error as Error).message);
+      setErrorMessage(text.errors.generic);
     } finally {
       setIsLoading(false);
     }
   };
-  const handleTrackAudioChange =
-    (trackId: string) => async (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-
-      setErrorMessage("");
-      setSuccessMessage("");
-      setIsLoading(true);
-      setTracks((prev) =>
-        prev.map((t) =>
-          t.id === trackId
-            ? {
-                ...t,
-                audioFile: file,
-              }
-            : t
-        )
-      );
-      const fd = new FormData();
-      fd.append("file", file);
-
-      try {
-        const res = await MediaModule.service.uploadAudioFile(fd);
-
-        if (res && (res.fileName || res.url)) {
-          const uploadedAudioUrl = res.url ?? res.fileName;
-          setAudioUrl(uploadedAudioUrl);
-          setTracks((prev) =>
-            prev.map((t) =>
-              t.id === trackId
-                ? {
-                    ...t,
-                    audioFile: file,
-                    audioUrl: uploadedAudioUrl || "",
-                  }
-                : t
-            )
-          );
-
-          setSuccessMessage("Fichier audio de la piste uploadé avec succès.");
-        } else {
-          setErrorMessage("Erreur lors de l'upload du fichier audio.");
-        }
-      } catch (error) {
-        console.error("Erreur upload audio EP :", error);
-        setErrorMessage(
-          (error as Error).message ||
-            "Erreur lors de l'upload du fichier audio."
-        );
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-  // ==========
-  // Upload vidéo langue des signes par piste
-  // ==========
-  const handleTrackSignLanguage =
-    (trackId: string) => async (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-
-      setErrorMessage("");
-      setSuccessMessage("");
-      setIsLoading(true);
-
-      setTracks((prev) =>
-        prev.map((t) =>
-          t.id === trackId
-            ? {
-                ...t,
-                signLanguageVideoFile: file,
-              }
-            : t
-        )
-      );
-
-      const fd = new FormData();
-      fd.append("file", file);
-
-      try {
-        const res = await MediaModule.service.uploadVideoFile(fd);
-
-        if (res && res.url) {
-          const previewUrl = URL.createObjectURL(file);
-          setSignLanguageVideoUrl(res.url);
-          setTracks((prev) =>
-            prev.map((t) =>
-              t.id === trackId
-                ? {
-                    ...t,
-                    signLanguageVideoFile: file,
-                    signLanguageVideoPreview: previewUrl,
-                    signLanguageVideoUrl: res.url,
-                  }
-                : t
-            )
-          );
-
-          setSuccessMessage(
-            "Vidéo en langue des signes de la piste uploadée avec succès."
-          );
-        } else {
-          setErrorMessage(
-            "Erreur lors de l'upload de la vidéo en langue des signes."
-          );
-        }
-      } catch (error) {
-        console.error("Erreur upload vidéo langue des signes EP :", error);
-        setErrorMessage(
-          (error as Error).message ||
-            "Erreur lors de l'upload de la vidéo en langue des signes."
-        );
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-  // ==========
-  // Upload braille global (pour l’EP)
-  // ==========
-  const handleBrailleFile =
-    (trackId: string) => async (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-
-      setErrorMessage("");
-      setSuccessMessage("");
-      setIsLoading(true);
-
-      setBrailleFile(file);
-      setTracks((prev) =>
-        prev.map((t) =>
-          t.id === trackId
-            ? {
-                ...t,
-                brailleFile: file,
-              }
-            : t
-        )
-      );
-      const fd = new FormData();
-      fd.append("file", file);
-
-      try {
-        const res = await MediaModule.service.uploadBrailleFile(fd);
-
-        if (res && res.url) {
-          setBrailleFileUrl(res.url);
-          setTracks((prev) =>
-            prev.map((t) =>
-              t.id === trackId
-                ? {
-                    ...t,
-                    brailleFileUrl: res.url,
-                  }
-                : t
-            )
-          );
-          setSuccessMessage("Fichier braille uploadé avec succès.");
-        } else {
-          setErrorMessage("Erreur lors de l'upload du fichier braille.");
-        }
-      } catch (error) {
-        console.error("Erreur upload fichier braille EP :", error);
-        setErrorMessage(
-          (error as Error).message ||
-            "Erreur lors de l'upload du fichier braille."
-        );
-      } finally {
-        setIsLoading(false);
-      }
-    };
 
   // ==========
   // allUploadsDone : chaque piste doit avoir un audioUrl
@@ -729,9 +554,7 @@ export function EpUploadSection({ text, language }: EpUploadSectionProps) {
     setSuccessMessage("");
 
     if (!allUploadsDone) {
-      setErrorMessage(
-        "Veuillez compléter les fichiers audio, les paroles et le mood avant de continuer."
-      );
+      setErrorMessage(text.completeAudioLyricsMood);
       return;
     }
 
@@ -743,7 +566,7 @@ export function EpUploadSection({ text, language }: EpUploadSectionProps) {
 
       if (!userId || !token) {
         setIsLoading(false);
-        setErrorMessage("Utilisateur non authentifié.");
+        setErrorMessage(text.unauthenticatedUser);
         return;
       }
 
@@ -789,13 +612,12 @@ export function EpUploadSection({ text, language }: EpUploadSectionProps) {
       const epId = (newEp as any)?.data?.id ?? (newEp as any)?.id;
 
       if (!epId) {
-        throw new Error("Impossible de récupérer l'identifiant de l'EP créé.");
+        throw new Error(text.errors.generic);
       }
 
       // 2️⃣ Création des tracks + association à l’EP
       for (const track of tracks) {
         if (!track.audioUrl) {
-          console.warn("Track sans audioUrl, ignoré :", track);
           continue;
         }
 
@@ -816,9 +638,7 @@ export function EpUploadSection({ text, language }: EpUploadSectionProps) {
         );
 
         if (!res || !res.data?.id) {
-          throw new Error(
-            "Impossible de récupérer l'identifiant d'un track créé pour l'EP."
-          );
+          throw new Error(text.errors.generic);
         }
 
         const trackId = res.data.id;
@@ -869,13 +689,10 @@ export function EpUploadSection({ text, language }: EpUploadSectionProps) {
       setArtworkPreview("");
       setCoverUrl("");
 
-      setSuccessMessage("EP et pistes créés et associés avec succès !");
+      setSuccessMessage(text.epCreatedSuccess);
     } catch (error) {
       console.error("Erreur création EP :", error);
-      setErrorMessage(
-        (error as Error).message ||
-          "Erreur lors de la création de l'EP et des pistes."
-      );
+      setErrorMessage(text.errors.generic);
     } finally {
       setIsLoading(false);
     }
@@ -1195,23 +1012,22 @@ export function EpUploadSection({ text, language }: EpUploadSectionProps) {
               {successMessage && <CustomSuccess message={successMessage} />}
               {errorMessage && <CustomAlert message={errorMessage} />}
 
-              {allUploadsDone && (
-                <button
-                  type="submit"
-                  className="cursor-pointer w-full py-4 px-6 bg-white/30 backdrop-blur-md border border-white/40 rounded-lg text-white drop-shadow hover:bg-white/40 transition-all flex items-center justify-center gap-2"
-                >
-                  <Upload size={20} />
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="cursor-pointer w-full py-4 px-6 bg-white/30 backdrop-blur-md border border-white/40 rounded-lg text-white drop-shadow hover:bg-white/40 transition-all flex items-center justify-center gap-2"
+              >
+                <Upload size={20} />
 
-                  {isLoading ? (
-                    <div className="flex items-center justify-center gap-2">
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                      <span>{text.uploadButton}...</span>
-                    </div>
-                  ) : (
-                    text.uploadButton
-                  )}
-                </button>
-              )}
+                {isLoading && !allUploadsDone ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="disabled:cursor-not-allowed w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    <span>{text.uploadButton}...</span>
+                  </div>
+                ) : (
+                  text.uploadButton
+                )}
+              </button>
             </form>
           </div>
           {/* Recent EP Uploads */}
@@ -1327,11 +1143,12 @@ export function EpUploadSection({ text, language }: EpUploadSectionProps) {
           </div>
 
           {/* Composant qui gère l'ajout de tracks pour cet EP */}
-          <EpTracksEditor epId={selectedEpId} language={language} />
+          <EpTracksEditor text={text} epId={selectedEpId} language={language} />
         </div>
       )}
 
       <ConfirmDeleteModal
+        text={text}
         open={isDeleteModalOpen}
         itemName={epToDelete?.title}
         isLoading={isLoading}

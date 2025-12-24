@@ -165,11 +165,12 @@ type SavedTrack = {
 type EpTracksEditorProps = {
   language: string;
   epId: string;
-  text?: any; // système de traductions
+  text: any; // système de traductions
 };
 
 export default function EpTracksEditor({
   epId,
+  text,
   language,
 }: EpTracksEditorProps) {
   const [tracks, setTracks] = React.useState<EpTrackForm[]>([makeEmptyTrack()]);
@@ -182,7 +183,6 @@ export default function EpTracksEditor({
   const [savedTracks, setSavedTracks] = React.useState<SavedTrack[]>([]);
   const [currentPage, setCurrentPage] = React.useState(1);
   const pageSize = 5;
-  const text = getEpTexts(language);
   const [playingTrackId, setPlayingTrackId] = React.useState<string | null>(
     null
   );
@@ -314,16 +314,11 @@ export default function EpTracksEditor({
                 : t
             )
           );
-          setSuccessMessage("Fichier audio de la piste uploadé avec succès.");
         } else {
-          setErrorMessage("Erreur lors de l'upload du fichier audio.");
         }
       } catch (error) {
         console.error("Erreur upload audio EP :", error);
-        setErrorMessage(
-          (error as Error).message ||
-            "Erreur lors de l'upload du fichier audio."
-        );
+        setErrorMessage(text.errors.generic);
       } finally {
         setIsLoading(false);
       }
@@ -369,20 +364,11 @@ export default function EpTracksEditor({
                 : t
             )
           );
-          setSuccessMessage(
-            "Vidéo en langue des signes de la piste uploadée avec succès."
-          );
         } else {
-          setErrorMessage(
-            "Erreur lors de l'upload de la vidéo en langue des signes."
-          );
         }
       } catch (error) {
         console.error("Erreur upload vidéo LSF EP :", error);
-        setErrorMessage(
-          (error as Error).message ||
-            "Erreur lors de l'upload de la vidéo en langue des signes."
-        );
+        setErrorMessage(text.errors.generic);
       } finally {
         setIsLoading(false);
       }
@@ -425,16 +411,11 @@ export default function EpTracksEditor({
                 : t
             )
           );
-          setSuccessMessage("Fichier braille uploadé avec succès.");
         } else {
-          setErrorMessage("Erreur lors de l'upload du fichier braille.");
         }
       } catch (error) {
         console.error("Erreur upload braille EP :", error);
-        setErrorMessage(
-          (error as Error).message ||
-            "Erreur lors de l'upload du fichier braille."
-        );
+        setErrorMessage(text.errors.generic);
       } finally {
         setIsLoading(false);
       }
@@ -514,10 +495,7 @@ export default function EpTracksEditor({
       }
     } catch (error) {
       console.error("Erreur création pistes EP :", error);
-      setErrorMessage(
-        (error as Error).message ||
-          "Erreur lors de la création des pistes pour cet EP."
-      );
+      setErrorMessage(text.errors.generic);
     } finally {
       setIsLoading(false);
     }

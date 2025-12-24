@@ -30,6 +30,10 @@ export function Questionnaire({
 
   const content = {
     spanish: {
+      errors: {
+        generic: "Algo salió mal. Por favor, inténtalo de nuevo más tarde.",
+      },
+
       title: "Únete a nuestro grupo de pruebas",
       subtitle: "Ayúdanos a construir el futuro de la música para todos",
       name: "Nombre",
@@ -49,6 +53,11 @@ export function Questionnaire({
       signUp: "Regístrate",
     },
     english: {
+      errors: {
+        generic: "Something went wrong. Please try again later.",
+      },
+      noAlbumUploadedYet: "No album uploaded yet.",
+
       title: "Join Our Testing Group",
       subtitle: "Help us build the future of music for everybody",
       name: "Name",
@@ -67,6 +76,10 @@ export function Questionnaire({
       signUp: "Sign up",
     },
     catalan: {
+      errors: {
+        generic:
+          "Alguna cosa ha anat malament. Si us plau, torna-ho a provar més tard.",
+      },
       title: "Uneix-te al nostre grup de proves",
       subtitle: "Ajuda'ns a construir el futur de la música per a tothom",
       name: "Nom",
@@ -163,10 +176,7 @@ export function Questionnaire({
       // Notification au parent (ex: fermer modal, passer à l'étape suivante, etc.)
       onSubmit();
     } catch (err: any) {
-      // Gestion d'erreur inspirée des pattern classiques
-      const apiMessage =
-        err?.response?.data?.message || err?.message || text.genericError;
-      setErrorMessage(apiMessage);
+      setErrorMessage(text.errors.generic);
     } finally {
       setIsSubmitting(false);
     }

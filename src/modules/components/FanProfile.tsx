@@ -258,8 +258,16 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
       hide: "Ocultar",
       phoneNumber: "Número de Teléfono",
       emailAddress: "Correo Electrónico",
+      errors: {
+        generic: "Algo salió mal. Por favor, inténtalo de nuevo más tarde.",
+      },
     },
     english: {
+      errors: {
+        generic: "Something went wrong. Please try again later.",
+      },
+      noAlbumUploadedYet: "No album uploaded yet.",
+
       saving: "Saving...",
       updating: "Updating...",
       title: "My Profile",
@@ -305,6 +313,10 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
       emailAddress: "Email Address",
     },
     catalan: {
+      errors: {
+        generic:
+          "Alguna cosa ha anat malament. Si us plau, torna-ho a provar més tard.",
+      },
       saving: "...",
       updating: "...",
       title: "El Meu Perfil",
@@ -464,7 +476,7 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
       fetchUser?.();
     } catch (error) {
       setSuccessPassword(false);
-      setErrorMessage((error as Error).message);
+      setErrorMessage(content.errors.generic);
     } finally {
       setIsLoadingPassword(false);
     }
@@ -517,7 +529,7 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
       setSuccessMessage("Profil mis à jour avec succès.");
       fetchUser?.(); // resync si tu veux
     } catch (error) {
-      setErrorMessage((error as Error).message);
+      setErrorMessage(content.errors.generic);
       setSuccess(false);
     } finally {
       setIsLoading(false);
@@ -570,7 +582,7 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
         setIsLoading(false);
       }
     } catch (error) {
-      setErrorMessage((error as Error).message);
+      setErrorMessage(content.errors.generic);
       setIsLoading(false);
       setSuccess(false);
     }
@@ -612,7 +624,7 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
       setSuccess(true);
       setErrorMessage("");
     } catch (error) {
-      setErrorMessage((error as Error).message);
+      setErrorMessage(content.errors.generic);
       setIsLoading(false);
       setSuccess(false);
     }

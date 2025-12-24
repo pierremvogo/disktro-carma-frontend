@@ -25,6 +25,7 @@ const Trash = ({ size = 20, className = "" }) => (
 );
 
 type ConfirmDeleteModalProps = {
+  text: any;
   open: boolean;
   title?: string;
   message?: string;
@@ -36,8 +37,9 @@ type ConfirmDeleteModalProps = {
 
 export default function ConfirmDeleteModal({
   open,
-  title = "Confirmer la suppression",
-  message = "Êtes-vous sûr de vouloir supprimer cet élément ? Cette action est définitive.",
+  text,
+  title = text.deleteModaltitle,
+  message = text.deleteModalmessage,
   itemName,
   isLoading = false,
   onCancel,
@@ -114,7 +116,7 @@ export default function ConfirmDeleteModal({
               transition-all cursor-pointer
             "
           >
-            Annuler
+            {text.deleteModalcancel}
           </button>
 
           <button
@@ -133,7 +135,7 @@ export default function ConfirmDeleteModal({
             "
           >
             <Trash size={16} />
-            {isLoading ? "Suppression..." : "Supprimer"}
+            {isLoading ? text.deleteModaldeleting : text.deleteModaldelete}
           </button>
         </div>
       </div>
