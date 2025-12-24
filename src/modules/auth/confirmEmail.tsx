@@ -88,6 +88,12 @@ export default function ConfirmEmailForm({ language }: ConfirmEmailFormProps) {
   const handleConfirm = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Récupérer la langue dans localStorage
+    const language =
+      (typeof window !== "undefined" &&
+        localStorage.getItem("disktro_language")) ||
+      "english";
+
     if (!token) {
       setStatus("error");
       setMessage(text.errors.emptyToken);
@@ -99,7 +105,7 @@ export default function ConfirmEmailForm({ language }: ConfirmEmailFormProps) {
       setErrorMessage("");
       setIsLoading(true);
 
-      const res = await ModuleObject.service.verifyEmail(token);
+      const res = await ModuleObject.service.verifyEmail(token, language);
       await wait();
 
       setStatus("success");

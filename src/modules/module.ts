@@ -57,14 +57,22 @@ class ServiceObject {
   static forgotPassword = (info: any): Promise<any> =>
     BaseMethods.postRequest(API_URLS.FORGOT_PASSWORD, info, false);
 
-  static resetPassword = (token: string, password: string): Promise<any> => {
+  static resetPassword = (
+    token: string,
+    password: string,
+    language: string
+  ): Promise<any> => {
     const url = formatURL(API_URLS.RESET_PASSWORD, { token });
-    return BaseMethods.postRequest(url, { newPassword: password }, false);
+    return BaseMethods.postRequest(
+      url,
+      { newPassword: password, language: language },
+      false
+    );
   };
 
-  static verifyEmail = (token: string): Promise<any> => {
+  static verifyEmail = (token: string, language: string): Promise<any> => {
     const url = formatURL(API_URLS.CONFIRM_EMAIL, { token });
-    return BaseMethods.getRequest(url, false);
+    return BaseMethods.getRequest(url, false, { language: language });
   };
 }
 interface LocalState {

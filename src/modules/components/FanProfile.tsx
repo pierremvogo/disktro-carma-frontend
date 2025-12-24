@@ -506,6 +506,11 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
       newErrors.email = "Please enter a valid email address";
     }
+    // Récupérer la langue dans localStorage
+    const language =
+      (typeof window !== "undefined" &&
+        localStorage.getItem("disktro_language")) ||
+      "english";
 
     setErrors(newErrors);
 
@@ -521,12 +526,13 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
       const payload = {
         name: trimmedName,
         email: trimmedEmail,
+        language,
       };
 
-      await UserModule.service.updateUser(userId, payload);
+      const res = await UserModule.service.updateUser(userId, payload);
 
       setSuccess(true);
-      setSuccessMessage("Profil mis à jour avec succès.");
+      setSuccessMessage(res.message);
       fetchUser?.(); // resync si tu veux
     } catch (error) {
       setErrorMessage(content.errors.generic);
@@ -832,7 +838,6 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
           {[
             { id: "account", label: content.account, icon: User },
             { id: "password", label: content.password, icon: Lock },
-            { id: "payment", label: content.payment, icon: CreditCard },
           ].map(({ id, label, icon: Icon }) => (
             <button
               key={id}
@@ -1102,9 +1107,8 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
         )}
 
         {/* Payment Tab */}
-        {activeTab === "payment" && (
+        {/* {activeTab === "payment" && (
           <div className="space-y-6">
-            {/* Saved Payment Methods */}
             {savedPaymentMethods.length > 0 && (
               <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 sm:p-6 lg:p-8 border border-white/20">
                 <h2 className="text-xl sm:text-2xl text-white drop-shadow-lg mb-4 sm:mb-6">
@@ -1117,7 +1121,6 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
                       key={method.id}
                       className="bg-white/5 backdrop-blur-sm rounded-lg p-3 sm:p-4 border border-white/10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4"
                     >
-                      {/* Icône + infos */}
                       <div className="flex items-center gap-3 sm:gap-4">
                         {getPaymentIcon(method.type)}
                         <div className="min-w-0">
@@ -1132,7 +1135,6 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
                         </div>
                       </div>
 
-                      {/* Bouton remove */}
                       <button
                         onClick={() => handleRemovePayment(method.id)}
                         className="w-full sm:w-auto px-4 py-2 bg-red-500/40 backdrop-blur-sm border border-white/20 rounded-lg text-white text-sm sm:text-base hover:bg-red-500/60 transition-all"
@@ -1151,7 +1153,6 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
               </h2>
 
               <div className="space-y-6">
-                {/* Payment Type Selector */}
                 <div>
                   <label className="block text-white drop-shadow mb-3">
                     {content.selectPaymentType}
@@ -1208,7 +1209,6 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
                   </div>
                 </div>
 
-                {/* Credit Card Form */}
                 {paymentType === "card" && (
                   <>
                     <div>
@@ -1273,7 +1273,6 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
                   </>
                 )}
 
-                {/* PayPal Form */}
                 {paymentType === "paypal" && (
                   <div>
                     <label className="block text-white drop-shadow mb-3">
@@ -1289,7 +1288,6 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
                   </div>
                 )}
 
-                {/* Bizum Form */}
                 {paymentType === "bizum" && (
                   <div>
                     <label className="block text-white drop-shadow mb-3">
@@ -1305,7 +1303,6 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
                   </div>
                 )}
 
-                {/* iDEAL Form */}
                 {paymentType === "ideal" && (
                   <>
                     <div>
@@ -1355,7 +1352,6 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
                   </>
                 )}
 
-                {/* Mobile Money Form */}
                 {paymentType === "mobilemoney" && (
                   <>
                     <div>
@@ -1402,7 +1398,6 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
                   </>
                 )}
 
-                {/* Orange Money Form */}
                 {paymentType === "orangemoney" && (
                   <div>
                     <label className="block text-white drop-shadow mb-3">
@@ -1418,7 +1413,6 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
                   </div>
                 )}
 
-                {/* Save Button */}
                 <button
                   onClick={handleSavePayment}
                   className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-green-500/40 to-emerald-500/40 backdrop-blur-md border-2 border-white/40 rounded-xl text-white hover:from-green-500/50 hover:to-emerald-500/50 hover:border-white/60 transition-all shadow-lg"
@@ -1429,7 +1423,7 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
               </div>
             </div>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );

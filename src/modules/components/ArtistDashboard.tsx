@@ -1909,6 +1909,7 @@ export function ArtistDashboard({
     try {
       const payload = {
         ...formData,
+        language,
       };
 
       await UserModule.service.updateUser(userId, payload);

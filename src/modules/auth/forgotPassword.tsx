@@ -103,6 +103,11 @@ export default function ForgotPasswordForm({
       setErrorMessage(text.errors.emptyEmail);
       return;
     }
+    // Récupérer la langue dans localStorage
+    const language =
+      (typeof window !== "undefined" &&
+        localStorage.getItem("disktro_language")) ||
+      "english";
 
     try {
       setSuccessMessage("");
@@ -110,7 +115,10 @@ export default function ForgotPasswordForm({
       setIsLoading(true);
       setSuccess(false);
 
-      const res = await ModuleObject.service.forgotPassword({ email });
+      const res = await ModuleObject.service.forgotPassword({
+        email,
+        language: language,
+      });
       await wait();
 
       setSuccess(true);
