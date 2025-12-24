@@ -1,13 +1,12 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { UserModuleObject as ModuleObject } from "@/modules/module"; // adapte si besoin
+import { UserModuleObject as ModuleObject } from "@/modules/module";
 
 type Status = "idle" | "processing" | "success" | "error";
 
-// Simple icon components (même esprit que ton Login)
+/* ================= ICONS ================= */
 const CheckCircle = ({ size = 24, className = "" }) => (
   <svg
     width={size}
@@ -86,6 +85,7 @@ const Music = ({ size = 24, className = "" }) => (
   </svg>
 );
 
+/* ================= COMPONENT ================= */
 export default function PaymentSuccessPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -96,47 +96,153 @@ export default function PaymentSuccessPage() {
   );
 
   const [status, setStatus] = useState<Status>("idle");
-  const [message, setMessage] = useState<string>("");
+  const [message, setMessage] = useState("");
+  const [language, setLanguage] = useState<"english" | "spanish" | "catalan">(
+    "english"
+  );
 
+  /* ================= LANGUAGE FROM STORAGE ================= */
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const stored = localStorage.getItem("disktro_language");
+    if (stored === "english" || stored === "spanish" || stored === "catalan") {
+      setLanguage(stored);
+    }
+  }, []);
+
+  /* ================= TRANSLATIONS ================= */
+  const content = {
+    english: {
+      headers: {
+        idle: "Preparing…",
+        processing: "Processing…",
+        success: "Success",
+        error: "Payment issue",
+      },
+      subtitles: {
+        idle: "Loading…",
+        processing: "We’re confirming your payment with Stripe.",
+        success: "You can continue to your dashboard.",
+        error: "We couldn’t confirm the payment.",
+      },
+      messages: {
+        missingSession: "Missing session_id in URL.",
+        notAuth: "Not authenticated. Please log in again.",
+        processing: "Finalizing your subscription…",
+        success: "Payment successful! Your subscription should now be active.",
+        error: "Something went wrong while confirming your payment.",
+      },
+      actions: {
+        home: "Go to Home",
+        dashboard: "Continue listening",
+      },
+      misc: {
+        session: "Session",
+        dontClose: "Please don’t close this page.",
+        refresh:
+          "If your subscription does not appear immediately, wait a few seconds and refresh.",
+      },
+    },
+    spanish: {
+      headers: {
+        idle: "Preparando…",
+        processing: "Procesando…",
+        success: "Éxito",
+        error: "Problema de pago",
+      },
+      subtitles: {
+        idle: "Cargando…",
+        processing: "Estamos confirmando tu pago con Stripe.",
+        success: "Puedes continuar a tu panel.",
+        error: "No pudimos confirmar el pago.",
+      },
+      messages: {
+        missingSession: "Falta session_id en la URL.",
+        notAuth: "No autenticado. Por favor, inicia sesión de nuevo.",
+        processing: "Finalizando tu suscripción…",
+        success: "¡Pago realizado con éxito! Tu suscripción ya está activa.",
+        error: "Algo salió mal al confirmar tu pago.",
+      },
+      actions: {
+        home: "Ir al inicio",
+        dashboard: "Seguir escuchando",
+      },
+      misc: {
+        session: "Sesión",
+        dontClose: "Por favor, no cierres esta página.",
+        refresh:
+          "Si tu suscripción no aparece inmediatamente, espera unos segundos y actualiza.",
+      },
+    },
+    catalan: {
+      headers: {
+        idle: "Preparant…",
+        processing: "Processant…",
+        success: "Èxit",
+        error: "Problema de pagament",
+      },
+      subtitles: {
+        idle: "Carregant…",
+        processing: "Estem confirmant el teu pagament amb Stripe.",
+        success: "Pots continuar cap al teu tauler.",
+        error: "No hem pogut confirmar el pagament.",
+      },
+      messages: {
+        missingSession: "Falta session_id a la URL.",
+        notAuth: "No autenticat. Torna a iniciar sessió.",
+        processing: "Finalitzant la teva subscripció…",
+        success:
+          "Pagament realitzat correctament! La teva subscripció ja està activa.",
+        error: "Alguna cosa ha anat malament en confirmar el pagament.",
+      },
+      actions: {
+        home: "Anar a l'inici",
+        dashboard: "Continuar escoltant",
+      },
+      misc: {
+        session: "Sessió",
+        dontClose: "Si us plau, no tanquis aquesta pàgina.",
+        refresh:
+          "Si la subscripció no apareix immediatament, espera uns segons i refresca.",
+      },
+    },
+  };
+
+  const text = content[language] || content.english;
+
+  /* ================= EFFECT ================= */
   useEffect(() => {
     let redirectTimer: any;
 
     async function run() {
       if (!sessionId) {
         setStatus("error");
-        setMessage("Missing session_id in URL.");
+        setMessage(text.messages.missingSession);
         return;
       }
 
       const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
       if (!token) {
         setStatus("error");
-        setMessage("Not authenticated. Please log in again.");
+        setMessage(text.messages.notAuth);
         return;
       }
 
       setStatus("processing");
-      setMessage("Finalizing your subscription…");
+      setMessage(text.messages.processing);
 
       try {
-        // Petit délai pour laisser le webhook écrire en DB
         await new Promise((r) => setTimeout(r, 1500));
 
         setStatus("success");
-        setMessage(
-          "Payment successful! Your subscription should now be active."
-        );
+        setMessage(text.messages.success);
 
-        // Auto-redirect (2.5s)
         redirectTimer = setTimeout(() => {
           router.push("/dashboard/fan-streaming?tab=dashboard&sub=success");
         }, 2500);
       } catch (e: any) {
-        console.error(e);
         setStatus("error");
-        setMessage(
-          e?.message ?? "Something went wrong while confirming your payment."
-        );
+        setMessage(e?.message || text.messages.error);
       }
     }
 
@@ -145,42 +251,39 @@ export default function PaymentSuccessPage() {
     return () => {
       if (redirectTimer) clearTimeout(redirectTimer);
     };
-  }, [sessionId, router]);
+  }, [sessionId, router, text]);
 
   const header = {
     idle: {
-      title: "Preparing…",
+      title: text.headers.idle,
       icon: <Music className="text-white" size={28} />,
     },
     processing: {
-      title: "Processing…",
+      title: text.headers.processing,
       icon: <Loader className="text-white animate-spin" size={22} />,
     },
     success: {
-      title: "Success",
+      title: text.headers.success,
       icon: <CheckCircle className="text-green-300" size={26} />,
     },
     error: {
-      title: "Payment issue",
+      title: text.headers.error,
       icon: <AlertTriangle className="text-red-300" size={26} />,
     },
   }[status];
 
+  /* ================= JSX ================= */
   return (
     <div
       className="fixed inset-0 w-screen h-screen bg-cover bg-center"
       style={{
         backgroundImage:
           'url("/image/4ac3eed398bb68113a14d0fa5efe7a6def6f7651.png")',
-        backgroundSize: "cover",
-        backgroundPosition: "center",
       }}
     >
-      {/* Overlay */}
       <div className="absolute inset-0 bg-black/50" />
 
-      {/* Content */}
-      <div className="relative w-full h-full overflow-y-auto flex items-center justify-center p-6">
+      <div className="relative w-full h-full flex items-center justify-center p-6">
         <div className="w-full max-w-lg mt-10">
           <div className="bg-white/10 backdrop-blur-md rounded-3xl border border-white/20 p-8 shadow-2xl">
             {/* Header */}
@@ -193,41 +296,26 @@ export default function PaymentSuccessPage() {
                   {header.title}
                 </h1>
                 <p className="text-white/70 drop-shadow mt-1">
-                  {status === "processing"
-                    ? "We’re confirming your payment with Stripe."
-                    : status === "success"
-                    ? "You can continue to your dashboard."
-                    : status === "error"
-                    ? "We couldn’t confirm the payment."
-                    : "Loading…"}
+                  {text.subtitles[status]}
                 </p>
               </div>
             </div>
 
             {/* Message */}
-            <div
-              className={[
-                "rounded-2xl border p-4 text-sm",
-                status === "success"
-                  ? "bg-green-500/15 border-green-500/30 text-white"
-                  : status === "error"
-                  ? "bg-red-500/15 border-red-500/30 text-white"
-                  : "bg-white/10 border-white/15 text-white",
-              ].join(" ")}
-            >
+            <div className="rounded-2xl border p-4 text-sm bg-white/10 border-white/15 text-white">
               <p className="text-white/90">{message}</p>
               {status === "processing" && (
                 <div className="mt-3 flex items-center gap-2 text-white/70 text-xs">
                   <div className="w-2 h-2 rounded-full bg-white/60 animate-pulse" />
-                  <span>Please don’t close this page.</span>
+                  <span>{text.misc.dontClose}</span>
                 </div>
               )}
             </div>
 
             {/* Session */}
             <div className="mt-6 bg-white/10 border border-white/15 rounded-2xl p-4 text-xs text-white/70">
-              <div className="flex items-center justify-between gap-3">
-                <span className="text-white/60">Session</span>
+              <div className="flex items-center justify-between">
+                <span>{text.misc.session}</span>
                 <span className="truncate max-w-[70%]">{sessionId ?? "—"}</span>
               </div>
             </div>
@@ -236,25 +324,21 @@ export default function PaymentSuccessPage() {
             <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
               <button
                 onClick={() => router.push("/home")}
-                className="w-full cursor-pointer px-6 py-4 bg-white/20 backdrop-blur-md border-2 border-white/30 rounded-xl text-white hover:bg-white/30 hover:border-white/50 transition-all shadow-lg"
+                className="px-6 py-4 bg-white/20 border-2 border-white/30 rounded-xl text-white hover:bg-white/30 transition-all"
               >
-                Go to Home
+                {text.actions.home}
               </button>
 
               <button
                 onClick={() => router.push("/dashboard/fan-streaming")}
-                className="w-full cursor-pointer px-6 py-4 bg-white/30 backdrop-blur-md border-2 border-white/40 rounded-xl text-white hover:bg-white/40 hover:border-white/60 transition-all shadow-lg"
+                className="px-6 py-4 bg-white/30 border-2 border-white/40 rounded-xl text-white hover:bg-white/40 transition-all"
               >
-                Continue listening
+                {text.actions.dashboard}
               </button>
             </div>
 
-            {/* Secondary links */}
             <div className="text-center pt-4 mt-6 border-t border-white/20">
-              <p className="mt-2 text-[11px] text-white/50">
-                If your subscription does not appear immediately, wait a few
-                seconds and refresh.
-              </p>
+              <p className="text-[11px] text-white/50">{text.misc.refresh}</p>
             </div>
           </div>
         </div>

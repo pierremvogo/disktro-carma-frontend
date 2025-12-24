@@ -422,7 +422,13 @@ export function FanProfileSetup({
     setSuccessMessage("");
     setIsLoading(true);
     setErrors({}); // reset previous errors
-    const newErrors: { [key: string]: string } = {};
+
+    // Récupérer la langue dans localStorage
+    const language =
+      (typeof window !== "undefined" &&
+        localStorage.getItem("disktro_language")) ||
+      "english";
+
     if (!username || !bio) {
       setErrorMessage(content.text.error.fillAllProfileFields);
       setIsLoading(false);
@@ -462,7 +468,8 @@ export function FanProfileSetup({
         emailVerified,
         twoFactorEnabled,
         country: country || undefined,
-        profileImageUrl, // 👈 on envoie aussi l'URL de l'image uploadée
+        profileImageUrl, // URL de l'image
+        language, // 👈 on ajoute la langue ici
       };
 
       const res = await ModuleObject.service.createUser(payload);

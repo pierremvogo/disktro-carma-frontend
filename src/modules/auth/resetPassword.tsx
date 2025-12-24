@@ -5,13 +5,13 @@ import { wait } from "@/@disktro/utils";
 import CustomAlert from "@/@disktro/CustomAlert";
 import CustomSuccess from "@/@disktro/CustomSuccess";
 import { UserModuleObject as ModuleObject } from "../module";
-import Loader from "@/@disktro/Loader";
 
 interface ResetPasswordFormProps {
   initialToken?: string;
+  language: "english" | "spanish" | "catalan";
 }
 
-// Icônes (mêmes styles que dans Login)
+/* ================= ICONS ================= */
 const Lock = ({ size = 24, className = "" }) => (
   <svg
     width={size}
@@ -63,13 +63,14 @@ const EyeOff = ({ size = 24, className = "" }) => (
   </svg>
 );
 
+/* ================= COMPONENT ================= */
 export default function ResetPasswordForm({
   initialToken = "",
+  language,
 }: ResetPasswordFormProps) {
-  const [token] = useState(initialToken); // si tu veux l'afficher dans un champ, tu peux, mais ici on le garde caché
+  const [token] = useState(initialToken);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -78,182 +79,216 @@ export default function ResetPasswordForm({
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const handleSubmit = async (e: any) => {
+  /* ================= TRANSLATIONS ================= */
+  const content = {
+    english: {
+      title: "Reset Password",
+      subtitle: "Choose a new password to secure your account.",
+      newPassword: "New password",
+      confirmPassword: "Confirm new password",
+      placeholderNew: "New password",
+      placeholderConfirm: "Confirm new password",
+      submit: "Reset Password",
+      submitting: "Resetting...",
+      successInfo: "✅ Your password has been reset successfully.",
+      loginText: "You can now",
+      loginLink: "log in",
+      errors: {
+        empty: "Please fill in all fields.",
+        mismatch: "Passwords do not match.",
+        generic: "Something went wrong. Please try again.",
+      },
+    },
+    spanish: {
+      title: "Restablecer contraseña",
+      subtitle: "Elige una nueva contraseña para proteger tu cuenta.",
+      newPassword: "Nueva contraseña",
+      confirmPassword: "Confirmar nueva contraseña",
+      placeholderNew: "Nueva contraseña",
+      placeholderConfirm: "Confirmar nueva contraseña",
+      submit: "Restablecer contraseña",
+      submitting: "Restableciendo...",
+      successInfo: "✅ Tu contraseña se ha restablecido correctamente.",
+      loginText: "Ahora puedes",
+      loginLink: "iniciar sesión",
+      errors: {
+        empty: "Por favor, completa todos los campos.",
+        mismatch: "Las contraseñas no coinciden.",
+        generic: "Ocurrió un error. Inténtalo de nuevo.",
+      },
+    },
+    catalan: {
+      title: "Restablir contrasenya",
+      subtitle: "Tria una nova contrasenya per protegir el teu compte.",
+      newPassword: "Nova contrasenya",
+      confirmPassword: "Confirma la nova contrasenya",
+      placeholderNew: "Nova contrasenya",
+      placeholderConfirm: "Confirma la nova contrasenya",
+      submit: "Restablir contrasenya",
+      submitting: "Restablint...",
+      successInfo: "✅ La teva contrasenya s’ha restablert correctament.",
+      loginText: "Ara pots",
+      loginLink: "iniciar sessió",
+      errors: {
+        empty: "Si us plau, omple tots els camps.",
+        mismatch: "Les contrasenyes no coincideixen.",
+        generic: "Alguna cosa ha anat malament. Torna-ho a intentar.",
+      },
+    },
+  };
+
+  const text = content[language] || content.english;
+
+  /* ================= HANDLER ================= */
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!token || !password || !confirmPassword) {
-      setError("");
-      setErrorMessage("Please fill in all fields.");
+      setErrorMessage(text.errors.empty);
       return;
     }
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match.");
-      setErrorMessage("Passwords do not match.");
+      setErrorMessage(text.errors.mismatch);
       return;
     }
 
     try {
-      setSuccessMessage("");
-      setErrorMessage("");
-      setError("");
       setIsLoading(true);
-      setSuccess(false);
+      setErrorMessage("");
+      setSuccessMessage("");
 
       const res = await ModuleObject.service.resetPassword(token, password);
       await wait();
 
-      setIsLoading(false);
-      setSuccessMessage(res.message);
       setSuccess(true);
-    } catch (error) {
-      console.log(error);
-      const msg = (error as Error).message;
-      setErrorMessage(msg);
-      setError(msg);
+      setSuccessMessage(res.message);
+    } catch (error: any) {
+      setErrorMessage(error?.message || text.errors.generic);
+    } finally {
       setIsLoading(false);
-      setSuccess(false);
     }
   };
 
+  /* ================= JSX ================= */
   return (
     <div
       className="fixed inset-0 w-screen h-screen bg-cover bg-center"
       style={{
         backgroundImage:
           'url("/image/4ac3eed398bb68113a14d0fa5efe7a6def6f7651.png")',
-        backgroundSize: "cover",
-        backgroundPosition: "center",
       }}
     >
-      {/* Overlay */}
       <div className="absolute inset-0 bg-black/50" />
 
-      {/* Contenu */}
-      <div className="relative w-full h-full overflow-y-auto flex items-center justify-center p-6">
+      <div className="relative w-full h-full flex items-center justify-center p-6">
         <div className="w-full max-w-md mt-10">
           <div className="bg-white/10 backdrop-blur-md rounded-3xl border border-white/20 p-8 shadow-2xl">
             {/* Header */}
             <div className="flex flex-col items-center gap-3 mb-6 text-center">
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <Lock className="text-white" size={32} />
-              </div>
+              <Lock className="text-white" size={32} />
               <h2 className="text-3xl text-white drop-shadow-lg">
-                Reset Password
+                {text.title}
               </h2>
-              <p className="text-white/70 drop-shadow mt-1">
-                Choose a new password to secure your account.
-              </p>
+              <p className="text-white/70 drop-shadow">{text.subtitle}</p>
             </div>
-            {/* Messages */}
+
             {successMessage && <CustomSuccess message={successMessage} />}
             {errorMessage && <CustomAlert message={errorMessage} />}
 
             {success ? (
               <div className="text-center space-y-4">
                 <p className="text-white/80 text-sm bg-green-500/20 border border-green-500/40 rounded-lg p-3">
-                  ✅ Your password has been reset successfully.
+                  {text.successInfo}
                 </p>
-
                 <p className="text-white/80">
-                  You can now{" "}
+                  {text.loginText}{" "}
                   <a
                     href="/auth/login"
-                    className="text-white underline hover:text-white/90"
+                    className="underline hover:text-white/90"
                   >
-                    log in
+                    {text.loginLink}
                   </a>
                   .
                 </p>
               </div>
             ) : (
-              <>
-                {error && (
-                  <p className="text-red-300 text-center mb-4 text-sm">
-                    {error}
-                  </p>
-                )}
-
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  {/* New password */}
-                  <div>
-                    <label className="block text-white drop-shadow mb-2">
-                      New password
-                    </label>
-                    <div className="relative">
-                      <div className="absolute left-3 top-1/2 -translate-y-1/2">
-                        <Lock className="text-white/60" size={20} />
-                      </div>
-                      <input
-                        type={showPassword ? "text" : "password"}
-                        placeholder="New password"
-                        className="w-full pl-11 pr-12 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-black placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/50"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-white/60 hover:text-white"
-                      >
-                        {showPassword ? (
-                          <EyeOff size={20} />
-                        ) : (
-                          <Eye size={20} />
-                        )}
-                      </button>
-                    </div>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Password */}
+                <div>
+                  <label className="block text-white mb-2">
+                    {text.newPassword}
+                  </label>
+                  <div className="relative">
+                    <Lock
+                      size={20}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-white/60"
+                    />
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      placeholder={text.placeholderNew}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full pl-11 pr-12 py-3 bg-white/20 border border-white/30 rounded-lg text-black placeholder-white/40"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-white/60"
+                    >
+                      {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                    </button>
                   </div>
+                </div>
 
-                  {/* Confirm password */}
-                  <div>
-                    <label className="block text-white drop-shadow mb-2">
-                      Confirm new password
-                    </label>
-                    <div className="relative">
-                      <div className="absolute left-3 top-1/2 -translate-y-1/2">
-                        <Lock className="text-white/60" size={20} />
-                      </div>
-                      <input
-                        type={showConfirmPassword ? "text" : "password"}
-                        placeholder="Confirm new password"
-                        className="w-full pl-11 pr-12 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-black placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/50"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                      />
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setShowConfirmPassword(!showConfirmPassword)
-                        }
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-white/60 hover:text-white"
-                      >
-                        {showConfirmPassword ? (
-                          <EyeOff size={20} />
-                        ) : (
-                          <Eye size={20} />
-                        )}
-                      </button>
-                    </div>
+                {/* Confirm */}
+                <div>
+                  <label className="block text-white mb-2">
+                    {text.confirmPassword}
+                  </label>
+                  <div className="relative">
+                    <Lock
+                      size={20}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-white/60"
+                    />
+                    <input
+                      type={showConfirmPassword ? "text" : "password"}
+                      placeholder={text.placeholderConfirm}
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      className="w-full pl-11 pr-12 py-3 bg-white/20 border border-white/30 rounded-lg text-black placeholder-white/40"
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-white/60"
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOff size={20} />
+                      ) : (
+                        <Eye size={20} />
+                      )}
+                    </button>
                   </div>
+                </div>
 
-                  {/* Bouton */}
-                  <button
-                    disabled={isLoading}
-                    type="submit"
-                    className="cursor-pointer w-full px-6 py-4 bg-white/30 backdrop-blur-md border-2 border-white/40 rounded-xl text-white text-lg hover:bg-white/40 hover:border-white/60 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                  >
-                    {isLoading ? (
-                      <>
-                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                        <span>Resetting...</span>
-                      </>
-                    ) : (
-                      "Reset Password"
-                    )}
-                  </button>
-                </form>
-              </>
+                <button
+                  disabled={isLoading}
+                  type="submit"
+                  className="w-full px-6 py-4 bg-white/30 border-2 border-white/40 rounded-xl text-white text-lg hover:bg-white/40 disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {isLoading ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <span>{text.submitting}</span>
+                    </>
+                  ) : (
+                    text.submit
+                  )}
+                </button>
+              </form>
             )}
           </div>
         </div>
