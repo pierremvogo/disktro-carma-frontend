@@ -299,10 +299,9 @@ export default function AlbumTracksEditor({
                 : t
             )
           );
-          setSuccessMessage("Fichier audio de la piste uploadé avec succès.");
         } else {
-          setErrorMessage("Erreur lors de l'upload du fichier audio.");
         }
+        setIsLoading(false);
       } catch (error) {
         console.error("Erreur upload audio ALBUM :", error);
         setErrorMessage(text.errors.generic);
@@ -351,14 +350,9 @@ export default function AlbumTracksEditor({
                 : t
             )
           );
-          setSuccessMessage(
-            "Vidéo en langue des signes de la piste uploadée avec succès."
-          );
         } else {
-          setErrorMessage(
-            "Erreur lors de l'upload de la vidéo en langue des signes."
-          );
         }
+        setIsLoading(false);
       } catch (error) {
         console.error("Erreur upload vidéo LSF ALBUM :", error);
         setErrorMessage(text.errors.generic);
@@ -404,10 +398,9 @@ export default function AlbumTracksEditor({
                 : t
             )
           );
-          setSuccessMessage("Fichier braille uploadé avec succès.");
         } else {
-          setErrorMessage("Erreur lors de l'upload du fichier braille.");
         }
+        setIsLoading(false);
       } catch (error) {
         console.error("Erreur upload braille ALBUM :", error);
         setErrorMessage(text.errors.generic);
@@ -415,10 +408,6 @@ export default function AlbumTracksEditor({
         setIsLoading(false);
       }
     };
-
-  const handleAddTrackForm = () => {
-    setTracks((prev) => [...prev, makeEmptyTrack()]);
-  };
 
   const handleRemoveTrackForm = (trackId: string) => {
     setTracks((prev) => prev.filter((t) => t.id !== trackId));
@@ -433,15 +422,13 @@ export default function AlbumTracksEditor({
     const userId = localStorage.getItem(ModuleObject.localState.USER_ID);
 
     if (!token || !userId) {
-      setErrorMessage("Utilisateur non authentifié.");
+      setErrorMessage(text.track.errors.notAuthenticated);
       return;
     }
 
     const invalid = tracks.some((t) => !t.audioUrl || !t.title || !t.moodId);
     if (invalid) {
-      setErrorMessage(
-        "Chaque piste doit avoir au minimum un audio, un titre et un mood."
-      );
+      setErrorMessage(text.track.errors.fillAllFields);
       return;
     }
 
@@ -465,15 +452,12 @@ export default function AlbumTracksEditor({
         const res = await TrackModule.service.createTrack(trackPayload, token);
         const trackId = res?.data?.id;
         if (!trackId) {
-          throw new Error(
-            "Impossible de récupérer l'identifiant d'un track créé."
-          );
+          throw new Error("Unable to retrieve the ID of a created track.");
         }
 
         await TrackModule.service.addTrackToAlbum(albumId, trackId);
       }
 
-      setSuccessMessage("Pistes créées et associées à l'ALBUM avec succès !");
       setTracks([makeEmptyTrack()]);
 
       // Rechargement des tracks déjà enregistrés
@@ -494,6 +478,8 @@ export default function AlbumTracksEditor({
         setSavedTracks(tracksFromApi);
         setCurrentPage(1);
       }
+      setIsLoading(false);
+      setSuccessMessage(text.track.success.tracksSaved);
     } catch (error) {
       console.error("Erreur création pistes ALBUM :", error);
       setErrorMessage(text.errors.generic);
@@ -552,11 +538,15 @@ export default function AlbumTracksEditor({
                   <button
                     type="button"
                     onClick={() => {
-                      handleTrackAudioChange(track.id)({
-                        target: { files: [] },
-                      } as any);
+                      setTracks((prevTracks) =>
+                        prevTracks.map((t) =>
+                          t.id === track.id
+                            ? { ...t, audioFile: null, audioUrlPreview: "" } // reset audio
+                            : t
+                        )
+                      );
                     }}
-                    className="absolute top-2 right-2 bg-red-500/80 backdrop-blur-sm text-white p-2 rounded-lg hover:bg-red-600/80 transition-all"
+                    className="cursor-pointer absolute top-0 right-0 bg-red-500/80 backdrop-blur-sm text-white p-2 rounded-lg hover:bg-red-600/80 transition-all"
                   >
                     <X size={20} />
                   </button>
@@ -821,7 +811,7 @@ export default function AlbumTracksEditor({
           disabled={isLoading}
           className="w-full py-3 px-4 bg-white/30 backdrop-blur-md border border-white/40 rounded-lg text-white drop-shadow hover:bg-white/40 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          {isLoading && !allUploadsDone && (
+          {isLoading && (
             <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
           )}
           <svg

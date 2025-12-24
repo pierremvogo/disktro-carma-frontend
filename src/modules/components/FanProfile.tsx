@@ -1144,8 +1144,7 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
                 </div>
               </div>
             )}
-
-            {/* Add Payment Method */}
+            Add Payment Method
             <div className="bg-white/10 backdrop-blur-md rounded-xl p-8 border border-white/20">
               <h2 className="text-2xl text-white drop-shadow-lg mb-6">
                 {content.addPaymentMethod}

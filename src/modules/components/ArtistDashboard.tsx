@@ -1985,7 +1985,9 @@ export function ArtistDashboard({
       musiciansStrings: "Cuerdas",
       mixingEngineer: "Ingeniero de Mezcla",
       masteringEngineer: "Ingeniero de Mastering",
-      uploadButton: "Subir EP",
+      uploadButtonEp: "Subir ep",
+      uploadButtonSingle: "Subir single",
+      uploadButtonAlbum: "Subir álbum",
       recentEpUploads: "Últimos EP subidos",
       noEpUploadedYet: "Aún no se ha subido ningún EP.",
       forEp: "Para el EP",
@@ -2187,7 +2189,7 @@ export function ArtistDashboard({
       unauthenticatedUser: "Usuario no autenticado.",
       epDeletedSuccess: "EP eliminado con éxito.",
       completeAudioLyricsMood:
-        "Por favor, complete los archivos de audio, las letras y el mood antes de continuar.",
+        "Por favor, completa toda la información requerida.",
       epCreatedSuccess: "¡EP creado con éxito!",
       deleteModaltitle: "Confirmar eliminación",
       deleteModalmessage:
@@ -2195,10 +2197,30 @@ export function ArtistDashboard({
       deleteModalcancel: "Cancelar",
       deleteModaldelete: "Eliminar",
       deleteModaldeleting: "Eliminando...",
+      creationInfoEp: "Información de creación de EP",
+      creationInfoSingle: "Información de creación de Single",
+      creationInfoAlbum: "Información de creación de Álbum",
+
+      // Espagnol
+      epUploadSuccess: "EP subido con éxito",
+      track: {
+        errors: {
+          notAuthenticated: "Usuario no autenticado.",
+          fillAllFields:
+            "Cada pista debe tener al menos un audio, un título y un mood.",
+          generic: "Ocurrió un error al guardar las pistas.",
+        },
+        success: {
+          tracksSaved: "¡Pistas creadas y asociadas al EP con éxito!",
+        },
+      },
+      albumCreatedSuccess: "¡ALBUM creado con éxito!",
     },
     english: {
       // EN
-      // Anglais
+
+      albumCreatedSuccess: "ALBUM created successfully!",
+      epUploadSuccess: "EP uploaded successfully",
 
       deleteModaltitle: "Confirm deletion",
       deleteModalmessage:
@@ -2207,14 +2229,26 @@ export function ArtistDashboard({
       deleteModaldelete: "Delete",
       deleteModaldeleting: "Deleting...",
 
-      completeAudioLyricsMood:
-        "Please complete the audio files, lyrics, and mood before continuing.",
+      completeAudioLyricsMood: "Please complete all required informations.",
 
       unauthenticatedUser: "User not authenticated.",
 
       errors: {
         generic: "Something went wrong. Please try again later.",
       },
+
+      track: {
+        errors: {
+          notAuthenticated: "User not authenticated.",
+          fillAllFields:
+            "Each track must have at least an audio, a title, and a mood.",
+          generic: "Something went wrong while saving tracks.",
+        },
+        success: {
+          tracksSaved: "Tracks created successfully!",
+        },
+      },
+
       subscription: {
         title: "Subscribe",
         subtitle: "Choose a plan to subscribe to {{artistName}}",
@@ -2244,7 +2278,9 @@ export function ArtistDashboard({
       epTitle: "EP Title",
       uploadArtwork: "Upload Artwork",
       artworkDragDrop: "Drag & drop your artwork here or click to upload",
-      creationInfo: "EP Creation Information",
+      creationInfoEp: "EP Creation Information",
+      creationInfoSingle: "Single Creation Information",
+      creationInfoAlbum: "Album Creation Information",
       trackTitle: "Main Track Title",
       recentAlbumUploads: "Recent ALBUM Uploads",
       authors: "Authors",
@@ -2258,7 +2294,9 @@ export function ArtistDashboard({
       musiciansStrings: "Strings",
       mixingEngineer: "Mixing Engineer",
       masteringEngineer: "Mastering Engineer",
-      uploadButton: "Upload EP",
+      uploadButtonEp: "Upload ep",
+      uploadButtonSingle: "Upload single",
+      uploadButtonAlbum: "Upload Album",
       recentEpUploads: "Recent EP Uploads",
       noEpUploadedYet: "No EP uploaded yet.",
       forEp: "For EP",
@@ -2433,6 +2471,23 @@ export function ArtistDashboard({
       epCreatedSuccess: "EP created successfully!",
     },
     catalan: {
+      // Catalan
+      albumCreatedSuccess: "ÀLBUM creat amb èxit!",
+      track: {
+        errors: {
+          notAuthenticated: "Usuari no autenticat.",
+          fillAllFields:
+            "Cada pista ha de tenir com a mínim un àudio, un títol i un mood.",
+          generic: "S'ha produït un error en desar les pistes.",
+        },
+        success: {
+          tracksSaved: "Pistes creades i associades a l'EP amb èxit!",
+        },
+      },
+      epUploadSuccess: "EP pujat amb èxit",
+      creationInfoEp: "Informació de creació d'EP",
+      creationInfoSingle: "Informació de creació de Single",
+      creationInfoAlbum: "Informació de creació d'Àlbum",
       deleteModaltitle: "Confirmeu l'eliminació",
       deleteModalmessage:
         "Esteu segur que voleu eliminar aquest element? Aquesta acció és permanent.",
@@ -2497,7 +2552,9 @@ export function ArtistDashboard({
       musiciansStrings: "Cordes",
       mixingEngineer: "Enginyer de Mescla",
       masteringEngineer: "Enginyer de Mastering",
-      uploadButton: "Pujar EP",
+      uploadButtonEp: "Pujar ep",
+      uploadButtonSingle: "Pujar single",
+      uploadButtonAlbum: "Pujar àlbum",
       recentEpUploads: "Últims EP pujats",
       noEpUploadedYet: "Encara no s'ha pujat cap EP.",
       forEp: "Per a l'EP",
@@ -2667,7 +2724,7 @@ export function ArtistDashboard({
       paymentDetailsSaved: "Detalls de pagament guardats amb èxit!",
       selectProvider: "--Seleccionar proveïdor--",
       completeAudioLyricsMood:
-        "Si us plau, completeu els arxius d’àudio, les lletres i el mood abans de continuar.",
+        "Si us plau, completa tota la informació requerida.",
     },
   };
 
