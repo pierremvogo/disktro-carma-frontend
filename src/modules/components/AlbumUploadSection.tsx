@@ -450,7 +450,7 @@ export function AlbumUploadSection({
       const albumList = res.data ?? res.albums ?? [];
       setALBUMs(albumList);
     } catch (error) {
-      setErrorMessage((error as Error).message);
+      setErrorMessage(text.errors.generic);
     } finally {
       setIsLoading(false);
     }
@@ -476,7 +476,7 @@ export function AlbumUploadSection({
       setSuccessMessage("ALBUM supprimé avec succès.");
       fetchALBUMs();
     } catch (error) {
-      setErrorMessage("Erreur lors de la suppression de l'ALBUM.");
+      setErrorMessage(text.errors.generic);
     } finally {
       setIsLoading(false);
       setIsDeleteModalOpen(false);
@@ -537,7 +537,7 @@ export function AlbumUploadSection({
         setErrorMessage("Erreur lors de l'upload de l'artwork.");
       }
     } catch (error) {
-      setErrorMessage((error as Error).message);
+      setErrorMessage(text.errors.generic);
     } finally {
       setIsLoading(false);
     }
@@ -587,10 +587,7 @@ export function AlbumUploadSection({
         }
       } catch (error) {
         console.error("Erreur upload audio ALBUM :", error);
-        setErrorMessage(
-          (error as Error).message ||
-            "Erreur lors de l'upload du fichier audio."
-        );
+        setErrorMessage(text.errors.generic);
       } finally {
         setIsLoading(false);
       }
@@ -651,10 +648,7 @@ export function AlbumUploadSection({
         }
       } catch (error) {
         console.error("Erreur upload vidéo langue des signes ALBUM :", error);
-        setErrorMessage(
-          (error as Error).message ||
-            "Erreur lors de l'upload de la vidéo en langue des signes."
-        );
+        setErrorMessage(text.errors.generic);
       } finally {
         setIsLoading(false);
       }
@@ -707,10 +701,7 @@ export function AlbumUploadSection({
         }
       } catch (error) {
         console.error("Erreur upload fichier braille ALBUM :", error);
-        setErrorMessage(
-          (error as Error).message ||
-            "Erreur lors de l'upload du fichier braille."
-        );
+        setErrorMessage(text.errors.generic);
       } finally {
         setIsLoading(false);
       }
@@ -877,10 +868,7 @@ export function AlbumUploadSection({
       setSuccessMessage("ALBUM et pistes créés et associés avec succès !");
     } catch (error) {
       console.error("Erreur création ALBUM :", error);
-      setErrorMessage(
-        (error as Error).message ||
-          "Erreur lors de la création de l'ALBUM et des pistes."
-      );
+      setErrorMessage(text.errors.generic);
     } finally {
       setIsLoading(false);
     }
@@ -1342,6 +1330,7 @@ export function AlbumUploadSection({
       )}
 
       <ConfirmDeleteModal
+        text={text}
         open={isDeleteModalOpen}
         itemName={albumToDelete?.title}
         isLoading={isLoading}

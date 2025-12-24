@@ -595,7 +595,8 @@ export function ArtistDashboard({
       setMobileMoneyPhone(data.mobileMoneyPhone ?? "");
       setOrangeMoneyPhone(data.orangeMoneyPhone ?? "");
     } catch (e: any) {
-      setPayoutError((e as Error).message || "Failed to load payout settings");
+      console.log((e as Error).message);
+      setPayoutError(text.errors.generic);
     } finally {
       setPayoutLoading(false);
     }
@@ -629,7 +630,8 @@ export function ArtistDashboard({
       setPaymentSaved(true);
       setTimeout(() => setPaymentSaved(false), 3000);
     } catch (e: any) {
-      setPayoutError(e?.message || "Failed to save payout settings");
+      console.log((e as Error).message);
+      setPayoutError(text.errors.generic);
     } finally {
       setPayoutSaving(false);
     }
@@ -660,7 +662,8 @@ export function ArtistDashboard({
 
       setRecentSubscribers(Array.isArray(items) ? items : []);
     } catch (e: any) {
-      setRecentError(e?.message || "Failed to load recent subscribers");
+      console.log((e as Error).message);
+      setRecentError(text.errors.generic);
     } finally {
       setRecentLoading(false);
     }
@@ -688,7 +691,8 @@ export function ArtistDashboard({
       const items = res?.data?.data ?? res?.data ?? res ?? [];
       setSubsByLocation(Array.isArray(items) ? items : []);
     } catch (e: any) {
-      setSubsLocError(e?.message || "Failed to load subscriptions by location");
+      console.log((e as Error).message);
+      setSubsLocError(text.errors.generic);
     } finally {
       setSubsLocLoading(false);
     }
@@ -720,7 +724,8 @@ export function ArtistDashboard({
 
       setUploadedExclusiveContent(items);
     } catch (e: any) {
-      setExclusiveError(e?.message || "Failed to load exclusive contents");
+      console.log((e as Error).message);
+      setExclusiveError(text.errors.generic);
     } finally {
       setIsExclusiveLoading(false);
     }
@@ -769,7 +774,8 @@ export function ArtistDashboard({
 
       setRoyaltiesTracks(Array.isArray(tracks) ? tracks : []);
     } catch (e: any) {
-      setRoyaltiesError(e?.message || "Failed to fetch royalties");
+      console.log((e as Error).message);
+      setRoyaltiesError(text.errors.generic);
     } finally {
       setRoyaltiesLoading(false);
     }
@@ -846,7 +852,8 @@ export function ArtistDashboard({
         setExclusiveError("Upload failed.");
       }
     } catch (err: any) {
-      setExclusiveError(err?.message || "Upload failed.");
+      console.log((err as Error).message);
+      setExclusiveError(text.errors.generic);
     } finally {
       setIsExclusiveSubmitting(false);
     }
@@ -897,7 +904,8 @@ export function ArtistDashboard({
 
       await fetchExclusiveContents();
     } catch (err: any) {
-      setExclusiveError(err?.message || "Failed to publish content.");
+      console.log((err as Error).message);
+      setExclusiveError(text.errors.generic);
     } finally {
       setIsExclusiveSubmitting(false);
     }
@@ -924,7 +932,8 @@ export function ArtistDashboard({
       await ExclusiveContentModuleObject.service.deleteExclusiveContent(id);
       await fetchExclusiveContents();
     } catch (err: any) {
-      setExclusiveError(err?.message || "Failed to delete content.");
+      console.log((err as Error).message);
+      setExclusiveError(text.errors.generic);
     }
   };
 
@@ -962,7 +971,8 @@ export function ArtistDashboard({
         growth: payload.growth ?? "0%",
       });
     } catch (e: any) {
-      setStatsError(e?.message || "Failed to fetch subscription stats");
+      console.log((e as Error).message);
+      setStatsError(text.errors.generic);
     } finally {
       setStatsLoading(false);
     }
@@ -1035,7 +1045,8 @@ export function ArtistDashboard({
       setPricingSaved(true);
       setTimeout(() => setPricingSaved(false), 2500);
     } catch (e: any) {
-      setPricingError(e?.message || "Failed to save pricing");
+      console.log((e as Error).message);
+      setPricingError(text.errors.generic);
     } finally {
       setPricingSaving(false);
     }
@@ -1050,7 +1061,8 @@ export function ArtistDashboard({
         setPricingError(null);
         await fetchMyPlansPricing();
       } catch (e: any) {
-        setPricingError(e?.message || "Failed to load pricing");
+        console.log((e as Error).message);
+        setPricingError(text.errors.generic);
       } finally {
         setPricingLoading(false);
       }
@@ -1135,7 +1147,8 @@ export function ArtistDashboard({
       setSingles(res.singles);
       setSuccess(true);
     } catch (error) {
-      setErrorMessage((error as Error).message);
+      console.log((error as Error).message);
+      setErrorMessage(text.errors.generic);
     } finally {
       setIsLoading(false);
     }
@@ -1258,8 +1271,8 @@ export function ArtistDashboard({
       setTotalListeners(totalListenersValue);
       setStreamsByLocation(streamsByLocationArr);
     } catch (error) {
-      console.error("Erreur récupération stats streams :", error);
-      setStreamsError((error as Error).message);
+      console.log((error as Error).message);
+      setStreamsError(text.errors.generic);
     } finally {
       setIsStreamsLoading(false);
     }
@@ -1342,7 +1355,8 @@ export function ArtistDashboard({
       setSuccess(true);
       setErrorMessage("");
     } catch (error) {
-      setErrorMessage((error as Error).message);
+      console.log((error as Error).message);
+      setErrorMessage(text.errors.generic);
       setIsLoading(false);
       setSuccess(false);
     }
@@ -1389,7 +1403,8 @@ export function ArtistDashboard({
         setSuccess(false);
       }
     } catch (error) {
-      setErrorMessage((error as Error).message);
+      console.log((error as Error).message);
+      setErrorMessage(text.errors.generic);
       setSuccess(false);
     } finally {
       setIsLoading(false);
@@ -1534,8 +1549,8 @@ export function ArtistDashboard({
 
       setSuccessMessage("Track et single créés et associés avec succès !");
     } catch (error) {
-      console.error("Erreur ajout track :", error);
-      setErrorMessage((error as Error).message);
+      console.log((error as Error).message);
+      setErrorMessage(text.errors.generic);
     } finally {
       setIsLoading(false);
     }
@@ -1586,8 +1601,8 @@ export function ArtistDashboard({
         setErrorMessage("Erreur lors de l'upload du fichier braille.");
       }
     } catch (error) {
-      console.error("Erreur upload fichier braille :", error);
-      setErrorMessage((error as Error).message);
+      console.log((error as Error).message);
+      setErrorMessage(text.errors.generic);
     } finally {
       setIsLoading(false);
     }
@@ -1601,7 +1616,8 @@ export function ArtistDashboard({
       setMoods(res.data);
       console.log("MY MOOD : ", res.data);
     } catch (error) {
-      console.error((error as Error).message);
+      console.log((error as Error).message);
+      console.error(text.errors.generic);
     }
   }
 
@@ -1657,8 +1673,8 @@ export function ArtistDashboard({
         );
       }
     } catch (error) {
-      console.error("Erreur upload vidéo langue des signes :", error);
-      setErrorMessage((error as Error).message);
+      console.log((error as Error).message);
+      setErrorMessage(text.errors.generic);
     } finally {
       setIsLoading(false);
     }
@@ -1709,8 +1725,8 @@ export function ArtistDashboard({
         setErrorMessage("Erreur lors de l'upload de la vidéo.");
       }
     } catch (error) {
-      console.error("Erreur upload vidéo intro :", error);
-      setErrorMessage((error as Error).message);
+      console.log((error as Error).message);
+      setErrorMessage(text.errors.generic);
     } finally {
       setIsLoading(false);
     }
@@ -1763,7 +1779,8 @@ export function ArtistDashboard({
         setIsLoading(false);
       }
     } catch (error) {
-      setErrorMessage((error as Error).message);
+      console.log((error as Error).message);
+      setErrorMessage(text.errors.generic);
       setIsLoading(false);
       setSuccess(false);
     }
@@ -1795,7 +1812,8 @@ export function ArtistDashboard({
       fetchUser(); // si tu veux re-synchroniser les données
       setSuccessMessage("Profil mis à jour avec succès.");
     } catch (error) {
-      setErrorMessage((error as Error).message);
+      console.log((error as Error).message);
+      setErrorMessage(text.errors.generic);
       setSuccess(false);
     } finally {
       setIsLoading(false);
@@ -1840,10 +1858,8 @@ export function ArtistDashboard({
         setErrorMessage("Erreur lors de l'upload de la mini-video.");
       }
     } catch (error) {
-      console.error("Erreur upload mini-video :", error);
-      setErrorMessage(
-        (error as Error).message || "Erreur lors de l'upload de la mini-video."
-      );
+      console.log((error as Error).message);
+      setErrorMessage(text.errors.generic);
     } finally {
       setIsLoading(false);
     }
@@ -1859,21 +1875,21 @@ export function ArtistDashboard({
 
     // 🔐 1. Ancien mot de passe obligatoire
     if (!formData.oldPassword) {
-      newErrors.oldPassword = "Please enter your current password";
+      newErrors.oldPassword = text.oldPasswordRequired;
     }
 
     // 🔐 2. Nouveau mot de passe obligatoire + min 8 caractères
     if (!formData.newPassword) {
-      newErrors.newPassword = "Please enter your new password";
+      newErrors.newPassword = text.newPasswordRequired;
     } else if (formData.newPassword.length < 8) {
-      newErrors.newPassword = "Password must be at least 8 characters long";
+      newErrors.newPassword = text.newPasswordMinLength;
     }
 
     // 🔐 3. Confirmation obligatoire
     if (!formData.confirmNewPassword) {
-      newErrors.confirmNewPassword = "Please confirm your new password";
+      newErrors.confirmNewPassword = text.confirmPasswordRequired;
     } else if (formData.newPassword !== formData.confirmNewPassword) {
-      newErrors.confirmNewPassword = "Passwords do not match";
+      newErrors.confirmNewPassword = text.passwordsDoNotMatch;
     }
 
     // 👉 on pousse les erreurs dans le state
@@ -1900,9 +1916,10 @@ export function ArtistDashboard({
       setErrorMessage("");
       setSuccess(true);
       fetchUser(); // si tu veux re-synchroniser les données
-      setSuccessMessage("Profil mis à jour avec succès.");
+      setSuccessMessage(text.profileUpdateSuccess);
     } catch (error) {
-      setErrorMessage((error as Error).message);
+      console.log((error as Error).message);
+      setErrorMessage(text.errors.generic);
       setSuccess(false);
     } finally {
       setIsLoading(false);
@@ -1951,7 +1968,7 @@ export function ArtistDashboard({
   const content = {
     spanish: {
       // ES
-
+      recentAlbumUploads: "Subidas recientes de álbumes",
       epTitle: "Título del EP",
       uploadArtwork: "Subir Portada",
       artworkDragDrop: "Arrastra tu portada aquí o haz clic para subirla",
@@ -2134,15 +2151,102 @@ export function ArtistDashboard({
       noSingleUploadedYet: "Todavía no se ha subido ningún single.",
       noAlbumUploadedYet: "Ningún álbum subido por el momento.",
       noSubscriptions: "No hay suscripciones",
+      oldPasswordRequired: "Por favor, introduce tu contraseña actual",
+      newPasswordRequired: "Por favor, introduce tu nueva contraseña",
+      newPasswordMinLength: "La contraseña debe tener al menos 8 caracteres",
+      confirmPasswordRequired: "Por favor, confirma tu nueva contraseña",
+      passwordsDoNotMatch: "Las contraseñas no coinciden",
+
+      profileUpdateSuccess: "Perfil actualizado con éxito.",
+      errors: {
+        generic: "Algo salió mal. Por favor, inténtalo de nuevo más tarde.",
+      },
+      subscription: {
+        title: "Suscribirse",
+        subtitle: "Elige un plan para suscribirte a {{artistName}}",
+
+        paymentMethods: {
+          stripe: "Stripe",
+          flutterwave: "Flutterwave",
+        },
+
+        buttons: {
+          cancel: "Cancelar",
+          continue: "Continuar al pago",
+          redirecting: "Redirigiendo…",
+        },
+
+        messages: {
+          redirecting: "Redirigiendo…",
+          paymentFailed: "El pago ha fallado",
+        },
+      },
+      epTracksTitle: "Canciones del EP",
+      requiredFields:
+        "Por favor, complete todos los campos obligatorios (audio, portada, título, mood, autores, productores, letristas y letras).",
+      unauthenticatedUser: "Usuario no autenticado.",
+      epDeletedSuccess: "EP eliminado con éxito.",
+      completeAudioLyricsMood:
+        "Por favor, complete los archivos de audio, las letras y el mood antes de continuar.",
+      epCreatedSuccess: "¡EP creado con éxito!",
+      deleteModaltitle: "Confirmar eliminación",
+      deleteModalmessage:
+        "¿Está seguro de que desea eliminar este elemento? Esta acción es permanente.",
+      deleteModalcancel: "Cancelar",
+      deleteModaldelete: "Eliminar",
+      deleteModaldeleting: "Eliminando...",
     },
     english: {
       // EN
       // Anglais
+
+      deleteModaltitle: "Confirm deletion",
+      deleteModalmessage:
+        "Are you sure you want to delete this item? This action is permanent.",
+      deleteModalcancel: "Cancel",
+      deleteModaldelete: "Delete",
+      deleteModaldeleting: "Deleting...",
+
+      completeAudioLyricsMood:
+        "Please complete the audio files, lyrics, and mood before continuing.",
+
+      unauthenticatedUser: "User not authenticated.",
+
+      errors: {
+        generic: "Something went wrong. Please try again later.",
+      },
+      subscription: {
+        title: "Subscribe",
+        subtitle: "Choose a plan to subscribe to {{artistName}}",
+
+        paymentMethods: {
+          stripe: "Stripe",
+          flutterwave: "Flutterwave",
+        },
+
+        buttons: {
+          cancel: "Cancel",
+          continue: "Continue to Payment",
+          redirecting: "Redirecting…",
+        },
+
+        messages: {
+          redirecting: "Redirecting…",
+          paymentFailed: "Payment failed",
+        },
+      },
+      oldPasswordRequired: "Please enter your current password",
+      newPasswordRequired: "Please enter your new password",
+      newPasswordMinLength: "Password must be at least 8 characters long",
+      confirmPasswordRequired: "Please confirm your new password",
+      passwordsDoNotMatch: "Passwords do not match",
+      profileUpdateSuccess: "Profile updated successfully.",
       epTitle: "EP Title",
       uploadArtwork: "Upload Artwork",
       artworkDragDrop: "Drag & drop your artwork here or click to upload",
       creationInfo: "EP Creation Information",
       trackTitle: "Main Track Title",
+      recentAlbumUploads: "Recent ALBUM Uploads",
       authors: "Authors",
       producers: "Producers",
       lyricists: "Lyricists",
@@ -2195,6 +2299,7 @@ export function ArtistDashboard({
       noSingleUploadedYet: "No single uploaded yet.",
 
       albumTracksTitle: "Album tracks",
+      epTracksTitle: "Ep tracks",
       saveTracks: "Save track",
       savedTracksTitle: "Tracks already saved",
       noSavedTracks: "No track saved for this album yet.",
@@ -2322,8 +2427,60 @@ export function ArtistDashboard({
       paymentDetailsSaved: "Payment details saved successfully!",
       selectProvider: "--Select provider--",
       noAlbumUploadedYet: "No album uploaded yet.",
+      requiredFields:
+        "Please fill in all required fields (audio, artwork, title, mood, authors, producers, lyricists, and lyrics).",
+      epDeletedSuccess: "EP deleted successfully.",
+      epCreatedSuccess: "EP created successfully!",
     },
     catalan: {
+      deleteModaltitle: "Confirmeu l'eliminació",
+      deleteModalmessage:
+        "Esteu segur que voleu eliminar aquest element? Aquesta acció és permanent.",
+      deleteModalcancel: "Cancel·lar",
+      deleteModaldelete: "Eliminar",
+      deleteModaldeleting: "Eliminant...",
+
+      epCreatedSuccess: "EP creat amb èxit!",
+
+      epDeletedSuccess: "EP eliminat amb èxit.",
+
+      unauthenticatedUser: "Usuari no autenticat.",
+
+      epTracksTitle: "Cançons de l'EP",
+      requiredFields:
+        "Si us plau, ompliu tots els camps obligatoris (àudio, portada, títol, mood, autors, productors, letristes i lletres).",
+      errors: {
+        generic:
+          "Alguna cosa ha anat malament. Si us plau, torna-ho a provar més tard.",
+      },
+      subscription: {
+        title: "Subscriure’s",
+        subtitle: "Tria un pla per subscriure’t a {{artistName}}",
+
+        paymentMethods: {
+          stripe: "Stripe",
+          flutterwave: "Flutterwave",
+        },
+
+        buttons: {
+          cancel: "Cancel·lar",
+          continue: "Continuar al pagament",
+          redirecting: "Redirigint…",
+        },
+
+        messages: {
+          redirecting: "Redirigint…",
+          paymentFailed: "El pagament ha fallat",
+        },
+      },
+      oldPasswordRequired: "Si us plau, introdueix la teva contrasenya actual",
+      newPasswordRequired: "Si us plau, introdueix la teva nova contrasenya",
+      newPasswordMinLength: "La contrasenya ha de tenir almenys 8 caràcters",
+      confirmPasswordRequired: "Si us plau, confirma la teva nova contrasenya",
+      passwordsDoNotMatch: "Les contrasenyes no coincideixen",
+
+      profileUpdateSuccess: "Perfil actualitzat amb èxit.",
+      recentAlbumUploads: "Àlbums pujats recentment",
       epTitle: "Títol de l'EP",
       uploadArtwork: "Pujar Portada",
       artworkDragDrop: "Arrossega la teva portada aquí o fes clic per pujar-la",
@@ -2509,6 +2666,8 @@ export function ArtistDashboard({
       savePaymentDetails: "Guardar Detalls de Pagament",
       paymentDetailsSaved: "Detalls de pagament guardats amb èxit!",
       selectProvider: "--Seleccionar proveïdor--",
+      completeAudioLyricsMood:
+        "Si us plau, completeu els arxius d’àudio, les lletres i el mood abans de continuar.",
     },
   };
 

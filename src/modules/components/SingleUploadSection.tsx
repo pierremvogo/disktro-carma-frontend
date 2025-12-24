@@ -482,7 +482,7 @@ export function SingleUploadSection({
 
       setSingleTrackMap(map);
     } catch (error) {
-      setErrorMessage((error as Error).message);
+      setErrorMessage(text.errors.generic);
     } finally {
       setIsLoading(false);
     }
@@ -513,15 +513,11 @@ export function SingleUploadSection({
       if (res && (res.fileName || res.url)) {
         const uploadedAudioUrl = res.url ?? res.fileName;
         setAudioUrl(uploadedAudioUrl);
-        setSuccessMessage("Fichier audio uploadé avec succès.");
       } else {
-        setErrorMessage("Erreur lors de l'upload du fichier audio.");
       }
     } catch (error) {
       console.error("Erreur upload audio :", error);
-      setErrorMessage(
-        (error as Error).message || "Erreur lors de l'upload du fichier audio."
-      );
+      setErrorMessage(text.errors.generic);
     } finally {
       setIsLoading(false);
     }
@@ -551,12 +547,10 @@ export function SingleUploadSection({
 
       if (res && res.url) {
         setCoverUrl(res.url);
-        setSuccessMessage("Artwork uploadé avec succès.");
       } else {
-        setErrorMessage("Erreur lors de l'upload de l'artwork.");
       }
     } catch (error) {
-      setErrorMessage((error as Error).message);
+      setErrorMessage(text.errors.generic);
     } finally {
       setIsLoading(false);
     }
@@ -586,15 +580,11 @@ export function SingleUploadSection({
 
       if (res && res.url) {
         setMiniVideoLoopUrl(res.url);
-        setSuccessMessage("Mini-video uploadée avec succès.");
       } else {
-        setErrorMessage("Erreur lors de l'upload de la mini-video.");
       }
     } catch (error) {
       console.error("Erreur upload mini-video :", error);
-      setErrorMessage(
-        (error as Error).message || "Erreur lors de l'upload de la mini-video."
-      );
+      setErrorMessage(text.errors.generic);
     } finally {
       setIsLoading(false);
     }
@@ -626,18 +616,11 @@ export function SingleUploadSection({
 
       if (res && res.url) {
         setSignLanguageVideoUrl(res.url);
-        setSuccessMessage("Vidéo en langue des signes uploadée avec succès.");
       } else {
-        setErrorMessage(
-          "Erreur lors de l'upload de la vidéo en langue des signes."
-        );
       }
     } catch (error) {
       console.error("Erreur upload vidéo langue des signes :", error);
-      setErrorMessage(
-        (error as Error).message ||
-          "Erreur lors de l'upload de la vidéo en langue des signes."
-      );
+      setErrorMessage(text.errors.generic);
     } finally {
       setIsLoading(false);
     }
@@ -663,16 +646,11 @@ export function SingleUploadSection({
 
       if (res && res.url) {
         setBrailleFileUrl(res.url);
-        setSuccessMessage("Fichier braille uploadé avec succès.");
       } else {
-        setErrorMessage("Erreur lors de l'upload du fichier braille.");
       }
     } catch (error) {
       console.error("Erreur upload fichier braille :", error);
-      setErrorMessage(
-        (error as Error).message ||
-          "Erreur lors de l'upload du fichier braille."
-      );
+      setErrorMessage(text.errors.generic);
     } finally {
       setIsLoading(false);
     }
@@ -718,9 +696,8 @@ export function SingleUploadSection({
       !lyricists ||
       !lyrics
     ) {
-      setErrorMessage(
-        "Veuillez renseigner tous les champs obligatoires (audio, artwork, titre, mood, auteurs, producteurs, paroliers et paroles)."
-      );
+      setErrorMessage(text.requiredFields);
+
       return;
     }
 
@@ -732,7 +709,7 @@ export function SingleUploadSection({
 
       if (!userId || !token) {
         setIsLoading(false);
-        setErrorMessage("Utilisateur non authentifié.");
+        setErrorMessage(text.unauthenticatedUser);
         return;
       }
 
@@ -762,9 +739,7 @@ export function SingleUploadSection({
       const singleId = (newSingle as any)?.data?.id ?? (newSingle as any)?.id;
 
       if (!singleId) {
-        throw new Error(
-          "Impossible de récupérer l'identifiant du single créé."
-        );
+        throw new Error(text.errore.generic);
       }
 
       // 2️⃣ Création du Track
@@ -782,7 +757,7 @@ export function SingleUploadSection({
       const res = await TrackModule.service.createTrack(newTrack, token);
 
       if (!res || !res.data?.id) {
-        throw new Error("Impossible de récupérer l'identifiant du track créé.");
+        throw new Error(text.errors.generic);
       }
 
       const trackId = res.data.id;
@@ -826,147 +801,14 @@ export function SingleUploadSection({
       setBrailleFile(null);
       setBrailleFileUrl("");
 
-      setSuccessMessage("Single créés avec succès !");
       fetchSingles();
     } catch (error) {
       console.error("Erreur ajout track :", error);
-      setErrorMessage(
-        (error as Error).message ||
-          "Erreur lors de la création du single et du track."
-      );
+      setErrorMessage(text.errors.generic);
     } finally {
       setIsLoading(false);
     }
   };
-  const mockTracks = [
-    { name: "Summer Vibes", streams: "345,678", revenue: "$1,234" },
-    { name: "Midnight Dreams", streams: "298,543", revenue: "$1,087" },
-    { name: "Electric Soul", streams: "234,890", revenue: "$856" },
-    { name: "Ocean Waves", streams: "187,654", revenue: "$678" },
-  ];
-
-  const mockTracksWithLocations = [
-    {
-      name: "Summer Vibes",
-      type: "single",
-      totalStreams: "345,678",
-      topLocations: [
-        { location: "United States", streams: "87,456", percentage: "25.3%" },
-        { location: "Spain", streams: "65,234", percentage: "18.9%" },
-        { location: "Mexico", streams: "52,345", percentage: "15.1%" },
-        { location: "Brazil", streams: "43,567", percentage: "12.6%" },
-        { location: "United Kingdom", streams: "34,567", percentage: "10.0%" },
-      ],
-    },
-    {
-      name: "Midnight Dreams",
-      type: "album",
-      totalStreams: "298,543",
-      topLocations: [
-        { location: "France", streams: "68,765", percentage: "23.0%" },
-        { location: "United States", streams: "59,876", percentage: "20.0%" },
-        { location: "Germany", streams: "47,234", percentage: "15.8%" },
-        { location: "Italy", streams: "38,543", percentage: "12.9%" },
-        { location: "Spain", streams: "29,854", percentage: "10.0%" },
-      ],
-    },
-    {
-      name: "Electric Soul",
-      type: "single",
-      totalStreams: "234,890",
-      topLocations: [
-        { location: "United Kingdom", streams: "56,234", percentage: "23.9%" },
-        { location: "Australia", streams: "42,345", percentage: "18.0%" },
-        { location: "Canada", streams: "35,432", percentage: "15.1%" },
-        { location: "United States", streams: "28,234", percentage: "12.0%" },
-        { location: "Japan", streams: "23,489", percentage: "10.0%" },
-      ],
-    },
-    {
-      name: "Ocean Waves",
-      type: "album",
-      totalStreams: "187,654",
-      topLocations: [
-        { location: "Mexico", streams: "48,765", percentage: "26.0%" },
-        { location: "Argentina", streams: "39,234", percentage: "20.9%" },
-        { location: "Colombia", streams: "28,654", percentage: "15.3%" },
-        { location: "Spain", streams: "22,543", percentage: "12.0%" },
-        { location: "Brazil", streams: "18,765", percentage: "10.0%" },
-      ],
-    },
-    {
-      name: "Neon Lights",
-      type: "single",
-      totalStreams: "156,432",
-      topLocations: [
-        { location: "Japan", streams: "39,108", percentage: "25.0%" },
-        { location: "United States", streams: "31,286", percentage: "20.0%" },
-        { location: "United Kingdom", streams: "23,465", percentage: "15.0%" },
-        { location: "Germany", streams: "18,772", percentage: "12.0%" },
-        { location: "France", streams: "15,643", percentage: "10.0%" },
-      ],
-    },
-    {
-      name: "Cosmic Journey EP",
-      type: "ep",
-      totalStreams: "198,765",
-      topLocations: [
-        { location: "Netherlands", streams: "49,691", percentage: "25.0%" },
-        { location: "Belgium", streams: "39,753", percentage: "20.0%" },
-        { location: "Germany", streams: "29,815", percentage: "15.0%" },
-        { location: "France", streams: "23,852", percentage: "12.0%" },
-        { location: "United Kingdom", streams: "19,877", percentage: "10.0%" },
-      ],
-    },
-    {
-      name: "Urban Stories",
-      type: "album",
-      totalStreams: "423,876",
-      topLocations: [
-        { location: "United States", streams: "127,163", percentage: "30.0%" },
-        { location: "Spain", streams: "84,775", percentage: "20.0%" },
-        { location: "Mexico", streams: "63,581", percentage: "15.0%" },
-        { location: "Argentina", streams: "50,865", percentage: "12.0%" },
-        { location: "Colombia", streams: "42,388", percentage: "10.0%" },
-      ],
-    },
-    {
-      name: "Sunset Boulevard",
-      type: "single",
-      totalStreams: "276,543",
-      topLocations: [
-        { location: "Spain", streams: "69,136", percentage: "25.0%" },
-        { location: "France", streams: "55,309", percentage: "20.0%" },
-        { location: "Italy", streams: "41,481", percentage: "15.0%" },
-        { location: "United States", streams: "33,185", percentage: "12.0%" },
-        { location: "Brazil", streams: "27,654", percentage: "10.0%" },
-      ],
-    },
-    {
-      name: "Midnight Sessions EP",
-      type: "ep",
-      totalStreams: "134,567",
-      topLocations: [
-        { location: "United Kingdom", streams: "33,642", percentage: "25.0%" },
-        { location: "Australia", streams: "26,913", percentage: "20.0%" },
-        { location: "Canada", streams: "20,185", percentage: "15.0%" },
-        { location: "United States", streams: "16,148", percentage: "12.0%" },
-        { location: "Ireland", streams: "13,457", percentage: "10.0%" },
-      ],
-    },
-    {
-      name: "Echoes of Tomorrow",
-      type: "album",
-      totalStreams: "312,987",
-      topLocations: [
-        { location: "Germany", streams: "78,247", percentage: "25.0%" },
-        { location: "United Kingdom", streams: "62,597", percentage: "20.0%" },
-        { location: "France", streams: "46,948", percentage: "15.0%" },
-        { location: "Netherlands", streams: "37,558", percentage: "12.0%" },
-        { location: "Belgium", streams: "31,299", percentage: "10.0%" },
-      ],
-    },
-  ];
 
   // ==========
   // Rendu JSX (upload audio, artwork, mini-video, lyrics, accessibilité, creation info)

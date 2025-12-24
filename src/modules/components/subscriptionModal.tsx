@@ -5,8 +5,8 @@ type ConfirmResult =
   | { ok: false; message: string };
 
 type SubscriptionModalProps = {
-  language: string;
-  text: { cancel: string };
+  text: any;
+
   showSubscriptionModal: boolean;
   selectedArtistForSubscription: any | null;
 
@@ -22,7 +22,6 @@ type SubscriptionModalProps = {
 };
 
 export function SubscriptionModal({
-  language,
   text,
   showSubscriptionModal,
   selectedArtistForSubscription,
@@ -66,7 +65,7 @@ export function SubscriptionModal({
           ? handleConfirmSubscriptionStripe
           : handleConfirmSubscriptionFlutterwave;
 
-      setSuccessMessage("Redirecting…");
+      setSuccessMessage(text.subscription.message.redirecting);
 
       const res = await Promise.resolve(handler());
 
@@ -82,8 +81,9 @@ export function SubscriptionModal({
         return;
       }
     } catch (e: any) {
+      console.error("Subscription payment error:", e);
       setSuccessMessage("");
-      setErrorMessage(e?.message || "Payment failed");
+      setErrorMessage(text.subscription.message.paymentFailed);
       setIsSubmitting(false);
     }
   };
@@ -96,9 +96,14 @@ export function SubscriptionModal({
         {/* Header */}
         <div className="flex items-start justify-between gap-4 mb-6">
           <div>
-            <h3 className="text-2xl text-white drop-shadow mb-1">Subscribe</h3>
+            <h3 className="text-2xl text-white drop-shadow mb-1">
+              {text.subscription.title}
+            </h3>
             <p className="text-white/60 text-sm">
-              Choose a plan to subscribe to {selectedArtistForSubscription.name}
+              {text.subscription.subtitle.replace(
+                "{{artistName}}",
+                selectedArtistForSubscription.name
+              )}
             </p>
           </div>
           <button
@@ -125,7 +130,7 @@ export function SubscriptionModal({
             }`}
             onClick={() => setPaymentMethod("stripe")}
           >
-            Stripe
+            {text.subscription.payment.stripe}
           </button>
           <button
             type="button"
@@ -136,7 +141,7 @@ export function SubscriptionModal({
             }`}
             onClick={() => setPaymentMethod("flutterwave")}
           >
-            Flutterwave
+            {text.subscription.payment.flutterwave}
           </button>
         </div>
 
@@ -173,7 +178,7 @@ export function SubscriptionModal({
         <div className="flex flex-col sm:flex-row gap-4">
           <button
             type="button"
-            onClick={() => onClose()}
+            onClick={onClose}
             disabled={isSubmitting}
             className="flex-1 px-5 py-3 bg-white/10 rounded-xl text-white hover:bg-white/20 border border-white/15 disabled:opacity-50 disabled:cursor-not-allowed"
           >
@@ -185,7 +190,9 @@ export function SubscriptionModal({
             disabled={!canSubmit}
             className="flex-1 px-5 py-3 bg-white/25 rounded-xl text-white hover:bg-white/35 border border-white/25 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSubmitting ? "Redirecting…" : "Continue to Payment"}
+            {isSubmitting
+              ? text.subscription.button.redirecting
+              : text.subscription.button.continue}
           </button>
         </div>
       </div>

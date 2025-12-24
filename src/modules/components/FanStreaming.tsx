@@ -466,7 +466,7 @@ export function FanStreaming({ language }: FanStreamingProps) {
       setArtists(mapped);
     } catch (e) {
       console.error("fetchArtists error:", e);
-      setArtistsError((e as Error).message);
+      setArtistsError(text.errors.generic);
       setArtists([]);
     } finally {
       setArtistsLoading(false);
@@ -505,7 +505,7 @@ export function FanStreaming({ language }: FanStreamingProps) {
       setFavoriteTracks(tracks);
     } catch (e) {
       console.error(e);
-      setFavError((e as Error).message);
+      setFavError(text.errors.generic);
     } finally {
       setFavLoading(false);
     }
@@ -591,7 +591,7 @@ export function FanStreaming({ language }: FanStreamingProps) {
       const message =
         e?.response?.data?.message || e?.message || (e as Error).message;
 
-      setCreatePlaylistError(message);
+      setCreatePlaylistError(text.errors.generic);
     } finally {
       setCreatingPlaylist(false);
     }
@@ -626,7 +626,7 @@ export function FanStreaming({ language }: FanStreamingProps) {
       setUserPlaylists(playlists);
     } catch (error) {
       console.error("fetchUserPlaylists error:", error);
-      setPlaylistsError((error as Error).message);
+      setPlaylistsError(text.errors.generic);
       setUserPlaylists([]);
     } finally {
       setPlaylistsLoading(false);
@@ -676,9 +676,7 @@ export function FanStreaming({ language }: FanStreamingProps) {
       setSubscribedArtists(Array.from(new Set(activeArtistIds)));
     } catch (e: any) {
       console.error(e);
-      setSubscriptionsError(
-        (e as Error).message ?? "Erreur lors du chargement des abonnements."
-      );
+      setSubscriptionsError(text.errors.generic);
       setMySubscriptions([]);
     } finally {
       setSubscriptionsLoading(false);
@@ -752,7 +750,7 @@ export function FanStreaming({ language }: FanStreamingProps) {
       setSelectedSongForPlaylist(null);
     } catch (error: any) {
       console.error("handleAddTrackToPlaylist error:", error);
-      setAddToPlaylistError((error as Error).message);
+      setAddToPlaylistError(text.errors.generic);
     } finally {
       setAddingToPlaylist(false);
     }
@@ -799,7 +797,7 @@ export function FanStreaming({ language }: FanStreamingProps) {
       setEditorPlaylists(mapped);
     } catch (e: any) {
       console.error(e);
-      setEditorPlaylistsError(e?.message ?? "Erreur lors du chargement.");
+      setEditorPlaylistsError(text.errors.generic);
       setEditorPlaylists([]);
     } finally {
       setEditorPlaylistsLoading(false);
@@ -869,7 +867,7 @@ export function FanStreaming({ language }: FanStreamingProps) {
       if (defaultPlan?.id) setSelectedPlanId(String(defaultPlan.id));
     } catch (e: any) {
       console.error(e);
-      setPlansError(e?.message ?? "Erreur lors du chargement des plans.");
+      setPlansError(text.errors.generic);
     } finally {
       setPlansLoading(false);
     }
@@ -934,7 +932,7 @@ export function FanStreaming({ language }: FanStreamingProps) {
 
       window.location.href = paymentUrl;
     } catch (e: any) {
-      throw new Error(e?.message ?? "Flutterwave checkout failed");
+      throw new Error(text.errors.generic);
     } finally {
       setCheckoutLoading(false);
     }
@@ -966,7 +964,7 @@ export function FanStreaming({ language }: FanStreamingProps) {
       window.location.href = url; // ✅ redirect
     } catch (e: any) {
       // IMPORTANT: rethrow pour que la modale puisse remettre isSubmitting=false
-      throw new Error((e as Error).message ?? "Checkout failed");
+      throw new Error(text.errors.generic);
     } finally {
       setCheckoutLoading(false);
     }
@@ -1088,7 +1086,7 @@ export function FanStreaming({ language }: FanStreamingProps) {
       setFeaturedSongs(mapped);
     } catch (e) {
       console.error(e);
-      setFeaturedError("Erreur lors du chargement des tracks en vedette.");
+      setFeaturedError(text.errors.generic);
     } finally {
       setFeaturedLoading(false);
     }
@@ -1222,7 +1220,7 @@ export function FanStreaming({ language }: FanStreamingProps) {
       setNewReleases(mapped);
     } catch (e) {
       console.error(e);
-      setNewReleasesError("Erreur lors du chargement des nouveautés.");
+      setNewReleasesError(text.errors.generic);
     } finally {
       setNewReleasesLoading(false);
     }
@@ -1470,8 +1468,16 @@ export function FanStreaming({ language }: FanStreamingProps) {
       focusMode: "Modo Enfoque",
       readingGuide: "Guía de Lectura",
       simplifiedInterface: "Interfaz Simplificada",
+      errors: {
+        generic: "Algo salió mal. Por favor, inténtalo de nuevo más tarde.",
+      },
     },
     english: {
+      errors: {
+        generic: "Something went wrong. Please try again later.",
+      },
+      noAlbumUploadedYet: "No album uploaded yet.",
+
       title: "Music for Everybody",
       discover: "Discover",
       myMusic: "My Music",
@@ -1550,6 +1556,10 @@ export function FanStreaming({ language }: FanStreamingProps) {
       simplifiedInterface: "Simplified Interface",
     },
     catalan: {
+      errors: {
+        generic:
+          "Alguna cosa ha anat malament. Si us plau, torna-ho a provar més tard.",
+      },
       title: "Música per a Tothom",
       discover: "Descobrir",
       myMusic: "La Meva Música",
@@ -1787,7 +1797,7 @@ export function FanStreaming({ language }: FanStreamingProps) {
       setSavedTracks(uniqueTracks);
     } catch (error: any) {
       console.error("Erreur chargement tracks par genre:", error);
-      setTracksError(error?.message ?? "Erreur lors du chargement des tracks.");
+      setTracksError(text.errors.generic);
       setSavedTracks([]);
     } finally {
       setLoadingTracks(false);
@@ -1839,7 +1849,7 @@ export function FanStreaming({ language }: FanStreamingProps) {
       setSavedTracks(uniqueTracks);
     } catch (error: any) {
       console.error("Erreur chargement tracks par mood:", error);
-      setTracksError(error?.message ?? "Erreur lors du chargement des tracks.");
+      setTracksError(text.errors.generic);
       setSavedTracks([]);
     } finally {
       setLoadingTracks(false);
@@ -3994,7 +4004,6 @@ Underneath the shining star`,
         </div>
       )}
       <SubscriptionModal
-        language={language}
         text={text}
         showSubscriptionModal={showSubscriptionModal}
         selectedArtistForSubscription={selectedArtistForSubscription}

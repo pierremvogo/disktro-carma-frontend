@@ -305,10 +305,7 @@ export default function AlbumTracksEditor({
         }
       } catch (error) {
         console.error("Erreur upload audio ALBUM :", error);
-        setErrorMessage(
-          (error as Error).message ||
-            "Erreur lors de l'upload du fichier audio."
-        );
+        setErrorMessage(text.errors.generic);
       } finally {
         setIsLoading(false);
       }
@@ -364,10 +361,7 @@ export default function AlbumTracksEditor({
         }
       } catch (error) {
         console.error("Erreur upload vidéo LSF ALBUM :", error);
-        setErrorMessage(
-          (error as Error).message ||
-            "Erreur lors de l'upload de la vidéo en langue des signes."
-        );
+        setErrorMessage(text.errors.generic);
       } finally {
         setIsLoading(false);
       }
@@ -416,10 +410,7 @@ export default function AlbumTracksEditor({
         }
       } catch (error) {
         console.error("Erreur upload braille ALBUM :", error);
-        setErrorMessage(
-          (error as Error).message ||
-            "Erreur lors de l'upload du fichier braille."
-        );
+        setErrorMessage(text.errors.generic);
       } finally {
         setIsLoading(false);
       }
@@ -505,10 +496,7 @@ export default function AlbumTracksEditor({
       }
     } catch (error) {
       console.error("Erreur création pistes ALBUM :", error);
-      setErrorMessage(
-        (error as Error).message ||
-          "Erreur lors de la création des pistes pour cet ALBUM."
-      );
+      setErrorMessage(text.errors.generic);
     } finally {
       setIsLoading(false);
     }
