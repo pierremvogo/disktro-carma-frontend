@@ -190,7 +190,11 @@ export function ScreenEmbed() {
   if (showLogin) {
     return (
       <Login
-        onBack={() => setShowLogin(false)}
+        onBack={() => {
+          setShowLogin(false);
+          setShowUserType(false);
+          setShowQuestionnaire(false);
+        }}
         onLoginAsFan={() => {
           setShowLogin(false);
           setIsArtist(false);
@@ -343,7 +347,10 @@ export function ScreenEmbed() {
 
           <div className="flex flex-wrap items-center justify-center gap-3 mt-1">
             <button
-              onClick={() => setShowQuestionnaire(true)}
+              onClick={() => {
+                setShowQuestionnaire(true);
+                setShowUserType(false);
+              }}
               className="flex cursor-pointer items-center gap-2 px-3 sm:px-4 py-2 bg-white/20 backdrop-blur-md border border.white/30 rounded-lg text-white text-sm sm:text-base drop-shadow hover:bg-white/30 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               Test Group
@@ -443,7 +450,10 @@ export function ScreenEmbed() {
                   <div className="flex-1 relative bg-gradient-to-br from-purple-500/20 via-pink-500/20 to-blue-500/20 flex items-center justify-center p-4 sm:p-6 md:p-8">
                     {showUserType ? (
                       <UserType
-                        onBack={() => setShowUserType(false)}
+                        onBack={() => {
+                          setShowUserType(false);
+                          setShowQuestionnaire(false);
+                        }}
                         onSelectArtist={() => {
                           setShowUserType(false);
                           setShowArtistProfileSetup(true);
@@ -463,7 +473,10 @@ export function ScreenEmbed() {
                       />
                     ) : showQuestionnaire ? (
                       <Questionnaire
-                        onBack={() => setShowQuestionnaire(false)}
+                        onBack={() => {
+                          setShowQuestionnaire(false);
+                          setShowUserType(false);
+                        }}
                         onSubmit={() => {
                           setShowQuestionnaire(false);
                           setShowLogin(true);

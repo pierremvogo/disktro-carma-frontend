@@ -27,6 +27,7 @@ export function Questionnaire({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
   const content = {
     spanish: {
@@ -46,11 +47,13 @@ export function Questionnaire({
         "Por favor, selecciona tu rango de edad e idioma.",
       genericError:
         "Ha ocurrido un error al enviar tu solicitud. Inténtalo de nuevo.",
-      success: "¡Solicitud enviada con éxito!",
+      success:
+        "Solicitud enviada con éxito. Por favor, revisa tu correo electrónico.",
       alreadyTester: "¿Ya eres tester?",
       login: "Inicia sesión",
       noAccount: "¿No tienes cuenta?",
       signUp: "Regístrate",
+      continue: "continuar",
     },
     english: {
       errors: {
@@ -69,11 +72,12 @@ export function Questionnaire({
       requiredAgeAndLanguage: "Please select your age range and language.",
       genericError:
         "An error occurred while submitting your application. Please try again.",
-      success: "Application submitted successfully!",
+      success: "Application submitted successfully. Please check your Email!",
       alreadyTester: "Already a tester?",
       login: "Log in",
       noAccount: "Don't have an account?",
       signUp: "Sign up",
+      continue: "continue",
     },
     catalan: {
       errors: {
@@ -92,11 +96,13 @@ export function Questionnaire({
         "Si us plau, selecciona el teu rang d'edat i idioma.",
       genericError:
         "S'ha produït un error en enviar la sol·licitud. Torna-ho a intentar.",
-      success: "Sol·licitud enviada correctament!",
+      success:
+        "ol·licitud enviada correctament. Si us plau, comprova el teu correu electrònic.",
       alreadyTester: "Ja ets tester?",
       login: "Inicia sessió",
       noAccount: "No tens compte?",
       signUp: "Registra't",
+      continue: "continua",
     },
   };
 
@@ -144,7 +150,7 @@ export function Questionnaire({
     e.preventDefault();
     setErrorMessage(null);
     setSuccessMessage(null);
-
+    setSuccess(false);
     if (!formData.ageRange || !formData.language) {
       setErrorMessage(text.requiredAgeAndLanguage);
       return;
@@ -167,6 +173,7 @@ export function Questionnaire({
       await ModuleObject.service.createTester(payload);
       setSuccessMessage(text.success);
       // Optionnel : reset du formulaire
+      setSuccess(true);
       setFormData({
         name: "",
         ageRange: "",
@@ -174,7 +181,6 @@ export function Questionnaire({
         email: "",
       });
       // Notification au parent (ex: fermer modal, passer à l'étape suivante, etc.)
-      onSubmit();
     } catch (err: any) {
       setErrorMessage(text.errors.generic);
     } finally {
@@ -183,7 +189,7 @@ export function Questionnaire({
   };
 
   return (
-    <div className="w-full h-full overflow-y-auto px-4 py-2 flex flex-col justify-start relative">
+    <div className="w-full h-full  overflow-y-auto px-4 py-2 flex flex-col justify-start relative">
       <button
         onClick={onBack}
         type="button"
@@ -207,18 +213,6 @@ export function Questionnaire({
       <div className="max-w-lg mx-auto w-full pt-8">
         <h2 className="text-white drop-shadow-lg mb-1">{text.title}</h2>
         <p className="text-white/90 drop-shadow mb-3">{text.subtitle}</p>
-
-        {/* zone messages */}
-        {errorMessage && (
-          <div className="mb-3 px-3 py-2 rounded-lg bg-red-500/70 text-white text-sm">
-            {errorMessage}
-          </div>
-        )}
-        {successMessage && (
-          <div className="mb-3 px-3 py-2 rounded-lg bg-emerald-500/70 text-white text-sm">
-            {successMessage}
-          </div>
-        )}
 
         <form onSubmit={handleSubmit} className="space-y-3">
           <div>
@@ -291,7 +285,7 @@ export function Questionnaire({
             >
               {text.email}
             </label>
-            <div className="flex flex-col sm:flex-row gap-3 w-full">
+            <div className="flex flex-col gap-3 w-full">
               <input
                 type="email"
                 id="email"
@@ -301,33 +295,59 @@ export function Questionnaire({
                 required
                 className="w-full sm:flex-1 px-4 py-2 rounded-lg bg-white/20 backdrop-blur-md border border-white/30 text-black placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50"
               />
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className={`w-full sm:w-auto px-6 cursor-pointer py-2 bg-gradient-to-r from-purple-500/50 to-pink-500/50 backdrop-blur-md border-2 border-white/50 rounded-xl text-white drop-shadow-lg hover:from-purple-500/60 hover:to-pink-500/60 transition-all flex items-center justify-center gap-2 shadow-xl whitespace-nowrap ${
-                  isSubmitting ? "opacity-70 cursor-not-allowed" : ""
-                }`}
-              >
-                {isSubmitting ? (
-                  <span className="text-sm font-medium">...</span>
-                ) : (
+              {/* zone messages */}
+              {errorMessage && (
+                <div className="mb-3 px-3 py-2 rounded-lg bg-red-500/70 text-white text-sm">
+                  {errorMessage}
+                </div>
+              )}
+              {successMessage && (
+                <div className="mb-3 px-3 py-2 rounded-lg bg-emerald-500/70 text-white text-sm">
+                  {successMessage}
+                </div>
+              )}
+              {!success && (
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className={`w-full disabled:cursor-not-allowed sm:w-auto px-6 cursor-pointer py-2 bg-gradient-to-r from-purple-500/50 to-pink-500/50 backdrop-blur-md border-2 border-white/50 rounded-xl text-white drop-shadow-lg hover:from-purple-500/60 hover:to-pink-500/60 transition-all flex items-center justify-center gap-2 shadow-xl whitespace-nowrap ${
+                    isSubmitting ? "opacity-70 cursor-not-allowed" : ""
+                  }`}
+                >
+                  {isSubmitting ? (
+                    <span className="text-sm font-medium">Loading...</span>
+                  ) : (
+                    <>
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                      <span className="font-medium">{text.submit}</span>
+                    </>
+                  )}
+                </button>
+              )}
+
+              {success && (
+                <button
+                  onClick={() => onSubmit()}
+                  className={`w-full sm:w-auto px-6 cursor-pointer py-2 bg-gradient-to-r from-purple-500/50 to-pink-500/50 backdrop-blur-md border-2 border-white/50 rounded-xl text-white drop-shadow-lg hover:from-purple-500/60 hover:to-pink-500/60 transition-all flex items-center justify-center gap-2 shadow-xl whitespace-nowrap ${
+                    isSubmitting ? "opacity-70 cursor-not-allowed" : ""
+                  }`}
+                >
                   <>
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <polyline points="20 6 9 17 4 12" />
-                    </svg>
-                    <span className="font-medium">{text.submit}</span>
+                    <span className="font-medium">{text.continue}</span>
                   </>
-                )}
-              </button>
+                </button>
+              )}
             </div>
           </div>
         </form>
