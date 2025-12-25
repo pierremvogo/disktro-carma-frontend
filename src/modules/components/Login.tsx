@@ -208,13 +208,23 @@ export function Login({
       setErrorMessage("Please fill all fields");
       return;
     }
-    console.log("Logging in with:", { email, password });
+
+    // Récupérer la langue dans localStorage
+    const language =
+      (typeof window !== "undefined" &&
+        localStorage.getItem("disktro_language")) ||
+      "english";
+    console.log("Logging in with:", { email, password, language });
     try {
       setSuccessMessage("");
       setErrorMessage("");
       setIsLoading(true);
       setSuccess(false);
-      const res = await ModuleObject.service.loginUser({ email, password });
+      const res = await ModuleObject.service.loginUser({
+        email,
+        password,
+        language,
+      });
 
       await wait();
       localStorage.setItem(ModuleObject.localState.ACCESS_TOKEN, res.token);

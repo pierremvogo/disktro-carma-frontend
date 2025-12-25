@@ -429,21 +429,46 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
 
     // 🔐 1. Current obligatoire
     if (!currentPassword) {
-      newErrors.currentPassword = "Please enter your current password";
+      newErrors.currentPassword =
+        language === "english"
+          ? "Please enter your current password"
+          : language === "spanish"
+          ? "Por favor ingresa tu contraseña actual"
+          : "Si us plau introdueix la contrasenya actual";
     }
 
     // 🔐 2. New obligatoire + min 8
     if (!newPassword) {
-      newErrors.newPassword = "Please enter your new password";
+      newErrors.newPassword =
+        language === "english"
+          ? "Please enter your new password"
+          : language === "spanish"
+          ? "Por favor ingresa tu nueva contraseña"
+          : "Si us plau introdueix la nova contrasenya";
     } else if (newPassword.length < 8) {
-      newErrors.newPassword = "Password must be at least 8 characters long";
+      newErrors.newPassword =
+        language === "english"
+          ? "Password must be at least 8 characters long"
+          : language === "spanish"
+          ? "La contraseña debe tener al menos 8 caracteres"
+          : "La contrasenya ha de tenir almenys 8 caràcters";
     }
 
     // 🔐 3. Confirm obligatoire + match
     if (!confirmPassword) {
-      newErrors.confirmPassword = "Please confirm your new password";
+      newErrors.confirmPassword =
+        language === "english"
+          ? "Please confirm your new password"
+          : language === "spanish"
+          ? "Por favor, confirma tu nueva contraseña"
+          : "Si us plau, confirma la nova contrasenya";
     } else if (newPassword !== confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match";
+      newErrors.confirmPassword =
+        language === "english"
+          ? "Passwords do not match"
+          : language === "spanish"
+          ? "Las contraseñas no coinciden"
+          : "Les contrasenyes no coincideixen";
     }
 
     setPasswordErrors(newErrors);
@@ -465,7 +490,13 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
       await UserModule.service.updateUser(userId, payload);
 
       setSuccessPassword(true);
-      setSuccessMessage("Password updated successfully.");
+      setSuccessMessage(
+        language === "english"
+          ? "Password updated successfully."
+          : language === "spanish"
+          ? "Contraseña actualizada con éxito."
+          : "Contrasenya actualitzada correctament."
+      );
       setErrorMessage("");
 
       // reset fields
@@ -484,7 +515,10 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
 
   const handleSubmitAccount = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    const language =
+      (typeof window !== "undefined" &&
+        localStorage.getItem("disktro_language")) ||
+      "english";
     const userId = localStorage.getItem(UserModule.localState.USER_ID);
     const token = localStorage.getItem(UserModule.localState.ACCESS_TOKEN);
     if (!userId || !token) return;
@@ -496,21 +530,37 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
     const trimmedEmail = email.trim();
 
     if (!trimmedName) {
-      newErrors.name = "Please enter your name";
+      newErrors.name =
+        language === "english"
+          ? "Please enter your name"
+          : language === "spanish"
+          ? "Por favor, ingrese su nombre"
+          : "Si us plau, introdueix el teu nom";
     } else if (trimmedName.length < 2) {
-      newErrors.name = "Name must be at least 2 characters";
+      newErrors.name =
+        language === "english"
+          ? "Name must be at least 2 characters"
+          : language === "spanish"
+          ? "El nombre debe tener al menos 2 caracteres"
+          : "El nom ha de tenir almenys 2 caràcters";
     }
 
     if (!trimmedEmail) {
-      newErrors.email = "Please enter your email";
+      newErrors.email =
+        language === "english"
+          ? "Please enter your email"
+          : language === "spanish"
+          ? "Por favor ingrese su correo electrónico"
+          : "Si us plau, introdueix el teu correu electrònic";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
-      newErrors.email = "Please enter a valid email address";
+      newErrors.email =
+        language === "english"
+          ? "Please enter a valid email address"
+          : language === "spanish"
+          ? "Por favor ingrese una dirección de correo electrónico válida"
+          : "Si us plau, introdueix una adreça de correu electrònic vàlida";
     }
     // Récupérer la langue dans localStorage
-    const language =
-      (typeof window !== "undefined" &&
-        localStorage.getItem("disktro_language")) ||
-      "english";
 
     setErrors(newErrors);
 
@@ -570,7 +620,13 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
           profileImageUrl: res.url, // 👉 adapte le nom du champ si nécessaire
         }));
         if (res && res.url) {
-          setSuccessMessage("Image uploadée avec succès.");
+          setSuccessMessage(
+            language === "english"
+              ? "Profile Image saved successfully."
+              : language === "spanish"
+              ? "Imagen de perfil guardada con éxito."
+              : "Imatge de perfil guardada amb èxit."
+          );
           await UserModule.service.updateUser(userId!, {
             profileImageUrl: res.url,
           });
@@ -578,13 +634,11 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
           setIsLoading(false);
           setErrorMessage("");
         } else {
-          setErrorMessage("Erreur lors de l'upload de l'image.");
         }
         setSuccess(true);
         setIsLoading(false);
         setErrorMessage("");
       } else {
-        setErrorMessage("Erreur lors de l'upload de l'image.");
         setIsLoading(false);
       }
     } catch (error) {
@@ -642,171 +696,6 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
     }
   }, []);
 
-  const handleSavePayment = () => {
-    let newMethod: any = null;
-
-    switch (paymentType) {
-      case "card":
-        if (!cardNumber || !cardName || !expiryDate || !cvv) {
-          alert(
-            language === "spanish"
-              ? "Por favor complete todos los campos"
-              : language === "english"
-              ? "Please fill all fields"
-              : "Si us plau ompliu tots els camps"
-          );
-          return;
-        }
-        newMethod = {
-          id: Date.now().toString(),
-          type: "card",
-          displayInfo: `Visa •••• ${cardNumber.slice(-4)}`,
-          details: expiryDate,
-        };
-        setCardNumber("");
-        setCardName("");
-        setExpiryDate("");
-        setCvv("");
-        break;
-
-      case "paypal":
-        if (!paypalEmail) {
-          alert(
-            language === "spanish"
-              ? "Por favor ingrese el correo de PayPal"
-              : language === "english"
-              ? "Please enter PayPal email"
-              : "Si us plau introdueix el correu de PayPal"
-          );
-          return;
-        }
-        newMethod = {
-          id: Date.now().toString(),
-          type: "paypal",
-          displayInfo: paypalEmail,
-          details: "PayPal",
-        };
-        setPaypalEmail("");
-        break;
-
-      case "bizum":
-        if (!bizumPhone) {
-          alert(
-            language === "spanish"
-              ? "Por favor ingrese el número de teléfono"
-              : language === "english"
-              ? "Please enter phone number"
-              : "Si us plau introdueix el número de telèfon"
-          );
-          return;
-        }
-        newMethod = {
-          id: Date.now().toString(),
-          type: "bizum",
-          displayInfo: bizumPhone,
-          details: "Bizum",
-        };
-        setBizumPhone("");
-        break;
-
-      case "ideal":
-        if (!idealBank || !idealAccountHolder) {
-          alert(
-            language === "spanish"
-              ? "Por favor complete todos los campos"
-              : language === "english"
-              ? "Please fill all fields"
-              : "Si us plau ompliu tots els camps"
-          );
-          return;
-        }
-        newMethod = {
-          id: Date.now().toString(),
-          type: "ideal",
-          displayInfo: idealAccountHolder,
-          details: idealBank,
-        };
-        setIdealBank("");
-        setIdealAccountHolder("");
-        break;
-
-      case "mobilemoney":
-        if (!mobileMoneyPhone || !mobileMoneyProvider) {
-          alert(
-            language === "spanish"
-              ? "Por favor complete todos los campos"
-              : language === "english"
-              ? "Please fill all fields"
-              : "Si us plau ompliu tots els camps"
-          );
-          return;
-        }
-        newMethod = {
-          id: Date.now().toString(),
-          type: "mobilemoney",
-          displayInfo: mobileMoneyPhone,
-          details: mobileMoneyProvider,
-        };
-        setMobileMoneyPhone("");
-        setMobileMoneyProvider("");
-        break;
-
-      case "orangemoney":
-        if (!orangeMoneyPhone) {
-          alert(
-            language === "spanish"
-              ? "Por favor ingrese el número de teléfono"
-              : language === "english"
-              ? "Please enter phone number"
-              : "Si us plau introdueix el número de telèfon"
-          );
-          return;
-        }
-        newMethod = {
-          id: Date.now().toString(),
-          type: "orangemoney",
-          displayInfo: orangeMoneyPhone,
-          details: "Orange Money",
-        };
-        setOrangeMoneyPhone("");
-        break;
-    }
-
-    if (newMethod) {
-      setSavedPaymentMethods([...savedPaymentMethods, newMethod]);
-      alert(
-        language === "spanish"
-          ? "Método de pago guardado exitosamente"
-          : language === "english"
-          ? "Payment method saved successfully"
-          : "Mètode de pagament guardat amb èxit"
-      );
-    }
-  };
-
-  const handleRemovePayment = (id: string) => {
-    setSavedPaymentMethods(
-      savedPaymentMethods.filter((method) => method.id !== id)
-    );
-  };
-
-  const getPaymentIcon = (type: string) => {
-    switch (type) {
-      case "card":
-        return <CreditCard size={24} className="text-white" />;
-      case "paypal":
-        return <Mail size={24} className="text-white" />;
-      case "bizum":
-      case "mobilemoney":
-      case "orangemoney":
-        return <Smartphone size={24} className="text-white" />;
-      case "ideal":
-        return <CreditCard size={24} className="text-white" />;
-      default:
-        return <CreditCard size={24} className="text-white" />;
-    }
-  };
-
   return (
     <div className="w-full h-full overflow-y-auto p-8  bg-gradient-to-br from-slate-900 via-purple-900 to-black">
       <button
@@ -860,22 +749,6 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
             <h2 className="text-2xl text-white drop-shadow-lg mb-6">
               {content.accountInfo}
             </h2>
-
-            {/* Alerts */}
-            {(successMessage || errorMessage) && (
-              <div className="mb-6">
-                {successMessage && (
-                  <div className="p-4 rounded-lg border border-green-300/40 bg-green-500/10 text-green-100">
-                    {successMessage}
-                  </div>
-                )}
-                {errorMessage && (
-                  <div className="p-4 rounded-lg border border-red-300/40 bg-red-500/10 text-red-100 mt-3">
-                    {errorMessage}
-                  </div>
-                )}
-              </div>
-            )}
 
             <form onSubmit={handleSubmitAccount} className="space-y-6">
               {/* Profile Picture */}
@@ -955,6 +828,21 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
                   <p className="text-red-300 text-sm mt-2">{errors.email}</p>
                 )}
               </div>
+              {/* Alerts */}
+              {(successMessage || errorMessage) && (
+                <div className="mb-6">
+                  {successMessage && (
+                    <div className="p-4 rounded-lg border border-green-300/40 bg-green-500/10 text-green-100">
+                      {successMessage}
+                    </div>
+                  )}
+                  {errorMessage && (
+                    <div className="p-4 rounded-lg border border-red-300/40 bg-red-500/10 text-red-100 mt-3">
+                      {errorMessage}
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Save Button */}
               <button
@@ -963,9 +851,7 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
                 className="w-full flex cursor-pointer items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-purple-500/40 to-pink-500/40 backdrop-blur-md border-2 border-white/40 rounded-xl text-white hover:from-purple-500/50 hover:to-pink-500/50 hover:border-white/60 transition-all shadow-lg disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 <Save size={20} />
-                {isLoading
-                  ? content.saving ?? "Saving..."
-                  : content.saveChanges}
+                {isLoading ? <>{"Loding..."}</> : content.saveChanges}
               </button>
             </form>
           </div>
@@ -977,22 +863,6 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
             <h2 className="text-2xl text-white drop-shadow-lg mb-6">
               {content.changePassword}
             </h2>
-
-            {/* Alerts */}
-            {(successMessage || errorMessage) && (
-              <div className="mb-6">
-                {successMessage && (
-                  <div className="p-4 rounded-lg border border-green-300/40 bg-green-500/10 text-green-100">
-                    {successMessage}
-                  </div>
-                )}
-                {errorMessage && (
-                  <div className="p-4 rounded-lg border border-red-300/40 bg-red-500/10 text-red-100 mt-3">
-                    {errorMessage}
-                  </div>
-                )}
-              </div>
-            )}
 
             <form onSubmit={handleUpdatePassword} className="space-y-6">
               {/* Current Password */}
@@ -1091,6 +961,22 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
                 {content.passwordRequirements}
               </p>
 
+              {/* Alerts */}
+              {(successMessage || errorMessage) && (
+                <div className="mb-6">
+                  {successMessage && (
+                    <div className="p-4 rounded-lg border border-green-300/40 bg-green-500/10 text-green-100">
+                      {successMessage}
+                    </div>
+                  )}
+                  {errorMessage && (
+                    <div className="p-4 rounded-lg border border-red-300/40 bg-red-500/10 text-red-100 mt-3">
+                      {errorMessage}
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Update Button */}
               <button
                 type="submit"
@@ -1098,9 +984,7 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
                 className="cursor-pointer w-full flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-blue-500/40 to-cyan-500/40 backdrop-blur-md border-2 border-white/40 rounded-xl text-white hover:from-blue-500/50 hover:to-cyan-500/50 hover:border-white/60 transition-all shadow-lg disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 <Lock size={20} />
-                {isLoadingPassword
-                  ? content.updating ?? "Updating..."
-                  : content.updatePassword}
+                {isLoadingPassword ? "Loading..." : content.updatePassword}
               </button>
             </form>
           </div>
