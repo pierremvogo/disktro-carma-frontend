@@ -2470,7 +2470,7 @@ Underneath the shining star`,
       </div>
 
       {/* Main Content */}
-      <div className="absolute bg-amber-700 pb-25 sm:top-[90px] top-[100px] mt-5 left-0 right-0 bottom-32 overflow-y-auto px-6">
+      <div className="absolute pb-25 sm:top-[90px] top-[100px] mt-5 left-0 right-0 bottom-32 overflow-y-auto px-6">
         {/* Search Bar */}
         <div className="mb-8 max-w-2xl mx-auto mt-2">
           <div className="relative">
