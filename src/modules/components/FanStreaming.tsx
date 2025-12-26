@@ -1492,8 +1492,28 @@ export function FanStreaming({ language }: FanStreamingProps) {
       errors: {
         generic: "Algo salió mal. Por favor, inténtalo de nuevo más tarde.",
       },
+      loading: "Cargando...",
+      track: "Pista",
+      refresh: "Actualizar",
+      loadingTracks: "Cargando pistas...",
+      loadingError: "Error al cargar",
+      retry: "Reintentar",
+      noTracksFound: "No se encontró ninguna pista",
+      tryAnother: "Prueba otra",
+      close: "Cerrar",
+      clear: "Borrar",
     },
     english: {
+      loading: "Loading...",
+      track: "Track",
+      refresh: "Refresh",
+      loadingTracks: "Loading tracks...",
+      loadingError: "Error loading",
+      retry: "Retry",
+      noTracksFound: "No track found",
+      tryAnother: "Try another",
+      close: "Close",
+      clear: "Clear",
       errors: {
         generic: "Something went wrong. Please try again later.",
       },
@@ -1577,6 +1597,16 @@ export function FanStreaming({ language }: FanStreamingProps) {
       simplifiedInterface: "Simplified Interface",
     },
     catalan: {
+      loading: "Carregant...",
+      track: "Pista",
+      refresh: "Actualitzar",
+      loadingTracks: "Carregant pistes...",
+      loadingError: "Error en carregar",
+      retry: "Torna-ho a provar",
+      noTracksFound: "Cap pista trobada",
+      tryAnother: "Prova una altra",
+      close: "Tancar",
+      clear: "Netejar",
       errors: {
         generic:
           "Alguna cosa ha anat malament. Si us plau, torna-ho a provar més tard.",
@@ -4976,8 +5006,8 @@ Underneath the shining star`,
               <div className="px-4 pb-4 flex items-center justify-between gap-3">
                 <div className="text-white/50 text-xs">
                   {loadingTracks
-                    ? "Loading..."
-                    : `${savedTracks.length} track(s)`}
+                    ? `${text.loading}`
+                    : `${savedTracks.length} ${text.track}(s)`}
                 </div>
 
                 <button
@@ -4999,7 +5029,7 @@ Underneath the shining star`,
               }
             `}
                 >
-                  Refresh
+                  {text.refresh}
                 </button>
               </div>
             </div>
@@ -5012,7 +5042,7 @@ Underneath the shining star`,
                   <div className="flex items-center gap-3">
                     <div className="w-3 h-3 rounded-full bg-white/60 animate-pulse" />
                     <p className="text-white/70 text-sm">
-                      Chargement des tracks...
+                      {text.loadingTracks}
                     </p>
                   </div>
 
@@ -5031,7 +5061,7 @@ Underneath the shining star`,
               {!loadingTracks && tracksError && (
                 <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4">
                   <p className="text-white/90 text-sm font-semibold">
-                    Erreur de chargement
+                    {text.loadingError}
                   </p>
                   <p className="text-white/70 text-sm mt-1">{tracksError}</p>
 
@@ -5046,7 +5076,7 @@ Underneath the shining star`,
                     }}
                     className="cursor-pointer mt-4 px-4 py-2 rounded-lg bg-white/15 hover:bg-white/25 text-white text-sm transition-all"
                   >
-                    Réessayer
+                    {text.retry}
                   </button>
                 </div>
               )}
@@ -5055,10 +5085,11 @@ Underneath the shining star`,
               {!loadingTracks && !tracksError && savedTracks.length === 0 && (
                 <div className="bg-white/10 border border-white/15 rounded-xl p-8 text-center">
                   <p className="text-white/80 font-semibold">
-                    Aucun track trouvé
+                    {text.noTracksFound}
                   </p>
                   <p className="text-white/60 text-sm mt-2">
-                    Essaie un autre {drawerType === "genre" ? "genre" : "mood"}.
+                    {text.tryAnother}{" "}
+                    {drawerType === "genre" ? "genre" : "mood"}.
                   </p>
                 </div>
               )}
@@ -5171,7 +5202,7 @@ Underneath the shining star`,
                 onClick={closeDrawer}
                 className="px-4 py-2 cursor-pointer rounded-lg bg-white/10 hover:bg-white/15 text-white transition-all"
               >
-                Close
+                {text.close}
               </button>
 
               <button
@@ -5184,7 +5215,7 @@ Underneath the shining star`,
                 }}
                 className="cursor-pointer px-4 py-2 rounded-lg bg-white/20 hover:bg-white/30 text-white transition-all"
               >
-                Clear
+                {text.clear}
               </button>
             </div>
           </aside>
