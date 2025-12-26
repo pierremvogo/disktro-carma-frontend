@@ -1271,13 +1271,13 @@ export function FanStreaming({ language }: FanStreamingProps) {
 
   const handleNextFromQueue1 = () => {
     const index = queue.findIndex((t) => t.id === currentSong.id);
-    const next = queue[index + 1];
+    const next = queue[index - 1];
     if (next) setCurrentSong(next);
   };
 
   const handlePrevFromQueue1 = () => {
     const index = queue.findIndex((t) => t.id === currentSong.id);
-    const prev = queue[index - 1];
+    const prev = queue[index + 1];
     if (prev) setCurrentSong(prev);
   };
   const handlePlaySong = (song: any, list?: any[]) => {
@@ -1701,24 +1701,6 @@ export function FanStreaming({ language }: FanStreamingProps) {
       audio.removeEventListener("ended", handleEnded);
     };
   }, [queue, queueIndex]);
-
-  const handleNext = () => {
-    if (queue.length === 0) return;
-
-    const nextIndex = queueIndex + 1;
-    if (nextIndex >= queue.length) {
-      // Option A: stop à la fin
-      setIsPlaying(false);
-      return;
-
-      // Option B: loop
-      // nextIndex = 0;
-    }
-
-    setQueueIndex(nextIndex);
-    setCurrentSong(queue[nextIndex]);
-    setIsPlaying(true);
-  };
 
   const toggleMute = () => setIsMuted((m) => !m);
 
