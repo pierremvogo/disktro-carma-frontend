@@ -247,7 +247,7 @@ export function Login({
         router.push("/dashboard/fan-streaming");
       }
     } catch (error) {
-      console.log(error);
+      console.log(error as Error);
       setErrorMessage((error as Error).message);
       setIsLoading(false);
       setSuccess(false);

@@ -534,6 +534,15 @@ export function FanStreaming({ language }: FanStreamingProps) {
     };
   }, [currentSong]);
 
+  // Seek when user interacts
+  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    const newTime = Number(e.target.value);
+    audio.currentTime = newTime;
+    setCurrentTime(newTime);
+  };
+
   useEffect(() => {
     fetchFavoriteTracks();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1260,6 +1269,18 @@ export function FanStreaming({ language }: FanStreamingProps) {
     await handlePlaySong(queue[prevIndex], queue);
   };
 
+  const handleNextFromQueue1 = () => {
+    const index = queue.findIndex((t) => t.id === currentSong.id);
+    const next = queue[index + 1];
+    if (next) setCurrentSong(next);
+  };
+
+  const handlePrevFromQueue1 = () => {
+    const index = queue.findIndex((t) => t.id === currentSong.id);
+    const prev = queue[index - 1];
+    if (prev) setCurrentSong(prev);
+  };
+
   const handlePlaySong = async (song: any, list?: any[]) => {
     const userId = localStorage.getItem(ModuleObject.localState.USER_ID);
     const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
@@ -1299,7 +1320,7 @@ export function FanStreaming({ language }: FanStreamingProps) {
 
       // ✅ autoplay next quand fini
       audio.onended = () => {
-        handleNextFromQueue();
+        handleNextFromQueue1();
       };
 
       await audio.play();
@@ -1661,9 +1682,12 @@ export function FanStreaming({ language }: FanStreamingProps) {
     setIsPlaying(true);
   };
 
-  const playFromList = (tracks: any[], trackId: string) => {
-    const idx = tracks.findIndex((t) => t.id === trackId);
-    loadQueueAndPlay(tracks, Math.max(idx, 0));
+  const formatTime = (sec = 0) => {
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60)
+      .toString()
+      .padStart(2, "0");
+    return `${m}:${s}`;
   };
 
   useEffect(() => {
@@ -1720,33 +1744,6 @@ export function FanStreaming({ language }: FanStreamingProps) {
 
     setQueueIndex(nextIndex);
     setCurrentSong(queue[nextIndex]);
-    setIsPlaying(true);
-  };
-
-  const handlePrev = () => {
-    if (queue.length === 0) return;
-
-    // si le track est déjà avancé > 3 sec -> revenir au début
-    const audio = audioRef.current;
-    if (audio && audio.currentTime > 3) {
-      audio.currentTime = 0;
-      return;
-    }
-
-    const prevIndex = queueIndex - 1;
-    if (prevIndex < 0) {
-      // Option A: rester au début
-      setQueueIndex(0);
-      setCurrentSong(queue[0]);
-      setIsPlaying(true);
-      return;
-
-      // Option B: loop vers le dernier
-      // prevIndex = queue.length - 1;
-    }
-
-    setQueueIndex(prevIndex);
-    setCurrentSong(queue[prevIndex]);
     setIsPlaying(true);
   };
 
@@ -4777,6 +4774,10 @@ Underneath the shining star`,
                   className="w-full h-full object-cover"
                 />
               </div>
+            </div>
+
+            {/* Player Controls */}
+            <div className="w-full flex flex-col gap-1 order-0 md:order-none ml-1 sm:ml-50">
               <div className="min-w-2.5">
                 <h4 className="text-white drop-shadow text-sm sm:text-base truncate">
                   {currentSong.title}
@@ -4787,18 +4788,11 @@ Underneath the shining star`,
                     currentSong.userId ??
                     ""}
                 </p>
-
-                {/* Progress Bar */}
-                {/* Progress Bar */}
               </div>
-            </div>
-
-            {/* Player Controls */}
-            <div className="w-full flex flex-col gap-3 order-0 md:order-none ml-1 sm:ml-50">
               {/* Controls (centrés) */}
               <div className="flex items-center justify-center gap-4 sm:gap-6">
                 <button
-                  onClick={handlePrevFromQueue}
+                  onClick={handlePrevFromQueue1}
                   className={`text-white/80 hover:text-white cursor-pointer ${animationClasses} ${buttonSizeClasses}`}
                   aria-label="Previous"
                 >
@@ -4826,7 +4820,7 @@ Underneath the shining star`,
                 </button>
 
                 <button
-                  onClick={handleNextFromQueue}
+                  onClick={handleNextFromQueue1}
                   className={`text-white/80 hover:text-white cursor-pointer ${animationClasses} ${buttonSizeClasses}`}
                   aria-label="Next"
                 >
@@ -4835,17 +4829,25 @@ Underneath the shining star`,
               </div>
 
               {/* Progress bar (pleine largeur du player) */}
-              <div className="w-full px-4">
-                <div className="w-full h-1 bg-white/20 rounded">
-                  <div
-                    className="h-1 bg-white rounded transition-all duration-200"
-                    style={{
-                      width: duration
-                        ? `${Math.min((currentTime / duration) * 100, 100)}%`
-                        : "0%",
-                    }}
-                  />
-                </div>
+              {/* Progress bar */}
+              <div className="w-full px-4 flex items-center gap-3">
+                <span className="text-white/60 text-xs sm:text-sm w-12 text-right">
+                  {formatTime(currentTime)}
+                </span>
+
+                <input
+                  type="range"
+                  min={0}
+                  max={duration ?? 0}
+                  step={0.1}
+                  value={currentTime}
+                  onChange={handleSeek}
+                  className="w-full accent-white"
+                />
+
+                <span className="text-white/60 text-xs sm:text-sm w-12">
+                  {formatTime(duration)}
+                </span>
               </div>
             </div>
 
