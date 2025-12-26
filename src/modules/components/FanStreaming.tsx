@@ -2236,7 +2236,7 @@ Underneath the shining star`,
       <button
         onClick={() => setShowAccessibility(true)}
         className={`
-    fixed bottom-6
+    fixed sm:bottom-12 bottom-9
     right-6 sm:right-auto
     sm:left-6
     z-40
@@ -2470,9 +2470,9 @@ Underneath the shining star`,
       </div>
 
       {/* Main Content */}
-      <div className="absolute sm:top-[150px] top-[150px] mt-5 left-0 right-0 bottom-32 overflow-y-auto px-6 pb-6">
+      <div className="absolute bg-amber-700 pb-25 sm:top-[90px] top-[100px] mt-5 left-0 right-0 bottom-32 overflow-y-auto px-6">
         {/* Search Bar */}
-        <div className="mb-8 max-w-2xl mx-auto">
+        <div className="mb-8 max-w-2xl mx-auto mt-2">
           <div className="relative">
             <Search
               size={20}
@@ -2835,7 +2835,7 @@ Underneath the shining star`,
                       key={song.id}
                       className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 hover:bg-white/15 transition-all"
                     >
-                      <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-4 sm:flex-row flex-col">
                         <div className="w-16 h-16 bg-white/5 rounded-lg overflow-hidden flex-shrink-0">
                           <img
                             src={song.cover ?? "/placeholder.png"}
