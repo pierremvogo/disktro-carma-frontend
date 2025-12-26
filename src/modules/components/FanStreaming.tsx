@@ -1280,8 +1280,7 @@ export function FanStreaming({ language }: FanStreamingProps) {
     const prev = queue[index - 1];
     if (prev) setCurrentSong(prev);
   };
-
-  const handlePlaySong = async (song: any, list?: any[]) => {
+  const handlePlaySong = (song: any, list?: any[]) => {
     const userId = localStorage.getItem(ModuleObject.localState.USER_ID);
     const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
 
@@ -1290,7 +1289,7 @@ export function FanStreaming({ language }: FanStreamingProps) {
 
     const trackId = song.id;
 
-    // ✅ set queue si on passe une liste (album/EP)
+    // ✅ Mettre à jour la queue
     if (list && Array.isArray(list) && list.length > 0) {
       const idx = list.findIndex((t) => t.id === trackId);
       setQueue(list);
@@ -1300,7 +1299,7 @@ export function FanStreaming({ language }: FanStreamingProps) {
       setQueueIndex(0);
     }
 
-    // ✅ toggle pause si on reclique sur le même track
+    // ✅ Toggle pause si on reclique sur le même track
     if (currentPlayingTrackId === trackId && !audio.paused) {
       audio.pause();
       setIsPlaying(false);
@@ -1308,108 +1307,50 @@ export function FanStreaming({ language }: FanStreamingProps) {
       return;
     }
 
-    // ✅ update UI
+    // ✅ Mise à jour immédiate de l'UI
     setCurrentSong(song);
     setIsPlaying(true);
+    setCurrentPlayingTrackId(trackId);
 
     try {
-      // ✅ charger la source
+      // ✅ Charger la source si nécessaire
       if (audio.src !== song.audioUrl) {
         audio.src = song.audioUrl;
+        audio.load(); // pré-chargement pour accélérer le play
       }
 
-      // ✅ autoplay next quand fini
-      audio.onended = () => {
+      // ✅ Jouer l'audio (async mais sans bloquer l'UI)
+      audio.play().catch((err) => {
+        console.error("Error playing audio:", err);
+        setIsPlaying(false);
+        setCurrentPlayingTrackId(null);
+      });
+
+      // ✅ autoplay next track
+      const handleEnded = () => {
         handleNextFromQueue1();
       };
+      audio.addEventListener("ended", handleEnded);
 
-      await audio.play();
-      setCurrentPlayingTrackId(trackId);
+      // Nettoyage automatique pour éviter les leaks
+      // (utile si handlePlaySong est appelé plusieurs fois)
+      const cleanupEndedListener = () => {
+        audio.removeEventListener("ended", handleEnded);
+      };
+      // On peut stocker cleanupEndedListener dans un ref si besoin
 
-      // ✅ Log stream (anti-spam déjà géré backend)
+      // ✅ Log stream en arrière-plan
       if (token && userId && trackId) {
-        try {
-          await TrackStreamModuleObject.service.createTrackStream(
-            userId,
-            trackId,
-            token
-          );
-        } catch (e) {
-          console.warn("Stream logging failed:", e);
-        }
+        TrackStreamModuleObject.service
+          .createTrackStream(userId, trackId, token)
+          .catch((e) => console.warn("Stream logging failed:", e));
       }
     } catch (err) {
-      console.error("Error playing audio:", err);
+      console.error("Error in handlePlaySong:", err);
       setIsPlaying(false);
       setCurrentPlayingTrackId(null);
     }
   };
-
-  // const handlePlaySong = async (song: any) => {
-  //   const userId = localStorage.getItem(ModuleObject.localState.USER_ID);
-  //   const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
-
-  //   const trackId = song.id;
-  //   const audioEl = document.getElementById(
-  //     `fan-audio-${trackId}`
-  //   ) as HTMLAudioElement | null;
-
-  //   if (!audioEl) return;
-
-  //   // ✅ Si on reclique sur le track en cours -> pause
-  //   if (currentPlayingTrackId === trackId) {
-  //     audioEl.pause();
-  //     setCurrentPlayingTrackId(null);
-  //     setIsPlaying(false);
-  //     // setCurrentSong(null);
-  //     return;
-  //   }
-
-  //   // ✅ Stopper l’ancien si un autre joue
-  //   if (currentPlayingTrackId) {
-  //     const prevAudio = document.getElementById(
-  //       `fan-audio-${currentPlayingTrackId}`
-  //     ) as HTMLAudioElement | null;
-
-  //     if (prevAudio) {
-  //       prevAudio.pause();
-  //       prevAudio.currentTime = 0;
-  //     }
-  //   }
-
-  //   // ✅ Met à jour ton UI player
-  //   console.log("CURRENT SONG : ", song);
-  //   setCurrentSong(song);
-  //   setIsPlaying(true);
-
-  //   try {
-  //     // Assure la source (au cas où)
-  //     if (song.audioUrl && audioEl.src !== song.audioUrl) {
-  //       audioEl.src = song.audioUrl;
-  //     }
-
-  //     await audioEl.play();
-  //     setCurrentPlayingTrackId(trackId);
-
-  //     // ✅ Log stream (au moment du play)
-  //     // (optionnel) éviter double log si l’utilisateur spam-click: tu peux ajouter un cooldown
-  //     if (token && userId && trackId) {
-  //       try {
-  //         await TrackStreamModuleObject.service.createTrackStream(
-  //           userId,
-  //           trackId,
-  //           token
-  //         );
-  //       } catch (e) {
-  //         console.warn("Stream logging failed:", e);
-  //       }
-  //     }
-  //   } catch (err) {
-  //     console.error("Error playing audio:", err);
-  //     setIsPlaying(false);
-  //     setCurrentPlayingTrackId(null);
-  //   }
-  // };
 
   const content = {
     spanish: {
@@ -1705,12 +1646,12 @@ export function FanStreaming({ language }: FanStreamingProps) {
   const [volume, setVolume] = useState(0.8); // 0..1
   const [isMuted, setIsMuted] = useState(false);
 
-  const loadQueueAndPlay = (tracks: any[], startIndex = 0) => {
-    setQueue(tracks);
-    setQueueIndex(startIndex);
-    setCurrentSong(tracks[startIndex] ?? null);
-    setIsPlaying(true);
-  };
+  // const loadQueueAndPlay = (tracks: any[], startIndex = 0) => {
+  //   setQueue(tracks);
+  //   setQueueIndex(startIndex);
+  //   setCurrentSong(tracks[startIndex] ?? null);
+  //   setIsPlaying(true);
+  // };
 
   const formatTime = (sec = 0) => {
     const m = Math.floor(sec / 60);
@@ -1751,12 +1692,14 @@ export function FanStreaming({ language }: FanStreamingProps) {
     const audio = audioRef.current;
     if (!audio) return;
 
-    const onEnded = () => {
-      handleNext();
+    const handleEnded = () => {
+      handleNextFromQueue1();
     };
 
-    audio.addEventListener("ended", onEnded);
-    return () => audio.removeEventListener("ended", onEnded);
+    audio.addEventListener("ended", handleEnded);
+    return () => {
+      audio.removeEventListener("ended", handleEnded);
+    };
   }, [queue, queueIndex]);
 
   const handleNext = () => {
@@ -4787,6 +4730,7 @@ Underneath the shining star`,
         </div>
       )}
 
+      {/*Player */}
       {currentSong && (
         <div className="absolute bottom-0 left-0 right-0 z-20 bg-black/40 backdrop-blur-xl border-t border-white/10">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-6 p-3 sm:p-4 md:p-6">
@@ -4882,7 +4826,7 @@ Underneath the shining star`,
             </div>
 
             {/* Volume & Actions */}
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3 justify-center md:gap-4 flex-1 justify-between md:justify-end order-2">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 md:gap-4 flex-1 justify-between md:justify-end order-2">
               <span className="text-white/60 text-xs sm:text-sm">
                 {currentSong.duration ?? ""}
               </span>
