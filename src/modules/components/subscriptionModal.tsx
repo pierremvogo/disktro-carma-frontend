@@ -11,7 +11,7 @@ type SubscriptionModalProps = {
   selectedArtistForSubscription: any | null;
 
   handleConfirmSubscriptionStripe: () => Promise<void | ConfirmResult> | void;
-  handleConfirmSubscriptionFlutterwave: () => Promise<void | ConfirmResult> | void;
+  handleConfirmSubscriptionLygos: () => Promise<void | ConfirmResult> | void;
 
   onClose: () => void;
   artistPlans: any[];
@@ -26,7 +26,7 @@ export function SubscriptionModal({
   showSubscriptionModal,
   selectedArtistForSubscription,
   handleConfirmSubscriptionStripe,
-  handleConfirmSubscriptionFlutterwave,
+  handleConfirmSubscriptionLygos,
   onClose,
   artistPlans,
   plansLoading,
@@ -37,7 +37,7 @@ export function SubscriptionModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState<"stripe" | "flutterwave">(
+  const [paymentMethod, setPaymentMethod] = useState<"stripe" | "lygos">(
     "stripe"
   );
 
@@ -63,7 +63,7 @@ export function SubscriptionModal({
       const handler =
         paymentMethod === "stripe"
           ? handleConfirmSubscriptionStripe
-          : handleConfirmSubscriptionFlutterwave;
+          : handleConfirmSubscriptionLygos;
 
       setSuccessMessage(text.subscription.message.redirecting);
 
@@ -135,13 +135,13 @@ export function SubscriptionModal({
           <button
             type="button"
             className={`flex-1 py-2 rounded-xl border ${
-              paymentMethod === "flutterwave"
+              paymentMethod === "lygos"
                 ? "bg-white/25 border-white text-white"
                 : "bg-white/10 border-white/30 text-white/70"
             }`}
-            onClick={() => setPaymentMethod("flutterwave")}
+            onClick={() => setPaymentMethod("lygos")}
           >
-            {text.subscription.payment.flutterwave}
+            {text.subscription.payment.lygos}
           </button>
         </div>
 
