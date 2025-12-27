@@ -914,14 +914,13 @@ export function FanStreaming({ language }: FanStreamingProps) {
     if (!userData) throw new Error("User data missing");
     const user = JSON.parse(userData);
     const email = user.email;
-    const phone = "698114902";
+    const phone = "+237698114902";
     if (!email || !phone) throw new Error("User email or phone missing");
 
     // ✅ Récupérer le plan pour connaître le montant
     const selectedPlan = artistPlans.find((p) => p.id === selectedPlanId);
     if (!selectedPlan) throw new Error("Plan not found");
-    const amount = selectedPlan.price;
-
+    const amount = Number(selectedPlan.price);
     try {
       setCheckoutLoading(true);
 
@@ -1354,6 +1353,26 @@ export function FanStreaming({ language }: FanStreamingProps) {
 
   const content = {
     spanish: {
+      subscription: {
+        title: "Suscribirse a un plan",
+        subtitle: "Elige una suscripción para apoyar a {{artistName}}",
+
+        button: {
+          continue: "Continuar",
+          redirecting: "Redirigiendo...",
+        },
+
+        message: {
+          redirecting: "Redirigiendo a la página de pago...",
+          paymentFailed: "El pago ha fallado. Inténtalo de nuevo.",
+          success: "¡Pago realizado con éxito!",
+        },
+
+        payment: {
+          stripe: "Tarjeta bancaria (Stripe)",
+          lygos: "Mobile Money (Lygos)",
+        },
+      },
       title: "Música para Todos",
       discover: "Descubrir",
       myMusic: "Mi Música",
@@ -1445,6 +1464,26 @@ export function FanStreaming({ language }: FanStreamingProps) {
       clear: "Borrar",
     },
     english: {
+      subscription: {
+        title: "Subscribe to a plan",
+        subtitle: "Choose a subscription to support {{artistName}}",
+
+        button: {
+          continue: "Continue",
+          redirecting: "Redirecting...",
+        },
+
+        message: {
+          redirecting: "Redirecting to the payment page...",
+          paymentFailed: "Payment failed. Please try again.",
+          success: "Payment completed successfully!",
+        },
+
+        payment: {
+          stripe: "Credit card (Stripe)",
+          lygos: "Mobile Money (Lygos)",
+        },
+      },
       loading: "Loading...",
       track: "Track",
       refresh: "Refresh",
@@ -1538,6 +1577,26 @@ export function FanStreaming({ language }: FanStreamingProps) {
       simplifiedInterface: "Simplified Interface",
     },
     catalan: {
+      subscription: {
+        title: "Subscriure's a un pla",
+        subtitle: "Tria una subscripció per donar suport a {{artistName}}",
+
+        button: {
+          continue: "Continuar",
+          redirecting: "Redirigint...",
+        },
+
+        message: {
+          redirecting: "Redirigint a la pàgina de pagament...",
+          paymentFailed: "El pagament ha fallat. Torna-ho a provar.",
+          success: "Pagament realitzat amb èxit!",
+        },
+
+        payment: {
+          stripe: "Targeta bancària (Stripe)",
+          lygos: "Mobile Money (Lygos)",
+        },
+      },
       loading: "Carregant...",
       track: "Pista",
       refresh: "Actualitzar",

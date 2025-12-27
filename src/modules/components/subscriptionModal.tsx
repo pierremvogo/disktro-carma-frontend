@@ -97,7 +97,7 @@ export function SubscriptionModal({
         <div className="flex items-start justify-between gap-4 mb-6">
           <div>
             <h3 className="text-2xl text-white drop-shadow mb-1">
-              {text.subscription.title}
+              {text.subscription.title || ""}
             </h3>
             <p className="text-white/60 text-sm">
               {text.subscription.subtitle.replace(
