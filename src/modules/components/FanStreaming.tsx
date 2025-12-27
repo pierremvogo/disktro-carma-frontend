@@ -15,7 +15,7 @@ import { EditorPlaylistModuleObject } from "./editorPlaylist/module";
 import { SubscriptionModal } from "./subscriptionModal";
 import { PlanModuleObject } from "../plan/module";
 import { StripeModuleObject } from "./stripe/module";
-import { FlutterwaveModuleObject } from "./flutterwave/module";
+import { LygosModuleObject } from "./lygos/module";
 
 // Icon components
 const Music = ({ size = 24, className = "" }) => (
@@ -901,7 +901,7 @@ export function FanStreaming({ language }: FanStreamingProps) {
     await handlePlaySong(tracks[startIndex], tracks);
   };
 
-  const handleConfirmSubscriptionFlutterwave = async () => {
+  const handleConfirmSubscriptionLygos = async () => {
     if (!selectedArtistForSubscription) throw new Error("No artist selected");
 
     const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
@@ -925,7 +925,7 @@ export function FanStreaming({ language }: FanStreamingProps) {
     try {
       setCheckoutLoading(true);
 
-      const res = await FlutterwaveModuleObject.service.initializeSubscription(
+      const res = await LygosModuleObject.service.initializeSubscription(
         {
           artistId: String(selectedArtistForSubscription.id),
           planId: String(selectedPlanId),
@@ -937,7 +937,7 @@ export function FanStreaming({ language }: FanStreamingProps) {
       );
 
       const paymentUrl = res?.data?.redirectUrl ?? res?.data?.link ?? res?.url;
-      if (!paymentUrl) throw new Error("Flutterwave payment url not returned");
+      if (!paymentUrl) throw new Error("Lygos payment url not returned");
 
       window.location.href = paymentUrl;
     } catch (e: any) {
@@ -3960,9 +3960,7 @@ Underneath the shining star`,
         showSubscriptionModal={showSubscriptionModal}
         selectedArtistForSubscription={selectedArtistForSubscription}
         handleConfirmSubscriptionStripe={handleConfirmSubscriptionStripe}
-        handleConfirmSubscriptionFlutterwave={
-          handleConfirmSubscriptionFlutterwave
-        }
+        handleConfirmSubscriptionLygos={handleConfirmSubscriptionLygos}
         artistPlans={artistPlans}
         plansLoading={plansLoading}
         plansError={plansError}
