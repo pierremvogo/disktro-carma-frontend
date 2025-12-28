@@ -92,7 +92,10 @@ export function SubscriptionModal({
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[90] p-4">
-      <div className="bg-black/80 backdrop-blur-xl rounded-3xl border border-white/20 p-8 w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto shadow-2xl">
+      <div
+        className="bg-black/80 backdrop-blur-xl rounded-3xl border border-white/20 p-8 w-full max-w-xl md:max-w-2xl
+ mx-4 max-h-[90vh] overflow-y-auto shadow-2xl"
+      >
         {/* Header */}
         <div className="flex items-start justify-between gap-4 mb-6">
           <div>
