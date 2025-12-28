@@ -455,10 +455,14 @@ export function FanStreaming({ language }: FanStreamingProps) {
           a.profileImageUrl && String(a.profileImageUrl).trim() !== ""
             ? a.profileImageUrl
             : "/avatar-placeholder.png",
-        genres: a.tags || "—", // tags names
+        genres: a.tags || "—",
         subscribers: a.subscribersCount ?? 0,
         activeSubscribers: a.activeSubscribers ?? 0,
+
+        // ✅ FIX CRITIQUE ICI
+        hasActivePlan: Boolean(a.hasActivePlan), // 0 -> false, 1 -> true
       }));
+
       setSubscribedArtists(
         mapped.filter((a: any) => a.isSubscribed).map((a: any) => String(a.id))
       );
@@ -1462,8 +1466,10 @@ export function FanStreaming({ language }: FanStreamingProps) {
       tryAnother: "Prueba otra",
       close: "Cerrar",
       clear: "Borrar",
+      paymentSoon: "Suscripción disponible próximamente",
     },
     english: {
+      paymentSoon: "Subscription coming soon",
       subscription: {
         title: "Subscribe to a plan",
         subtitle: "Choose a subscription to support {{artistName}}",
@@ -1577,6 +1583,7 @@ export function FanStreaming({ language }: FanStreamingProps) {
       simplifiedInterface: "Simplified Interface",
     },
     catalan: {
+      paymentSoon: "Subscripció disponible aviat",
       subscription: {
         title: "Subscriure's a un pla",
         subtitle: "Tria una subscripció per donar suport a {{artistName}}",
@@ -3061,29 +3068,41 @@ Underneath the shining star`,
                     </p>
 
                     <button
-                      onClick={
-                        () =>
-                          subscribedArtists.includes(String(artist.id))
-                            ? toggleSubscription(String(artist.id)) // unsubscribe
-                            : startSubscription(artist) // open payment options
-                      }
-                      className={`w-full px-4 py-2 backdrop-blur-sm rounded-lg text-white transition-all flex items-center justify-center gap-2 ${
-                        subscribedArtists.includes(artist.id)
-                          ? "bg-white/30 border border-white/40"
-                          : "bg-white/20 hover:bg-white/30"
-                      }`}
+                      disabled={!artist.hasActivePlan}
+                      onClick={() => {
+                        if (!artist.hasActivePlan) return;
+
+                        subscribedArtists.includes(String(artist.id))
+                          ? toggleSubscription(String(artist.id)) // unsubscribe
+                          : startSubscription(artist); // open payment options
+                      }}
+                      className={`cursor-pointer disabled:cursor-not-allowed w-full px-4 py-2 backdrop-blur-sm rounded-lg text-white transition-all flex items-center justify-center gap-2
+                                  ${
+                                    artist.hasActivePlan
+                                      ? subscribedArtists.includes(
+                                          String(artist.id)
+                                        )
+                                        ? "bg-white/30 border border-white/40"
+                                        : "bg-white/20 hover:bg-white/30"
+                                      : "bg-white/10 text-white/60 cursor-not-allowed"
+                                  }
+                                `}
                     >
                       <Star
                         size={16}
                         className={
-                          subscribedArtists.includes(artist.id)
+                          artist.hasActivePlan &&
+                          subscribedArtists.includes(String(artist.id))
                             ? "fill-white"
                             : ""
                         }
                       />
-                      {subscribedArtists.includes(artist.id)
-                        ? text.subscribed
-                        : text.subscribe}
+
+                      {artist.hasActivePlan
+                        ? subscribedArtists.includes(artist.id)
+                          ? text.subscribed
+                          : text.subscribe
+                        : text.paymentSoon}
                     </button>
                   </div>
                 ))}
