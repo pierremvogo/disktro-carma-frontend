@@ -58,3 +58,50 @@ select:disabled,
 textarea:disabled {
   @apply bg-gray-100 text-gray-500 cursor-not-allowed;
 }
+
+/* ============ Keyboard navigation ============ */
+html.keyboard-nav :focus-visible {
+  outline: 3px solid rgba(255, 255, 255, 0.9);
+  outline-offset: 3px;
+}
+
+/* ============ Larger buttons ============ */
+html.larger-buttons button,
+html.larger-buttons [role="button"],
+html.larger-buttons input,
+html.larger-buttons select,
+html.larger-buttons textarea {
+  min-height: 52px;
+  font-size: 1.05rem;
+}
+
+/* ============ Focus mode (réduit les distractions) ============ */
+html.focus-mode * {
+  animation: none !important;
+  transition: none !important;
+}
+
+html.focus-mode .decorative,
+html.focus-mode [data-decorative="true"] {
+  opacity: 0.35;
+  filter: blur(0.5px);
+}
+
+/* ============ Reading guide ============ */
+html {
+  --reading-guide-position: 50vh;
+}
+
+html.reading-guide body::before {
+  content: "";
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: calc(var(--reading-guide-position) - 16px);
+  height: 32px;
+  background: rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+  pointer-events: none;
+  z-index: 9998;
+}

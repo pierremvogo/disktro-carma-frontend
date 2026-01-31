@@ -925,6 +925,7 @@ export function FanStreaming({ language }: FanStreamingProps) {
     const selectedPlan = artistPlans.find((p) => p.id === selectedPlanId);
     if (!selectedPlan) throw new Error("Plan not found");
     const amount = Number(selectedPlan.price);
+
     try {
       setCheckoutLoading(true);
 
@@ -1376,6 +1377,39 @@ export function FanStreaming({ language }: FanStreamingProps) {
           stripe: "Tarjeta bancaria (Stripe)",
           lygos: "Mobile Money (Lygos)",
         },
+
+        plans: {
+          monthly: {
+            label: "Suscripción mensual",
+            features: [
+              "Acceso a lanzamientos exclusivos",
+              "Escucha anticipada",
+              "Contenido exclusivo para fans",
+              "Soporte estándar",
+            ],
+          },
+          quarterly: {
+            label: "Suscripción trimestral",
+            features: [
+              "Todos los beneficios mensuales",
+              "Contenido premium exclusivo",
+              "Acceso a conciertos en vivo privados",
+              "Descargas limitadas",
+              "Soporte prioritario",
+            ],
+          },
+          annual: {
+            label: "Suscripción anual",
+            features: [
+              "Todos los beneficios trimestrales",
+              "Acceso ilimitado a contenido premium",
+              "Descargas ilimitadas",
+              "Encuentros virtuales con el artista",
+              "Insignia de Fan VIP",
+              "Soporte VIP",
+            ],
+          },
+        },
       },
       title: "Música para Todos",
       discover: "Descubrir",
@@ -1488,6 +1522,39 @@ export function FanStreaming({ language }: FanStreamingProps) {
         payment: {
           stripe: "Credit card (Stripe)",
           lygos: "Mobile Money (Lygos)",
+        },
+
+        plans: {
+          monthly: {
+            label: "Monthly subscription",
+            features: [
+              "Access to exclusive releases",
+              "Early listening",
+              "Fan-only content",
+              "Standard support",
+            ],
+          },
+          quarterly: {
+            label: "Quarterly subscription",
+            features: [
+              "All monthly benefits",
+              "Exclusive premium content",
+              "Access to private live sessions",
+              "Limited downloads",
+              "Priority support",
+            ],
+          },
+          annual: {
+            label: "Annual subscription",
+            features: [
+              "All quarterly benefits",
+              "Unlimited access to premium content",
+              "Unlimited downloads",
+              "Virtual meet & greet with the artist",
+              "VIP Fan badge",
+              "VIP support",
+            ],
+          },
         },
       },
       loading: "Loading...",
@@ -1602,6 +1669,39 @@ export function FanStreaming({ language }: FanStreamingProps) {
         payment: {
           stripe: "Targeta bancària (Stripe)",
           lygos: "Mobile Money (Lygos)",
+        },
+
+        plans: {
+          monthly: {
+            label: "Subscripció mensual",
+            features: [
+              "Accés a llançaments exclusius",
+              "Escolta anticipada",
+              "Contingut exclusiu per a fans",
+              "Suport estàndard",
+            ],
+          },
+          quarterly: {
+            label: "Subscripció trimestral",
+            features: [
+              "Tots els avantatges mensuals",
+              "Contingut premium exclusiu",
+              "Accés a directes privats",
+              "Descàrregues limitades",
+              "Suport prioritari",
+            ],
+          },
+          annual: {
+            label: "Subscripció anual",
+            features: [
+              "Tots els avantatges trimestrals",
+              "Accés il·limitat a contingut premium",
+              "Descàrregues il·limitades",
+              "Trobades virtuals amb l’artista",
+              "Insígnia de Fan VIP",
+              "Suport VIP",
+            ],
+          },
         },
       },
       loading: "Carregant...",

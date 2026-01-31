@@ -13,6 +13,9 @@ import Select from "react-select";
 import countryList from "react-select-country-list";
 import { ArtistModuleObject } from "../artist/module";
 
+// ✅ Ajoute cet import (adapte le chemin)
+import { AccessibilityButton } from "./accessibilityButton/AccessibilityButton";
+
 // Icon components
 const User = ({ size = 24, className = "" }) => (
   <svg
@@ -171,7 +174,7 @@ interface ArtistProfileSetupProps {
   onComplete: () => void;
   onBack: () => void;
   language: string;
-  onSignUp?: () => void; // 👈 nouvelle prop
+  onSignUp?: () => void;
 }
 
 export function ArtistProfileSetup({
@@ -193,14 +196,13 @@ export function ArtistProfileSetup({
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
   const [showVerificationCode, setShowVerificationCode] = useState(false);
   const [verificationCode, setVerificationCode] = useState("");
-  const [country, setCountry] = useState<string>(""); // code pays (ex: "FR")
+  const [country, setCountry] = useState<string>("");
   const options = React.useMemo(() => countryList().getData(), []);
 
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
-  // 👇 Gestion de la photo de profil comme dans ProfileSettings
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const [profileImageUrl, setProfileImageUrl] = useState<string>("");
   const [success, setSuccess] = useState(false);
@@ -210,12 +212,6 @@ export function ArtistProfileSetup({
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   const [isDraggingPic, setIsDraggingPic] = useState(false);
   const [isDraggingVideo, setIsDraggingVideo] = useState(false);
-
-  // Petits helpers
-  const preventDefaults = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-  };
 
   const text = {
     spanish: {
@@ -373,9 +369,7 @@ export function ArtistProfileSetup({
 
   const content = text[language as keyof typeof text] || text.english;
 
-  const handleVerifyEmail = () => {
-    setShowVerificationCode(true);
-  };
+  const handleVerifyEmail = () => setShowVerificationCode(true);
 
   const handleVerifyCode = () => {
     if (verificationCode === "") {
@@ -384,9 +378,7 @@ export function ArtistProfileSetup({
     }
   };
 
-  const handleEnableTwoFactor = () => {
-    setTwoFactorEnabled(true);
-  };
+  const handleEnableTwoFactor = () => setTwoFactorEnabled(true);
 
   const passwordsMatch =
     password && confirmPassword && password === confirmPassword;
@@ -402,11 +394,11 @@ export function ArtistProfileSetup({
       console.log(error);
     }
   };
+
   useEffect(() => {
     if (tags.length === 0) getTags();
   }, []);
 
-  // ⚙️ Upload image comme dans ProfileSettings
   const handleImageChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
     const userId = localStorage.getItem(ModuleObject.localState.USER_ID);
@@ -450,7 +442,6 @@ export function ArtistProfileSetup({
     setIsLoading(true);
     setErrors({});
 
-    // Récupérer la langue dans localStorage
     const language =
       (typeof window !== "undefined" &&
         localStorage.getItem("disktro_language")) ||
@@ -495,7 +486,6 @@ export function ArtistProfileSetup({
         country: country || undefined,
         profileImageUrl,
         language,
-        // ✅ NEW
         tagIds: selectedTagIds,
       };
 
@@ -522,6 +512,9 @@ export function ArtistProfileSetup({
         backgroundPosition: "center",
       }}
     >
+      {/* ✅ Bouton d’accessibilité : monté au plus haut niveau */}
+      <AccessibilityButton />
+
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/40" />
 
@@ -549,8 +542,6 @@ export function ArtistProfileSetup({
                 </p>
               </div>
             </div>
-
-            {/* Messages globaux */}
 
             <form onSubmit={handleSubmit}>
               <div className="grid lg:grid-cols-2 gap-8 mb-5">
@@ -581,7 +572,7 @@ export function ArtistProfileSetup({
                         e.preventDefault();
                         setIsDraggingPic(true);
                       }}
-                      onDragOver={(e) => e.preventDefault()} // nécessaire pour autoriser le drop
+                      onDragOver={(e) => e.preventDefault()}
                       onDragLeave={(e) => {
                         e.preventDefault();
                         setIsDraggingPic(false);
@@ -597,11 +588,11 @@ export function ArtistProfileSetup({
                         }
                       }}
                       className={`aspect-square max-w-xs border-2 border-dashed rounded-xl p-4 text-center transition-all cursor-pointer flex items-center justify-center overflow-hidden
-      ${
-        isDraggingPic
-          ? "border-white/80 bg-white/15"
-          : "border-white/30 bg-white/5 hover:bg-white/10"
-      }`}
+                      ${
+                        isDraggingPic
+                          ? "border-white/80 bg-white/15"
+                          : "border-white/30 bg-white/5 hover:bg-white/10"
+                      }`}
                     >
                       {previewUrl ? (
                         <img
@@ -661,7 +652,7 @@ export function ArtistProfileSetup({
                       multiple
                       className={`w-full border cursor-pointer ${
                         errors?.genre ? "border-red-500" : "border-white/30"
-                      } rounded px-3 py-3 backdrop-blur-md text-black  focus:outline-none focus:ring-2 ${
+                      } rounded px-3 py-3 backdrop-blur-md text-black focus:outline-none focus:ring-2 ${
                         errors?.genre
                           ? "focus:ring-red-500"
                           : "focus:ring-white/50"
@@ -686,7 +677,7 @@ export function ArtistProfileSetup({
                         ? "Hold Ctrl (Windows) or Cmd (Mac) to select multiple."
                         : language === "spanish"
                         ? "Mantén pulsada la tecla Ctrl (Windows) o Cmd (Mac) para seleccionar varios généros."
-                        : "Mantén premuda la tecla Ctrl (Windows) o Cmd (Mac) per seleccionar diversos gèneres."}
+                        : "Mantèn premuda la tecla Ctrl (Windows) o Cmd (Mac) per seleccionar diversos gèneres."}
                     </p>
 
                     {errors?.genre && (
@@ -769,8 +760,7 @@ export function ArtistProfileSetup({
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2  p-1.5 rounded-full 
-             text-black/90 hover:text-black/100 cursor-pointer backdrop-blur-sm"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-full text-black/90 hover:text-black/100 cursor-pointer backdrop-blur-sm"
                       >
                         {showPassword ? (
                           <EyeOff size={18} />
@@ -808,9 +798,7 @@ export function ArtistProfileSetup({
                         onClick={() =>
                           setShowConfirmPassword(!showConfirmPassword)
                         }
-                        className="absolute right-3 top-1/2 -translate-y-1/2 
-                        text-black/90 hover:text-black/100 p-1.5 rounded-full 
-                    cursor-pointer backdrop-blur-sm"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-black/90 hover:text-black/100 p-1.5 rounded-full cursor-pointer backdrop-blur-sm"
                       >
                         {showConfirmPassword ? (
                           <EyeOff size={20} />
@@ -831,48 +819,12 @@ export function ArtistProfileSetup({
                       </p>
                     )}
                   </div>
-
-                  {/* Two-Factor Authentication */}
-                  {/* <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
-                    <div className="flex items-center justify-between mb-4">
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <Lock className="text-white" size={20} />
-                          <h3 className="text-white drop-shadow">
-                            {content.twoFactor}
-                          </h3>
-                        </div>
-                        <p className="text-white/60 text-sm">
-                          {content.twoFactorDesc}
-                        </p>
-                      </div>
-                      {twoFactorEnabled && (
-                        <CheckCircle className="text-green-400" size={20} />
-                      )}
-                    </div>
-
-                    {!twoFactorEnabled ? (
-                      <button
-                        type="button"
-                        onClick={handleEnableTwoFactor}
-                        className="w-full cursor-pointer px-4 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-white hover:bg-white/30 transition-all"
-                      >
-                        {content.enable}
-                      </button>
-                    ) : (
-                      <div className="flex items-center gap-2 text-green-400 text-sm">
-                        <CheckCircle size={16} />
-                        {content.enabled}
-                      </div>
-                    )}
-                  </div> */}
                 </div>
               </div>
-              {successMessage && <CustomSuccess message={successMessage} />}
 
+              {successMessage && <CustomSuccess message={successMessage} />}
               {errorMessage && <CustomAlert message={errorMessage} />}
 
-              {/* Complete Button */}
               <div className="mt-8 flex justify-end">
                 <button
                   type="submit"

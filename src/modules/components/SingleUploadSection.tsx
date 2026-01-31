@@ -11,6 +11,7 @@ import { TrackModuleObject as TrackModule } from "../track/module";
 import { SingleModuleObject } from "../single/module";
 import React, { useEffect, useState } from "react";
 import { TrackStreamModuleObject } from "../trackSTreams/module";
+import ConfirmDeleteModal from "./ConfirmDeleteModal";
 
 const Upload = ({ size = 24, className = "" }) => (
   <svg
@@ -44,6 +45,26 @@ const TrendingUp = ({ size = 24, className = "" }) => (
   >
     <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
     <polyline points="17 6 23 6 23 12" />
+  </svg>
+);
+
+const Trash = ({ size = 20, className = "" }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <polyline points="3 6 5 6 21 6" />
+    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+    <path d="M10 11v6" />
+    <path d="M14 11v6" />
+    <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
   </svg>
 );
 
@@ -315,6 +336,20 @@ type Single = {
   masteringEngineer: string;
 };
 
+type SingleCreationInfo = {
+  id: string;
+  title: string;
+  slug: string;
+  duration: number | null;
+  coverUrl: string;
+  audioUrl: string;
+  authors: string;
+  producers: string;
+  lyricists: string;
+  mixingEngineer: string;
+  masteringEngineer: string;
+};
+
 export function SingleUploadSection({
   text,
   language,
@@ -325,6 +360,8 @@ export function SingleUploadSection({
   const [singleTrackMap, setSingleTrackMap] = useState<Record<string, string>>(
     {}
   );
+  const [singleToDelete, setSingleToDelete] =
+    React.useState<SingleCreationInfo | null>(null);
 
   const [creation, setCreation] =
     React.useState<CreationInfoForm>(initialCreationInfo);
@@ -334,6 +371,7 @@ export function SingleUploadSection({
   const [audioPreviewUrl, setAudioPreviewUrl] = React.useState<string | null>(
     null
   );
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState(false);
   const [audioUrl, setAudioUrl] = React.useState<string>("");
 
   const [artworkFile, setArtworkFile] = React.useState<File | null>(null);
@@ -422,6 +460,29 @@ export function SingleUploadSection({
       // }
     } catch (err) {
       console.error("Error playing audio:", err);
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!singleToDelete) return;
+
+    const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
+
+    setIsLoading(true);
+    setErrorMessage("");
+    setSuccessMessage("");
+
+    try {
+      await SingleModuleObject.service.deleteSingle(singleToDelete.id!);
+      setSingles((prev) => prev.filter((e) => e.id !== singleToDelete.id));
+      setSuccessMessage("SINGLE supprimé avec succès.");
+      fetchSingles();
+    } catch (error) {
+      setErrorMessage(text.errors.generic);
+    } finally {
+      setIsLoading(false);
+      setIsDeleteModalOpen(false);
+      setSingleToDelete(null);
     }
   };
 
@@ -1370,89 +1431,115 @@ export function SingleUploadSection({
         </form>
       </div>
       <div className="mt-8">
-        <div className="mt-8">
-          <h3 className="text-xl text-white drop-shadow mb-4">
-            {text.recentSingleUploads}
-          </h3>
-          <div className="space-y-3">
-            {singles && singles.length > 0 ? (
-              singles.slice(0, 5).map((single) => (
-                <div
-                  key={single.id}
-                  className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/10 hover:bg-white/15 transition-all"
-                >
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                    {/* Infos Single */}
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-12 h-12 sm:w-10 sm:h-10 bg-white/20 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
-                        {single.coverUrl ? (
-                          <img
-                            src={single.coverUrl}
-                            alt={single.title}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <Music size={20} className="text-white" />
-                        )}
-                      </div>
+        <h3 className="text-xl text-white drop-shadow mb-4">
+          {text.recentSingleUploads}
+        </h3>
 
-                      <div className="min-w-0">
-                        <span className="text-white drop-shadow font-medium truncate block">
-                          {single.title}
-                        </span>
-                        <span className="block text-white/60 text-xs truncate">
-                          {single.authors || "—"}
-                        </span>
-                      </div>
+        <div className="space-y-3">
+          {singles && singles.length > 0 ? (
+            singles.slice(0, 5).map((single) => (
+              <div
+                key={single.id}
+                className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/10 hover:bg-white/15 transition-all"
+              >
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  {/* Infos Single */}
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-12 h-12 sm:w-10 sm:h-10 bg-white/20 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
+                      {single.coverUrl ? (
+                        <img
+                          src={single.coverUrl}
+                          alt={single.title}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <Music size={20} className="text-white" />
+                      )}
                     </div>
 
-                    {/* Streams + Play */}
-                    <div className="flex items-center justify-between sm:justify-end gap-4">
-                      <span className="text-white/80 text-sm whitespace-nowrap">
-                        {(single as any).streamsCount
-                          ? `${(single as any).streamsCount} streams`
-                          : "0 streams"}
+                    <div className="min-w-0">
+                      <span className="text-white drop-shadow font-medium truncate block">
+                        {single.title}
                       </span>
+                      <span className="block text-white/60 text-xs truncate">
+                        {single.authors || "—"}
+                      </span>
+                    </div>
+                  </div>
 
-                      {/* audio caché + bouton play */}
-                      <div className="flex items-center gap-2">
-                        {single.audioUrl && (
-                          <audio
-                            id={`single-audio-${single.id}`}
-                            src={single.audioUrl}
-                            onContextMenu={(e) => e.preventDefault()}
-                            className="hidden"
-                          />
+                  {/* Actions (streams + play + delete) */}
+                  <div className="flex items-center justify-between sm:justify-end gap-3">
+                    <span className="text-white/80 text-sm whitespace-nowrap">
+                      {(single as any).streamsCount
+                        ? `${(single as any).streamsCount} streams`
+                        : "0 streams"}
+                    </span>
+
+                    {/* Audio caché */}
+                    {single.audioUrl && (
+                      <audio
+                        id={`single-audio-${single.id}`}
+                        src={single.audioUrl}
+                        onContextMenu={(e) => e.preventDefault()}
+                        className="hidden"
+                      />
+                    )}
+
+                    {/* Boutons */}
+                    <div className="flex items-center gap-2">
+                      {/* Play / Pause */}
+                      <button
+                        type="button"
+                        disabled={!single.audioUrl}
+                        onClick={() => handleTogglePlaySingle(single.id)}
+                        className="p-2 rounded-lg bg-white/10 hover:bg-white/20 
+                             text-white/70 hover:text-white transition-all
+                             disabled:opacity-40 disabled:cursor-not-allowed"
+                        aria-label={
+                          currentPlayingId === single.id ? "Pause" : "Play"
+                        }
+                      >
+                        {currentPlayingId === single.id ? (
+                          <Pause size={18} />
+                        ) : (
+                          <Play size={18} />
                         )}
+                      </button>
 
-                        <button
-                          type="button"
-                          disabled={!single.audioUrl}
-                          onClick={() => handleTogglePlaySingle(single.id)}
-                          className="cursor-pointer text-white/60 hover:text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed p-2 rounded-lg bg-white/10 hover:bg-white/20"
-                          aria-label={
-                            currentPlayingId === single.id ? "Pause" : "Play"
-                          }
-                        >
-                          {currentPlayingId === single.id ? (
-                            <Pause size={18} />
-                          ) : (
-                            <Play size={18} />
-                          )}
-                        </button>
-                      </div>
+                      {/* Delete */}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSingleToDelete(single);
+                          setIsDeleteModalOpen(true);
+                        }}
+                        className="cursor-pointer p-2 rounded-lg bg-red-500/80 hover:bg-red-600/80
+                             text-white transition-all"
+                        aria-label="Delete single"
+                      >
+                        <Trash size={18} />
+                      </button>
                     </div>
                   </div>
                 </div>
-              ))
-            ) : (
-              <p className="text-white/60 text-sm">
-                {text.noSingleUploadedYet}
-              </p>
-            )}
-          </div>
+              </div>
+            ))
+          ) : (
+            <p className="text-white/60 text-sm">{text.noSingleUploadedYet}</p>
+          )}
         </div>
       </div>
+      <ConfirmDeleteModal
+        text={text}
+        open={isDeleteModalOpen}
+        itemName={singleToDelete?.title}
+        isLoading={isLoading}
+        onCancel={() => {
+          setIsDeleteModalOpen(false);
+          setSingleToDelete(null);
+        }}
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   );
 }

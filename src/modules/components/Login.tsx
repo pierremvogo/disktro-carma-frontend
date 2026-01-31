@@ -7,6 +7,7 @@ import { UserModuleObject as ModuleObject } from "../module";
 
 import CustomAlert from "@/@disktro/CustomAlert";
 import CustomSuccess from "@/@disktro/CustomSuccess";
+import { AccessibilityButton } from "./accessibilityButton/AccessibilityButton";
 
 // Icon components
 const Mail = ({ size = 24, className = "" }) => (
@@ -264,6 +265,8 @@ export function Login({
         backgroundPosition: "center",
       }}
     >
+      {/* ✅ Bouton d’accessibilité : monté au plus haut niveau */}
+      <AccessibilityButton />
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/50" />
 
