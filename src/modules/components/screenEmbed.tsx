@@ -9,6 +9,7 @@ import { FanProfileSetup } from "./FanProfileSetup";
 import { ArtistProfileSetup } from "./ArtistProfileSetup";
 import { Login } from "./Login";
 import { ArtistChoice } from "./ArtistChoice";
+import { AccessibilityButton } from "./accessibilityButton/AccessibilityButton";
 
 type Language = "english" | "spanish" | "catalan";
 const LANGUAGE_STORAGE_KEY = "disktro_language";
@@ -285,6 +286,8 @@ export function ScreenEmbed() {
         backgroundPosition: "center",
       }}
     >
+      {/* ✅ Bouton d’accessibilité : monté au plus haut niveau */}
+      <AccessibilityButton />
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/50" />
 

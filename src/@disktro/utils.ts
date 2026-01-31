@@ -210,6 +210,12 @@ export const ISO_COUNTRIES: Record<string, string> = {
   ZW: "Zimbabwe",
 };
 
+const EUR_TO_FCFA = 656;
+
+export const convertEuroToFcfa = (euro: number): number => {
+  return Math.round(euro * EUR_TO_FCFA);
+};
+
 export function getCountryName(code: string | null | undefined): string {
   if (!code) return "Unknown";
   const upper = code.toUpperCase();

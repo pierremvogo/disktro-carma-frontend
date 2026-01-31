@@ -35,11 +35,13 @@ export function SubscriptionModal({
   setSelectedPlanId,
 }: SubscriptionModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<"stripe" | "lygos">(
     "stripe"
   );
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!showSubscriptionModal) {
@@ -49,8 +51,34 @@ export function SubscriptionModal({
     }
   }, [showSubscriptionModal]);
 
+  useEffect(() => {
+    if (artistPlans.length === 0) setLoading(true);
+    else setLoading(false);
+  }, [artistPlans.length]);
+
   const canSubmit =
     !!selectedPlanId && !plansLoading && !plansError && !isSubmitting;
+
+  const PLAN_ACCESS: Record<
+    string,
+    {
+      label: string;
+      features: string[];
+    }
+  > = {
+    Monthly: {
+      label: text.subscription.plans.monthly.label,
+      features: text.subscription.plans.monthly.features,
+    },
+    Quarterly: {
+      label: text.subscription.plans.quarterly.label,
+      features: text.subscription.plans.quarterly.features,
+    },
+    Annual: {
+      label: text.subscription.plans.annual.label,
+      features: text.subscription.plans.annual.features,
+    },
+  };
 
   const onConfirmClick = async () => {
     if (!canSubmit) return;
@@ -126,9 +154,9 @@ export function SubscriptionModal({
         <div className="flex gap-4 mb-4">
           <button
             type="button"
-            className={`flex-1 py-2 rounded-xl border ${
+            className={`cursor-pointer flex-1 py-2 rounded-xl border ${
               paymentMethod === "stripe"
-                ? "bg-white/25 border-white text-white"
+                ? "bg-white/25 border-white ring-1 text-white"
                 : "bg-white/10 border-white/30 text-white/70"
             }`}
             onClick={() => setPaymentMethod("stripe")}
@@ -137,9 +165,9 @@ export function SubscriptionModal({
           </button>
           <button
             type="button"
-            className={`flex-1 py-2 rounded-xl border ${
+            className={`cursor-pointer flex-1 py-2 rounded-xl border ${
               paymentMethod === "lygos"
-                ? "bg-white/25 border-white text-white"
+                ? "bg-white/25 border-white ring-1 text-white"
                 : "bg-white/10 border-white/30 text-white/70"
             }`}
             onClick={() => setPaymentMethod("lygos")}
@@ -147,27 +175,44 @@ export function SubscriptionModal({
             {text.subscription.payment.lygos}
           </button>
         </div>
-
+        {loading && (
+          <div className="text-white text-1xl text-center">
+            <p>Loading...</p>
+          </div>
+        )}
         {/* Plan selector */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           {artistPlans.map((p: any) => {
             const isSelected = selectedPlanId === String(p.id);
+            const access = PLAN_ACCESS[p.name];
             return (
               <button
                 key={p.id}
                 type="button"
                 onClick={() => setSelectedPlanId(String(p.id))}
-                className={`p-4 rounded-xl border transition ${
+                className={`cursor-pointer p-4 rounded-xl border text-left transition ${
                   isSelected
-                    ? "border-white/40 ring-2 ring-white/30 bg-white/15"
+                    ? "border-white ring-2 ring-white bg-white/15"
                     : "border-white/15 bg-white/10"
                 }`}
               >
-                <h4 className="text-white font-semibold">{p.name}</h4>
-                <p className="text-white/70">{p.description}</p>
-                <p className="text-white/80 mt-2">
-                  {p.price} {p.currency}
+                <h4 className="text-white font-semibold text-lg">{p.name}</h4>
+                <p className="text-white/70 text-sm mb-3">{p.description}</p>
+
+                {/* Price */}
+                <p className="text-white/90 font-semibold mb-3">
+                  {p.price} {p.currency} / {access?.label}
                 </p>
+
+                {/* Access list */}
+                <ul className="space-y-1 text-sm text-white/80">
+                  {access?.features.map((feature, index) => (
+                    <li key={index} className="flex items-center gap-2">
+                      <span className="text-green-400">✔</span>
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
               </button>
             );
           })}
@@ -183,7 +228,7 @@ export function SubscriptionModal({
             type="button"
             onClick={onClose}
             disabled={isSubmitting}
-            className="flex-1 px-5 py-3 bg-white/10 rounded-xl text-white hover:bg-white/20 border border-white/15 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="cursor-pointer flex-1 px-5 py-3 bg-white/10 rounded-xl text-white hover:bg-white/20 border border-white/15 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {text.cancel}
           </button>
@@ -191,7 +236,7 @@ export function SubscriptionModal({
             type="button"
             onClick={onConfirmClick}
             disabled={!canSubmit}
-            className="flex-1 px-5 py-3 bg-white/25 rounded-xl text-white hover:bg-white/35 border border-white/25 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="cursor-pointer flex-1 px-5 py-3 bg-white/25 rounded-xl text-white hover:bg-white/35 border border-white/25 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting
               ? text.subscription.button.redirecting

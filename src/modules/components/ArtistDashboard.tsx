@@ -1556,58 +1556,6 @@ export function ArtistDashboard({
     }
   }
 
-  const handleBrailleFile = async (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const token = localStorage.getItem(MediaModule.localState.ACCESS_TOKEN);
-    const userId = localStorage.getItem(UserModule.localState.USER_ID);
-
-    setErrorMessage("");
-    setSuccessMessage("");
-    setIsLoading(true);
-
-    // garder le fichier en state
-    setBrailleFile(file);
-
-    // si tu veux un apercu texte un jour
-    setBrailleFilePreview((prev) => {
-      if (prev) URL.revokeObjectURL(prev);
-      return URL.createObjectURL(file);
-    });
-
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-      const res = await MediaModule.service.uploadBrailleFile(formData);
-
-      if (res && res.url) {
-        // stocker l’URL backend dans ton form global
-        setFormData((prev: any) => ({
-          ...prev,
-          brailleFileUrl: res.url,
-        }));
-
-        // synchro backend désactivée comme dans ton handler vidéo
-        // if (userId && token) {
-        //   await UserModule.service.updateUser(userId, {
-        //     brailleFileUrl: res.url,
-        //   });
-        // }
-
-        setSuccessMessage("Fichier braille uploadé avec succès.");
-      } else {
-        setErrorMessage("Erreur lors de l'upload du fichier braille.");
-      }
-    } catch (error) {
-      console.log((error as Error).message);
-      setErrorMessage(text.errors.generic);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   async function fetchMoods() {
     try {
       const token = localStorage.getItem(MoodModule.localState.ACCESS_TOKEN);
@@ -1626,59 +1574,6 @@ export function ArtistDashboard({
       fetchMoods();
     }
   }, []);
-
-  const handleSignLanguageVideo = async (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const token = localStorage.getItem(MediaModule.localState.ACCESS_TOKEN);
-    const userId = localStorage.getItem(UserModule.localState.USER_ID);
-
-    setErrorMessage("");
-    setSuccessMessage("");
-    setIsLoading(true);
-
-    // garder le fichier en state
-    setSignLanguageVideo(file);
-
-    // preview local
-    setSignLanguageVideoPreview((prev) => {
-      if (prev) URL.revokeObjectURL(prev);
-      return URL.createObjectURL(file);
-    });
-
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-      const res = await MediaModule.service.uploadVideoFile(formData);
-
-      if (res && res.url) {
-        // stocker l’URL backend dans ton form global
-        setFormData((prev: any) => ({
-          ...prev,
-          signLanguageVideoUrl: res.url,
-        }));
-
-        // éventuellement synchro côté backend user
-        // if (userId && token) {
-        //   await UserModule.service.updateUser(userId, {
-        //     signLanguageVideoUrl: res.url,
-        //   });
-        // }
-        setSuccessMessage("Vidéo en langue des signes uploadée avec succès.");
-      } else {
-        setErrorMessage(
-          "Erreur lors de l'upload de la vidéo en langue des signes."
-        );
-      }
-    } catch (error) {
-      console.log((error as Error).message);
-      setErrorMessage(text.errors.generic);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const handleVideoIntro = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -1815,51 +1710,6 @@ export function ArtistDashboard({
       console.log((error as Error).message);
       setErrorMessage(text.errors.generic);
       setSuccess(false);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleMiniVideoLoop = async (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setErrorMessage("");
-    setSuccessMessage("");
-    setIsLoading(true);
-
-    // garder le fichier localement
-    setMiniVideo(file);
-
-    // preview local
-    setMiniVideoPreview((prev) => {
-      if (prev) URL.revokeObjectURL(prev);
-      return URL.createObjectURL(file);
-    });
-
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-      const res = await MediaModule.service.uploadVideoFile(formData);
-
-      if (res && res.url) {
-        // stock prématuré de l'URL cloudinary
-        setMiniVideoUrl(res.url);
-
-        // si tu veux aussi le stocker dans un form global :
-        setFormData((prev: any) => ({
-          ...prev,
-          miniVideoLoopUrl: res.url,
-        }));
-
-        setSuccessMessage("Mini-video uploadée avec succès.");
-      } else {
-        setErrorMessage("Erreur lors de l'upload de la mini-video.");
-      }
-    } catch (error) {
-      console.log((error as Error).message);
-      setErrorMessage(text.errors.generic);
     } finally {
       setIsLoading(false);
     }
@@ -2746,28 +2596,6 @@ export function ArtistDashboard({
     return (monthly * 12).toFixed(2);
   };
 
-  // const quarterlyPrice = calculateQuarterlyPrice();
-  // const annualPrice = calculateAnnualPrice();
-
-  const mockSubscriptions = {
-    total: "12,456",
-    active: "11,892",
-    growth: "+8.3%",
-  };
-
-  const mockRoyalties = {
-    total: "$45,678.90",
-    thisMonth: "$3,245.50",
-    pending: "$892.30",
-  };
-
-  const mockTracks = [
-    { name: "Summer Vibes", streams: "345,678", revenue: "$1,234" },
-    { name: "Midnight Dreams", streams: "298,543", revenue: "$1,087" },
-    { name: "Electric Soul", streams: "234,890", revenue: "$856" },
-    { name: "Ocean Waves", streams: "187,654", revenue: "$678" },
-  ];
-
   const filteredTracks = React.useMemo(() => {
     return tracksStats.filter((t) => {
       const matchesType = trackFilter === "all" ? true : t.type === trackFilter;
@@ -2777,22 +2605,6 @@ export function ArtistDashboard({
       return matchesType && matchesSearch;
     });
   }, [tracksStats, trackFilter, trackSearch]);
-
-  const mockSubscriptionsByLocation = [
-    { location: "United States", subscribers: "2,345", percentage: "18.8%" },
-    { location: "Spain", subscribers: "1,987", percentage: "15.9%" },
-    { location: "Mexico", subscribers: "1,756", percentage: "14.1%" },
-    { location: "United Kingdom", subscribers: "1,432", percentage: "11.5%" },
-    { location: "France", subscribers: "892", percentage: "7.2%" },
-    { location: "Germany", subscribers: "823", percentage: "6.6%" },
-    { location: "Brazil", subscribers: "734", percentage: "5.9%" },
-    { location: "Argentina", subscribers: "678", percentage: "5.4%" },
-    { location: "Italy", subscribers: "567", percentage: "4.5%" },
-    { location: "Canada", subscribers: "489", percentage: "3.9%" },
-    { location: "Colombia", subscribers: "432", percentage: "3.5%" },
-    { location: "Japan", subscribers: "234", percentage: "1.9%" },
-    { location: "Australia", subscribers: "87", percentage: "0.7%" },
-  ];
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
