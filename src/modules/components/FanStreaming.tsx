@@ -16,6 +16,7 @@ import { SubscriptionModal } from "./subscriptionModal";
 import { PlanModuleObject } from "../plan/module";
 import { StripeModuleObject } from "./stripe/module";
 import { LygosModuleObject } from "./lygos/module";
+import { Search } from "lucide-react";
 
 // Icon components
 const Music = ({ size = 24, className = "" }) => (
@@ -82,23 +83,6 @@ const Heart = ({ size = 24, className = "" }) => (
     className={className}
   >
     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-  </svg>
-);
-
-const Search = ({ size = 24, className = "" }) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <circle cx="11" cy="11" r="8" />
-    <path d="m21 21-4.35-4.35" />
   </svg>
 );
 
@@ -1411,7 +1395,7 @@ export function FanStreaming({ language }: FanStreamingProps) {
           },
         },
       },
-      title: "Música para Todos",
+      title: "Música Para Todos",
       discover: "Descubrir",
       myMusic: "Mi Música",
       artists: "Artistas",
@@ -1572,7 +1556,7 @@ export function FanStreaming({ language }: FanStreamingProps) {
       },
       noAlbumUploadedYet: "No album uploaded yet.",
 
-      title: "Music for Everybody",
+      title: "Music For Everybody",
       discover: "Discover",
       myMusic: "My Music",
       artists: "Artists",
@@ -1718,7 +1702,7 @@ export function FanStreaming({ language }: FanStreamingProps) {
         generic:
           "Alguna cosa ha anat malament. Si us plau, torna-ho a provar més tard.",
       },
-      title: "Música per a Tothom",
+      title: "Música Per a Tothom",
       discover: "Descobrir",
       myMusic: "La Meva Música",
       artists: "Artistes",
@@ -2399,22 +2383,22 @@ Underneath the shining star`,
       </svg>
 
       {/* Accessibility Floating Button */}
-      <button
+      {/* <button
         onClick={() => setShowAccessibility(true)}
         className={`
-    fixed sm:bottom-12 bottom-9
-    right-6 sm:right-auto
-    sm:left-6
-    z-40
-    
-    bg-white/20 backdrop-blur-md
-    rounded-full p-4
-    border border-white/30
-    hover:bg-white/30
-    shadow-xl
-    ${animationClasses}
-    ${buttonSizeClasses}
-  `}
+                    fixed
+                    top-20 sm:top-24
+                    left-4 sm:left-6
+                    z-50
+
+                    bg-white/20 backdrop-blur-md
+                    rounded-full p-3 sm:p-4
+                    border border-white/30
+                    hover:bg-white/30
+                    shadow-xl
+                    ${animationClasses}
+                    ${buttonSizeClasses}
+                  `}
         aria-label={text.accessibility}
         title={text.accessibility}
       >
@@ -2433,7 +2417,7 @@ Underneath the shining star`,
           <path d="M12 16v-4" />
           <path d="M12 8h.01" />
         </svg>
-      </button>
+      </button> */}
 
       {/* Reading Guide */}
       {readingGuide && (
@@ -2487,54 +2471,105 @@ Underneath the shining star`,
           focusMode ? "opacity-80" : ""
         }`}
       >
-        {isArtist && (
-          <button
-            onClick={() => router.push("/dashboard/artist/select")}
-            className={`flex cursor-pointer items-center m-1 text-white drop-shadow hover:opacity-70 ${animationClasses} ${buttonSizeClasses}`}
-            aria-label={text.back}
-          >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+        {/* ✅ LIGNE 1 : Back + Title + Profile/Logout */}
+        <div className="flex items-center justify-between gap-3 px-4 sm:px-6 py-2">
+          <div className="flex items-center gap-3 min-w-0">
+            <button
+              onClick={() => setShowAccessibility(true)}
+              className={`
+                          flex items-center justify-center
+                          h-9 w-9 sm:h-10 sm:w-10
+                          rounded-full
+                          bg-white/15 backdrop-blur-md
+                          border border-white/25
+                          hover:bg-white/25
+                          transition-all
+                          shadow-md
+                          ${animationClasses}
+                        `}
+              aria-label={text.accessibility}
+              title={text.accessibility}
+              type="button"
             >
-              <path d="M19 12H5M12 19l-7-7 7-7" />
-            </svg>
-            {text.back}
-          </button>
-        )}
-        <div className="flex items-center justify-between p-2">
-          <h1 className="text-2xl text-white drop-shadow-lg">{text.title}</h1>
-          <div className="flex items-center gap-2 ml-auto">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-white"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 16v-4" />
+                <path d="M12 8h.01" />
+              </svg>
+            </button>
+            {isArtist && (
+              <button
+                onClick={() => router.push("/dashboard/artist/select")}
+                className={`flex cursor-pointer items-center gap-2 text-white drop-shadow hover:opacity-70 ${animationClasses} ${buttonSizeClasses}`}
+                aria-label={text.back}
+              >
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+                <span className="hidden sm:inline"></span>
+              </button>
+            )}
+
+            <h1
+              className="
+                          text-lg sm:text-xl
+                          font-semibold
+                          bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400
+                          bg-clip-text text-transparent
+                          drop-shadow
+                          truncate
+                        "
+            >
+              {text.title}
+            </h1>
+          </div>
+
+          <div className="flex items-center gap-2 flex-shrink-0">
             {/* PROFILE BUTTON */}
             <button
               onClick={() => setShowProfile(true)}
-              className="flex cursor-pointer items-center gap-2 px-4 py-2 text-white bg-white/10
-    backdrop-blur-md border border-white/20 rounded-lg hover:bg-white/20 transition-all"
+              className="flex cursor-pointer items-center gap-2 px-3 py-2 text-white bg-white/10
+          backdrop-blur-md border border-white/20 rounded-lg hover:bg-white/20 transition-all"
             >
-              <User size={20} />
-              {language === "spanish"
-                ? "Perfil"
-                : language === "english"
-                ? "Profile"
-                : "Perfil"}
+              <User size={18} />
+              <span className="hidden sm:inline">
+                {language === "spanish"
+                  ? "Perfil"
+                  : language === "english"
+                  ? "Profile"
+                  : "Perfil"}
+              </span>
             </button>
 
             {/* LOGOUT BUTTON */}
             <button
               onClick={handleLogout}
-              className="px-4 py-2 bg-gradient-to-r cursor-pointer from-red-500/40 to-orange-500/40 
-    backdrop-blur-md border border-white/30 rounded-lg text-white
-    hover:from-red-500/60 hover:to-orange-500/60 transition-all flex items-center gap-2"
+              className="px-3 py-2 bg-gradient-to-r cursor-pointer from-red-500/40 to-orange-500/40 
+          backdrop-blur-md border border-white/30 rounded-lg text-white
+          hover:from-red-500/60 hover:to-orange-500/60 transition-all flex items-center gap-2"
             >
               <svg
-                width="18"
-                height="18"
+                width="16"
+                height="16"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -2548,112 +2583,157 @@ Underneath the shining star`,
                 <line x1="21" y1="12" x2="9" y2="12" />
               </svg>
 
-              {language === "spanish" && "Cerrar sesión"}
-              {language === "english" && "Logout"}
-              {language === "catalan" && "Tancar sessió"}
+              <span className="hidden sm:inline">
+                {language === "spanish" && "Cerrar sesión"}
+                {language === "english" && "Logout"}
+                {language === "catalan" && "Tancar sessió"}
+              </span>
             </button>
           </div>
         </div>
-        {/* Tab Navigation */}
-        <div className="w-full overflow-x-auto">
-          <div className="flex flex-nowrap items-center justify-start sm:justify-center gap-4 sm:gap-8 px-4 sm:px-6 pb-3 sm:pb-4">
-            <button
-              onClick={() => setSelectedTab("discover")}
-              className={`
-        flex-shrink-0 text-sm sm:text-base text-white drop-shadow cursor-pointer 
-        pb-2 border-b-2 transition-colors
-        ${
-          selectedTab === "discover"
-            ? "border-white opacity-100"
-            : "border-transparent opacity-60 hover:opacity-80"
-        }
-      `}
-            >
-              {text.discover}
-            </button>
 
-            <button
-              onClick={() => setSelectedTab("artists")}
-              className={`
-        flex-shrink-0 text-sm sm:text-base text-white drop-shadow cursor-pointer 
-        pb-2 border-b-2 transition-colors
-        ${
-          selectedTab === "artists"
-            ? "border-white opacity-100"
-            : "border-transparent opacity-60 hover:opacity-80"
-        }
-      `}
-            >
-              {text.artists}
-            </button>
+        {/* ✅ LIGNE 2 : Tabs + Search */}
+        <div className="w-full border-t border-white/10">
+          <div className="flex items-center gap-4 px-4 sm:px-6 py-2">
+            {/* Tabs (scrollable) */}
+            <div className="flex-1 overflow-x-auto">
+              <div className="flex flex-nowrap items-center justify-start sm:justify-center gap-4 sm:gap-8">
+                <button
+                  onClick={() => setSelectedTab("discover")}
+                  className={`
+              flex-shrink-0 text-sm sm:text-base text-white drop-shadow cursor-pointer 
+              pb-1 border-b-2 transition-colors
+              ${
+                selectedTab === "discover"
+                  ? "border-white opacity-100"
+                  : "border-transparent opacity-60 hover:opacity-80"
+              }
+            `}
+                >
+                  {text.discover}
+                </button>
 
-            <button
-              onClick={() => setSelectedTab("mymusic")}
-              className={`
-        flex-shrink-0 text-sm sm:text-base text-white drop-shadow cursor-pointer 
-        pb-2 border-b-2 transition-colors
-        ${
-          selectedTab === "mymusic"
-            ? "border-white opacity-100"
-            : "border-transparent opacity-60 hover:opacity-80"
-        }
-      `}
-            >
-              {text.myMusic}
-            </button>
+                <button
+                  onClick={() => setSelectedTab("artists")}
+                  className={`
+              flex-shrink-0 text-sm sm:text-base text-white drop-shadow cursor-pointer 
+              pb-1 border-b-2 transition-colors
+              ${
+                selectedTab === "artists"
+                  ? "border-white opacity-100"
+                  : "border-transparent opacity-60 hover:opacity-80"
+              }
+            `}
+                >
+                  {text.artists}
+                </button>
 
-            <button
-              onClick={() => setSelectedTab("editorplaylists")}
-              className={`
-        flex-shrink-0 text-sm sm:text-base text-white drop-shadow cursor-pointer 
-        pb-2 border-b-2 transition-colors
-        ${
-          selectedTab === "editorplaylists"
-            ? "border-white opacity-100"
-            : "border-transparent opacity-60 hover:opacity-80"
-        }
-      `}
-            >
-              {text.editorPlaylists}
-            </button>
+                <button
+                  onClick={() => setSelectedTab("mymusic")}
+                  className={`
+              flex-shrink-0 text-sm sm:text-base text-white drop-shadow cursor-pointer 
+              pb-1 border-b-2 transition-colors
+              ${
+                selectedTab === "mymusic"
+                  ? "border-white opacity-100"
+                  : "border-transparent opacity-60 hover:opacity-80"
+              }
+            `}
+                >
+                  {text.myMusic}
+                </button>
 
-            <button
-              onClick={() => setSelectedTab("dashboard")}
-              className={`
-        flex-shrink-0 text-sm sm:text-base text-white drop-shadow cursor-pointer 
-        pb-2 border-b-2 transition-colors
-        ${
-          selectedTab === "dashboard"
-            ? "border-white opacity-100"
-            : "border-transparent opacity-60 hover:opacity-80"
-        }
-      `}
-            >
-              {text.dashboard}
-            </button>
+                <button
+                  onClick={() => setSelectedTab("editorplaylists")}
+                  className={`
+              flex-shrink-0 text-sm sm:text-base text-white drop-shadow cursor-pointer 
+              pb-1 border-b-2 transition-colors
+              ${
+                selectedTab === "editorplaylists"
+                  ? "border-white opacity-100"
+                  : "border-transparent opacity-60 hover:opacity-80"
+              }
+            `}
+                >
+                  {text.editorPlaylists}
+                </button>
+
+                <button
+                  onClick={() => setSelectedTab("dashboard")}
+                  className={`
+              flex-shrink-0 text-sm sm:text-base text-white drop-shadow cursor-pointer 
+              pb-1 border-b-2 transition-colors
+              ${
+                selectedTab === "dashboard"
+                  ? "border-white opacity-100"
+                  : "border-transparent opacity-60 hover:opacity-80"
+              }
+            `}
+                >
+                  {text.dashboard}
+                </button>
+              </div>
+            </div>
+
+            {/* Search desktop (right) */}
+            <div className="hidden md:block w-[260px]">
+              <div className="relative">
+                <Search
+                  size={16}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 pointer-events-none z-10"
+                />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder={text.search}
+                  className="
+                              w-full py-2 pr-3 pl-9
+                              bg-white/10 backdrop-blur-md
+                              border border-white/20
+                              rounded-lg
+                              text-black text-sm
+                              placeholder:text-black/50
+                              placeholder:text-center
+                              focus:outline-none
+                              focus:ring-2 focus:ring-white/40
+                            "
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Search mobile (under tabs) */}
+          <div className="md:hidden px-4 sm:px-6 pb-2">
+            <div className="relative">
+              <Search
+                size={16}
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 pointer-events-none z-10"
+              />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder={text.search}
+                className="
+                            w-full py-2 pr-3 pl-9
+                            bg-white/10 backdrop-blur-md
+                            border border-white/20
+                            rounded-lg
+                            text-black text-sm
+                            placeholder:text-black/50
+                            placeholder:text-center
+                            focus:outline-none
+                            focus:ring-2 focus:ring-white/40
+                          "
+              />
+            </div>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="absolute pb-25 sm:top-[90px] top-[100px] mt-5 left-0 right-0 bottom-32 overflow-y-auto px-6">
-        {/* Search Bar */}
-        <div className="mb-8 max-w-2xl mx-auto mt-2">
-          <div className="relative">
-            <Search
-              size={20}
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-white/60"
-            />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={text.search}
-              className="w-full pl-12 pr-4 py-4 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
-            />
-          </div>
-        </div>
-
+      <div className="absolute pb-25 pt-10 sm:top-[90px] top-[100px] mt-5 left-0 right-0 bottom-32 overflow-y-auto px-6">
         {/* Discover Tab */}
         {selectedTab === "discover" && (
           <div className="space-y-8 max-w-6xl mx-auto">
@@ -4891,129 +4971,123 @@ Underneath the shining star`,
       {/*Player */}
       {currentSong && (
         <div className="absolute bottom-0 left-0 right-0 z-20 bg-black/40 backdrop-blur-xl border-t border-white/10">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-6 p-3 sm:p-4 md:p-6">
-            {/* Song Info */}
-            <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0 order-1 md:order-none">
-              {/* Décalage pour l’icône d’accessibilité */}
-              <div className="ml-1  sm:ml-35 w-10 h-10 sm:w-12 sm:h-12 bg-white/5 rounded-lg overflow-hidden flex-shrink-0">
-                <img
-                  src={
-                    currentSong.coverUrl ??
-                    currentSong.cover ??
-                    "/placeholder.png"
-                  }
-                  alt={currentSong.title}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            </div>
+          <div className="px-3 sm:px-4 py-3">
+            {/* ===== DESKTOP: 3 columns (left / center / right) ===== */}
+            <div className="hidden md:grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+              {/* LEFT : Song info */}
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-11 h-11 bg-white/5 rounded-lg overflow-hidden flex-shrink-0">
+                  <img
+                    src={
+                      currentSong.coverUrl ??
+                      currentSong.cover ??
+                      "/placeholder.png"
+                    }
+                    alt={currentSong.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
 
-            {/* Player Controls */}
-            <div className="w-full flex flex-col gap-1 order-0 md:order-none ml-1 sm:ml-50">
-              <div className="min-w-2.5">
-                <h4 className="text-white drop-shadow text-sm sm:text-base truncate">
-                  {currentSong.title}
-                </h4>
-                <p className="text-white/60 text-xs sm:text-sm truncate">
-                  {currentSong.artistName ??
-                    currentSong.artist ??
-                    currentSong.userId ??
-                    ""}
-                </p>
-              </div>
-              {/* Controls (centrés) */}
-              <div className="flex items-center justify-center gap-4 sm:gap-6">
-                <button
-                  onClick={handlePrevFromQueue1}
-                  className={`text-white/80 hover:text-white cursor-pointer ${animationClasses} ${buttonSizeClasses}`}
-                  aria-label="Previous"
-                >
-                  <SkipBack size={largerTargets ? 32 : 22} />
-                </button>
-
-                <button
-                  onClick={() =>
-                    currentSong && handlePlaySong(currentSong, queue)
-                  }
-                  className={`${buttonSizeClasses} ${animationClasses} cursor-pointer flex items-center justify-center p-3 sm:p-4 bg-white/20 backdrop-blur-sm rounded-full hover:bg-white/30`}
-                  aria-label={isPlaying ? text.pause : text.play}
-                >
-                  {isPlaying ? (
-                    <Pause
-                      size={largerTargets ? 36 : 26}
-                      className="text-white"
-                    />
-                  ) : (
-                    <Play
-                      size={largerTargets ? 36 : 26}
-                      className="text-white"
-                    />
-                  )}
-                </button>
-
-                <button
-                  onClick={handleNextFromQueue1}
-                  className={`text-white/80 hover:text-white cursor-pointer ${animationClasses} ${buttonSizeClasses}`}
-                  aria-label="Next"
-                >
-                  <SkipForward size={largerTargets ? 32 : 22} />
-                </button>
+                <div className="min-w-0">
+                  <h4 className="text-white text-sm sm:text-base truncate">
+                    {currentSong.title}
+                  </h4>
+                  <p className="text-white text-xs sm:text-sm truncate">
+                    {currentSong.artistName ??
+                      currentSong.artist ??
+                      currentSong.userId ??
+                      ""}
+                  </p>
+                </div>
               </div>
 
-              {/* Progress bar (pleine largeur du player) */}
-              {/* Progress bar */}
-              <div className="w-full px-4 flex items-center gap-3">
-                <span className="text-white/60 text-xs sm:text-sm w-12 text-right">
-                  {formatTime(currentTime)}
+              {/* CENTER : Controls + Progress (always centered) */}
+              <div className="flex flex-col items-center justify-center min-w-[300px]">
+                <div className="flex items-center gap-4">
+                  <button
+                    onClick={handlePrevFromQueue1}
+                    className={`text-white/80 hover:text-white cursor-pointer ${animationClasses}`}
+                    aria-label="Previous"
+                  >
+                    <SkipBack size={largerTargets ? 28 : 20} />
+                  </button>
+
+                  <button
+                    onClick={() =>
+                      currentSong && handlePlaySong(currentSong, queue)
+                    }
+                    className="cursor-pointer flex items-center justify-center p-3 bg-white/20 rounded-full hover:bg-white/30 transition"
+                    aria-label={isPlaying ? text.pause : text.play}
+                    title={isPlaying ? text.pause : text.play}
+                  >
+                    {isPlaying ? (
+                      <Pause
+                        size={largerTargets ? 30 : 22}
+                        className="text-white"
+                      />
+                    ) : (
+                      <Play
+                        size={largerTargets ? 30 : 22}
+                        className="text-white"
+                      />
+                    )}
+                  </button>
+
+                  <button
+                    onClick={handleNextFromQueue1}
+                    className={`text-white/80 hover:text-white cursor-pointer ${animationClasses}`}
+                    aria-label="Next"
+                  >
+                    <SkipForward size={largerTargets ? 28 : 20} />
+                  </button>
+                </div>
+
+                <div className="mt-2 flex items-center gap-2 w-full">
+                  <span className="text-white/60 text-[11px] w-10 text-right tabular-nums">
+                    {formatTime(currentTime)}
+                  </span>
+                  <input
+                    type="range"
+                    min={0}
+                    max={duration ?? 0}
+                    step={0.1}
+                    value={currentTime}
+                    onChange={handleSeek}
+                    className="w-full accent-white"
+                  />
+                  <span className="text-white/60 text-[11px] w-10 tabular-nums">
+                    {formatTime(duration)}
+                  </span>
+                </div>
+              </div>
+
+              {/* RIGHT : Actions */}
+              <div className="flex items-center justify-end gap-3">
+                <span className="text-white/60 text-xs">
+                  {currentSong.duration ?? ""}
                 </span>
 
-                <input
-                  type="range"
-                  min={0}
-                  max={duration ?? 0}
-                  step={0.1}
-                  value={currentTime}
-                  onChange={handleSeek}
-                  className="w-full accent-white"
-                />
-
-                <span className="text-white/60 text-xs sm:text-sm w-12">
-                  {formatTime(duration)}
-                </span>
-              </div>
-            </div>
-
-            {/* Volume & Actions */}
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3 md:gap-4 flex-1 justify-between md:justify-end order-2">
-              <span className="text-white/60 text-xs sm:text-sm">
-                {currentSong.duration ?? ""}
-              </span>
-
-              <div className="flex items-center gap-2 sm:gap-3">
-                {/* Lyrics */}
                 <button
                   onClick={() => {
                     setLyricsViewMode("text");
                     setShowLyrics(true);
                   }}
-                  className={`text-white/80 hover:text-white cursor-pointer ${animationClasses} ${buttonSizeClasses}`}
-                  title={text.lyrics}
+                  className="text-white/80 hover:text-white cursor-pointer"
                   aria-label={text.lyrics}
+                  title={text.lyrics}
                 >
-                  <FileText size={largerTargets ? 28 : 22} />
+                  <FileText size={18} />
                 </button>
 
-                {/* Volume */}
                 <button
                   onClick={toggleMute}
-                  className={`text-white/80 hover:text-white cursor-pointer ${animationClasses} ${buttonSizeClasses}`}
+                  className="text-white/80 hover:text-white cursor-pointer"
                   aria-label="Volume"
                   title={isMuted ? "Unmute" : "Mute"}
                 >
-                  <Volume2 size={largerTargets ? 28 : 22} />
+                  <Volume2 size={18} />
                 </button>
 
-                {/* Slider */}
                 <input
                   type="range"
                   min={0}
@@ -5024,26 +5098,171 @@ Underneath the shining star`,
                     setIsMuted(false);
                     setVolume(Number(e.target.value));
                   }}
-                  className="w-24 accent-white"
+                  className="w-20 accent-white"
                   aria-label="Volume slider"
                 />
 
-                {/* Like */}
                 <button
                   onClick={() => toggleFavorite(currentSong.id)}
-                  className={`text-white/80 hover:text-white cursor-pointer ${animationClasses} ${buttonSizeClasses}`}
+                  className="text-white/80 hover:text-white cursor-pointer"
                   aria-label={text.addToFavorites}
                   title={text.addToFavorites}
                 >
                   <Heart
                     size={18}
-                    className={`${
+                    className={
                       favoriteTrackIds.includes(String(currentSong.id))
                         ? "text-red-400 fill-red-400"
                         : "text-white"
-                    }`}
+                    }
                   />
                 </button>
+              </div>
+            </div>
+
+            {/* ===== MOBILE: center always centered + options row below ===== */}
+            <div className="md:hidden">
+              {/* Center (always centered) */}
+              <div className="flex flex-col items-center justify-center">
+                <div className="flex items-center gap-4">
+                  <button
+                    onClick={handlePrevFromQueue1}
+                    className={`text-white/80 hover:text-white cursor-pointer ${animationClasses}`}
+                    aria-label="Previous"
+                  >
+                    <SkipBack size={largerTargets ? 28 : 20} />
+                  </button>
+
+                  <button
+                    onClick={() =>
+                      currentSong && handlePlaySong(currentSong, queue)
+                    }
+                    className="cursor-pointer flex items-center justify-center p-3 bg-white/20 rounded-full hover:bg-white/30 transition"
+                    aria-label={isPlaying ? text.pause : text.play}
+                    title={isPlaying ? text.pause : text.play}
+                  >
+                    {isPlaying ? (
+                      <Pause
+                        size={largerTargets ? 30 : 22}
+                        className="text-white"
+                      />
+                    ) : (
+                      <Play
+                        size={largerTargets ? 30 : 22}
+                        className="text-white"
+                      />
+                    )}
+                  </button>
+
+                  <button
+                    onClick={handleNextFromQueue1}
+                    className={`text-white/80 hover:text-white cursor-pointer ${animationClasses}`}
+                    aria-label="Next"
+                  >
+                    <SkipForward size={largerTargets ? 28 : 20} />
+                  </button>
+                </div>
+
+                <div className="mt-2 flex items-center gap-2 w-full">
+                  <span className="text-white/60 text-[11px] w-10 text-right tabular-nums">
+                    {formatTime(currentTime)}
+                  </span>
+                  <input
+                    type="range"
+                    min={0}
+                    max={duration ?? 0}
+                    step={0.1}
+                    value={currentTime}
+                    onChange={handleSeek}
+                    className="w-full accent-white"
+                  />
+                  <span className="text-white/60 text-[11px] w-10 tabular-nums">
+                    {formatTime(duration)}
+                  </span>
+                </div>
+              </div>
+
+              {/* Song info + Actions row (visible on mobile) */}
+              <div className="mt-3 flex items-center justify-between gap-3">
+                {/* Left info */}
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="w-9 h-9 bg-white/5 rounded-md overflow-hidden flex-shrink-0">
+                    <img
+                      src={
+                        currentSong.coverUrl ??
+                        currentSong.cover ??
+                        "/placeholder.png"
+                      }
+                      alt={currentSong.title}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-white text-xs truncate">
+                      {currentSong.title}
+                    </p>
+                    <p className="text-white/60 text-[11px] truncate">
+                      {currentSong.artistName ??
+                        currentSong.artist ??
+                        currentSong.userId ??
+                        ""}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Right actions */}
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <button
+                    onClick={() => {
+                      setLyricsViewMode("text");
+                      setShowLyrics(true);
+                    }}
+                    className="text-white/80 hover:text-white"
+                    aria-label={text.lyrics}
+                    title={text.lyrics}
+                  >
+                    <FileText size={18} />
+                  </button>
+
+                  <button
+                    onClick={toggleMute}
+                    className="text-white/80 hover:text-white"
+                    aria-label="Volume"
+                    title={isMuted ? "Unmute" : "Mute"}
+                  >
+                    <Volume2 size={18} />
+                  </button>
+
+                  <input
+                    type="range"
+                    min={0}
+                    max={1}
+                    step={0.01}
+                    value={isMuted ? 0 : volume}
+                    onChange={(e) => {
+                      setIsMuted(false);
+                      setVolume(Number(e.target.value));
+                    }}
+                    className="w-20 accent-white"
+                    aria-label="Volume slider"
+                  />
+
+                  <button
+                    onClick={() => toggleFavorite(currentSong.id)}
+                    className="text-white/80 hover:text-white"
+                    aria-label={text.addToFavorites}
+                    title={text.addToFavorites}
+                  >
+                    <Heart
+                      size={18}
+                      className={
+                        favoriteTrackIds.includes(String(currentSong.id))
+                          ? "text-red-400 fill-red-400"
+                          : "text-white"
+                      }
+                    />
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -5063,12 +5282,12 @@ Underneath the shining star`,
           {/* Drawer */}
           <aside
             className="
-        absolute right-0 top-0 h-full w-full sm:w-[560px]
-        bg-black/85 backdrop-blur-xl
-        border-l border-white/20
-        shadow-2xl
-        flex flex-col
-      "
+                        absolute right-0 top-0 h-full w-full sm:w-[560px]
+                        bg-black/85 backdrop-blur-xl
+                        border-l border-white/20
+                        shadow-2xl
+                        flex flex-col
+                      "
             role="dialog"
             aria-modal="true"
             aria-label="Tracks drawer"

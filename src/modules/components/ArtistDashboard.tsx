@@ -21,6 +21,7 @@ import { SubscriptionModuleObject } from "../subscription/module";
 import { ExclusiveContentModuleObject } from "./exclusiveContent/module";
 import { RoyaltiesModuleObject } from "../royalties/module";
 import { PayoutModuleObject } from "../payout/module";
+import { AccessibilityButton } from "./accessibilityButton/AccessibilityButton";
 // Icon components
 const Upload = ({ size = 24, className = "" }) => (
   <svg
@@ -4744,6 +4745,8 @@ export function ArtistDashboard({
           </div>
         )}
       </div>
+      {/* ✅ Bouton d’accessibilité : monté au plus haut niveau */}
+      <AccessibilityButton language={language} />
     </div>
   );
 }

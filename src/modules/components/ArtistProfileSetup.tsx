@@ -513,7 +513,7 @@ export function ArtistProfileSetup({
       }}
     >
       {/* ✅ Bouton d’accessibilité : monté au plus haut niveau */}
-      <AccessibilityButton />
+      <AccessibilityButton language={language} />
 
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/40" />

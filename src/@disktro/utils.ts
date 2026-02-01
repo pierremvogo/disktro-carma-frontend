@@ -308,3 +308,13 @@ export const getUserRole = () => {
   const rawRole = localStorage.getItem(ModuleObject.localState.USER_ROLE);
   return rawRole ? rawRole.trim().toLowerCase().replace(/['"]+/g, "") : null;
 };
+
+// utils/language.ts
+export const LANGUAGE_KEY = "disktro_language";
+export const LANGUAGE_EVENT = "disktro_language_change";
+
+export function setAppLanguage(lang: "english" | "spanish" | "catalan") {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(LANGUAGE_KEY, lang);
+  window.dispatchEvent(new Event(LANGUAGE_EVENT));
+}

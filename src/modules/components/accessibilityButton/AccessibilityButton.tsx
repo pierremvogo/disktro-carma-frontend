@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+"use client";
+
+import React, { useEffect, useState } from "react";
 import { X, Circle } from "lucide-react";
-import { Button } from "./ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Separator } from "./ui/separator";
 import { Switch } from "./ui/switch";
@@ -17,33 +18,99 @@ function StickmanIcon({ className }: { className?: string }) {
       strokeLinecap="round"
       strokeLinejoin="round"
       className={className}
+      aria-hidden="true"
     >
-      {/* Head */}
       <circle cx="12" cy="5" r="2.5" />
-      {/* Body */}
       <line x1="12" y1="7.5" x2="12" y2="14" />
-      {/* Arms */}
       <line x1="12" y1="9.5" x2="8" y2="12" />
       <line x1="12" y1="9.5" x2="16" y2="12" />
-      {/* Legs */}
       <line x1="12" y1="14" x2="9" y2="19" />
       <line x1="12" y1="14" x2="15" y2="19" />
     </svg>
   );
 }
 
-export function AccessibilityButton() {
+type Language = string;
+
+export function AccessibilityButton({ language }: { language: Language }) {
   const [isOpen, setIsOpen] = useState(false);
+
   const [keyboardNav, setKeyboardNav] = useState(false);
   const [largerButtons, setLargerButtons] = useState(false);
   const [voiceControl, setVoiceControl] = useState(false);
   const [focusMode, setFocusMode] = useState(false);
   const [readingGuide, setReadingGuide] = useState(false);
 
-  // Dragging state
-  const [position, setPosition] = useState({ x: 24, y: 24 }); // top-left position
+  const text = {
+    english: {
+      aria: { open: "Accessibility options", close: "Close" },
+      header: "Accessibility",
+      keyboardNav: "Keyboard Navigation",
+      largerButtons: "Larger Buttons",
+      voiceControl: "Voice Control",
+      voiceControlDesc: "Control the app with voice commands",
+      cognitiveTitle: "Cognitive Accessibility",
+      focusMode: "Focus Mode",
+      focusModeDesc: "Reduce visual distractions",
+      readingGuide: "Reading Guide",
+      readingGuideDesc: "Guiding line for reading",
+    },
+    spanish: {
+      aria: { open: "Opciones de accesibilidad", close: "Cerrar" },
+      header: "Accesibilidad",
+      keyboardNav: "Navegación por Teclado",
+      largerButtons: "Botones Más Grandes",
+      voiceControl: "Control por Voz",
+      voiceControlDesc: "Controla la aplicación con comandos de voz",
+      cognitiveTitle: "Accesibilidad Cognitiva",
+      focusMode: "Modo Enfoque",
+      focusModeDesc: "Reduce las distracciones visuales",
+      readingGuide: "Guía de Lectura",
+      readingGuideDesc: "Línea guía para leer",
+    },
+    catalan: {
+      aria: { open: "Opcions d’accessibilitat", close: "Tancar" },
+      header: "Accessibilitat",
+      keyboardNav: "Navegació per Teclat",
+      largerButtons: "Botons Més Grans",
+      voiceControl: "Control per Veu",
+      voiceControlDesc: "Controla l'aplicació amb comandes de veu",
+      cognitiveTitle: "Accessibilitat Cognitiva",
+      focusMode: "Mode Focus",
+      focusModeDesc: "Redueix distraccions visuals",
+      readingGuide: "Guia de Lectura",
+      readingGuideDesc: "Línia guia per llegir",
+    },
+  };
+
+  const content = text[language as keyof typeof text] || text.english;
+
+  // ✅ Button size reduced
+  const BUTTON_SIZE = 64; // h-16 w-16
+  const MARGIN = 24;
+
+  // ✅ Position: init bottom-right on client
+  const [position, setPosition] = useState<{ x: number; y: number } | null>(
+    null
+  );
+
+  // ✅ Dragging state
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+
+  // ✅ Init bottom-right + update on resize
+  useEffect(() => {
+    const setBottomRight = () => {
+      setPosition({
+        x: window.innerWidth - BUTTON_SIZE - MARGIN,
+        y: window.innerHeight - BUTTON_SIZE - MARGIN,
+      });
+    };
+
+    setBottomRight();
+    window.addEventListener("resize", setBottomRight);
+    return () => window.removeEventListener("resize", setBottomRight);
+  }, []);
 
   // Reading guide mouse tracking
   useEffect(() => {
@@ -60,36 +127,41 @@ export function AccessibilityButton() {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, [readingGuide]);
 
-  // Dragging functionality
+  // ✅ Only start dragging if user clicked the BUTTON (not the popover)
   const handleMouseDown = (e: React.MouseEvent) => {
-    // Prevent dragging if clicking on the button itself (to allow opening popover)
-    if (
-      (e.target as HTMLElement).closest(
-        'button[aria-label="Accessibility options"]'
-      )
-    ) {
-      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-      setDragOffset({
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
-      });
-      setIsDragging(true);
-    }
+    const clickedButton = (e.target as HTMLElement).closest(
+      `button[aria-label="${content.aria.open}"]`
+    );
+    if (!clickedButton) return;
+
+    const wrapper = e.currentTarget as HTMLElement;
+    const rect = wrapper.getBoundingClientRect();
+
+    setDragOffset({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    });
+    setIsDragging(true);
   };
 
+  // ✅ Drag listeners
   useEffect(() => {
     if (!isDragging) return;
 
     const handleMouseMove = (e: MouseEvent) => {
+      const x = e.clientX - dragOffset.x;
+      const y = e.clientY - dragOffset.y;
+
+      const maxX = window.innerWidth - BUTTON_SIZE;
+      const maxY = window.innerHeight - BUTTON_SIZE;
+
       setPosition({
-        x: e.clientX - dragOffset.x,
-        y: e.clientY - dragOffset.y,
+        x: Math.max(0, Math.min(x, maxX)),
+        y: Math.max(0, Math.min(y, maxY)),
       });
     };
 
-    const handleMouseUp = () => {
-      setIsDragging(false);
-    };
+    const handleMouseUp = () => setIsDragging(false);
 
     document.addEventListener("mousemove", handleMouseMove);
     document.addEventListener("mouseup", handleMouseUp);
@@ -102,49 +174,30 @@ export function AccessibilityButton() {
 
   const toggleKeyboardNav = (checked: boolean) => {
     setKeyboardNav(checked);
-    if (checked) {
-      document.documentElement.classList.add("keyboard-nav");
-    } else {
-      document.documentElement.classList.remove("keyboard-nav");
-    }
+    document.documentElement.classList.toggle("keyboard-nav", checked);
   };
 
   const toggleLargerButtons = (checked: boolean) => {
     setLargerButtons(checked);
-    if (checked) {
-      document.documentElement.classList.add("larger-buttons");
-    } else {
-      document.documentElement.classList.remove("larger-buttons");
-    }
+    document.documentElement.classList.toggle("larger-buttons", checked);
   };
 
   const toggleVoiceControl = (checked: boolean) => {
     setVoiceControl(checked);
-    if (checked) {
-      document.documentElement.classList.add("voice-control");
-      // Voice control implementation would go here
-    } else {
-      document.documentElement.classList.remove("voice-control");
-    }
+    document.documentElement.classList.toggle("voice-control", checked);
   };
 
   const toggleFocusMode = (checked: boolean) => {
     setFocusMode(checked);
-    if (checked) {
-      document.documentElement.classList.add("focus-mode");
-    } else {
-      document.documentElement.classList.remove("focus-mode");
-    }
+    document.documentElement.classList.toggle("focus-mode", checked);
   };
 
   const toggleReadingGuide = (checked: boolean) => {
     setReadingGuide(checked);
-    if (checked) {
-      document.documentElement.classList.add("reading-guide");
-    } else {
-      document.documentElement.classList.remove("reading-guide");
-    }
+    document.documentElement.classList.toggle("reading-guide", checked);
   };
+
+  if (!position) return null;
 
   return (
     <div
@@ -159,8 +212,8 @@ export function AccessibilityButton() {
       <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
           <button
-            className="relative h-20 w-20 rounded-full shadow-2xl transition-all hover:scale-105 focus:outline-none focus:ring-4 focus:ring-white/30"
-            aria-label="Accessibility options"
+            className="relative h-16 w-16 rounded-full shadow-2xl transition-all hover:scale-105 focus:outline-none focus:ring-4 focus:ring-white/30"
+            aria-label={content.aria.open}
             style={{
               background: "rgba(168, 85, 145, 0.4)",
               backdropFilter: "blur(10px)",
@@ -176,40 +229,45 @@ export function AccessibilityButton() {
                   "radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.15) 0%, transparent 60%)",
               }}
             />
-            <StickmanIcon className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-10 w-10 text-white" />
+            <StickmanIcon className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-8 w-8 text-white" />
           </button>
         </PopoverTrigger>
+
+        {/* ✅ Scrollable Popover */}
         <PopoverContent
-          className="w-96 bg-black/95 border-gray-800 text-white backdrop-blur-xl"
+          className="w-96 bg-black/95 border-gray-800 text-white backdrop-blur-xl max-h-[calc(100vh-120px)] flex flex-col"
           side="top"
-          align="start"
+          align="end"
           sideOffset={16}
         >
-          <div className="space-y-4">
-            {/* Header */}
+          {/* Sticky header */}
+          <div className="sticky top-0 z-10 bg-black/95 pb-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <StickmanIcon className="h-5 w-5" />
-                <h4 className="font-semibold text-lg">Accessibilitat</h4>
+                <h4 className="font-semibold text-lg">{content.header}</h4>
               </div>
               <button
                 onClick={() => setIsOpen(false)}
                 className="rounded-full p-1 hover:bg-white/10 transition-colors"
-                aria-label="Close"
+                aria-label={content.aria.close}
+                type="button"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
-            <Separator className="bg-gray-800" />
+            <Separator className="bg-gray-800 mt-3" />
+          </div>
 
-            {/* Keyboard Navigation */}
+          {/* Scrollable body */}
+          <div className="flex-1 overflow-y-auto pr-1 space-y-4 pt-3">
             <div className="flex items-center justify-between p-3 rounded-lg bg-zinc-900/50">
               <Label
                 htmlFor="keyboard-nav"
                 className="cursor-pointer text-base font-normal"
               >
-                Navegació per Teclat
+                {content.keyboardNav}
               </Label>
               <Switch
                 id="keyboard-nav"
@@ -218,13 +276,12 @@ export function AccessibilityButton() {
               />
             </div>
 
-            {/* Larger Buttons */}
             <div className="flex items-center justify-between p-3 rounded-lg bg-zinc-900/50">
               <Label
                 htmlFor="larger-buttons"
                 className="cursor-pointer text-base font-normal"
               >
-                Botons Més Grans
+                {content.largerButtons}
               </Label>
               <Switch
                 id="larger-buttons"
@@ -233,42 +290,41 @@ export function AccessibilityButton() {
               />
             </div>
 
-            {/* Voice Control */}
             <div className="space-y-2 p-3 rounded-lg bg-zinc-900/50">
               <div className="flex items-center justify-between">
                 <Label
                   htmlFor="voice-control"
                   className="cursor-pointer text-base font-normal"
                 >
-                  Control per Veu
+                  {content.voiceControl}
                 </Label>
-                <span className="text-xs px-2 py-1 rounded bg-gray-700 text-gray-300">
-                  Experimental
-                </span>
+                <Switch
+                  id="voice-control"
+                  checked={voiceControl}
+                  onCheckedChange={toggleVoiceControl}
+                />
               </div>
               <p className="text-sm text-gray-400">
-                Controla l'aplicació amb comandes de veu
+                {content.voiceControlDesc}
               </p>
             </div>
 
             <Separator className="bg-gray-800" />
 
-            {/* Cognitive Accessibility Section */}
             <div className="flex items-center gap-2">
               <Circle className="h-5 w-5" />
               <h5 className="font-semibold text-base">
-                Accessibilitat Cognitiva
+                {content.cognitiveTitle}
               </h5>
             </div>
 
-            {/* Focus Mode */}
             <div className="space-y-2 p-3 rounded-lg bg-zinc-900/50">
               <div className="flex items-center justify-between">
                 <Label
                   htmlFor="focus-mode"
                   className="cursor-pointer text-base font-normal"
                 >
-                  Mode Focus
+                  {content.focusMode}
                 </Label>
                 <Switch
                   id="focus-mode"
@@ -276,19 +332,16 @@ export function AccessibilityButton() {
                   onCheckedChange={toggleFocusMode}
                 />
               </div>
-              <p className="text-sm text-gray-400">
-                Redueix distraccions visuals
-              </p>
+              <p className="text-sm text-gray-400">{content.focusModeDesc}</p>
             </div>
 
-            {/* Reading Guide */}
             <div className="space-y-2 p-3 rounded-lg bg-zinc-900/50">
               <div className="flex items-center justify-between">
                 <Label
                   htmlFor="reading-guide"
                   className="cursor-pointer text-base font-normal"
                 >
-                  Guia de Lectura
+                  {content.readingGuide}
                 </Label>
                 <Switch
                   id="reading-guide"
@@ -296,7 +349,9 @@ export function AccessibilityButton() {
                   onCheckedChange={toggleReadingGuide}
                 />
               </div>
-              <p className="text-sm text-gray-400">Línia guia per llegir</p>
+              <p className="text-sm text-gray-400">
+                {content.readingGuideDesc}
+              </p>
             </div>
           </div>
         </PopoverContent>

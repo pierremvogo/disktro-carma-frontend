@@ -10,6 +10,7 @@ import Select from "react-select";
 import countryList from "react-select-country-list";
 import CustomSuccess from "@/@disktro/CustomSuccess";
 import CustomAlert from "@/@disktro/CustomAlert";
+import { AccessibilityButton } from "./accessibilityButton/AccessibilityButton";
 
 // Icon components
 const User = ({ size = 24, className = "" }) => (
@@ -495,6 +496,8 @@ export function FanProfileSetup({
         backgroundPosition: "center",
       }}
     >
+      {/* ✅ Bouton d’accessibilité : monté au plus haut niveau */}
+      <AccessibilityButton language={language} />
       {/* Overlay (même que Login) */}
       <div className="absolute inset-0 bg-black/50" />
 
