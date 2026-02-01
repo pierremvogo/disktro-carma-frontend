@@ -1258,16 +1258,27 @@ export function FanStreaming({ language }: FanStreamingProps) {
   };
 
   const handleNextFromQueue1 = () => {
-    const index = queue.findIndex((t) => t.id === currentSong.id);
-    const next = queue[index - 1];
-    if (next) setCurrentSong(next);
+    setQueueIndex((prevIndex) => {
+      const nextIndex = prevIndex + 1;
+      if (nextIndex < queue.length) {
+        setCurrentSong(queue[nextIndex]);
+        return nextIndex;
+      }
+      return prevIndex; // fin de queue
+    });
   };
 
   const handlePrevFromQueue1 = () => {
-    const index = queue.findIndex((t) => t.id === currentSong.id);
-    const prev = queue[index + 1];
-    if (prev) setCurrentSong(prev);
+    setQueueIndex((prevIndex) => {
+      const prev = prevIndex - 1;
+      if (prev >= 0) {
+        setCurrentSong(queue[prev]);
+        return prev;
+      }
+      return prevIndex;
+    });
   };
+
   const handlePlaySong = (song: any, list?: any[]) => {
     const userId = localStorage.getItem(ModuleObject.localState.USER_ID);
     const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
@@ -1280,11 +1291,15 @@ export function FanStreaming({ language }: FanStreamingProps) {
     // ✅ Mettre à jour la queue
     if (list && Array.isArray(list) && list.length > 0) {
       const idx = list.findIndex((t) => t.id === trackId);
+      const safeIndex = idx >= 0 ? idx : 0;
+
       setQueue(list);
-      setQueueIndex(idx >= 0 ? idx : 0);
+      setQueueIndex(safeIndex);
+      setCurrentSong(list[safeIndex]); // ✅ CRUCIAL
     } else {
       setQueue([song]);
       setQueueIndex(0);
+      setCurrentSong(song); // ✅
     }
 
     // ✅ Toggle pause si on reclique sur le même track
