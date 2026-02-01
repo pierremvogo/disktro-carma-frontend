@@ -1,6 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import React from "react";
+import { AccessibilityButton } from "./accessibilityButton/AccessibilityButton";
 
 // Icon components
 const Music = ({ size = 24, className = "" }) => (
@@ -168,6 +169,8 @@ export function ArtistChoice({
         backgroundPosition: "center",
       }}
     >
+      {/* ✅ Bouton d’accessibilité : monté au plus haut niveau */}
+      <AccessibilityButton language={language} />
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/60" />
 
