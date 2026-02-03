@@ -176,13 +176,13 @@ export function ArtistChoice({
       <AccessibilityButton language={language} />
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/60" />
-
-      {/* Content */}
-      <div className="relative w-full h-full overflow-y-auto flex justify-center p-4 sm:p-6">
+      {/* TOP BAR */}
+      <div className="absolute top-2 left-2 right-2 z-20 flex items-center justify-between px-2 sm:px-4">
+        {/* Back */}
         <button
           onClick={() => router.push("/home")}
           type="button"
-          className="absolute cursor-pointer top-2 left-2 flex items-center gap-2  text-white drop-shadow-2xl font-semibold"
+          className="flex items-center gap-2 text-white drop-shadow-2xl font-semibold hover:opacity-80 transition"
         >
           <svg
             width="20"
@@ -198,6 +198,20 @@ export function ArtistChoice({
           </svg>
           {content.back}
         </button>
+
+        {/* Logout */}
+        <button
+          onClick={onLogout}
+          className="flex items-center gap-2 px-4 py-2 bg-red-500/40 backdrop-blur-md border border-red-300/60 rounded-xl text-white text-sm sm:text-base hover:bg-red-500/60 hover:border-white/70 transition-all shadow-lg"
+          title={content.logout}
+        >
+          <LogOut size={18} />
+          <span className="drop-shadow">{content.logout}</span>
+        </button>
+      </div>
+
+      {/* Content */}
+      <div className="relative w-full h-full overflow-y-auto flex justify-center p-4 sm:p-6">
         <div className="w-full max-w-5xl flex flex-col gap-6 sm:gap-8">
           {/* Header */}
           <header className="flex flex-col items-center gap-4 text-center mb-4 sm:mb-8">
@@ -211,16 +225,6 @@ export function ArtistChoice({
               <h1 className="text-3xl sm:text-4xl md:text-5xl text-white drop-shadow-2xl font-semibold">
                 {content.title}
               </h1>
-              {onLogout && (
-                <button
-                  onClick={onLogout}
-                  className="flex items-center gap-2 px-4 py-2 bg-red-500/40 backdrop-blur-md border border-red-300/60 rounded-xl text-white text-sm sm:text-base hover:bg-red-500/60 hover:border-white/70 transition-all shadow-lg"
-                  title={content.logout}
-                >
-                  <LogOut size={18} />
-                  <span className="drop-shadow">{content.logout}</span>
-                </button>
-              )}
             </div>
 
             {/* Subtitle */}
