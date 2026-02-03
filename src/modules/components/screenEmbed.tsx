@@ -11,6 +11,7 @@ import { Login } from "./Login";
 import { ArtistChoice } from "./ArtistChoice";
 import { AccessibilityButton } from "./accessibilityButton/AccessibilityButton";
 import { UserModuleObject as UserModule } from "../module";
+import { getUserRole } from "@/@disktro/utils";
 
 type Language = "english" | "spanish" | "catalan";
 const LANGUAGE_STORAGE_KEY = "disktro_language";
@@ -500,7 +501,7 @@ export function ScreenEmbed() {
               <button
                 onClick={() => {
                   // ✅ si connecté, on va au bon "dashboard"
-                  if (isArtist) {
+                  if (getUserRole() == "artist") {
                     setShowArtistChoice(true); // ou direct setShowArtistDashboard(true) selon ton flow
                   } else {
                     setShowFanStreaming(true);
