@@ -1292,6 +1292,7 @@ export function FanStreaming({ language }: FanStreamingProps) {
     if (list && Array.isArray(list) && list.length > 0) {
       const idx = list.findIndex((t) => t.id === trackId);
       const safeIndex = idx >= 0 ? idx : 0;
+
       setQueue(list);
       setQueueIndex(safeIndex);
       setCurrentSong(list[safeIndex]); // ✅ CRUCIAL
@@ -1500,6 +1501,7 @@ export function FanStreaming({ language }: FanStreamingProps) {
       clear: "Borrar",
       paymentSoon: "Suscripción disponible próximamente",
     },
+
     english: {
       paymentSoon: "Subscription coming soon",
       subscription: {
@@ -1570,7 +1572,7 @@ export function FanStreaming({ language }: FanStreamingProps) {
       },
       noAlbumUploadedYet: "No album uploaded yet.",
 
-      title: "Music For Everybody",
+      title: "Bokk Music For Everybody",
       discover: "Discover",
       myMusic: "My Music",
       artists: "Artists",
@@ -2690,7 +2692,7 @@ Underneath the shining star`,
             </div>
 
             {/* Search desktop (right) */}
-            <div className="hidden md:block w-[260px]">
+            <div className="hidden md:block max-w-[420px] w-full">
               <div className="relative">
                 <Search
                   size={16}
@@ -2747,7 +2749,11 @@ Underneath the shining star`,
       </div>
 
       {/* Main Content */}
-      <div className="absolute pb-25 pt-10 sm:top-[90px] top-[100px] mt-5 left-0 right-0 bottom-32 overflow-y-auto px-6">
+      <div
+        className={`absolute pt-10 sm:top-[90px] top-[100px] mt-5 left-0 right-0 overflow-y-auto px-6 ${
+          currentSong ? "bottom-28" : "bottom-20"
+        }`}
+      >
         {/* Discover Tab */}
         {selectedTab === "discover" && (
           <div className="space-y-8 max-w-6xl mx-auto">
