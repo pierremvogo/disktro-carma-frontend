@@ -1292,7 +1292,6 @@ export function FanStreaming({ language }: FanStreamingProps) {
     if (list && Array.isArray(list) && list.length > 0) {
       const idx = list.findIndex((t) => t.id === trackId);
       const safeIndex = idx >= 0 ? idx : 0;
-
       setQueue(list);
       setQueueIndex(safeIndex);
       setCurrentSong(list[safeIndex]); // ✅ CRUCIAL
