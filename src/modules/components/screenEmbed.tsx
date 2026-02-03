@@ -10,11 +10,13 @@ import { ArtistProfileSetup } from "./ArtistProfileSetup";
 import { Login } from "./Login";
 import { ArtistChoice } from "./ArtistChoice";
 import { AccessibilityButton } from "./accessibilityButton/AccessibilityButton";
+import { UserModuleObject as UserModule } from "../module";
 
 type Language = "english" | "spanish" | "catalan";
 const LANGUAGE_STORAGE_KEY = "disktro_language";
 
 export function ScreenEmbed() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [language, setLanguage] = useState<Language>("english");
   const [showQuestionnaire, setShowQuestionnaire] = useState(false);
   const [showUserType, setShowUserType] = useState(false);
@@ -37,6 +39,10 @@ export function ScreenEmbed() {
   // ✅ NEW: index actif + refs vidéos
   const [activeMediaIndex, setActiveMediaIndex] = useState(0);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+  const ACCESS_TOKEN_KEY = UserModule.localState.ACCESS_TOKEN;
+  const USER_ID_KEY = UserModule.localState.USER_ID;
+  const USER_DATA_KEY = UserModule.localState.USER_DATA;
+  const USER_ROLE_KEY = UserModule.localState.USER_ROLE;
 
   // Charger la langue depuis localStorage au montage
   useEffect(() => {
@@ -45,6 +51,80 @@ export function ScreenEmbed() {
     if (saved === "english" || saved === "spanish" || saved === "catalan") {
       setLanguage(saved);
     }
+  }, []);
+
+  function decodeJwt(
+    token: string
+  ): { exp?: number; [key: string]: any } | null {
+    try {
+      const [, payloadBase64] = token.split(".");
+      if (!payloadBase64) return null;
+
+      const payloadJson = atob(
+        payloadBase64.replace(/-/g, "+").replace(/_/g, "/")
+      );
+      return JSON.parse(payloadJson);
+    } catch (e) {
+      console.error("Failed to decode JWT", e);
+      return null;
+    }
+  }
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const cleanupAndRedirect = () => {
+      localStorage.removeItem(ACCESS_TOKEN_KEY);
+      localStorage.removeItem(USER_ID_KEY);
+      localStorage.removeItem(USER_DATA_KEY);
+      localStorage.removeItem(USER_ROLE_KEY);
+    };
+
+    const checkAuth = async () => {
+      try {
+        const token = localStorage.getItem(ACCESS_TOKEN_KEY);
+        const userId = localStorage.getItem(USER_ID_KEY);
+
+        // 1️⃣ Vérifie que le token et l'ID utilisateur existent
+        if (!token || !userId) {
+          cleanupAndRedirect();
+          return;
+        }
+
+        // 2️⃣ Vérifie la date d'expiration du token (si JWT)
+        const payload = decodeJwt(token);
+        if (payload?.exp) {
+          const nowInSeconds = Math.floor(Date.now() / 1000);
+          if (payload.exp < nowInSeconds) {
+            console.warn("Token expiré");
+            cleanupAndRedirect();
+            return;
+          }
+        }
+
+        // 3️⃣ Vérifie en base que l'utilisateur existe encore
+        //    et que le token est toujours valide côté backend
+        const res = await UserModule.service.getUser(userId);
+
+        if (!res?.data) {
+          console.warn("Utilisateur introuvable");
+          cleanupAndRedirect();
+          return;
+        }
+
+        // Tu peux éventuellement resynchroniser le USER_DATA
+        localStorage.setItem(USER_DATA_KEY, JSON.stringify(res.data));
+        localStorage.setItem(USER_ROLE_KEY, JSON.stringify(res.data.type));
+
+        // Tous les checks sont OK
+        setIsLoggedIn(true);
+      } catch (error) {
+        console.error("Erreur lors de la vérification d'auth", error);
+        cleanupAndRedirect();
+      }
+    };
+
+    checkAuth();
   }, []);
 
   // Changer la langue + la persister
@@ -394,27 +474,57 @@ export function ScreenEmbed() {
               {signUpText[language as keyof typeof signUpText]}
             </button>
 
-            <button
-              onClick={() => setShowLogin(true)}
-              className="flex cursor-pointer items-center gap-2 px-3 sm:px-4 py-2 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-white text-sm sm:text-base drop-shadow hover:bg-white/30 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
-              aria-label={loginText[language as keyof typeof loginText]}
-            >
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+            {!isLoggedIn ? (
+              <button
+                onClick={() => setShowLogin(true)}
+                className="flex cursor-pointer items-center gap-2 px-3 sm:px-4 py-2 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-white text-sm sm:text-base drop-shadow hover:bg-white/30 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
+                aria-label={loginText[language as keyof typeof loginText]}
               >
-                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
-                <polyline points="10 17 15 12 10 7" />
-                <line x1="15" y1="12" x2="3" y2="12" />
-              </svg>
-              {loginText[language as keyof typeof loginText]}
-            </button>
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                  <polyline points="10 17 15 12 10 7" />
+                  <line x1="15" y1="12" x2="3" y2="12" />
+                </svg>
+                {loginText[language as keyof typeof loginText]}
+              </button>
+            ) : (
+              <button
+                onClick={() => {
+                  // ✅ si connecté, on va au bon "dashboard"
+                  if (isArtist) {
+                    setShowArtistChoice(true); // ou direct setShowArtistDashboard(true) selon ton flow
+                  } else {
+                    setShowFanStreaming(true);
+                  }
+                }}
+                className="flex cursor-pointer items-center gap-2 px-3 sm:px-4 py-2 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-white text-sm sm:text-base drop-shadow hover:bg-white/30 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
+                aria-label="Dashboard"
+              >
+                {/* icône */}
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M3 13h8V3H3v10zM13 21h8V11h-8v10zM13 3h8v6h-8V3zM3 17h8v4H3v-4z" />
+                </svg>
+                Dashboard
+              </button>
+            )}
           </div>
         </div>
 

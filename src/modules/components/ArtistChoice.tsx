@@ -134,6 +134,7 @@ export function ArtistChoice({
       fanDescription: "Descubre y escucha música como fan",
       choose: "Elegir",
       logout: "Cerrar sesión",
+      back: "Volver",
     },
     english: {
       title: "Welcome!",
@@ -144,9 +145,11 @@ export function ArtistChoice({
       fanDescription: "Discover and listen to music as a fan",
       choose: "Choose",
       logout: "Log out",
+      back: "Back",
     },
     catalan: {
       title: "Benvingut!",
+      back: "Tornar",
       subtitle: "Com a artista, tens accés a ambdues plataformes",
       artistDashboard: "Dashboard d'Artista",
       artistDescription: "Gestiona la teva música, streams, regalies i més",
@@ -176,6 +179,25 @@ export function ArtistChoice({
 
       {/* Content */}
       <div className="relative w-full h-full overflow-y-auto flex justify-center p-4 sm:p-6">
+        <button
+          onClick={() => router.push("/home")}
+          type="button"
+          className="absolute cursor-pointer top-2 left-2 flex items-center gap-2  text-white drop-shadow-2xl font-semibold"
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M19 12H5M12 19l-7-7 7-7" />
+          </svg>
+          {content.back}
+        </button>
         <div className="w-full max-w-5xl flex flex-col gap-6 sm:gap-8">
           {/* Header */}
           <header className="flex flex-col items-center gap-4 text-center mb-4 sm:mb-8">
