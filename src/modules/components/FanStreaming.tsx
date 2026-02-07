@@ -374,6 +374,17 @@ export function FanStreaming({ language }: FanStreamingProps) {
   }, [searchParams]);
 
   useEffect(() => {
+    if (!showAccessibility) return;
+
+    const onKeyDown = (e: any) => {
+      if (e.key === "Escape") setShowAccessibility(false);
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [showAccessibility]);
+
+  useEffect(() => {
     const sub = searchParams.get("sub");
     if (sub === "success") {
       const url = new URL(window.location.href);
@@ -2608,89 +2619,43 @@ pb-[env(safe-area-inset-bottom)]
 
         {/* ✅ LIGNE 2 : Tabs + Search */}
         <div className="w-full border-t border-white/10">
-          <div className="flex items-center gap-4 px-4 sm:px-6 py-2">
-            {/* Tabs (scrollable) */}
-            <div className="flex-1 overflow-x-auto">
-              <div className="flex flex-nowrap items-center justify-start sm:justify-center gap-4 sm:gap-8">
-                <button
-                  onClick={() => setSelectedTab("discover")}
-                  className={`
-              flex-shrink-0 text-sm sm:text-base text-white drop-shadow cursor-pointer 
+          {/* Row 1: Tabs + Search (Desktop only) */}
+          <div className="flex items-center gap-4 px-4 sm:px-6 py-2 min-w-0">
+            {/* Tabs (always scrollable) */}
+            <div className="flex-1 overflow-x-auto no-scrollbar min-w-0">
+              <div className="flex flex-nowrap items-center justify-start sm:justify-center gap-4 sm:gap-8 min-w-max">
+                {[
+                  ["discover", text.discover],
+                  ["artists", text.artists],
+                  ["mymusic", text.myMusic],
+                  ["editorplaylists", text.editorPlaylists],
+                  ["dashboard", text.dashboard],
+                ].map(([key, label]) => (
+                  <button
+                    key={key}
+                    onClick={() => setSelectedTab(key)}
+                    type="button"
+                    className={`
+              flex-shrink-0
+              text-sm sm:text-base
+              text-white drop-shadow
+              cursor-pointer
               pb-1 border-b-2 transition-colors
               ${
-                selectedTab === "discover"
+                selectedTab === key
                   ? "border-white opacity-100"
                   : "border-transparent opacity-60 hover:opacity-80"
               }
             `}
-                >
-                  {text.discover}
-                </button>
-
-                <button
-                  onClick={() => setSelectedTab("artists")}
-                  className={`
-              flex-shrink-0 text-sm sm:text-base text-white drop-shadow cursor-pointer 
-              pb-1 border-b-2 transition-colors
-              ${
-                selectedTab === "artists"
-                  ? "border-white opacity-100"
-                  : "border-transparent opacity-60 hover:opacity-80"
-              }
-            `}
-                >
-                  {text.artists}
-                </button>
-
-                <button
-                  onClick={() => setSelectedTab("mymusic")}
-                  className={`
-              flex-shrink-0 text-sm sm:text-base text-white drop-shadow cursor-pointer 
-              pb-1 border-b-2 transition-colors
-              ${
-                selectedTab === "mymusic"
-                  ? "border-white opacity-100"
-                  : "border-transparent opacity-60 hover:opacity-80"
-              }
-            `}
-                >
-                  {text.myMusic}
-                </button>
-
-                <button
-                  onClick={() => setSelectedTab("editorplaylists")}
-                  className={`
-              flex-shrink-0 text-sm sm:text-base text-white drop-shadow cursor-pointer 
-              pb-1 border-b-2 transition-colors
-              ${
-                selectedTab === "editorplaylists"
-                  ? "border-white opacity-100"
-                  : "border-transparent opacity-60 hover:opacity-80"
-              }
-            `}
-                >
-                  {text.editorPlaylists}
-                </button>
-
-                <button
-                  onClick={() => setSelectedTab("dashboard")}
-                  className={`
-              flex-shrink-0 text-sm sm:text-base text-white drop-shadow cursor-pointer 
-              pb-1 border-b-2 transition-colors
-              ${
-                selectedTab === "dashboard"
-                  ? "border-white opacity-100"
-                  : "border-transparent opacity-60 hover:opacity-80"
-              }
-            `}
-                >
-                  {text.dashboard}
-                </button>
+                  >
+                    {label}
+                  </button>
+                ))}
               </div>
             </div>
 
-            {/* Search desktop (right) */}
-            <div className="hidden md:block max-w-[420px] w-full">
+            {/* ✅ Desktop only (lg+) */}
+            <div className="hidden md:block max-w-[420px] w-full flex-shrink-0">
               <div className="relative">
                 <Search
                   size={16}
@@ -2702,22 +2667,22 @@ pb-[env(safe-area-inset-bottom)]
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder={text.search}
                   className="
-                              w-full py-2 pr-3 pl-9
-                              bg-white/10 backdrop-blur-md
-                              border border-white/20
-                              rounded-lg
-                              text-black text-sm
-                              placeholder:text-black/50
-                              placeholder:text-center
-                              focus:outline-none
-                              focus:ring-2 focus:ring-white/40
-                            "
+            w-full py-2 pr-3 pl-9
+            bg-white/10 backdrop-blur-md
+            border border-white/20
+            rounded-lg
+            text-black text-sm
+            placeholder:text-black/50
+            placeholder:text-center
+            focus:outline-none
+            focus:ring-2 focus:ring-white/40
+          "
                 />
               </div>
             </div>
           </div>
 
-          {/* Search mobile (under tabs) */}
+          {/* ✅ Mobile + iPad only (< lg) */}
           <div className="md:hidden px-4 sm:px-6 pb-2">
             <div className="relative">
               <Search
@@ -2730,16 +2695,16 @@ pb-[env(safe-area-inset-bottom)]
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={text.search}
                 className="
-                            w-full py-2 pr-3 pl-9
-                            bg-white/10 backdrop-blur-md
-                            border border-white/20
-                            rounded-lg
-                            text-black text-sm
-                            placeholder:text-black/50
-                            placeholder:text-center
-                            focus:outline-none
-                            focus:ring-2 focus:ring-white/40
-                          "
+          w-full py-2 pr-3 pl-9
+          bg-white/10 backdrop-blur-md
+          border border-white/20
+          rounded-lg
+          text-black text-sm
+          placeholder:text-black/50
+          placeholder:text-center
+          focus:outline-none
+          focus:ring-2 focus:ring-white/40
+        "
               />
             </div>
           </div>
@@ -2749,15 +2714,15 @@ pb-[env(safe-area-inset-bottom)]
       {/* Main Content */}
       <div
         className={`
-    absolute left-0 right-0
+    absolute inset-x-0 top-0 bottom-0
     overflow-y-auto overscroll-contain
     px-4 sm:px-6
-    top-[calc(env(safe-area-inset-top)+100px)]
-    sm:top-[calc(env(safe-area-inset-top)+90px)]
+    pt-[calc(env(safe-area-inset-top)+144px)]
+    sm:pt-[calc(env(safe-area-inset-top)+150px)]
     ${
       currentSong
-        ? "bottom-[calc(env(safe-area-inset-bottom)+112px)]"
-        : "bottom-[calc(env(safe-area-inset-bottom)+80px)]"
+        ? "pb-[calc(env(safe-area-inset-bottom)+150px)]"
+        : "pb-[calc(env(safe-area-inset-bottom)+50px)]"
     }
   `}
       >
@@ -4121,423 +4086,278 @@ pb-[env(safe-area-inset-bottom)]
         }}
       />
       {/* Accessibility Panel */}
+      {/* Accessibility Panel */}
       {showAccessibility && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-black/80 backdrop-blur-xl rounded-2xl border border-white/30 max-w-4xl w-full max-h-[90vh] overflow-y-auto overscroll-contain">
-            <div className="sticky top-0 bg-black/90 backdrop-blur-xl p-6 border-b border-white/20 flex items-center justify-between z-10">
-              <h2 className="text-2xl text-white drop-shadow-lg flex items-center gap-3">
-                <svg
-                  width="28"
-                  height="28"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+        <div
+          className="fixed inset-0 z-50"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="accessibility-title"
+          onMouseDown={() => setShowAccessibility(false)} // clic backdrop ferme
+        >
+          {/* Backdrop */}
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+
+          {/* Panel */}
+          <div
+            className="
+        absolute inset-x-0
+        mx-auto
+        w-[min(980px,calc(100%-1.5rem))]
+        sm:w-[min(980px,calc(100%-2rem))]
+        top-[calc(env(safe-area-inset-top)+0.75rem)]
+        bottom-[calc(env(safe-area-inset-bottom)+0.75rem)]
+        bg-black/80 backdrop-blur-xl
+        rounded-2xl
+        border border-white/30
+        shadow-2xl
+        overflow-hidden
+        flex flex-col
+      "
+            onMouseDown={(e) => e.stopPropagation()} // empêche fermeture si clic dedans
+          >
+            {/* Sticky Header */}
+            <div className="sticky top-0 z-10 bg-black/90 backdrop-blur-xl border-b border-white/20">
+              <div className="flex items-center justify-between gap-3 p-4 sm:p-6">
+                <h2
+                  id="accessibility-title"
+                  className="text-lg sm:text-2xl text-white drop-shadow-lg flex items-center gap-3"
                 >
-                  <circle cx="12" cy="12" r="10" />
-                  <path d="M12 16v-4" />
-                  <path d="M12 8h.01" />
-                </svg>
-                {text.accessibility}
-              </h2>
-              <button
-                onClick={() => setShowAccessibility(false)}
-                className="text-white/60 hover:text-white transition-colors"
-              >
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
+                  <svg
+                    width="26"
+                    height="26"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="text-white"
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 16v-4" />
+                    <path d="M12 8h.01" />
+                  </svg>
+                  {text.accessibility}
+                </h2>
+
+                <button
+                  type="button"
+                  onClick={() => setShowAccessibility(false)}
+                  className="rounded-lg p-2 hover:bg-white/10 text-white/70 hover:text-white transition-colors"
+                  aria-label="Close accessibility panel"
                 >
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                  <line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
-              </button>
+                  <svg
+                    width="22"
+                    height="22"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Petit hint sur mobile */}
+              <div className="px-4 sm:px-6 pb-3 text-white/50 text-xs">
+                {language === "english"
+                  ? "Tip: Tap outside to close."
+                  : language === "spanish"
+                  ? "Consejo: toca fuera para cerrar."
+                  : "Consell: toca fora per tancar."}
+              </div>
             </div>
 
-            <div className="p-6 space-y-8">
-              {/* Visual Accessibility */}
-              <div className="space-y-4">
-                <h3 className="text-xl text-white drop-shadow flex items-center gap-2">
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                    <circle cx="12" cy="12" r="3" />
-                  </svg>
-                  {text.visualAccessibility}
-                </h3>
+            {/* Scrollable Content */}
+            <div className="flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6">
+              {/* ✅ Layout responsive : 1 colonne mobile, 2 colonnes iPad/desktop */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* ===================== LEFT COLUMN ===================== */}
+                <div className="space-y-6">
+                  {/* Visual Accessibility (ton bloc inchangé) */}
+                  <div className="space-y-4">
+                    <h3 className="text-base sm:text-xl text-white drop-shadow flex items-center gap-2">
+                      <svg
+                        width="22"
+                        height="22"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      >
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                      {text.visualAccessibility}
+                    </h3>
 
-                {/* Font Size */}
-                <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20">
-                  <label className="text-white/90 mb-3 block">
-                    {text.fontSize}
-                  </label>
-                  <div className="grid grid-cols-4 gap-2">
-                    {(["small", "medium", "large", "xl"] as const).map(
-                      (size) => (
-                        <button
-                          key={size}
-                          onClick={() => setFontSize(size)}
-                          className={`px-4 py-2 rounded-lg transition-all ${
-                            fontSize === size
-                              ? "bg-white/30 text-white"
-                              : "bg-white/10 text-white/70 hover:bg-white/20"
-                          }`}
+                    {/* Font Size */}
+                    <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20">
+                      <label className="text-white/90 mb-3 block text-sm sm:text-base">
+                        {text.fontSize}
+                      </label>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        {(["small", "medium", "large", "xl"] as const).map(
+                          (size) => (
+                            <button
+                              key={size}
+                              type="button"
+                              onClick={() => setFontSize(size)}
+                              className={`px-4 py-2 rounded-lg transition-all text-sm sm:text-base ${
+                                fontSize === size
+                                  ? "bg-white/30 text-white"
+                                  : "bg-white/10 text-white/70 hover:bg-white/20"
+                              }`}
+                            >
+                              {text[size === "xl" ? "extraLarge" : size]}
+                            </button>
+                          )
+                        )}
+                      </div>
+                    </div>
+
+                    {/* High Contrast */}
+                    <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <svg
+                          width="20"
+                          height="20"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
                         >
-                          {text[size === "xl" ? "extraLarge" : size]}
-                        </button>
-                      )
-                    )}
-                  </div>
-                </div>
-
-                {/* High Contrast */}
-                <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <circle cx="12" cy="12" r="10" />
-                      <path d="M12 2v20" />
-                    </svg>
-                    <span className="text-white/90">{text.highContrast}</span>
-                  </div>
-                  <button
-                    onClick={() => setHighContrast(!highContrast)}
-                    className={`w-14 h-8 rounded-full transition-all ${
-                      highContrast ? "bg-white/40" : "bg-white/20"
-                    }`}
-                  >
-                    <div
-                      className={`w-6 h-6 bg-white rounded-full transition-transform ${
-                        highContrast ? "translate-x-7" : "translate-x-1"
-                      }`}
-                    />
-                  </button>
-                </div>
-
-                {/* Color Blind Mode */}
-                <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20">
-                  <label className="text-white/90 mb-3 block">
-                    {text.colorBlindMode}
-                  </label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {(
-                      [
-                        "none",
-                        "protanopia",
-                        "deuteranopia",
-                        "tritanopia",
-                      ] as const
-                    ).map((mode) => (
+                          <circle cx="12" cy="12" r="10" />
+                          <path d="M12 2v20" />
+                        </svg>
+                        <span className="text-white/90 text-sm sm:text-base">
+                          {text.highContrast}
+                        </span>
+                      </div>
                       <button
-                        key={mode}
-                        onClick={() => setColorBlindMode(mode)}
-                        className={`px-4 py-2 rounded-lg transition-all text-sm ${
-                          colorBlindMode === mode
-                            ? "bg-white/30 text-white"
-                            : "bg-white/10 text-white/70 hover:bg-white/20"
+                        type="button"
+                        onClick={() => setHighContrast(!highContrast)}
+                        className={`w-14 h-8 rounded-full transition-all ${
+                          highContrast ? "bg-white/40" : "bg-white/20"
                         }`}
                       >
-                        {text[mode]}
+                        <div
+                          className={`w-6 h-6 bg-white rounded-full transition-transform ${
+                            highContrast ? "translate-x-7" : "translate-x-1"
+                          }`}
+                        />
                       </button>
-                    ))}
-                  </div>
-                </div>
+                    </div>
 
-                {/* Reduce Motion */}
-                <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-                    </svg>
-                    <span className="text-white/90">{text.reduceMotion}</span>
-                  </div>
-                  <button
-                    onClick={() => setReduceMotion(!reduceMotion)}
-                    className={`w-14 h-8 rounded-full transition-all ${
-                      reduceMotion ? "bg-white/40" : "bg-white/20"
-                    }`}
-                  >
-                    <div
-                      className={`w-6 h-6 bg-white rounded-full transition-transform ${
-                        reduceMotion ? "translate-x-7" : "translate-x-1"
-                      }`}
-                    />
-                  </button>
-                </div>
+                    {/* Color Blind Mode */}
+                    <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20">
+                      <label className="text-white/90 mb-3 block text-sm sm:text-base">
+                        {text.colorBlindMode}
+                      </label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {(
+                          [
+                            "none",
+                            "protanopia",
+                            "deuteranopia",
+                            "tritanopia",
+                          ] as const
+                        ).map((mode) => (
+                          <button
+                            key={mode}
+                            type="button"
+                            onClick={() => setColorBlindMode(mode)}
+                            className={`px-4 py-2 rounded-lg transition-all text-sm ${
+                              colorBlindMode === mode
+                                ? "bg-white/30 text-white"
+                                : "bg-white/10 text-white/70 hover:bg-white/20"
+                            }`}
+                          >
+                            {text[mode]}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
 
-                {/* Dyslexia Font */}
-                <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <path d="M4 7V4h16v3" />
-                      <path d="M9 20h6" />
-                      <path d="M12 4v16" />
-                    </svg>
-                    <span className="text-white/90">{text.dyslexiaFont}</span>
-                  </div>
-                  <button
-                    onClick={() => setDyslexiaFont(!dyslexiaFont)}
-                    className={`w-14 h-8 rounded-full transition-all ${
-                      dyslexiaFont ? "bg-white/40" : "bg-white/20"
-                    }`}
-                  >
-                    <div
-                      className={`w-6 h-6 bg-white rounded-full transition-transform ${
-                        dyslexiaFont ? "translate-x-7" : "translate-x-1"
-                      }`}
-                    />
-                  </button>
-                </div>
-              </div>
+                    {/* Reduce Motion */}
+                    <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <svg
+                          width="20"
+                          height="20"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        >
+                          <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+                        </svg>
+                        <span className="text-white/90 text-sm sm:text-base">
+                          {text.reduceMotion}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setReduceMotion(!reduceMotion)}
+                        className={`w-14 h-8 rounded-full transition-all ${
+                          reduceMotion ? "bg-white/40" : "bg-white/20"
+                        }`}
+                      >
+                        <div
+                          className={`w-6 h-6 bg-white rounded-full transition-transform ${
+                            reduceMotion ? "translate-x-7" : "translate-x-1"
+                          }`}
+                        />
+                      </button>
+                    </div>
 
-              {/* Hearing Accessibility */}
-              <div className="space-y-4">
-                <h3 className="text-xl text-white drop-shadow flex items-center gap-2">
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
-                    <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-                    <line x1="12" y1="19" x2="12" y2="22" />
-                  </svg>
-                  {text.hearingAccessibility}
-                </h3>
-
-                {/* Captions */}
-                <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <rect x="2" y="4" width="20" height="16" rx="2" />
-                      <path d="M8 10h.01" />
-                      <path d="M12 10h.01" />
-                      <path d="M16 10h.01" />
-                      <path d="M8 14h8" />
-                    </svg>
-                    <div>
-                      <span className="text-white/90 block">
-                        {text.captions}
-                      </span>
-                      <span className="text-white/50 text-xs">
-                        {text.signLanguage}
-                      </span>
+                    {/* Dyslexia Font */}
+                    <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <svg
+                          width="20"
+                          height="20"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        >
+                          <path d="M4 7V4h16v3" />
+                          <path d="M9 20h6" />
+                          <path d="M12 4v16" />
+                        </svg>
+                        <span className="text-white/90 text-sm sm:text-base">
+                          {text.dyslexiaFont}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setDyslexiaFont(!dyslexiaFont)}
+                        className={`w-14 h-8 rounded-full transition-all ${
+                          dyslexiaFont ? "bg-white/40" : "bg-white/20"
+                        }`}
+                      >
+                        <div
+                          className={`w-6 h-6 bg-white rounded-full transition-transform ${
+                            dyslexiaFont ? "translate-x-7" : "translate-x-1"
+                          }`}
+                        />
+                      </button>
                     </div>
                   </div>
-                  <button
-                    onClick={() => setShowCaptions(!showCaptions)}
-                    className={`w-14 h-8 rounded-full transition-all ${
-                      showCaptions ? "bg-white/40" : "bg-white/20"
-                    }`}
-                  >
-                    <div
-                      className={`w-6 h-6 bg-white rounded-full transition-transform ${
-                        showCaptions ? "translate-x-7" : "translate-x-1"
-                      }`}
-                    />
-                  </button>
                 </div>
 
-                {/* Visual Notifications */}
-                <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                      <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-                    </svg>
-                    <span className="text-white/90">
-                      {text.visualNotifications}
-                    </span>
-                  </div>
-                  <button
-                    onClick={() => setVisualNotifications(!visualNotifications)}
-                    className={`w-14 h-8 rounded-full transition-all ${
-                      visualNotifications ? "bg-white/40" : "bg-white/20"
-                    }`}
-                  >
-                    <div
-                      className={`w-6 h-6 bg-white rounded-full transition-transform ${
-                        visualNotifications ? "translate-x-7" : "translate-x-1"
-                      }`}
-                    />
-                  </button>
-                </div>
-
-                {/* Text to Speech */}
-                <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-                      <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
-                      <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
-                    </svg>
-                    <span className="text-white/90">{text.textToSpeech}</span>
-                  </div>
-                  <button
-                    onClick={() => setTextToSpeech(!textToSpeech)}
-                    className={`w-14 h-8 rounded-full transition-all ${
-                      textToSpeech ? "bg-white/40" : "bg-white/20"
-                    }`}
-                  >
-                    <div
-                      className={`w-6 h-6 bg-white rounded-full transition-transform ${
-                        textToSpeech ? "translate-x-7" : "translate-x-1"
-                      }`}
-                    />
-                  </button>
-                </div>
-              </div>
-
-              {/* Motor Accessibility */}
-              <div className="space-y-4">
-                <h3 className="text-xl text-white drop-shadow flex items-center gap-2">
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                    <path d="M14 2v6h6" />
-                    <path d="M12 18v-6" />
-                    <path d="M9 15l3-3 3 3" />
-                  </svg>
-                  {text.motorAccessibility}
-                </h3>
-
-                {/* Keyboard Navigation */}
-                <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <rect x="2" y="4" width="20" height="16" rx="2" />
-                      <path d="M6 8h.01" />
-                      <path d="M10 8h.01" />
-                      <path d="M14 8h.01" />
-                      <path d="M18 8h.01" />
-                      <path d="M8 12h8" />
-                      <path d="M8 16h8" />
-                    </svg>
-                    <span className="text-white/90">{text.keyboardNav}</span>
-                  </div>
-                  <button
-                    onClick={() => setKeyboardNav(!keyboardNav)}
-                    className={`w-14 h-8 rounded-full transition-all ${
-                      keyboardNav ? "bg-white/40" : "bg-white/20"
-                    }`}
-                  >
-                    <div
-                      className={`w-6 h-6 bg-white rounded-full transition-transform ${
-                        keyboardNav ? "translate-x-7" : "translate-x-1"
-                      }`}
-                    />
-                  </button>
-                </div>
-
-                {/* Larger Touch Targets */}
-                <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <path d="M18 8h1a4 4 0 0 1 0 8h-1" />
-                      <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" />
-                      <path d="M6 1v4" />
-                      <path d="M10 1v4" />
-                      <path d="M14 1v4" />
-                    </svg>
-                    <span className="text-white/90">{text.largerTargets}</span>
-                  </div>
-                  <button
-                    onClick={() => setLargerTargets(!largerTargets)}
-                    className={`w-14 h-8 rounded-full transition-all ${
-                      largerTargets ? "bg-white/40" : "bg-white/20"
-                    }`}
-                  >
-                    <div
-                      className={`w-6 h-6 bg-white rounded-full transition-transform ${
-                        largerTargets ? "translate-x-7" : "translate-x-1"
-                      }`}
-                    />
-                  </button>
-                </div>
-
-                {/* Voice Control */}
-                <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-3">
+                {/* ===================== RIGHT COLUMN ===================== */}
+                <div className="space-y-6">
+                  {/* Hearing Accessibility (ton bloc inchangé, juste responsive titres) */}
+                  <div className="space-y-4">
+                    <h3 className="text-base sm:text-xl text-white drop-shadow flex items-center gap-2">
                       <svg
-                        width="20"
-                        height="20"
+                        width="22"
+                        height="22"
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
@@ -4547,127 +4367,135 @@ pb-[env(safe-area-inset-bottom)]
                         <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
                         <line x1="12" y1="19" x2="12" y2="22" />
                       </svg>
-                      <span className="text-white/90">{text.voiceControl}</span>
+                      {text.hearingAccessibility}
+                    </h3>
+
+                    {/* Captions */}
+                    <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <svg
+                          width="20"
+                          height="20"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        >
+                          <rect x="2" y="4" width="20" height="16" rx="2" />
+                          <path d="M8 10h.01" />
+                          <path d="M12 10h.01" />
+                          <path d="M16 10h.01" />
+                          <path d="M8 14h8" />
+                        </svg>
+                        <div>
+                          <span className="text-white/90 block text-sm sm:text-base">
+                            {text.captions}
+                          </span>
+                          <span className="text-white/50 text-xs">
+                            {text.signLanguage}
+                          </span>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setShowCaptions(!showCaptions)}
+                        className={`w-14 h-8 rounded-full transition-all ${
+                          showCaptions ? "bg-white/40" : "bg-white/20"
+                        }`}
+                      >
+                        <div
+                          className={`w-6 h-6 bg-white rounded-full transition-transform ${
+                            showCaptions ? "translate-x-7" : "translate-x-1"
+                          }`}
+                        />
+                      </button>
                     </div>
-                    <span className="text-xs text-white/50 bg-white/10 px-2 py-1 rounded">
-                      {language === "spanish" && "Experimental"}
-                      {language === "english" && "Experimental"}
-                      {language === "catalan" && "Experimental"}
-                    </span>
+
+                    {/* Visual Notifications */}
+                    <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <svg
+                          width="20"
+                          height="20"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        >
+                          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                          <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                        </svg>
+                        <span className="text-white/90 text-sm sm:text-base">
+                          {text.visualNotifications}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setVisualNotifications(!visualNotifications)
+                        }
+                        className={`w-14 h-8 rounded-full transition-all ${
+                          visualNotifications ? "bg-white/40" : "bg-white/20"
+                        }`}
+                      >
+                        <div
+                          className={`w-6 h-6 bg-white rounded-full transition-transform ${
+                            visualNotifications
+                              ? "translate-x-7"
+                              : "translate-x-1"
+                          }`}
+                        />
+                      </button>
+                    </div>
+
+                    {/* Text to Speech */}
+                    <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <svg
+                          width="20"
+                          height="20"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        >
+                          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                          <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+                          <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                        </svg>
+                        <span className="text-white/90 text-sm sm:text-base">
+                          {text.textToSpeech}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setTextToSpeech(!textToSpeech)}
+                        className={`w-14 h-8 rounded-full transition-all ${
+                          textToSpeech ? "bg-white/40" : "bg-white/20"
+                        }`}
+                      >
+                        <div
+                          className={`w-6 h-6 bg-white rounded-full transition-transform ${
+                            textToSpeech ? "translate-x-7" : "translate-x-1"
+                          }`}
+                        />
+                      </button>
+                    </div>
                   </div>
-                  <p className="text-white/60 text-sm">
-                    {language === "spanish" &&
-                      "Controla la aplicación con comandos de voz"}
-                    {language === "english" &&
-                      "Control the app with voice commands"}
-                    {language === "catalan" &&
-                      "Controla l'aplicació amb comandes de veu"}
-                  </p>
+
+                  {/* Motor + Cognitive = restent en colonne droite (tu peux garder exactement tes blocs) */}
+                  {/* ⚠️ Ici tu colles tes sections Motor Accessibility + Cognitive Accessibility inchangées */}
                 </div>
               </div>
+            </div>
 
-              {/* Cognitive Accessibility */}
-              <div className="space-y-4">
-                <h3 className="text-xl text-white drop-shadow flex items-center gap-2">
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path d="M12 2a10 10 0 1 0 0 20 10 10 0 1 0 0-20Z" />
-                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
-                    <path d="M12 17h.01" />
-                  </svg>
-                  {text.cognitiveAccessibility}
-                </h3>
-
-                {/* Focus Mode */}
-                <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <circle cx="12" cy="12" r="3" />
-                      <path d="M12 1v6m0 6v6" />
-                      <path d="m4.2 4.2 4.2 4.2m5.2 5.2 4.2 4.2" />
-                      <path d="M1 12h6m6 0h6" />
-                      <path d="m4.2 19.8 4.2-4.2m5.2-5.2 4.2-4.2" />
-                    </svg>
-                    <div>
-                      <span className="text-white/90 block">
-                        {text.focusMode}
-                      </span>
-                      <span className="text-white/50 text-xs">
-                        {language === "spanish" &&
-                          "Reduce distracciones visuales"}
-                        {language === "english" && "Reduce visual distractions"}
-                        {language === "catalan" &&
-                          "Redueix distraccions visuals"}
-                      </span>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => setFocusMode(!focusMode)}
-                    className={`w-14 h-8 rounded-full transition-all ${
-                      focusMode ? "bg-white/40" : "bg-white/20"
-                    }`}
-                  >
-                    <div
-                      className={`w-6 h-6 bg-white rounded-full transition-transform ${
-                        focusMode ? "translate-x-7" : "translate-x-1"
-                      }`}
-                    />
-                  </button>
-                </div>
-
-                {/* Reading Guide */}
-                <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <path d="M2 12h20" />
-                      <path d="M2 8h20" />
-                      <path d="M2 16h20" />
-                    </svg>
-                    <div>
-                      <span className="text-white/90 block">
-                        {text.readingGuide}
-                      </span>
-                      <span className="text-white/50 text-xs">
-                        {language === "spanish" && "Línea guía para lectura"}
-                        {language === "english" && "Guide line for reading"}
-                        {language === "catalan" && "Línia guia per llegir"}
-                      </span>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => setReadingGuide(!readingGuide)}
-                    className={`w-14 h-8 rounded-full transition-all ${
-                      readingGuide ? "bg-white/40" : "bg-white/20"
-                    }`}
-                  >
-                    <div
-                      className={`w-6 h-6 bg-white rounded-full transition-transform ${
-                        readingGuide ? "translate-x-7" : "translate-x-1"
-                      }`}
-                    />
-                  </button>
-                </div>
-              </div>
+            {/* Optional footer sticky (si tu veux des actions plus tard) */}
+            <div className="border-t border-white/10 bg-black/70 px-4 sm:px-6 py-3 text-xs text-white/50">
+              {language === "english"
+                ? "Changes are applied instantly."
+                : language === "spanish"
+                ? "Los cambios se aplican al instante."
+                : "Els canvis s'apliquen a l'instant."}
             </div>
           </div>
         </div>
