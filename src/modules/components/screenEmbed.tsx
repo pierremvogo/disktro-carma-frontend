@@ -359,7 +359,14 @@ export function ScreenEmbed() {
   // 🧩 EMBEDDED SCREEN
   return (
     <div
-      className="fixed inset-0 w-screen h-screen bg-cover bg-center"
+      className="
+        relative w-full
+        min-h-[100svh] md:min-h-screen
+        overflow-hidden
+        bg-gradient-to-br from-[#5A0B4D] via-[#4A1456] to-[#2D0E3E]
+        text-white
+        bg-cover bg-center
+      "
       style={{
         backgroundImage:
           'url("/image/4ac3eed398bb68113a14d0fa5efe7a6def6f7651.png")',
@@ -369,13 +376,22 @@ export function ScreenEmbed() {
     >
       {/* ✅ Bouton d’accessibilité : monté au plus haut niveau */}
       <AccessibilityButton language={language} />
+
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/50" />
 
-      {/* WRAPPER PRINCIPAL */}
-      <div className="relative z-10 flex flex-col h-full w-full">
+      {/* ✅ WRAPPER PRINCIPAL (safe-area + hauteur stable iOS) */}
+      <div
+        className="
+          relative z-10 flex flex-col w-full
+          min-h-[100svh] md:min-h-screen
+          pt-[env(safe-area-inset-top)]
+          pb-[env(safe-area-inset-bottom)]
+          overflow-hidden
+        "
+      >
         {/* Language Options and Controls */}
-        <div className="flex flex-col items-center gap-3 w-full pt-4">
+        <div className="flex flex-col items-center gap-3 w-full pt-4 px-3">
           <nav
             aria-label={
               language === "spanish"
@@ -399,9 +415,11 @@ export function ScreenEmbed() {
                 }`}
                 aria-label="Español"
                 aria-current={language === "spanish" ? "true" : "false"}
+                type="button"
               >
                 Spanish
               </button>
+
               <button
                 onClick={() => changeLanguage("english")}
                 className={`text-white cursor-pointer drop-shadow hover:opacity-70 transition-opacity underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent rounded px-2 py-1 text-sm sm:text-base ${
@@ -411,9 +429,11 @@ export function ScreenEmbed() {
                 }`}
                 aria-label="English"
                 aria-current={language === "english" ? "true" : "false"}
+                type="button"
               >
                 English
               </button>
+
               <button
                 onClick={() => changeLanguage("catalan")}
                 className={`text-white cursor-pointer drop-shadow hover:opacity-70 transition-opacity underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent rounded px-2 py-1 text-sm sm:text-base ${
@@ -423,6 +443,7 @@ export function ScreenEmbed() {
                 }`}
                 aria-label="Català"
                 aria-current={language === "catalan" ? "true" : "false"}
+                type="button"
               >
                 Catalan
               </button>
@@ -435,7 +456,18 @@ export function ScreenEmbed() {
                 setShowQuestionnaire(true);
                 setShowUserType(false);
               }}
-              className="flex cursor-pointer items-center gap-2 px-3 sm:px-4 py-2 bg-white/20 backdrop-blur-md border border.white/30 rounded-lg text-white text-sm sm:text-base drop-shadow hover:bg-white/30 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="
+                flex cursor-pointer items-center gap-2
+                px-3 sm:px-4 py-2
+                bg-white/20 backdrop-blur-md
+                border border-white/30
+                rounded-lg
+                text-white text-sm sm:text-base
+                drop-shadow
+                hover:bg-white/30 transition-all
+                focus:outline-none focus:ring-2 focus:ring-blue-500
+              "
+              type="button"
             >
               Test Group
               <svg
@@ -454,8 +486,19 @@ export function ScreenEmbed() {
 
             <button
               onClick={() => setShowUserType(true)}
-              className="flex cursor-pointer items-center gap-2 px-3 sm:px-4 py-2 bg-white/30 backdrop-blur-md border border-white/40 rounded-lg text-white text-sm sm:text-base drop-shadow hover:bg-white/40 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="
+                flex cursor-pointer items-center gap-2
+                px-3 sm:px-4 py-2
+                bg-white/30 backdrop-blur-md
+                border border-white/40
+                rounded-lg
+                text-white text-sm sm:text-base
+                drop-shadow
+                hover:bg-white/40 transition-all
+                focus:outline-none focus:ring-2 focus:ring-blue-500
+              "
               aria-label={signUpText[language as keyof typeof signUpText]}
+              type="button"
             >
               <svg
                 width="18"
@@ -478,8 +521,19 @@ export function ScreenEmbed() {
             {!isLoggedIn ? (
               <button
                 onClick={() => setShowLogin(true)}
-                className="flex cursor-pointer items-center gap-2 px-3 sm:px-4 py-2 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-white text-sm sm:text-base drop-shadow hover:bg-white/30 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="
+                  flex cursor-pointer items-center gap-2
+                  px-3 sm:px-4 py-2
+                  bg-white/20 backdrop-blur-md
+                  border border-white/30
+                  rounded-lg
+                  text-white text-sm sm:text-base
+                  drop-shadow
+                  hover:bg-white/30 transition-all
+                  focus:outline-none focus:ring-2 focus:ring-blue-500
+                "
                 aria-label={loginText[language as keyof typeof loginText]}
+                type="button"
               >
                 <svg
                   width="18"
@@ -500,17 +554,23 @@ export function ScreenEmbed() {
             ) : (
               <button
                 onClick={() => {
-                  // ✅ si connecté, on va au bon "dashboard"
-                  if (getUserRole() == "artist") {
-                    setShowArtistChoice(true); // ou direct setShowArtistDashboard(true) selon ton flow
-                  } else {
-                    setShowFanStreaming(true);
-                  }
+                  if (getUserRole() == "artist") setShowArtistChoice(true);
+                  else setShowFanStreaming(true);
                 }}
-                className="flex cursor-pointer items-center gap-2 px-3 sm:px-4 py-2 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-white text-sm sm:text-base drop-shadow hover:bg-white/30 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="
+                  flex cursor-pointer items-center gap-2
+                  px-3 sm:px-4 py-2
+                  bg-white/20 backdrop-blur-md
+                  border border-white/30
+                  rounded-lg
+                  text-white text-sm sm:text-base
+                  drop-shadow
+                  hover:bg-white/30 transition-all
+                  focus:outline-none focus:ring-2 focus:ring-blue-500
+                "
                 aria-label="Dashboard"
+                type="button"
               >
-                {/* icône */}
                 <svg
                   width="18"
                   height="18"
@@ -529,33 +589,15 @@ export function ScreenEmbed() {
           </div>
         </div>
 
-        {/* Content */}
-        <div className="flex-1 w-full overflow-y-auto flex items-center justify-center px-4 md:px-8 pb-4">
-          <div className="relative w-full max-w-7xl flex flex-col items-center gap-8 md:gap-10">
+        {/* ✅ Content (scroll stable) */}
+        <div className="flex-1 w-full overflow-y-auto overscroll-contain px-4 md:px-8 pb-4">
+          <div className="relative w-full max-w-7xl mx-auto flex flex-col items-center gap-8 md:gap-10">
             <div className="relative w-full flex items-center justify-center">
               {/* Left Panel */}
-              <div
-                className="hidden lg:block absolute left-0 w-64 h-full rounded-3xl overflow-hidden shadow-2xl bg-cover bg-center origin-center"
-                // style={{
-                //   backgroundImage:
-                //     'url("/image/4ac3eed398bb68113a14d0fa5efe7a6def6f7651.png")',
-                //   backgroundPosition: "25% 35%",
-                //   backgroundSize: "cover",
-                //   transform: "rotate(90deg)",
-                // }}
-              />
+              <div className="hidden lg:block absolute left-0 w-64 h-full rounded-3xl overflow-hidden shadow-2xl bg-cover bg-center origin-center" />
 
               {/* Right Panel */}
-              <div
-                className="hidden lg:block absolute right-0 w-64 h-full rounded-3xl overflow-hidden shadow-2xl bg-cover bg-center origin-center"
-                // style={{
-                //   backgroundImage:
-                //     'url("/image/4ac3eed398bb68113a14d0fa5efe7a6def6f7651.png")',
-                //   backgroundPosition: "75% 35%",
-                //   backgroundSize: "cover",
-                //   transform: "rotate(90deg)",
-                // }}
-              />
+              <div className="hidden lg:block absolute right-0 w-64 h-full rounded-3xl overflow-hidden shadow-2xl bg-cover bg-center origin-center" />
 
               {/* Middle Panel */}
               <div className="relative z-10 w-full max-w-4xl mt-4 md:mt-2 lg:mt-2">
@@ -615,47 +657,68 @@ export function ScreenEmbed() {
 
                         {/* MEDIA CARD */}
                         <div className="mt-6 sm:mt-8 bg-white/10 backdrop-blur-md rounded-xl p-4 sm:p-6 max-w-md mx-auto border border-white/20 relative">
-                          {/* ✅ Arrow Left (visible mobile too) */}
+                          {/* Arrow Left */}
                           {canScrollLeft && (
                             <button
                               type="button"
                               onClick={() => scrollByAmount(-300)}
                               className="flex items-center justify-center absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 text-white p-2 rounded-full backdrop-blur-md shadow-md hover:bg-black/60 transition"
+                              aria-label="Scroll left"
                             >
                               ←
                             </button>
                           )}
 
-                          {/* ✅ Arrow Right (visible mobile too) */}
+                          {/* Arrow Right */}
                           {canScrollRight && (
                             <button
                               type="button"
                               onClick={() => scrollByAmount(300)}
                               className="flex items-center justify-center absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 text-white p-2 rounded-full backdrop-blur-md shadow-md hover:bg-black/60 transition"
+                              aria-label="Scroll right"
                             >
                               →
                             </button>
                           )}
 
-                          {/* Scrollable Zone */}
+                          {/* Scrollable Zone (Pointer events = mobile + desktop) */}
                           <div
                             ref={mediaScrollRef}
                             onScroll={handleMediaScroll}
-                            onMouseDown={handleMouseDown}
-                            onMouseMove={handleMouseMove}
-                            onMouseUp={handleMouseUp}
-                            onMouseLeave={handleMouseLeave}
+                            onPointerDown={(e) => {
+                              const el = mediaScrollRef.current;
+                              if (!el) return;
+                              el.setPointerCapture(e.pointerId);
+                              setIsDragging(true);
+                              dragData.current = {
+                                startX: e.clientX,
+                                scrollLeft: el.scrollLeft,
+                              };
+                            }}
+                            onPointerMove={(e) => {
+                              if (!isDragging) return;
+                              const el = mediaScrollRef.current;
+                              if (!el) return;
+                              e.preventDefault();
+                              const walk =
+                                (e.clientX - dragData.current.startX) * 1.2;
+                              el.scrollLeft =
+                                dragData.current.scrollLeft - walk;
+                            }}
+                            onPointerUp={() => setIsDragging(false)}
+                            onPointerCancel={() => setIsDragging(false)}
                             className={`
-                              flex gap-4 
-                              overflow-x-auto 
-                              snap-x snap-mandatory 
-                              pb-2 
-                              no-scrollbar 
+                              flex gap-4
+                              overflow-x-auto
+                              snap-x snap-mandatory
+                              pb-2
+                              no-scrollbar
+                              touch-pan-x select-none
                               ${isDragging ? "cursor-grabbing" : "cursor-grab"}
                             `}
                             style={{ scrollBehavior: "smooth" }}
                           >
-                            {/* ✅ Videos (Cloudinary MP4 => <video>) */}
+                            {/* Videos */}
                             {videos.map((url, index) => (
                               <div
                                 key={index}
@@ -673,7 +736,6 @@ export function ScreenEmbed() {
                                     playsInline
                                     preload="metadata"
                                     onEnded={() => {
-                                      // auto-advance to next slide
                                       const el = mediaScrollRef.current;
                                       if (!el) return;
                                       const next = Math.min(

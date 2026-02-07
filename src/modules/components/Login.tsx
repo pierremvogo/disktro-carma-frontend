@@ -257,7 +257,13 @@ export function Login({
 
   return (
     <div
-      className="fixed inset-0 w-screen h-screen bg-cover bg-center"
+      className="
+        relative w-full
+        min-h-[100svh] md:min-h-screen
+        overflow-hidden
+        bg-cover bg-center
+        text-white
+      "
       style={{
         backgroundImage:
           'url("/image/4ac3eed398bb68113a14d0fa5efe7a6def6f7651.png")',
@@ -267,42 +273,66 @@ export function Login({
     >
       {/* ✅ Bouton d’accessibilité : monté au plus haut niveau */}
       <AccessibilityButton language={language} />
+
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/50" />
 
-      {/* Content */}
-      <div className="relative w-full h-full overflow-y-auto flex items-center justify-center p-6">
-        <div className="w-full max-w-md mt-10">
-          <div className="bg-white/10 backdrop-blur-md rounded-3xl border border-white/20 p-8 shadow-2xl">
+      {/* Back button (safe on notch, doesn't scroll) */}
+      <button
+        onClick={onBack}
+        type="button"
+        className="
+          fixed z-50
+          left-4 sm:left-6
+          top-[calc(env(safe-area-inset-top)+1rem)]
+          flex items-center gap-2
+          text-white drop-shadow
+          hover:opacity-70 transition-opacity
+          bg-white/10 backdrop-blur-md
+          border border-white/20
+          rounded-full
+          px-3 py-2
+        "
+      >
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M19 12H5M12 19l-7-7 7-7" />
+        </svg>
+        <span className="text-sm sm:text-base">{content.back}</span>
+      </button>
+
+      {/* Scroll container */}
+      <div
+        className="
+          relative z-10
+          min-h-[100svh]
+          overflow-y-auto overscroll-contain
+          px-4 sm:px-6
+          pt-[calc(env(safe-area-inset-top)+4.5rem)]
+          pb-[calc(env(safe-area-inset-bottom)+1.5rem)]
+          flex items-center justify-center
+        "
+      >
+        <div className="w-full max-w-md">
+          <div className="bg-white/10 backdrop-blur-md rounded-3xl border border-white/20 p-6 sm:p-8 shadow-2xl">
             {/* Header */}
-            <button
-              onClick={onBack}
-              type="button"
-              className="absolute cursor-pointer top-2 left-2 flex items-center gap-2 text-white drop-shadow hover:opacity-70 transition-opacity"
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M19 12H5M12 19l-7-7 7-7" />
-              </svg>
-              {content.back}
-            </button>
             <div className="flex items-center gap-4 mb-8">
               <div className="flex-1 text-center">
                 <div className="flex items-center justify-center gap-2 mb-2">
                   <Music className="text-white" size={32} />
                 </div>
-                <h1 className="text-3xl text-white drop-shadow-lg">
+                <h1 className="text-2xl sm:text-3xl text-white drop-shadow-lg">
                   {content.title}
                 </h1>
-                <p className="text-white/70 drop-shadow mt-1">
+                <p className="text-white/70 drop-shadow mt-1 text-sm sm:text-base">
                   {content.subtitle}
                 </p>
               </div>
@@ -343,31 +373,30 @@ export function Login({
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder={content.passwordPlaceholder}
-                    className="w-full px-4 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-black placeholder-white/40 focus:outline-none focus:ring-2"
+                    className="w-full pl-11 pr-12 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-black placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/50"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 
-              p-1.5 rounded-full 
-             text-black/90 hover:text-black/100 cursor-pointer backdrop-blur-sm"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-full text-black/90 hover:text-black cursor-pointer backdrop-blur-sm"
+                    aria-label={
+                      showPassword ? "Hide password" : "Show password"
+                    }
                   >
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
               </div>
 
-              {/* Error Message */}
-              {error && (
-                <div className="bg-red-500/20 border border-red-500/40 rounded-lg p-3 text-white text-sm">
-                  {error}
-                </div>
+              {/* Success / Error */}
+              {successMessage && (
+                <p className="text-sm text-green-400">{successMessage}</p>
               )}
-
-              {/* Demo Hint */}
-              {/* <div className="bg-blue-500/20 border border-blue-500/40 rounded-lg p-3 text-white/80 text-xs">
-                {content.demoHint}
-              </div> */}
+              {errorMessage && (
+                <p className="text-sm text-center text-red-400">
+                  {errorMessage}
+                </p>
+              )}
 
               {/* Forgot Password Link */}
               <div className="text-right">
@@ -378,24 +407,16 @@ export function Login({
                   {content.forgotPassword}
                 </Link>
               </div>
-              {successMessage && (
-                <p className="m-4 text-sm text-green-400">{successMessage}</p>
-              )}
-              {errorMessage && (
-                <p className="m-4 text-sm text-center text-red-400">
-                  {errorMessage}
-                </p>
-              )}
 
               {/* Login Button */}
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full cursor-pointer px-6 py-4 bg-white/30 backdrop-blur-md border-2 border-white/40 rounded-xl text-white text-lg hover:bg-white/40 hover:border-white/60 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full cursor-pointer px-6 py-4 bg-white/30 backdrop-blur-md border-2 border-white/40 rounded-xl text-white text-base sm:text-lg hover:bg-white/40 hover:border-white/60 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
                   <div className="flex items-center justify-center gap-2">
-                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                     <span>{content.loginButton}...</span>
                   </div>
                 ) : (
@@ -407,17 +428,16 @@ export function Login({
               <div className="text-center pt-4 border-t border-white/20">
                 <p className="text-white/70 text-sm">
                   {content.noAccount}{" "}
-                  <a
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
+                  <button
+                    type="button"
+                    onClick={() => {
                       if (onSignUp) onSignUp();
                       else onBack();
                     }}
                     className="text-white hover:underline"
                   >
                     {content.signUp}
-                  </a>
+                  </button>
                 </p>
               </div>
             </form>

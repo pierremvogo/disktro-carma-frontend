@@ -319,6 +319,7 @@ type FormSetting = {
   email: string;
   oldPassword: string;
   newPassword: string;
+
   confirmNewPassword: string;
 };
 const DefaultValue: FormSetting = {
@@ -2649,458 +2650,55 @@ export function ArtistDashboard({
   }, []);
 
   return (
-    <div className="w-full h-full min-h-screen overflow-y-auto p-8 bg-gradient-to-br from-slate-900 via-purple-900 to-black">
-      {isArtist && (
-        <button
-          onClick={() => router.push("/dashboard/artist/select")}
-          className="cursor-pointer flex items-center gap-2 text-white drop-shadow hover:opacity-70 transition-opacity mb-6"
-        >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M19 12H5M12 19l-7-7 7-7" />
-          </svg>
-          {text.back}
-        </button>
-      )}
-      <div className="max-w-6xl mx-auto space-y-6 sm:space-y-8">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl text-white drop-shadow-lg">{text.title}</h1>
-
-          {onGoToStreaming && (
-            <button
-              onClick={onGoToStreaming}
-              className="cursor-pointer flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500/40 to-cyan-500/40 backdrop-blur-md border-2 border-white/40 rounded-xl text-white hover:from-blue-500/50 hover:to-cyan-500/50 hover:border-white/60 transition-all shadow-lg"
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3" />
-              </svg>
-              {language === "spanish" && "Ir a Plataforma de Streaming"}
-              {language === "english" && "Go to Streaming Platform"}
-              {language === "catalan" && "Anar a Plataforma d'Streaming"}
-            </button>
-          )}
-
+    <div
+      className="
+    relative w-full
+    min-h-[100svh] md:min-h-screen
+    overflow-hidden
+    bg-gradient-to-br from-slate-900 via-purple-900 to-black
+  "
+    >
+      <div
+        className="
+      min-h-[100svh]
+      overflow-y-auto overscroll-contain
+      px-4 sm:px-6 md:px-8
+      pt-[calc(env(safe-area-inset-top)+1.25rem)]
+      pb-[calc(env(safe-area-inset-bottom)+1.25rem)]
+    "
+      >
+        {isArtist && (
           <button
-            onClick={handleLogout}
-            className="px-4 py-2 bg-gradient-to-r cursor-pointer from-red-500/40 to-orange-500/40 
-    backdrop-blur-md border border-white/30 rounded-lg text-white
-    hover:from-red-500/60 hover:to-orange-500/60 transition-all flex items-center gap-2"
+            type="button"
+            onClick={() => router.push("/dashboard/artist/select")}
+            className="cursor-pointer flex items-center gap-2 text-white drop-shadow hover:opacity-70 transition-opacity mb-6"
           >
             <svg
-              width="18"
-              height="18"
+              width="20"
+              height="20"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="text-white"
             >
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-              <polyline points="16 17 21 12 16 7" />
-              <line x1="21" y1="12" x2="9" y2="12" />
+              <path d="M19 12H5M12 19l-7-7 7-7" />
             </svg>
-
-            {language === "spanish" && "Cerrar sesión"}
-            {language === "english" && "Logout"}
-            {language === "catalan" && "Tancar sessió"}
+            {text.back}
           </button>
-        </div>
+        )}
+        <div className="max-w-6xl mx-auto space-y-6 sm:space-y-8">
+          <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center mb-6">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl text-white drop-shadow-lg">
+              {text.title}
+            </h1>
 
-        {/* Tab Navigation */}
-        <div className="flex gap-3 sm:gap-4 mb-4 sm:mb-6 overflow-x-auto pb-1">
-          {[
-            { id: "profile", label: text.profile, icon: Users },
-            { id: "upload", label: text.upload, icon: Upload },
-            { id: "streams", label: text.streams, icon: TrendingUp },
-            { id: "subscriptions", label: text.subscriptions, icon: Users },
-            { id: "royalties", label: text.royalties, icon: DollarSign },
-
-            // 👉 Nouvel onglet ajouté ici
-            { id: "payout", label: text.payout, icon: PayoutIcon },
-          ].map(({ id, label, icon: Icon }) => (
-            <button
-              key={id}
-              onClick={() => setActiveTab(id)}
-              className={`cursor-pointer flex items-center gap-2 px-6 py-3 rounded-lg transition-all whitespace-nowrap ${
-                activeTab === id
-                  ? "bg-white/30 backdrop-blur-md border-2 border-white/50"
-                  : "bg-white/10 backdrop-blur-md border-2 border-white/20 hover:bg-white/20"
-              }`}
-            >
-              <Icon size={20} className="text-white" />
-              <span className="text-white drop-shadow">{label}</span>
-            </button>
-          ))}
-        </div>
-
-        {/* Profile Tab */}
-        {activeTab === "profile" && (
-          <div className="bg-white/10 backdrop-blur-md rounded-xl p-8 border border-white/20">
-            <h2 className="text-2xl text-white drop-shadow-lg mb-6">
-              {text.profileTitle}
-            </h2>
-
-            <div className="grid md:grid-cols-2 gap-8">
-              {/* Profile Picture Upload */}
-              <div>
-                <h3 className="text-xl text-white drop-shadow mb-4">
-                  {text.uploadPicture}
-                </h3>
-
-                {profilePicturePreview ? (
-                  <div className="relative aspect-square rounded-xl overflow-hidden bg-white/5 border-2 border-white/20">
-                    <img
-                      src={profilePicturePreview}
-                      alt="Profile"
-                      className="w-full h-full object-cover"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setProfilePicture(null);
-                        setProfilePicturePreview("");
-                        setFormData((prev: any) => ({
-                          ...prev,
-                          profileImageUrl: "",
-                        }));
-                      }}
-                      className="absolute cursor-pointer top-2 right-2 bg-red-500/80 backdrop-blur-sm text-white p-2 rounded-lg hover:bg-red-600/80 transition-all"
-                    >
-                      <X size={20} />
-                    </button>
-                  </div>
-                ) : (
-                  <div
-                    onDragEnter={(e) => {
-                      preventDefaults(e);
-                      setIsDraggingPic(true);
-                    }}
-                    onDragOver={preventDefaults}
-                    onDragLeave={(e) => {
-                      preventDefaults(e);
-                      setIsDraggingPic(false);
-                    }}
-                    onDrop={handleDropProfile}
-                    className={`border-2 border-dashed rounded-xl p-12 text-center transition-all cursor-pointer aspect-square flex items-center justify-center
-                    ${
-                      isDraggingPic
-                        ? "border-white/80 bg-white/15"
-                        : "border-white/30 bg-white/5 hover:bg-white/10"
-                    }
-                  `}
-                  >
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleProfilePicture}
-                      className="hidden"
-                      id="picture-upload"
-                    />
-                    <label
-                      htmlFor="picture-upload"
-                      className="cursor-pointer text-center"
-                    >
-                      <svg
-                        width="48"
-                        height="48"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        className="mx-auto mb-4 text-white/60"
-                      >
-                        <rect
-                          x="3"
-                          y="3"
-                          width="18"
-                          height="18"
-                          rx="2"
-                          ry="2"
-                        />
-                        <circle cx="8.5" cy="8.5" r="1.5" />
-                        <polyline points="21 15 16 10 5 21" />
-                      </svg>
-                      <p className="text-white drop-shadow">
-                        {text.pictureDragDrop}
-                      </p>
-                    </label>
-                  </div>
-                )}
-              </div>
-
-              {/* Video Introduction Upload */}
-              <div>
-                <h3 className="text-xl text-white drop-shadow mb-4">
-                  {text.uploadVideo}
-                </h3>
-
-                {videoIntroPreview ? (
-                  <div className="relative aspect-square rounded-xl overflow-hidden bg-black border-2 border-white/20">
-                    <video
-                      src={videoIntroPreview || formData.videoIntroUrl}
-                      controls
-                      className="w-full h-full object-cover"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setVideoIntro(null);
-                        setVideoIntroPreview("");
-                        // si tu stockes l’URL dans un form user:
-                        setFormData((prev: any) => ({
-                          ...prev,
-                          videoIntroUrl: "",
-                        }));
-                      }}
-                      className="absolute top-2 right-2 bg-red-500/80 backdrop-blur-sm text-white p-2 rounded-lg hover:bg-red-600/80 transition-all"
-                    >
-                      <svg
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      >
-                        <line x1="18" y1="6" x2="6" y2="18" />
-                        <line x1="6" y1="6" x2="18" y2="18" />
-                      </svg>
-                    </button>
-                  </div>
-                ) : (
-                  <div
-                    onDragEnter={(e) => {
-                      preventDefaults(e);
-                      setIsDraggingVideo(true);
-                    }}
-                    onDragOver={preventDefaults}
-                    onDragLeave={(e) => {
-                      preventDefaults(e);
-                      setIsDraggingVideo(false);
-                    }}
-                    onDrop={handleDropVideo}
-                    className={`border-2 border-dashed rounded-xl p-12 text-center transition-all cursor-pointer aspect-square flex items-center justify-center
-                    ${
-                      isDraggingVideo
-                        ? "border-white/80 bg-white/15"
-                        : "border-white/30 bg-white/5 hover:bg-white/10"
-                    }
-                  `}
-                  >
-                    <input
-                      type="file"
-                      accept="video/*"
-                      onChange={handleVideoIntro}
-                      className="hidden"
-                      id="video-upload"
-                    />
-                    <label
-                      htmlFor="video-upload"
-                      className="cursor-pointer text-center"
-                    >
-                      <svg
-                        width="48"
-                        height="48"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        className="mx-auto mb-4 text-white/60"
-                      >
-                        <polygon points="23 7 16 12 23 17 23 7" />
-                        <rect
-                          x="1"
-                          y="5"
-                          width="15"
-                          height="14"
-                          rx="2"
-                          ry="2"
-                        />
-                      </svg>
-                      <p className="text-white drop-shadow">
-                        {text.videoDragDrop}
-                      </p>
-                    </label>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Bio Section */}
-            <div className="mt-8">
-              <h3 className="text-xl text-white drop-shadow mb-4">
-                {text.bioTitle}
-              </h3>
-
-              <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                <form onSubmit={handleSubmitBio} className="space-y-6">
-                  <label className="block text-white/80 drop-shadow mb-3 text-sm">
-                    {text.bioPrompt}
-                  </label>
-
-                  <textarea
-                    rows={4}
-                    onChange={(e) =>
-                      setFormData((prev: any) => ({
-                        ...prev,
-                        bio: e.target.value,
-                      }))
-                    }
-                    name="bio"
-                    value={formData.bio}
-                    maxLength={300}
-                    placeholder={text.bioPrompt}
-                    className="w-full p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg 
-           text-black placeholder:text-white/40 focus:outline-none 
-           focus:border-white/40 transition-all text-xl resize-none"
-                  />
-
-                  {bioOneWord && (
-                    <p className="text-white/60 text-sm mt-2 text-center">
-                      {bioOneWord.length}/50
-                    </p>
-                  )}
-                  {successMessage && <CustomSuccess message={successMessage} />}
-
-                  {errorMessage && <CustomAlert message={errorMessage} />}
-
-                  {/* Bouton pour valider le form */}
-                  <button
-                    type="submit"
-                    className="mt-4 cursor-pointer w-full py-3 px-4 bg-white/20 backdrop-blur-md 
-                 border border-white/30 rounded-lg text-white drop-shadow 
-                 hover:bg-white/30 transition-all"
-                  >
-                    {isLoading ? (
-                      <div className="flex items-center justify-center gap-2">
-                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                        <span>{text.updateBio}...</span>
-                      </div>
-                    ) : (
-                      text.updateBio
-                    )}
-                  </button>
-                </form>
-              </div>
-            </div>
-
-            {/* Account Security Section */}
-            <div className="mt-8">
-              <h3 className="text-xl text-white drop-shadow mb-4">
-                {text.accountSecurity}
-              </h3>
-
-              {/* Change Password */}
-              <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                <h4 className="text-white drop-shadow mb-4">
-                  {text.changePassword}
-                </h4>
-                <div className="space-y-4">
-                  <form onSubmit={handleSubmit} className="space-y-6">
-                    <div>
-                      <label className="block text-white/80 drop-shadow mb-2 text-sm">
-                        {text.currentPassword}
-                      </label>
-                      <input
-                        name="oldPassword"
-                        type="password"
-                        value={formData.oldPassword}
-                        onChange={handleChange}
-                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
-                      />
-                      {errors.oldPassword && (
-                        <p className="text-red-500 text-sm">
-                          {errors.oldPassword}
-                        </p>
-                      )}
-                    </div>
-
-                    <div>
-                      <label className="block text-white/80 drop-shadow mb-2 text-sm">
-                        {text.newPassword}
-                      </label>
-                      <input
-                        name="newPassword"
-                        type="password" // 🟢 corrigé
-                        value={formData.newPassword}
-                        onChange={handleChange}
-                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
-                      />
-                      {errors.newPassword && (
-                        <p className="text-red-500 text-sm">
-                          {errors.newPassword}
-                        </p>
-                      )}
-                    </div>
-
-                    <div>
-                      <label className="block text-white/80 drop-shadow mb-2 text-sm">
-                        {text.confirmPassword}
-                      </label>
-                      <input
-                        name="confirmNewPassword"
-                        type="password" // 🟢 corrigé aussi
-                        value={formData.confirmNewPassword}
-                        onChange={handleChange}
-                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
-                      />
-                      {errors.confirmNewPassword && (
-                        <p className="text-red-500 text-sm">
-                          {errors.confirmNewPassword}
-                        </p>
-                      )}
-                    </div>
-
-                    {successMessage && (
-                      <CustomSuccess message={successMessage} />
-                    )}
-
-                    {errorMessage && <CustomAlert message={errorMessage} />}
-
-                    <button
-                      type="submit"
-                      className="cursor-pointer w-full py-3 px-4 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-white drop-shadow hover:bg-white/30 transition-all"
-                    >
-                      {isLoading ? (
-                        <div className="flex items-center justify-center gap-2">
-                          <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                          <span>{text.updatePassword}...</span>
-                        </div>
-                      ) : (
-                        text.updatePassword
-                      )}
-                    </button>
-                  </form>
-                </div>
-              </div>
-            </div>
-
-            {/* Save Button */}
-            {(profilePicture || videoIntro || bioOneWord) && (
+            {onGoToStreaming && (
               <button
-                onClick={() => {
-                  alert("Profile saved successfully!");
-                }}
-                className="mt-8 w-full py-4 px-6 bg-white/30 backdrop-blur-md border border-white/40 rounded-lg text-white drop-shadow hover:bg-white/40 transition-all flex items-center justify-center gap-2"
+                type="button"
+                onClick={onGoToStreaming}
+                className="cursor-pointer flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500/40 to-cyan-500/40 backdrop-blur-md border-2 border-white/40 rounded-xl text-white hover:from-blue-500/50 hover:to-cyan-500/50 hover:border-white/60 transition-all shadow-lg"
               >
                 <svg
                   width="20"
@@ -3109,1080 +2707,1766 @@ export function ArtistDashboard({
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 >
-                  <polyline points="20 6 9 17 4 12" />
+                  <path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3" />
                 </svg>
-                {text.saveProfile}
+                {language === "spanish" && "Ir a Plataforma de Streaming"}
+                {language === "english" && "Go to Streaming Platform"}
+                {language === "catalan" && "Anar a Plataforma d'Streaming"}
               </button>
             )}
-          </div>
-        )}
 
-        {/* Upload Tab */}
-        {activeTab === "upload" && (
-          <div className="bg-white/10 backdrop-blur-md rounded-xl p-8 border border-white/20 space-y-8">
-            <div>
-              <h2 className="text-2xl text-white drop-shadow-lg mb-2">
-                {text.uploadTitle}
+            <button
+              onClick={handleLogout}
+              type="button"
+              className="px-4 py-2 bg-gradient-to-r cursor-pointer from-red-500/40 to-orange-500/40 
+    backdrop-blur-md border border-white/30 rounded-lg text-white
+    hover:from-red-500/60 hover:to-orange-500/60 transition-all flex items-center gap-2"
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-white"
+              >
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" y1="12" x2="9" y2="12" />
+              </svg>
+
+              {language === "spanish" && "Cerrar sesión"}
+              {language === "english" && "Logout"}
+              {language === "catalan" && "Tancar sessió"}
+            </button>
+          </div>
+
+          {/* Tab Navigation */}
+          <div className="flex gap-3 sm:gap-4 mb-4 sm:mb-6 overflow-x-auto pb-1 no-scrollbar">
+            {[
+              { id: "profile", label: text.profile, icon: Users },
+              { id: "upload", label: text.upload, icon: Upload },
+              { id: "streams", label: text.streams, icon: TrendingUp },
+              { id: "subscriptions", label: text.subscriptions, icon: Users },
+              { id: "royalties", label: text.royalties, icon: DollarSign },
+
+              // 👉 Nouvel onglet ajouté ici
+              { id: "payout", label: text.payout, icon: PayoutIcon },
+            ].map(({ id, label, icon: Icon }) => (
+              <button
+                type="button"
+                key={id}
+                onClick={() => setActiveTab(id)}
+                className={`cursor-pointer flex items-center gap-2 px-6 py-3 rounded-lg transition-all whitespace-nowrap ${
+                  activeTab === id
+                    ? "bg-white/30 backdrop-blur-md border-2 border-white/50"
+                    : "bg-white/10 backdrop-blur-md border-2 border-white/20 hover:bg-white/20"
+                }`}
+              >
+                <Icon size={20} className="text-white" />
+                <span className="text-white drop-shadow">{label}</span>
+              </button>
+            ))}
+          </div>
+
+          {/* Profile Tab */}
+          {activeTab === "profile" && (
+            <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 sm:p-6 md:p-8 border border-white/20">
+              <h2 className="text-xl sm:text-2xl text-white drop-shadow-lg mb-6">
+                {text.profileTitle}
               </h2>
-              <p className="text-white/80 drop-shadow mb-6">
-                {text.uploadSubtitle}
-              </p>
 
-              {/* Type Selection */}
-              <div className="mb-6">
-                <label className="block text-white/90 drop-shadow mb-3">
-                  {text.typeLabel}
-                </label>
-
-                {/* 1 colonne sur mobile, 3 colonnes à partir de sm */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-                  <button
-                    onClick={() => setUploadType("single")}
-                    className={`cursor-pointer w-full py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg border-2 text-sm sm:text-base transition-all ${
-                      uploadType === "single"
-                        ? "bg-white/30 border-white/60 text-white"
-                        : "bg-white/10 border-white/20 text-white/70 hover:bg-white/15"
-                    }`}
-                  >
-                    {text.single}
-                  </button>
-
-                  <button
-                    onClick={() => setUploadType("ep")}
-                    className={`cursor-pointer w-full py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg border-2 text-sm sm:text-base transition-all ${
-                      uploadType === "ep"
-                        ? "bg-white/30 border-white/60 text-white"
-                        : "bg-white/10 border-white/20 text-white/70 hover:bg-white/15"
-                    }`}
-                  >
-                    {text.ep}
-                  </button>
-
-                  <button
-                    onClick={() => setUploadType("album")}
-                    className={`cursor-pointer w-full py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg border-2 text-sm sm:text-base transition-all ${
-                      uploadType === "album"
-                        ? "bg-white/30 border-white/60 text-white"
-                        : "bg-white/10 border-white/20 text-white/70 hover:bg-white/15"
-                    }`}
-                  >
-                    {text.album}
-                  </button>
-                </div>
-              </div>
-
-              {uploadType === "single" ? (
-                <SingleUploadSection text={text} language={language} />
-              ) : (
-                // Album/EP Title
-                // <div className="mb-6">
-                //   <label className="block text-white/90 drop-shadow mb-2">
-                //     {uploadType === "ep" ? text.epTitle : text.albumTitle}
-                //   </label>
-                //   <input
-                //     type="text"
-                //     value={trackTitle}
-                //     onChange={(e) => setTrackTitle(e.target.value)}
-                //     className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
-                //   />
-                // </div><>
-                <></>
-              )}
-            </div>
-            {uploadType === "album" && (
-              <AlbumUploadSection text={text} language={language} />
-            )}
-
-            {uploadType === "ep" && (
-              <EpUploadSection text={text} language={language} />
-            )}
-
-            {/* Additional Upload Options */}
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* Artwork Upload */}
-
-              {/* Mini Video Loop Upload */}
-            </div>
-
-            {/* Recent Uploads */}
-          </div>
-        )}
-
-        {/* Streams Tab */}
-        {activeTab === "streams" && (
-          <div className="space-y-6">
-            {/* Cartes de stats globales */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
-                <div className="flex items-center gap-2 mb-2">
-                  <TrendingUp size={20} className="text-white" />
-                  <h3 className="text-white/80 drop-shadow">
-                    {text.totalStreams}
+              <div className="grid md:grid-cols-2 gap-6 md:gap-8">
+                {/* Profile Picture Upload */}
+                <div>
+                  <h3 className="text-lg sm:text-xl text-white drop-shadow mb-4">
+                    {text.uploadPicture}
                   </h3>
-                </div>
-                <p className="text-3xl text-white drop-shadow">
-                  {totalStreams.toLocaleString()}
-                </p>
-              </div>
 
-              <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
-                <div className="flex items-center gap-2 mb-2">
-                  <TrendingUp size={20} className="text-white" />
-                  <h3 className="text-white/80 drop-shadow">
-                    {text.monthlyStreams}
-                  </h3>
-                </div>
-                <p className="text-3xl text-white drop-shadow">
-                  {monthlyStreams.toLocaleString()}
-                </p>
-              </div>
-
-              <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
-                <div className="flex items-center gap-2 mb-2">
-                  <Music size={20} className="text-white" />
-                  <h3 className="text-white/80 drop-shadow">{text.tracks}</h3>
-                </div>
-                <p className="text-3xl text-white drop-shadow">
-                  {totalTracksCount}
-                </p>
-              </div>
-
-              <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
-                <div className="flex items-center gap-2 mb-2">
-                  <Users size={20} className="text-white" />
-                  <h3 className="text-white/80 drop-shadow">
-                    {text.listeners}
-                  </h3>
-                </div>
-                <p className="text-3xl text-white drop-shadow">
-                  {totalListeners.toLocaleString()}
-                </p>
-              </div>
-            </div>
-
-            {streamsError && <CustomAlert message={streamsError} />}
-            {isStreamsLoading && (
-              <p className="text-white/60 text-sm">
-                {/* petit loader si tu veux */}
-              </p>
-            )}
-
-            {/* Top Tracks + By Location */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Top Tracks */}
-              <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
-                <h3 className="text-xl text-white drop-shadow mb-4">
-                  {text.topTracks}
-                </h3>
-                <div className="space-y-3">
-                  {tracksStats.slice(0, 5).map((track, index) => (
+                  {profilePicturePreview ? (
+                    <div className="relative aspect-square rounded-xl overflow-hidden bg-white/5 border-2 border-white/20">
+                      <img
+                        src={profilePicturePreview}
+                        alt="Profile"
+                        className="w-full h-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setProfilePicture(null);
+                          setProfilePicturePreview("");
+                          setFormData((prev: any) => ({
+                            ...prev,
+                            profileImageUrl: "",
+                          }));
+                        }}
+                        className="absolute cursor-pointer top-2 right-2 bg-red-500/80 backdrop-blur-sm text-white p-2 rounded-lg hover:bg-red-600/80 transition-all"
+                      >
+                        <X size={20} />
+                      </button>
+                    </div>
+                  ) : (
                     <div
-                      key={track.id}
-                      className="flex items-center justify-between p-4 bg-white/5 rounded-lg"
+                      onDragEnter={(e) => {
+                        preventDefaults(e);
+                        setIsDraggingPic(true);
+                      }}
+                      onDragOver={preventDefaults}
+                      onDragLeave={(e) => {
+                        preventDefaults(e);
+                        setIsDraggingPic(false);
+                      }}
+                      onDrop={handleDropProfile}
+                      className={`border-2 border-dashed rounded-xl p-8 sm:p-10 md:p-12 text-center transition-all cursor-pointer aspect-square flex items-center justify-center
+              ${
+                isDraggingPic
+                  ? "border-white/80 bg-white/15"
+                  : "border-white/30 bg-white/5 hover:bg-white/10"
+              }`}
                     >
-                      <div className="flex items-center gap-4">
-                        <span className="text-2xl text-white/60">
-                          #{index + 1}
-                        </span>
-                        <span className="text-white drop-shadow">
-                          {track.name}
-                        </span>
-                      </div>
-                      <span className="text-white/80">
-                        {track.totalStreams.toLocaleString()}
-                      </span>
-                    </div>
-                  ))}
-                  {tracksStats.length === 0 && (
-                    <p className="text-white/60 text-sm">
-                      {text.noSavedTracks ||
-                        "No track saved for this album yet."}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              {/* Streams by Location */}
-              <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
-                <h3 className="text-xl text-white drop-shadow mb-4">
-                  {text.byLocation}
-                </h3>
-                <div className="space-y-4">
-                  {streamsByLocation.map((location, index) => (
-                    <div key={index}>
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-white drop-shadow">
-                          {getCountryName(location.location)}
-                        </span>
-                        <span className="text-white/80">
-                          {location.streams.toLocaleString()}
-                        </span>
-                      </div>
-                      <div className="w-full bg-white/10 rounded-full h-2">
-                        <div
-                          className="bg-white/50 h-2 rounded-full transition-all"
-                          style={{ width: location.percentage }}
-                        ></div>
-                      </div>
-                      <span className="text-white/60 text-sm">
-                        {location.percentage}
-                      </span>
-                    </div>
-                  ))}
-                  {streamsByLocation.length === 0 && (
-                    <p className="text-white/60 text-sm">
-                      {/* aucun data de localisation pour l’instant */}
-                      {text.noContent || "No location data yet."}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Streams per Track with Locations */}
-            <div className="space-y-6">
-              {/* Header + Filter */}
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <h3 className="text-xl sm:text-2xl text-white drop-shadow">
-                  {text.streamsPerTrack}
-                </h3>
-
-                {/* Filter Dropdown */}
-                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
-                  <label className="text-white/90 drop-shadow text-sm sm:text-base">
-                    {text.filterByType}:
-                  </label>
-                  <select
-                    value={trackFilter}
-                    onChange={(e) => setTrackFilter(e.target.value as any)}
-                    className="w-full sm:w-auto px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-lg text-black cursor-pointer focus:outline-none focus:border-white/40 transition-all"
-                  >
-                    <option value="all" className="bg-gray-800">
-                      {text.all}
-                    </option>
-                    <option value="single" className="bg-gray-800">
-                      {text.single}
-                    </option>
-                    <option value="ep" className="bg-gray-800">
-                      {text.ep}
-                    </option>
-                    <option value="album" className="bg-gray-800">
-                      {text.album}
-                    </option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Search Track Input */}
-              <div className="relative">
-                <input
-                  type="text"
-                  value={trackSearch}
-                  onChange={(e) => setTrackSearch(e.target.value)}
-                  placeholder={text.searchTrack}
-                  className="w-full px-4 py-3 pl-12 bg-white/10 backdrop-blur-md border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
-                />
-                <Search
-                  className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50"
-                  size={20}
-                />
-              </div>
-
-              {/* List */}
-              <div className="max-h-[70vh] sm:max-h-[800px] overflow-y-auto space-y-4 sm:space-y-6 pr-0 sm:pr-2">
-                {filteredTracks.map((track) => (
-                  <div
-                    key={track.id}
-                    className="bg-white/10 backdrop-blur-md rounded-xl p-4 sm:p-6 border border-white/20"
-                  >
-                    {/* Track header */}
-                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-5">
-                      <div className="flex items-start gap-3 sm:gap-4 min-w-0">
-                        <div className="mt-0.5 sm:mt-1 flex-shrink-0">
-                          <Play size={22} className="text-white/80" />
-                        </div>
-
-                        <div className="min-w-0">
-                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
-                            <h4 className="text-lg sm:text-xl text-white drop-shadow font-medium break-words sm:truncate">
-                              {track.name}
-                            </h4>
-
-                            <span className="w-fit px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-[11px] sm:text-xs text-white/90 uppercase">
-                              {track.type === "single"
-                                ? text.single
-                                : track.type === "ep"
-                                ? text.ep
-                                : text.album}
-                            </span>
-                          </div>
-
-                          <p className="text-white/60 mt-1 text-sm">
-                            {track.totalStreams.toLocaleString()}{" "}
-                            {text.totalStreams.toLowerCase()}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Location section title */}
-                    <h5 className="text-white/90 drop-shadow mb-3 sm:mb-4 text-sm sm:text-base">
-                      {text.locationPerTrack}
-                    </h5>
-
-                    {/* Locations grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                      {(track.topLocations ?? []).map((location, locIndex) => (
-                        <div
-                          key={locIndex}
-                          className="bg-white/5 rounded-lg p-4 border border-white/10"
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleProfilePicture}
+                        className="hidden"
+                        id="picture-upload"
+                      />
+                      <label
+                        htmlFor="picture-upload"
+                        className="cursor-pointer text-center"
+                      >
+                        <svg
+                          width="48"
+                          height="48"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          className="mx-auto mb-4 text-white/60"
                         >
-                          <div className="flex items-center justify-between gap-3 mb-2">
-                            <span className="text-white drop-shadow truncate">
-                              {getCountryName(location.location)}
-                            </span>
-                            <span className="text-white/80 flex-shrink-0 text-sm">
-                              {location.streams.toLocaleString()}
-                            </span>
-                          </div>
-
-                          <div className="w-full bg-white/10 rounded-full h-2 mb-1 overflow-hidden">
-                            <div
-                              className="bg-white/50 h-2 rounded-full transition-all"
-                              style={{ width: location.percentage ?? "0%" }}
-                            />
-                          </div>
-
-                          <span className="text-white/60 text-xs sm:text-sm">
-                            {location.percentage ?? "0%"}
-                          </span>
-                        </div>
-                      ))}
-
-                      {(track.topLocations ?? []).length === 0 && (
-                        <div className="bg-white/5 rounded-lg p-4 border border-white/10">
-                          <p className="text-white/60 text-sm">
-                            {text.noContent ||
-                              "No location data for this track."}
-                          </p>
-                        </div>
-                      )}
+                          <rect
+                            x="3"
+                            y="3"
+                            width="18"
+                            height="18"
+                            rx="2"
+                            ry="2"
+                          />
+                          <circle cx="8.5" cy="8.5" r="1.5" />
+                          <polyline points="21 15 16 10 5 21" />
+                        </svg>
+                        <p className="text-white drop-shadow">
+                          {text.pictureDragDrop}
+                        </p>
+                      </label>
                     </div>
-                  </div>
-                ))}
+                  )}
+                </div>
+
+                {/* Video Introduction Upload */}
+                <div>
+                  <h3 className="text-lg sm:text-xl text-white drop-shadow mb-4">
+                    {text.uploadVideo}
+                  </h3>
+
+                  {videoIntroPreview ? (
+                    <div className="relative aspect-square rounded-xl overflow-hidden bg-black border-2 border-white/20">
+                      <video
+                        src={videoIntroPreview || formData.videoIntroUrl}
+                        controls
+                        className="w-full h-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setVideoIntro(null);
+                          setVideoIntroPreview("");
+                          setFormData((prev: any) => ({
+                            ...prev,
+                            videoIntroUrl: "",
+                          }));
+                        }}
+                        className="absolute top-2 right-2 bg-red-500/80 backdrop-blur-sm text-white p-2 rounded-lg hover:bg-red-600/80 transition-all"
+                      >
+                        <svg
+                          width="20"
+                          height="20"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        >
+                          <line x1="18" y1="6" x2="6" y2="18" />
+                          <line x1="6" y1="6" x2="18" y2="18" />
+                        </svg>
+                      </button>
+                    </div>
+                  ) : (
+                    <div
+                      onDragEnter={(e) => {
+                        preventDefaults(e);
+                        setIsDraggingVideo(true);
+                      }}
+                      onDragOver={preventDefaults}
+                      onDragLeave={(e) => {
+                        preventDefaults(e);
+                        setIsDraggingVideo(false);
+                      }}
+                      onDrop={handleDropVideo}
+                      className={`border-2 border-dashed rounded-xl p-8 sm:p-10 md:p-12 text-center transition-all cursor-pointer aspect-square flex items-center justify-center
+              ${
+                isDraggingVideo
+                  ? "border-white/80 bg-white/15"
+                  : "border-white/30 bg-white/5 hover:bg-white/10"
+              }`}
+                    >
+                      <input
+                        type="file"
+                        accept="video/*"
+                        onChange={handleVideoIntro}
+                        className="hidden"
+                        id="video-upload"
+                      />
+                      <label
+                        htmlFor="video-upload"
+                        className="cursor-pointer text-center"
+                      >
+                        <svg
+                          width="48"
+                          height="48"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          className="mx-auto mb-4 text-white/60"
+                        >
+                          <polygon points="23 7 16 12 23 17 23 7" />
+                          <rect
+                            x="1"
+                            y="5"
+                            width="15"
+                            height="14"
+                            rx="2"
+                            ry="2"
+                          />
+                        </svg>
+                        <p className="text-white drop-shadow">
+                          {text.videoDragDrop}
+                        </p>
+                      </label>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          </div>
-        )}
 
-        {/* Subscriptions Tab */}
-        {activeTab === "subscriptions" && (
-          <div className="space-y-6">
-            {/* Subscription Pricing Section */}
-            <div className="bg-white/10 backdrop-blur-md rounded-xl p-8 border border-white/20">
-              <h2 className="text-2xl text-white drop-shadow-lg mb-6">
-                {text.subscriptionPricing}
-              </h2>
-              <div>
-                <label className="block text-white drop-shadow mb-6 text-lg">
-                  {text.setPriceLabel}
-                </label>
+              {/* Bio Section */}
+              <div className="mt-8">
+                <h3 className="text-lg sm:text-xl text-white drop-shadow mb-4">
+                  {text.bioTitle}
+                </h3>
 
-                <form onSubmit={handleSubmitPricing}>
-                  {/* Messages */}
-                  {pricingLoading && (
-                    <p className="text-white/70 text-sm mb-4">
-                      Loading pricing…
-                    </p>
-                  )}
+                <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/20">
+                  <form onSubmit={handleSubmitBio} className="space-y-6">
+                    <label className="block text-white/80 drop-shadow mb-3 text-sm">
+                      {text.bioPrompt}
+                    </label>
 
-                  {pricingError && (
-                    <div className="mb-4 p-3 bg-red-500/20 border border-red-400/40 rounded-lg">
-                      <p className="text-red-200 text-sm">{pricingError}</p>
-                    </div>
-                  )}
+                    <textarea
+                      rows={4}
+                      onChange={(e) =>
+                        setFormData((prev: any) => ({
+                          ...prev,
+                          bio: e.target.value,
+                        }))
+                      }
+                      name="bio"
+                      value={formData.bio}
+                      maxLength={300}
+                      placeholder={text.bioPrompt}
+                      className="w-full p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg 
+              text-black placeholder:text-white/40 focus:outline-none 
+              focus:border-white/40 transition-all text-base sm:text-xl resize-none"
+                    />
 
-                  {pricingSaved && (
-                    <div className="mb-4 p-3 bg-green-500/20 border border-green-400/40 rounded-lg">
-                      <p className="text-green-200 text-sm">
-                        {language === "spanish"
-                          ? "Precios guardados"
-                          : language === "english"
-                          ? "Prices saved"
-                          : "Preus guardats"}
+                    {bioOneWord && (
+                      <p className="text-white/60 text-sm mt-2 text-center">
+                        {bioOneWord.length}/50
                       </p>
-                    </div>
-                  )}
+                    )}
 
-                  {/* Pricing Options Grid */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                    {/* Monthly */}
-                    <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                      <h3 className="text-white drop-shadow mb-4">
-                        {text.monthly}
-                      </h3>
-                      <div className="relative">
-                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/60 text-xl">
-                          €
-                        </span>
-                        <input
-                          type="number"
-                          value={monthlyPrice}
-                          onChange={(e) => {
-                            let value = parseFloat(e.target.value);
-                            if (value < 1) value = 1; // Minimum
-                            if (value > 5) value = 5; // Maximum
-                            setMonthlyPrice(value.toString());
-                          }}
-                          placeholder="1.00"
-                          step="0.01"
-                          min="1"
-                          max="5"
-                          disabled={pricingLoading || pricingSaving}
-                          className="w-full pl-10 pr-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all disabled:opacity-60"
-                        />
-                      </div>
-                      <p className="text-white/60 text-sm mt-2">
-                        {text.pricePerMonth}
-                      </p>
-                    </div>
+                    {successMessage && (
+                      <CustomSuccess message={successMessage} />
+                    )}
+                    {errorMessage && <CustomAlert message={errorMessage} />}
 
-                    {/* Quarterly */}
-                    <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                      <h3 className="text-white drop-shadow mb-4">
-                        {text.quarterly}
-                      </h3>
-                      <div className="relative">
-                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/60 text-xl">
-                          €
-                        </span>
-                        <input
-                          type="text"
-                          value={quarterlyPrice}
-                          readOnly
-                          placeholder="—"
-                          className="w-full pl-10 pr-4 py-3 bg-white/5 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 cursor-not-allowed opacity-80"
-                        />
-                      </div>
-                      <p className="text-white/60 text-sm mt-2">
-                        {text.pricePerQuarter}
-                      </p>
-                      {monthlyPrice && (
-                        <p className="text-white/50 text-xs mt-1">
-                          {language === "spanish" &&
-                            "(Calculado automáticamente)"}
-                          {language === "english" &&
-                            "(Calculated automatically)"}
-                          {language === "catalan" &&
-                            "(Calculat automàticament)"}
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Annual */}
-                    <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                      <h3 className="text-white drop-shadow mb-4">
-                        {text.annual}
-                      </h3>
-                      <div className="relative">
-                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/60 text-xl">
-                          €
-                        </span>
-                        <input
-                          type="text"
-                          value={annualPrice}
-                          readOnly
-                          placeholder="—"
-                          className="w-full pl-10 pr-4 py-3 bg-white/5 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 cursor-not-allowed opacity-80"
-                        />
-                      </div>
-                      <p className="text-white/60 text-sm mt-2">
-                        {text.pricePerYear}
-                      </p>
-                      {monthlyPrice && (
-                        <p className="text-white/50 text-xs mt-1">
-                          {language === "spanish" &&
-                            "(Calculado automáticamente)"}
-                          {language === "english" &&
-                            "(Calculated automatically)"}
-                          {language === "catalan" &&
-                            "(Calculat automàticament)"}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Submit */}
-                  <div className="flex justify-end">
                     <button
                       type="submit"
-                      disabled={
-                        !monthlyPrice || pricingSaving || pricingLoading
-                      }
-                      className="px-8 cursor-pointer py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-white hover:bg-white/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="mt-4 cursor-pointer w-full py-3 px-4 bg-white/20 backdrop-blur-md 
+              border border-white/30 rounded-lg text-white drop-shadow 
+              hover:bg-white/30 transition-all"
                     >
-                      {pricingSaving
-                        ? language === "english"
-                          ? "Saving..."
-                          : language === "spanish"
-                          ? "Guardando..."
-                          : "Desant..."
-                        : text.savePrice}
+                      {isLoading ? (
+                        <div className="flex items-center justify-center gap-2">
+                          <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          <span>{text.updateBio}...</span>
+                        </div>
+                      ) : (
+                        text.updateBio
+                      )}
+                    </button>
+                  </form>
+                </div>
+              </div>
+
+              {/* Account Security Section */}
+              <div className="mt-8">
+                <h3 className="text-lg sm:text-xl text-white drop-shadow mb-4">
+                  {text.accountSecurity}
+                </h3>
+
+                <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/20">
+                  <h4 className="text-white drop-shadow mb-4">
+                    {text.changePassword}
+                  </h4>
+
+                  <div className="space-y-4">
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                      <div>
+                        <label className="block text-white/80 drop-shadow mb-2 text-sm">
+                          {text.currentPassword}
+                        </label>
+                        <input
+                          name="oldPassword"
+                          type="password"
+                          value={formData.oldPassword}
+                          onChange={handleChange}
+                          className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
+                        />
+                        {errors.oldPassword && (
+                          <p className="text-red-500 text-sm">
+                            {errors.oldPassword}
+                          </p>
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="block text-white/80 drop-shadow mb-2 text-sm">
+                          {text.newPassword}
+                        </label>
+                        <input
+                          name="newPassword"
+                          type="password"
+                          value={formData.newPassword}
+                          onChange={handleChange}
+                          className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
+                        />
+                        {errors.newPassword && (
+                          <p className="text-red-500 text-sm">
+                            {errors.newPassword}
+                          </p>
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="block text-white/80 drop-shadow mb-2 text-sm">
+                          {text.confirmPassword}
+                        </label>
+                        <input
+                          name="confirmNewPassword"
+                          type="password"
+                          value={formData.confirmNewPassword}
+                          onChange={handleChange}
+                          className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
+                        />
+                        {errors.confirmNewPassword && (
+                          <p className="text-red-500 text-sm">
+                            {errors.confirmNewPassword}
+                          </p>
+                        )}
+                      </div>
+
+                      {successMessage && (
+                        <CustomSuccess message={successMessage} />
+                      )}
+                      {errorMessage && <CustomAlert message={errorMessage} />}
+
+                      <button
+                        type="submit"
+                        className="cursor-pointer w-full py-3 px-4 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-white drop-shadow hover:bg-white/30 transition-all"
+                      >
+                        {isLoading ? (
+                          <div className="flex items-center justify-center gap-2">
+                            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                            <span>{text.updatePassword}...</span>
+                          </div>
+                        ) : (
+                          text.updatePassword
+                        )}
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+
+              {/* Save Button */}
+              {(profilePicture || videoIntro || bioOneWord) && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    alert("Profile saved successfully!");
+                  }}
+                  className="mt-8 w-full py-4 px-6 bg-white/30 backdrop-blur-md border border-white/40 rounded-lg text-white drop-shadow hover:bg-white/40 transition-all flex items-center justify-center gap-2"
+                >
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  {text.saveProfile}
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Upload Tab */}
+          {activeTab === "upload" && (
+            <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 sm:p-6 md:p-8 border border-white/20 space-y-8">
+              <div>
+                <h2 className="text-xl sm:text-2xl text-white drop-shadow-lg mb-2">
+                  {text.uploadTitle}
+                </h2>
+                <p className="text-white/80 drop-shadow mb-6 text-sm sm:text-base">
+                  {text.uploadSubtitle}
+                </p>
+
+                {/* Type Selection */}
+                <div className="mb-6">
+                  <label className="block text-white/90 drop-shadow mb-3 text-sm sm:text-base">
+                    {text.typeLabel}
+                  </label>
+
+                  {/* 1 colonne sur mobile, 3 colonnes à partir de sm */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+                    <button
+                      type="button"
+                      onClick={() => setUploadType("single")}
+                      className={`cursor-pointer w-full py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg border-2 text-sm sm:text-base transition-all ${
+                        uploadType === "single"
+                          ? "bg-white/30 border-white/60 text-white"
+                          : "bg-white/10 border-white/20 text-white/70 hover:bg-white/15"
+                      }`}
+                    >
+                      {text.single}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setUploadType("ep")}
+                      className={`cursor-pointer w-full py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg border-2 text-sm sm:text-base transition-all ${
+                        uploadType === "ep"
+                          ? "bg-white/30 border-white/60 text-white"
+                          : "bg-white/10 border-white/20 text-white/70 hover:bg-white/15"
+                      }`}
+                    >
+                      {text.ep}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setUploadType("album")}
+                      className={`cursor-pointer w-full py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg border-2 text-sm sm:text-base transition-all ${
+                        uploadType === "album"
+                          ? "bg-white/30 border-white/60 text-white"
+                          : "bg-white/10 border-white/20 text-white/70 hover:bg-white/15"
+                      }`}
+                    >
+                      {text.album}
                     </button>
                   </div>
-                </form>
+                </div>
 
-                {(monthlyPrice || quarterlyPrice || annualPrice) && (
-                  <div className="mt-6 p-5 bg-white/5 backdrop-blur-md rounded-xl border border-white/20">
-                    {/* Title */}
-                    <p className="text-white/90 text-sm mb-4 font-medium">
-                      {language === "spanish" &&
-                        "Los fans podrán elegir entre estas opciones de suscripción:"}
-                      {language === "english" &&
-                        "Fans will be able to choose between these subscription options:"}
-                      {language === "catalan" &&
-                        "Els fans podran triar entre aquestes opcions de subscripció:"}
-                    </p>
+                {uploadType === "single" ? (
+                  <SingleUploadSection text={text} language={language} />
+                ) : (
+                  // Album/EP Title
+                  // <div className="mb-6">
+                  //   <label className="block text-white/90 drop-shadow mb-2">
+                  //     {uploadType === "ep" ? text.epTitle : text.albumTitle}
+                  //   </label>
+                  //   <input
+                  //     type="text"
+                  //     value={trackTitle}
+                  //     onChange={(e) => setTrackTitle(e.target.value)}
+                  //     className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
+                  //   />
+                  // </div>
+                  <></>
+                )}
+              </div>
 
-                    {/* Pricing cards */}
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {uploadType === "album" && (
+                <AlbumUploadSection text={text} language={language} />
+              )}
+
+              {uploadType === "ep" && (
+                <EpUploadSection text={text} language={language} />
+              )}
+
+              {/* Additional Upload Options */}
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* Artwork Upload */}
+                {/* Mini Video Loop Upload */}
+              </div>
+
+              {/* Recent Uploads */}
+            </div>
+          )}
+
+          {/* Streams Tab */}
+          {activeTab === "streams" && (
+            <div className="space-y-6">
+              {/* Cartes de stats globales */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 sm:p-6 border border-white/20">
+                  <div className="flex items-center gap-2 mb-2">
+                    <TrendingUp size={20} className="text-white" />
+                    <h3 className="text-white/80 drop-shadow text-sm sm:text-base">
+                      {text.totalStreams}
+                    </h3>
+                  </div>
+                  <p className="text-2xl sm:text-3xl text-white drop-shadow">
+                    {totalStreams.toLocaleString()}
+                  </p>
+                </div>
+
+                <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 sm:p-6 border border-white/20">
+                  <div className="flex items-center gap-2 mb-2">
+                    <TrendingUp size={20} className="text-white" />
+                    <h3 className="text-white/80 drop-shadow text-sm sm:text-base">
+                      {text.monthlyStreams}
+                    </h3>
+                  </div>
+                  <p className="text-2xl sm:text-3xl text-white drop-shadow">
+                    {monthlyStreams.toLocaleString()}
+                  </p>
+                </div>
+
+                <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 sm:p-6 border border-white/20">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Music size={20} className="text-white" />
+                    <h3 className="text-white/80 drop-shadow text-sm sm:text-base">
+                      {text.tracks}
+                    </h3>
+                  </div>
+                  <p className="text-2xl sm:text-3xl text-white drop-shadow">
+                    {totalTracksCount}
+                  </p>
+                </div>
+
+                <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 sm:p-6 border border-white/20">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Users size={20} className="text-white" />
+                    <h3 className="text-white/80 drop-shadow text-sm sm:text-base">
+                      {text.listeners}
+                    </h3>
+                  </div>
+                  <p className="text-2xl sm:text-3xl text-white drop-shadow">
+                    {totalListeners.toLocaleString()}
+                  </p>
+                </div>
+              </div>
+
+              {streamsError && <CustomAlert message={streamsError} />}
+              {isStreamsLoading && (
+                <p className="text-white/60 text-sm">
+                  {/* loader optionnel */}
+                </p>
+              )}
+
+              {/* Top Tracks + By Location */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Top Tracks */}
+                <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 sm:p-6 border border-white/20">
+                  <h3 className="text-lg sm:text-xl text-white drop-shadow mb-4">
+                    {text.topTracks}
+                  </h3>
+                  <div className="space-y-3">
+                    {tracksStats.slice(0, 5).map((track, index) => (
+                      <div
+                        key={track.id}
+                        className="flex items-center justify-between gap-3 p-3 sm:p-4 bg-white/5 rounded-lg"
+                      >
+                        <div className="flex items-center gap-3 min-w-0">
+                          <span className="text-xl sm:text-2xl text-white/60 flex-shrink-0">
+                            #{index + 1}
+                          </span>
+                          <span className="text-white drop-shadow truncate">
+                            {track.name}
+                          </span>
+                        </div>
+                        <span className="text-white/80 flex-shrink-0 text-sm sm:text-base">
+                          {track.totalStreams.toLocaleString()}
+                        </span>
+                      </div>
+                    ))}
+                    {tracksStats.length === 0 && (
+                      <p className="text-white/60 text-sm">
+                        {text.noSavedTracks ||
+                          "No track saved for this album yet."}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Streams by Location */}
+                <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 sm:p-6 border border-white/20">
+                  <h3 className="text-lg sm:text-xl text-white drop-shadow mb-4">
+                    {text.byLocation}
+                  </h3>
+                  <div className="space-y-4">
+                    {streamsByLocation.map((location, index) => (
+                      <div key={index}>
+                        <div className="flex items-center justify-between gap-3 mb-2">
+                          <span className="text-white drop-shadow truncate">
+                            {getCountryName(location.location)}
+                          </span>
+                          <span className="text-white/80 flex-shrink-0 text-sm sm:text-base">
+                            {location.streams.toLocaleString()}
+                          </span>
+                        </div>
+                        <div className="w-full bg-white/10 rounded-full h-2">
+                          <div
+                            className="bg-white/50 h-2 rounded-full transition-all"
+                            style={{ width: location.percentage }}
+                          />
+                        </div>
+                        <span className="text-white/60 text-xs sm:text-sm">
+                          {location.percentage}
+                        </span>
+                      </div>
+                    ))}
+                    {streamsByLocation.length === 0 && (
+                      <p className="text-white/60 text-sm">
+                        {text.noContent || "No location data yet."}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Streams per Track with Locations */}
+              <div className="space-y-6">
+                {/* Header + Filter */}
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                  <h3 className="text-lg sm:text-2xl text-white drop-shadow">
+                    {text.streamsPerTrack}
+                  </h3>
+
+                  {/* Filter Dropdown */}
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                    <label className="text-white/90 drop-shadow text-sm sm:text-base">
+                      {text.filterByType}:
+                    </label>
+                    <select
+                      value={trackFilter}
+                      onChange={(e) => setTrackFilter(e.target.value as any)}
+                      className="w-full sm:w-auto px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-lg text-black cursor-pointer focus:outline-none focus:border-white/40 transition-all"
+                    >
+                      <option value="all" className="bg-gray-800">
+                        {text.all}
+                      </option>
+                      <option value="single" className="bg-gray-800">
+                        {text.single}
+                      </option>
+                      <option value="ep" className="bg-gray-800">
+                        {text.ep}
+                      </option>
+                      <option value="album" className="bg-gray-800">
+                        {text.album}
+                      </option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Search Track Input */}
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={trackSearch}
+                    onChange={(e) => setTrackSearch(e.target.value)}
+                    placeholder={text.searchTrack}
+                    className="w-full px-4 py-3 pl-12 bg-white/10 backdrop-blur-md border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
+                  />
+                  <Search
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50"
+                    size={20}
+                  />
+                </div>
+
+                {/* List */}
+                <div className="max-h-[70vh] sm:max-h-[800px] overflow-y-auto overscroll-contain space-y-4 sm:space-y-6 pr-0 sm:pr-2">
+                  {filteredTracks.map((track) => (
+                    <div
+                      key={track.id}
+                      className="bg-white/10 backdrop-blur-md rounded-xl p-4 sm:p-6 border border-white/20"
+                    >
+                      {/* Track header */}
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-5">
+                        <div className="flex items-start gap-3 sm:gap-4 min-w-0">
+                          <div className="mt-0.5 sm:mt-1 flex-shrink-0">
+                            <Play size={22} className="text-white/80" />
+                          </div>
+
+                          <div className="min-w-0">
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                              <h4 className="text-base sm:text-xl text-white drop-shadow font-medium break-words sm:truncate">
+                                {track.name}
+                              </h4>
+
+                              <span className="w-fit px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-[11px] sm:text-xs text-white/90 uppercase">
+                                {track.type === "single"
+                                  ? text.single
+                                  : track.type === "ep"
+                                  ? text.ep
+                                  : text.album}
+                              </span>
+                            </div>
+
+                            <p className="text-white/60 mt-1 text-sm">
+                              {track.totalStreams.toLocaleString()}{" "}
+                              {text.totalStreams.toLowerCase()}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Location section title */}
+                      <h5 className="text-white/90 drop-shadow mb-3 sm:mb-4 text-sm sm:text-base">
+                        {text.locationPerTrack}
+                      </h5>
+
+                      {/* Locations grid */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                        {(track.topLocations ?? []).map(
+                          (location, locIndex) => (
+                            <div
+                              key={locIndex}
+                              className="bg-white/5 rounded-lg p-4 border border-white/10"
+                            >
+                              <div className="flex items-center justify-between gap-3 mb-2">
+                                <span className="text-white drop-shadow truncate">
+                                  {getCountryName(location.location)}
+                                </span>
+                                <span className="text-white/80 flex-shrink-0 text-sm">
+                                  {location.streams.toLocaleString()}
+                                </span>
+                              </div>
+
+                              <div className="w-full bg-white/10 rounded-full h-2 mb-1 overflow-hidden">
+                                <div
+                                  className="bg-white/50 h-2 rounded-full transition-all"
+                                  style={{ width: location.percentage ?? "0%" }}
+                                />
+                              </div>
+
+                              <span className="text-white/60 text-xs sm:text-sm">
+                                {location.percentage ?? "0%"}
+                              </span>
+                            </div>
+                          )
+                        )}
+
+                        {(track.topLocations ?? []).length === 0 && (
+                          <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+                            <p className="text-white/60 text-sm">
+                              {text.noContent ||
+                                "No location data for this track."}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === "subscriptions" && (
+            <div className="space-y-6">
+              {/* Subscription Pricing Section */}
+              <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 sm:p-6 md:p-8 border border-white/20">
+                <h2 className="text-xl sm:text-2xl text-white drop-shadow-lg mb-6">
+                  {text.subscriptionPricing}
+                </h2>
+
+                <div>
+                  <label className="block text-white drop-shadow mb-6 text-base sm:text-lg">
+                    {text.setPriceLabel}
+                  </label>
+
+                  <form onSubmit={handleSubmitPricing}>
+                    {/* Messages */}
+                    {pricingLoading && (
+                      <p className="text-white/70 text-sm mb-4">
+                        Loading pricing…
+                      </p>
+                    )}
+
+                    {pricingError && (
+                      <div className="mb-4 p-3 bg-red-500/20 border border-red-400/40 rounded-lg">
+                        <p className="text-red-200 text-sm">{pricingError}</p>
+                      </div>
+                    )}
+
+                    {pricingSaved && (
+                      <div className="mb-4 p-3 bg-green-500/20 border border-green-400/40 rounded-lg">
+                        <p className="text-green-200 text-sm">
+                          {language === "spanish"
+                            ? "Precios guardados"
+                            : language === "english"
+                            ? "Prices saved"
+                            : "Preus guardats"}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Pricing Options Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-6">
                       {/* Monthly */}
-                      <div className="bg-white/10 rounded-lg p-4 border border-white/20">
-                        <p className="text-white/60 text-xs uppercase tracking-wide mb-1">
+                      <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/20">
+                        <h3 className="text-white drop-shadow mb-4 text-base sm:text-lg">
                           {text.monthly}
-                        </p>
-                        <p className="text-white text-2xl font-semibold">
-                          €{monthlyPrice || "—"}
-                        </p>
-                        <p className="text-white/50 text-xs mt-1">
+                        </h3>
+                        <div className="relative">
+                          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/60 text-xl">
+                            €
+                          </span>
+                          <input
+                            type="number"
+                            value={monthlyPrice}
+                            onChange={(e) => {
+                              let value = parseFloat(e.target.value);
+                              if (value < 1) value = 1;
+                              if (value > 5) value = 5;
+                              setMonthlyPrice(value.toString());
+                            }}
+                            placeholder="1.00"
+                            step="0.01"
+                            min="1"
+                            max="5"
+                            disabled={pricingLoading || pricingSaving}
+                            className="w-full pl-10 pr-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all disabled:opacity-60"
+                          />
+                        </div>
+                        <p className="text-white/60 text-sm mt-2">
                           {text.pricePerMonth}
                         </p>
                       </div>
 
                       {/* Quarterly */}
-                      <div className="bg-white/10 rounded-lg p-4 border border-white/20">
-                        <p className="text-white/60 text-xs uppercase tracking-wide mb-1">
+                      <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/20">
+                        <h3 className="text-white drop-shadow mb-4 text-base sm:text-lg">
                           {text.quarterly}
-                        </p>
-                        <p className="text-white text-2xl font-semibold">
-                          €{quarterlyPrice || "—"}
-                        </p>
-                        <p className="text-white/50 text-xs mt-1">
+                        </h3>
+                        <div className="relative">
+                          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/60 text-xl">
+                            €
+                          </span>
+                          <input
+                            type="text"
+                            value={quarterlyPrice}
+                            readOnly
+                            placeholder="—"
+                            className="w-full pl-10 pr-4 py-3 bg-white/5 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 cursor-not-allowed opacity-80"
+                          />
+                        </div>
+                        <p className="text-white/60 text-sm mt-2">
                           {text.pricePerQuarter}
                         </p>
+                        {monthlyPrice && (
+                          <p className="text-white/50 text-xs mt-1">
+                            {language === "spanish" &&
+                              "(Calculado automáticamente)"}
+                            {language === "english" &&
+                              "(Calculated automatically)"}
+                            {language === "catalan" &&
+                              "(Calculat automàticament)"}
+                          </p>
+                        )}
                       </div>
 
                       {/* Annual */}
-                      <div className="bg-white/10 rounded-lg p-4 border border-white/20">
-                        <p className="text-white/60 text-xs uppercase tracking-wide mb-1">
+                      <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/20">
+                        <h3 className="text-white drop-shadow mb-4 text-base sm:text-lg">
                           {text.annual}
-                        </p>
-                        <p className="text-white text-2xl font-semibold">
-                          €{annualPrice || "—"}
-                        </p>
-                        <p className="text-white/50 text-xs mt-1">
+                        </h3>
+                        <div className="relative">
+                          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/60 text-xl">
+                            €
+                          </span>
+                          <input
+                            type="text"
+                            value={annualPrice}
+                            readOnly
+                            placeholder="—"
+                            className="w-full pl-10 pr-4 py-3 bg-white/5 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 cursor-not-allowed opacity-80"
+                          />
+                        </div>
+                        <p className="text-white/60 text-sm mt-2">
                           {text.pricePerYear}
                         </p>
+                        {monthlyPrice && (
+                          <p className="text-white/50 text-xs mt-1">
+                            {language === "spanish" &&
+                              "(Calculado automáticamente)"}
+                            {language === "english" &&
+                              "(Calculated automatically)"}
+                            {language === "catalan" &&
+                              "(Calculat automàticament)"}
+                          </p>
+                        )}
                       </div>
                     </div>
 
-                    {/* Small helper */}
-                    <p className="text-white/40 text-xs mt-4">
-                      {language === "spanish" &&
-                        "Los precios se muestran tal como aparecerán para los fans."}
-                      {language === "english" &&
-                        "Prices are displayed exactly as fans will see them."}
-                      {language === "catalan" &&
-                        "Els preus es mostren exactament com els veuran els fans."}
-                    </p>
+                    {/* Submit */}
+                    <div className="flex justify-end">
+                      <button
+                        type="submit"
+                        disabled={
+                          !monthlyPrice || pricingSaving || pricingLoading
+                        }
+                        className="px-6 sm:px-8 cursor-pointer py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-white hover:bg-white/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {pricingSaving
+                          ? language === "english"
+                            ? "Saving..."
+                            : language === "spanish"
+                            ? "Guardando..."
+                            : "Desant..."
+                          : text.savePrice}
+                      </button>
+                    </div>
+                  </form>
+
+                  {(monthlyPrice || quarterlyPrice || annualPrice) && (
+                    <div className="mt-6 p-4 sm:p-5 bg-white/5 backdrop-blur-md rounded-xl border border-white/20">
+                      <p className="text-white/90 text-sm mb-4 font-medium">
+                        {language === "spanish" &&
+                          "Los fans podrán elegir entre estas opciones de suscripción:"}
+                        {language === "english" &&
+                          "Fans will be able to choose between these subscription options:"}
+                        {language === "catalan" &&
+                          "Els fans podran triar entre aquestes opcions de subscripció:"}
+                      </p>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div className="bg-white/10 rounded-lg p-4 border border-white/20">
+                          <p className="text-white/60 text-xs uppercase tracking-wide mb-1">
+                            {text.monthly}
+                          </p>
+                          <p className="text-white text-2xl font-semibold">
+                            €{monthlyPrice || "—"}
+                          </p>
+                          <p className="text-white/50 text-xs mt-1">
+                            {text.pricePerMonth}
+                          </p>
+                        </div>
+
+                        <div className="bg-white/10 rounded-lg p-4 border border-white/20">
+                          <p className="text-white/60 text-xs uppercase tracking-wide mb-1">
+                            {text.quarterly}
+                          </p>
+                          <p className="text-white text-2xl font-semibold">
+                            €{quarterlyPrice || "—"}
+                          </p>
+                          <p className="text-white/50 text-xs mt-1">
+                            {text.pricePerQuarter}
+                          </p>
+                        </div>
+
+                        <div className="bg-white/10 rounded-lg p-4 border border-white/20">
+                          <p className="text-white/60 text-xs uppercase tracking-wide mb-1">
+                            {text.annual}
+                          </p>
+                          <p className="text-white text-2xl font-semibold">
+                            €{annualPrice || "—"}
+                          </p>
+                          <p className="text-white/50 text-xs mt-1">
+                            {text.pricePerYear}
+                          </p>
+                        </div>
+                      </div>
+
+                      <p className="text-white/40 text-xs mt-4">
+                        {language === "spanish" &&
+                          "Los precios se muestran tal como aparecerán para los fans."}
+                        {language === "english" &&
+                          "Prices are displayed exactly as fans will see them."}
+                        {language === "catalan" &&
+                          "Els preus es mostren exactament com els veuran els fans."}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Stats cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 sm:p-6 border border-white/20">
+                  <div className="flex items-center gap-2 mb-2">
+                    <DollarSign size={20} className="text-white" />
+                    <h3 className="text-white/80 drop-shadow text-sm sm:text-base">
+                      {text.totalRevenue}
+                    </h3>
                   </div>
-                )}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
-                <div className="flex items-center gap-2 mb-2">
-                  <DollarSign size={20} className="text-white" />
-                  <h3 className="text-white/80 drop-shadow">
-                    {text.totalRevenue}
-                  </h3>
+                  <p className="text-2xl sm:text-3xl text-white drop-shadow truncate">
+                    {statsLoading ? "—" : `€${subStats.totalRevenue}`}
+                  </p>
                 </div>
-                <p className="text-3xl text-white drop-shadow">
-                  {statsLoading ? "—" : `€${subStats.totalRevenue}`}
-                </p>
-              </div>
 
-              <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
-                <div className="flex items-center gap-2 mb-2">
-                  <Users size={20} className="text-white" />
-                  <h3 className="text-white/80 drop-shadow">
-                    {text.totalSubscribers}
-                  </h3>
+                <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 sm:p-6 border border-white/20">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Users size={20} className="text-white" />
+                    <h3 className="text-white/80 drop-shadow text-sm sm:text-base">
+                      {text.totalSubscribers}
+                    </h3>
+                  </div>
+                  <p className="text-2xl sm:text-3xl text-white drop-shadow">
+                    {statsLoading ? "—" : subStats.totalSubscribers}
+                  </p>
                 </div>
-                <p className="text-3xl text-white drop-shadow">
-                  {statsLoading ? "—" : subStats.totalSubscribers}
-                </p>
-              </div>
 
-              <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
-                <div className="flex items-center gap-2 mb-2">
-                  <Users size={20} className="text-white" />
-                  <h3 className="text-white/80 drop-shadow">
-                    {text.activeSubscribers}
-                  </h3>
+                <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 sm:p-6 border border-white/20">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Users size={20} className="text-white" />
+                    <h3 className="text-white/80 drop-shadow text-sm sm:text-base">
+                      {text.activeSubscribers}
+                    </h3>
+                  </div>
+                  <p className="text-2xl sm:text-3xl text-white drop-shadow">
+                    {statsLoading ? "—" : subStats.activeSubscribers}
+                  </p>
                 </div>
-                <p className="text-3xl text-white drop-shadow">
-                  {statsLoading ? "—" : subStats.activeSubscribers}
-                </p>
-              </div>
 
-              <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
-                <div className="flex items-center gap-2 mb-2">
-                  <TrendingUp size={20} className="text-white" />
-                  <h3 className="text-white/80 drop-shadow">Growth</h3>
+                <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 sm:p-6 border border-white/20">
+                  <div className="flex items-center gap-2 mb-2">
+                    <TrendingUp size={20} className="text-white" />
+                    <h3 className="text-white/80 drop-shadow text-sm sm:text-base">
+                      Growth
+                    </h3>
+                  </div>
+                  <p className="text-2xl sm:text-3xl text-white drop-shadow">
+                    {statsLoading ? "—" : subStats.growth}
+                  </p>
                 </div>
-                <p className="text-3xl text-white drop-shadow">
-                  {statsLoading ? "—" : subStats.growth}
-                </p>
-              </div>
-            </div>
-
-            {statsError && (
-              <div className="mt-4 p-3 bg-red-500/20 border border-red-400/40 rounded-lg">
-                <p className="text-red-200 text-sm">{statsError}</p>
-              </div>
-            )}
-
-            {/* Exclusive Content Upload Section */}
-            <div className="bg-white/10 backdrop-blur-md rounded-xl p-8 border border-white/20">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl text-white drop-shadow-lg">
-                  {text.exclusiveContent}
-                </h2>
-
-                <button
-                  type="button"
-                  onClick={fetchExclusiveContents}
-                  className="cursor-pointer px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white/80 hover:bg-white/20 transition-all disabled:cursor-not-allowed"
-                  disabled={isExclusiveLoading}
-                >
-                  {isExclusiveLoading
-                    ? "loading…"
-                    : language === "english"
-                    ? "Refresh"
-                    : language === "spanish"
-                    ? "Actualizar"
-                    : "Actualitzar"}
-                </button>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                {/* Upload Form */}
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-white drop-shadow mb-2">
-                      {text.contentType}
-                    </label>
-                    <select
-                      value={exclusiveContentType}
-                      onChange={(e) => {
-                        setExclusiveContentType(e.target.value);
-                        // reset file when switching type
-                        setExclusiveContentFile(null);
-                        setExclusiveContentPreview("");
-                        setExclusiveContentUrl("");
-                      }}
-                      className="cursor-pointer w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black focus:outline-none focus:border-white/40 transition-all"
+              {statsError && (
+                <div className="mt-4 p-3 bg-red-500/20 border border-red-400/40 rounded-lg">
+                  <p className="text-red-200 text-sm">{statsError}</p>
+                </div>
+              )}
+
+              {/* Exclusive Content Upload Section */}
+              <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 sm:p-6 md:p-8 border border-white/20">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+                  <h2 className="text-xl sm:text-2xl text-white drop-shadow-lg">
+                    {text.exclusiveContent}
+                  </h2>
+
+                  <button
+                    type="button"
+                    onClick={fetchExclusiveContents}
+                    className="cursor-pointer px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white/80 hover:bg-white/20 transition-all disabled:cursor-not-allowed"
+                    disabled={isExclusiveLoading}
+                  >
+                    {isExclusiveLoading
+                      ? "loading…"
+                      : language === "english"
+                      ? "Refresh"
+                      : language === "spanish"
+                      ? "Actualizar"
+                      : "Actualitzar"}
+                  </button>
+                </div>
+
+                {/* Le reste de ton bloc Exclusive Content reste IDENTIQUE */}
+                <div className="bg-white/10 backdrop-blur-md rounded-xl p-8 border border-white/20">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-2xl text-white drop-shadow-lg">
+                      {text.exclusiveContent}
+                    </h2>
+
+                    <button
+                      type="button"
+                      onClick={fetchExclusiveContents}
+                      className="cursor-pointer px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white/80 hover:bg-white/20 transition-all disabled:cursor-not-allowed"
+                      disabled={isExclusiveLoading}
                     >
-                      <option value="music">{text.music}</option>
-                      <option value="video">{text.video}</option>
-                      <option value="photo">{text.photo}</option>
-                      <option value="document">{text.document}</option>
-                    </select>
+                      {isExclusiveLoading
+                        ? "loading…"
+                        : language === "english"
+                        ? "Refresh"
+                        : language === "spanish"
+                        ? "Actualizar"
+                        : "Actualitzar"}
+                    </button>
                   </div>
 
-                  <div>
-                    <label className="block text-white drop-shadow mb-2">
-                      {text.contentTitle}
-                    </label>
-                    <input
-                      type="text"
-                      value={exclusiveContentTitle}
-                      onChange={(e) => setExclusiveContentTitle(e.target.value)}
-                      placeholder={text.contentTitle}
-                      className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
-                    />
-                  </div>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    {/* Upload Form */}
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-white drop-shadow mb-2">
+                          {text.contentType}
+                        </label>
+                        <select
+                          value={exclusiveContentType}
+                          onChange={(e) => {
+                            setExclusiveContentType(e.target.value);
+                            // reset file when switching type
+                            setExclusiveContentFile(null);
+                            setExclusiveContentPreview("");
+                            setExclusiveContentUrl("");
+                          }}
+                          className="cursor-pointer w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black focus:outline-none focus:border-white/40 transition-all"
+                        >
+                          <option value="music">{text.music}</option>
+                          <option value="video">{text.video}</option>
+                          <option value="photo">{text.photo}</option>
+                          <option value="document">{text.document}</option>
+                        </select>
+                      </div>
 
-                  <div>
-                    <label className="block text-white drop-shadow mb-2">
-                      {text.contentDescription}
-                    </label>
-                    <textarea
-                      value={exclusiveContentDescription}
-                      onChange={(e) =>
-                        setExclusiveContentDescription(e.target.value)
-                      }
-                      placeholder={text.contentDescription}
-                      rows={3}
-                      className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all resize-none"
-                    />
-                  </div>
+                      <div>
+                        <label className="block text-white drop-shadow mb-2">
+                          {text.contentTitle}
+                        </label>
+                        <input
+                          type="text"
+                          value={exclusiveContentTitle}
+                          onChange={(e) =>
+                            setExclusiveContentTitle(e.target.value)
+                          }
+                          placeholder={text.contentTitle}
+                          className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all"
+                        />
+                      </div>
 
-                  {/* File Upload */}
-                  <div>
-                    <label className="block text-white drop-shadow mb-2">
-                      {text.uploadFile}
-                    </label>
+                      <div>
+                        <label className="block text-white drop-shadow mb-2">
+                          {text.contentDescription}
+                        </label>
+                        <textarea
+                          value={exclusiveContentDescription}
+                          onChange={(e) =>
+                            setExclusiveContentDescription(e.target.value)
+                          }
+                          placeholder={text.contentDescription}
+                          rows={3}
+                          className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all resize-none"
+                        />
+                      </div>
 
-                    {exclusiveContentFile ? (
-                      <div className="bg-white/5 border border-white/20 rounded-xl p-4">
-                        {/* Preview per type */}
-                        {exclusiveContentType === "photo" &&
-                          exclusiveContentPreview && (
-                            <img
-                              src={exclusiveContentPreview}
-                              alt="Preview"
-                              className="w-full max-h-56 object-cover rounded-lg"
-                            />
-                          )}
+                      {/* File Upload */}
+                      <div>
+                        <label className="block text-white drop-shadow mb-2">
+                          {text.uploadFile}
+                        </label>
 
-                        {exclusiveContentType === "video" &&
-                          exclusiveContentPreview && (
-                            <video
-                              src={exclusiveContentPreview}
-                              controls
-                              className="w-full max-h-56 rounded-lg"
-                            />
-                          )}
+                        {exclusiveContentFile ? (
+                          <div className="bg-white/5 border border-white/20 rounded-xl p-4">
+                            {/* Preview per type */}
+                            {exclusiveContentType === "photo" &&
+                              exclusiveContentPreview && (
+                                <img
+                                  src={exclusiveContentPreview}
+                                  alt="Preview"
+                                  className="w-full max-h-56 object-cover rounded-lg"
+                                />
+                              )}
 
-                        {exclusiveContentType === "music" &&
-                          exclusiveContentPreview && (
-                            <audio
-                              src={exclusiveContentPreview}
-                              controls
-                              className="w-full"
-                            />
-                          )}
+                            {exclusiveContentType === "video" &&
+                              exclusiveContentPreview && (
+                                <video
+                                  src={exclusiveContentPreview}
+                                  controls
+                                  className="w-full max-h-56 rounded-lg"
+                                />
+                              )}
 
-                        {exclusiveContentType === "document" && (
-                          <div className="text-white/80 text-sm">
-                            <p className="font-medium">
-                              {exclusiveContentFile.name}
-                            </p>
-                            <p className="text-white/50 text-xs mt-1">
-                              TXT document
-                            </p>
+                            {exclusiveContentType === "music" &&
+                              exclusiveContentPreview && (
+                                <audio
+                                  src={exclusiveContentPreview}
+                                  controls
+                                  className="w-full"
+                                />
+                              )}
+
+                            {exclusiveContentType === "document" && (
+                              <div className="text-white/80 text-sm">
+                                <p className="font-medium">
+                                  {exclusiveContentFile.name}
+                                </p>
+                                <p className="text-white/50 text-xs mt-1">
+                                  TXT document
+                                </p>
+                              </div>
+                            )}
+                            {/* Alerts */}
+                            {exclusiveError && (
+                              <div className="mb-6 p-4 bg-red-500/20 border border-red-400/40 rounded-lg">
+                                <p className="text-red-200 text-sm">
+                                  {exclusiveError}
+                                </p>
+                              </div>
+                            )}
+
+                            {exclusiveSuccess && (
+                              <div className="mb-6 p-4 bg-green-500/20 border border-green-400/40 rounded-lg">
+                                <p className="text-green-200 text-sm">
+                                  {exclusiveSuccess}
+                                </p>
+                              </div>
+                            )}
+
+                            <div className="mt-4 flex gap-3">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setExclusiveContentFile(null);
+                                  setExclusiveContentPreview("");
+                                  setExclusiveContentUrl("");
+                                }}
+                                className="cursor-pointer flex-1 px-4 py-2 bg-red-500/30 border border-red-500/40 rounded-lg text-white hover:bg-red-500/40 transition-all"
+                              >
+                                {language === "english"
+                                  ? "Remove"
+                                  : language === "spanish"
+                                  ? "Eliminar"
+                                  : "Eliminar"}
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  document
+                                    .getElementById("exclusive-content-file")
+                                    ?.click()
+                                }
+                                className="cursor-pointer flex-1 px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white/80 hover:bg-white/20 transition-all"
+                              >
+                                {language === "english"
+                                  ? "Change"
+                                  : language === "spanish"
+                                  ? "Cambiar"
+                                  : "Canviar"}
+                              </button>
+                            </div>
                           </div>
-                        )}
-                        {/* Alerts */}
-                        {exclusiveError && (
-                          <div className="mb-6 p-4 bg-red-500/20 border border-red-400/40 rounded-lg">
-                            <p className="text-red-200 text-sm">
-                              {exclusiveError}
-                            </p>
-                          </div>
-                        )}
-
-                        {exclusiveSuccess && (
-                          <div className="mb-6 p-4 bg-green-500/20 border border-green-400/40 rounded-lg">
-                            <p className="text-green-200 text-sm">
-                              {exclusiveSuccess}
-                            </p>
-                          </div>
-                        )}
-
-                        <div className="mt-4 flex gap-3">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setExclusiveContentFile(null);
-                              setExclusiveContentPreview("");
-                              setExclusiveContentUrl("");
-                            }}
-                            className="cursor-pointer flex-1 px-4 py-2 bg-red-500/30 border border-red-500/40 rounded-lg text-white hover:bg-red-500/40 transition-all"
-                          >
-                            {language === "english"
-                              ? "Remove"
-                              : language === "spanish"
-                              ? "Eliminar"
-                              : "Eliminar"}
-                          </button>
-
-                          <button
-                            type="button"
+                        ) : (
+                          <div
+                            className="border-2 border-dashed border-white/30 rounded-xl p-8 text-center hover:border-white/50 transition-all cursor-pointer bg-white/5"
                             onClick={() =>
                               document
                                 .getElementById("exclusive-content-file")
                                 ?.click()
                             }
-                            className="cursor-pointer flex-1 px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white/80 hover:bg-white/20 transition-all"
                           >
-                            {language === "english"
-                              ? "Change"
-                              : language === "spanish"
-                              ? "Cambiar"
-                              : "Canviar"}
-                          </button>
-                        </div>
+                            <Upload
+                              size={32}
+                              className="text-white/60 mx-auto mb-2"
+                            />
+                            <p className="text-white/60 text-sm">
+                              {language === "english"
+                                ? "Click to upload"
+                                : language === "spanish"
+                                ? "Haz clic para subir"
+                                : "Fes clic per pujar"}
+                            </p>
+
+                            <input
+                              id="exclusive-content-file"
+                              type="file"
+                              accept={
+                                ACCEPT_BY_TYPE[exclusiveContentType] || "*/*"
+                              }
+                              onChange={handleExclusiveFile}
+                              className="hidden"
+                            />
+                          </div>
+                        )}
                       </div>
-                    ) : (
-                      <div
-                        className="border-2 border-dashed border-white/30 rounded-xl p-8 text-center hover:border-white/50 transition-all cursor-pointer bg-white/5"
-                        onClick={() =>
-                          document
-                            .getElementById("exclusive-content-file")
-                            ?.click()
+
+                      {/* Submit */}
+                      <button
+                        type="button"
+                        onClick={handleSubmitExclusiveContent}
+                        disabled={
+                          isExclusiveSubmitting ||
+                          isUploadingExclusive ||
+                          !exclusiveContentTitle.trim() ||
+                          !exclusiveContentUrl
                         }
+                        className="cursor-pointer w-full px-6 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-white hover:bg-white/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        <Upload
-                          size={32}
-                          className="text-white/60 mx-auto mb-2"
-                        />
-                        <p className="text-white/60 text-sm">
-                          {language === "english"
-                            ? "Click to upload"
+                        {isExclusiveSubmitting
+                          ? language === "english"
+                            ? "Publishing…"
                             : language === "spanish"
-                            ? "Haz clic para subir"
-                            : "Fes clic per pujar"}
-                        </p>
+                            ? "Publicando…"
+                            : "Publicant…"
+                          : text.uploadExclusiveContent}
+                      </button>
 
-                        <input
-                          id="exclusive-content-file"
-                          type="file"
-                          accept={ACCEPT_BY_TYPE[exclusiveContentType] || "*/*"}
-                          onChange={handleExclusiveFile}
-                          className="hidden"
-                        />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Submit */}
-                  <button
-                    type="button"
-                    onClick={handleSubmitExclusiveContent}
-                    disabled={
-                      isExclusiveSubmitting ||
-                      isUploadingExclusive ||
-                      !exclusiveContentTitle.trim() ||
-                      !exclusiveContentUrl
-                    }
-                    className="cursor-pointer w-full px-6 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-white hover:bg-white/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {isExclusiveSubmitting
-                      ? language === "english"
-                        ? "Publishing…"
-                        : language === "spanish"
-                        ? "Publicando…"
-                        : "Publicant…"
-                      : text.uploadExclusiveContent}
-                  </button>
-
-                  <p className="text-white/50 text-xs">
-                    {exclusiveContentUrl
-                      ? language === "english"
-                        ? "File uploaded. Ready to publish."
-                        : language === "spanish"
-                        ? "Archivo subido. Listo para publicar."
-                        : "Fitxer pujat. Llest per publicar."
-                      : language === "english"
-                      ? "Upload a file before publishing."
-                      : language === "spanish"
-                      ? "Sube un archivo antes de publicar."
-                      : "Puja un fitxer abans de publicar."}
-                  </p>
-                </div>
-
-                {/* Uploaded Content List */}
-                <div>
-                  <h3 className="text-lg text-white drop-shadow mb-4">
-                    {text.uploadedContent}
-                  </h3>
-
-                  {isExclusiveLoading ? (
-                    <div className="bg-white/5 rounded-lg p-8 text-center border border-white/20">
-                      <p className="text-white/60 text-sm">Loading…</p>
+                      <p className="text-white/50 text-xs">
+                        {exclusiveContentUrl
+                          ? language === "english"
+                            ? "File uploaded. Ready to publish."
+                            : language === "spanish"
+                            ? "Archivo subido. Listo para publicar."
+                            : "Fitxer pujat. Llest per publicar."
+                          : language === "english"
+                          ? "Upload a file before publishing."
+                          : language === "spanish"
+                          ? "Sube un archivo antes de publicar."
+                          : "Puja un fitxer abans de publicar."}
+                      </p>
                     </div>
-                  ) : uploadedExclusiveContent.length === 0 ? (
-                    <div className="bg-white/5 rounded-lg p-8 text-center border border-white/20">
-                      <Music size={48} className="text-white/40 mx-auto mb-4" />
-                      <p className="text-white/60">{text.noContent}</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {uploadedExclusiveContent.map((content) => {
-                        const created = content.createdAt
-                          ? new Date(content.createdAt).toLocaleDateString()
-                          : "";
 
-                        const typeLabel =
-                          content.type?.toUpperCase?.() ?? "CONTENT";
+                    {/* Uploaded Content List */}
+                    <div>
+                      <h3 className="text-lg text-white drop-shadow mb-4">
+                        {text.uploadedContent}
+                      </h3>
 
-                        const TypeIcon =
-                          content.type === "music"
-                            ? Music
-                            : content.type === "video"
-                            ? Video
-                            : content.type === "photo"
-                            ? Image
-                            : FileText;
+                      {isExclusiveLoading ? (
+                        <div className="bg-white/5 rounded-lg p-8 text-center border border-white/20">
+                          <p className="text-white/60 text-sm">Loading…</p>
+                        </div>
+                      ) : uploadedExclusiveContent.length === 0 ? (
+                        <div className="bg-white/5 rounded-lg p-8 text-center border border-white/20">
+                          <Music
+                            size={48}
+                            className="text-white/40 mx-auto mb-4"
+                          />
+                          <p className="text-white/60">{text.noContent}</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {uploadedExclusiveContent.map((content) => {
+                            const created = content.createdAt
+                              ? new Date(content.createdAt).toLocaleDateString()
+                              : "";
 
-                        return (
-                          <div
-                            key={content.id}
-                            className="bg-white/5 rounded-xl border border-white/20 overflow-hidden hover:bg-white/10 transition-all"
-                          >
-                            {/* TOP */}
-                            <div className="p-4 flex flex-col sm:flex-row sm:items-start gap-4">
-                              {/* Thumbnail */}
-                              <div className="w-full sm:w-16 sm:h-16">
-                                <div className="w-full h-44 sm:w-16 sm:h-16 rounded-lg bg-white/10 border border-white/15 flex items-center justify-center overflow-hidden">
-                                  {content.type === "photo" &&
-                                  content.fileUrl ? (
-                                    <img
-                                      src={content.fileUrl}
-                                      alt={content.title}
-                                      className="w-full h-full object-cover"
-                                    />
-                                  ) : content.type === "video" &&
-                                    content.fileUrl ? (
-                                    <video
-                                      src={content.fileUrl}
-                                      className="w-full h-full object-cover"
-                                      muted
-                                      playsInline
-                                      preload="metadata"
-                                    />
-                                  ) : (
-                                    <TypeIcon
-                                      size={26}
-                                      className="text-white/70"
-                                    />
-                                  )}
-                                </div>
-                              </div>
+                            const typeLabel =
+                              content.type?.toUpperCase?.() ?? "CONTENT";
 
-                              {/* Content */}
-                              <div className="flex-1 min-w-0">
-                                {/* Header row */}
-                                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-                                  {/* Title + meta */}
-                                  <div className="min-w-0">
-                                    <h4 className="text-white drop-shadow font-medium break-words sm:truncate">
-                                      {content.title}
-                                    </h4>
+                            const TypeIcon =
+                              content.type === "music"
+                                ? Music
+                                : content.type === "video"
+                                ? Video
+                                : content.type === "photo"
+                                ? Image
+                                : FileText;
 
-                                    <div className="mt-2 flex items-center gap-2 flex-wrap">
-                                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] bg-white/10 border border-white/20 text-white/80">
+                            return (
+                              <div
+                                key={content.id}
+                                className="bg-white/5 rounded-xl border border-white/20 overflow-hidden hover:bg-white/10 transition-all"
+                              >
+                                {/* TOP */}
+                                <div className="p-4 flex flex-col sm:flex-row sm:items-start gap-4">
+                                  {/* Thumbnail */}
+                                  <div className="w-full sm:w-16 sm:h-16">
+                                    <div className="w-full h-44 sm:w-16 sm:h-16 rounded-lg bg-white/10 border border-white/15 flex items-center justify-center overflow-hidden">
+                                      {content.type === "photo" &&
+                                      content.fileUrl ? (
+                                        <img
+                                          src={content.fileUrl}
+                                          alt={content.title}
+                                          className="w-full h-full object-cover"
+                                        />
+                                      ) : content.type === "video" &&
+                                        content.fileUrl ? (
+                                        <video
+                                          src={content.fileUrl}
+                                          className="w-full h-full object-cover"
+                                          muted
+                                          playsInline
+                                          preload="metadata"
+                                        />
+                                      ) : (
                                         <TypeIcon
-                                          size={12}
+                                          size={26}
                                           className="text-white/70"
                                         />
-                                        {typeLabel}
-                                      </span>
-
-                                      {created && (
-                                        <span className="text-white/50 text-xs">
-                                          {language === "english"
-                                            ? `Uploaded: ${created}`
-                                            : language === "spanish"
-                                            ? `Subido: ${created}`
-                                            : `Pujat: ${created}`}
-                                        </span>
                                       )}
                                     </div>
                                   </div>
 
-                                  {/* Actions */}
-                                  <div className="flex items-center gap-2 sm:justify-end">
-                                    {content.fileUrl && (
-                                      <a
-                                        href={content.fileUrl}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                        className="flex-1 sm:flex-none text-center px-3 py-2 rounded-lg bg-white/10 border border-white/20 text-white/80 hover:bg-white/20 hover:text-white transition-all text-xs"
-                                      >
-                                        {language === "english"
-                                          ? "Open"
-                                          : language === "spanish"
-                                          ? "Abrir"
-                                          : "Obrir"}
-                                      </a>
-                                    )}
+                                  {/* Content */}
+                                  <div className="flex-1 min-w-0">
+                                    {/* Header row */}
+                                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                                      {/* Title + meta */}
+                                      <div className="min-w-0">
+                                        <h4 className="text-white drop-shadow font-medium break-words sm:truncate">
+                                          {content.title}
+                                        </h4>
 
-                                    <button
-                                      type="button"
-                                      onClick={() =>
-                                        handleDeleteExclusiveContent(content.id)
-                                      }
-                                      className="cursor-pointer p-2 rounded-lg bg-red-500/20 border border-red-400/30 text-white/80 hover:bg-red-500/30 hover:text-white transition-all"
-                                      title={
-                                        language === "english"
-                                          ? "Delete"
-                                          : language === "spanish"
-                                          ? "Eliminar"
-                                          : "Eliminar"
-                                      }
-                                    >
-                                      <X size={18} />
-                                    </button>
+                                        <div className="mt-2 flex items-center gap-2 flex-wrap">
+                                          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] bg-white/10 border border-white/20 text-white/80">
+                                            <TypeIcon
+                                              size={12}
+                                              className="text-white/70"
+                                            />
+                                            {typeLabel}
+                                          </span>
+
+                                          {created && (
+                                            <span className="text-white/50 text-xs">
+                                              {language === "english"
+                                                ? `Uploaded: ${created}`
+                                                : language === "spanish"
+                                                ? `Subido: ${created}`
+                                                : `Pujat: ${created}`}
+                                            </span>
+                                          )}
+                                        </div>
+                                      </div>
+
+                                      {/* Actions */}
+                                      <div className="flex items-center gap-2 sm:justify-end">
+                                        {content.fileUrl && (
+                                          <a
+                                            href={content.fileUrl}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="flex-1 sm:flex-none text-center px-3 py-2 rounded-lg bg-white/10 border border-white/20 text-white/80 hover:bg-white/20 hover:text-white transition-all text-xs"
+                                          >
+                                            {language === "english"
+                                              ? "Open"
+                                              : language === "spanish"
+                                              ? "Abrir"
+                                              : "Obrir"}
+                                          </a>
+                                        )}
+
+                                        <button
+                                          type="button"
+                                          onClick={() =>
+                                            handleDeleteExclusiveContent(
+                                              content.id
+                                            )
+                                          }
+                                          className="cursor-pointer p-2 rounded-lg bg-red-500/20 border border-red-400/30 text-white/80 hover:bg-red-500/30 hover:text-white transition-all"
+                                          title={
+                                            language === "english"
+                                              ? "Delete"
+                                              : language === "spanish"
+                                              ? "Eliminar"
+                                              : "Eliminar"
+                                          }
+                                        >
+                                          <X size={18} />
+                                        </button>
+                                      </div>
+                                    </div>
+
+                                    {/* Description */}
+                                    {content.description && (
+                                      <p className="text-white/60 text-sm mt-3 line-clamp-3 sm:line-clamp-2">
+                                        {content.description}
+                                      </p>
+                                    )}
                                   </div>
                                 </div>
 
-                                {/* Description */}
-                                {content.description && (
-                                  <p className="text-white/60 text-sm mt-3 line-clamp-3 sm:line-clamp-2">
-                                    {content.description}
-                                  </p>
-                                )}
+                                {/* BOTTOM BAR */}
+                                <div className="px-4 py-3 border-t border-white/10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs text-white/50">
+                                  <span className="break-all sm:truncate">
+                                    {content.fileUrl
+                                      ? content.fileUrl.replace(
+                                          /^https?:\/\//,
+                                          ""
+                                        )
+                                      : ""}
+                                  </span>
+
+                                  <span className="sm:ml-4 flex-shrink-0">
+                                    {content.type === "music"
+                                      ? "Audio"
+                                      : content.type === "video"
+                                      ? "Video"
+                                      : content.type === "photo"
+                                      ? "Image"
+                                      : "Document"}
+                                  </span>
+                                </div>
                               </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Le reste (Recent subscribers, By location, etc.) reste IDENTIQUE */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Recent Subscribers */}
+                  <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-xl text-white drop-shadow">
+                        {text.recentSubscribers}
+                      </h3>
+
+                      <button
+                        type="button"
+                        onClick={() => fetchRecentSubscribers(5)}
+                        className="cursor-pointer px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white/80 hover:bg-white/20 transition-all text-xs disabled:cursor-not-allowed"
+                        disabled={recentLoading}
+                      >
+                        {recentLoading
+                          ? "loading…"
+                          : language === "english"
+                          ? "Refresh"
+                          : language === "spanish"
+                          ? "Actualizar"
+                          : "Actualitzar"}
+                      </button>
+                    </div>
+
+                    {recentError && (
+                      <div className="mb-4 p-3 bg-red-500/20 border border-red-400/40 rounded-lg">
+                        <p className="text-red-200 text-sm">{recentError}</p>
+                      </div>
+                    )}
+
+                    {recentLoading ? (
+                      <div className="bg-white/5 rounded-lg p-6 text-center border border-white/20">
+                        <p className="text-white/60 text-sm">Loading…</p>
+                      </div>
+                    ) : recentSubscribers.length === 0 ? (
+                      <div className="bg-white/5 rounded-lg p-6 text-center border border-white/20">
+                        <p className="text-white/60 text-sm">
+                          {text.noSubscriptions}
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {recentSubscribers.map((s, index) => {
+                          const displayName =
+                            s.username?.trim?.() ||
+                            `${s.name ?? ""} ${s.surname ?? ""}`.trim() ||
+                            `Subscriber ${index + 1}`;
+
+                          return (
+                            <div
+                              key={s.subscriptionId ?? s.fanId ?? index}
+                              className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-4 bg-white/5 rounded-lg border border-white/10"
+                            >
+                              <div className="flex items-center gap-3 min-w-0">
+                                <div className="w-10 h-10 bg-white/20 rounded-full overflow-hidden flex items-center justify-center flex-shrink-0">
+                                  {s.profileImageUrl ? (
+                                    <img
+                                      src={s.profileImageUrl}
+                                      alt={displayName}
+                                      className="w-full h-full object-cover"
+                                    />
+                                  ) : (
+                                    <Users size={20} className="text-white" />
+                                  )}
+                                </div>
+
+                                <div className="min-w-0">
+                                  <p className="text-white drop-shadow truncate">
+                                    {displayName}
+                                  </p>
+                                  {s.country && (
+                                    <p className="text-white/50 text-xs truncate">
+                                      {s.country}
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+
+                              <span className="text-white/60 text-sm flex-shrink-0">
+                                {daysAgoLabel(s.subscribedAt)}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Subscriptions by Location */}
+                  <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-xl text-white drop-shadow">
+                        {text.byLocation}
+                      </h3>
+
+                      <button
+                        type="button"
+                        onClick={fetchSubscriptionsByLocation}
+                        className="cursor-pointer px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white/80 hover:bg-white/20 transition-all text-xs disabled:cursor-not-allowed"
+                        disabled={subsLocLoading}
+                      >
+                        {subsLocLoading
+                          ? "loading…"
+                          : language === "english"
+                          ? "Refresh"
+                          : language === "spanish"
+                          ? "Actualizar"
+                          : "Actualitzar"}
+                      </button>
+                    </div>
+
+                    {subsLocError && (
+                      <div className="mb-4 p-3 bg-red-500/20 border border-red-400/40 rounded-lg">
+                        <p className="text-red-200 text-sm">{subsLocError}</p>
+                      </div>
+                    )}
+
+                    {subsLocLoading ? (
+                      <div className="bg-white/5 rounded-lg p-6 text-center border border-white/20">
+                        <p className="text-white/60 text-sm">Loading…</p>
+                      </div>
+                    ) : subsByLocation.length === 0 ? (
+                      <div className="bg-white/5 rounded-lg p-6 text-center border border-white/20">
+                        <p className="text-white/60 text-sm">
+                          {language === "english"
+                            ? "No subscriptions by location yet"
+                            : language === "spanish"
+                            ? "Aún no hay suscripciones por ubicación"
+                            : "Encara no hi ha subscripcions per ubicació"}
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {subsByLocation.map((loc, index) => (
+                          <div
+                            key={`${loc.location}-${index}`}
+                            className="space-y-2"
+                          >
+                            <div className="flex items-center justify-between gap-3">
+                              <span className="text-white drop-shadow truncate">
+                                {loc.location || "Unknown"}
+                              </span>
+                              <span className="text-white/80 flex-shrink-0">
+                                {loc.subscribers}
+                              </span>
                             </div>
 
-                            {/* BOTTOM BAR */}
-                            <div className="px-4 py-3 border-t border-white/10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs text-white/50">
-                              <span className="break-all sm:truncate">
-                                {content.fileUrl
-                                  ? content.fileUrl.replace(/^https?:\/\//, "")
-                                  : ""}
-                              </span>
+                            <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden">
+                              <div
+                                className="bg-white/50 h-2 rounded-full transition-all"
+                                style={{ width: loc.percentage }}
+                              />
+                            </div>
 
-                              <span className="sm:ml-4 flex-shrink-0">
-                                {content.type === "music"
-                                  ? "Audio"
-                                  : content.type === "video"
-                                  ? "Video"
-                                  : content.type === "photo"
-                                  ? "Image"
-                                  : "Document"}
+                            <div className="flex items-center justify-between text-white/60 text-sm">
+                              <span>{loc.percentage}</span>
+                              <span className="text-xs text-white/40">
+                                {language === "english"
+                                  ? "Active subscribers"
+                                  : language === "spanish"
+                                  ? "Suscriptores activos"
+                                  : "Subscriptors actius"}
                               </span>
                             </div>
                           </div>
-                        );
-                      })}
-                    </div>
-                  )}
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
+          )}
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Recent Subscribers */}
-              <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl text-white drop-shadow">
-                    {text.recentSubscribers}
+          {/* Royalties Tab */}
+          {activeTab === "royalties" && (
+            <div className="space-y-6">
+              {/* Error */}
+              {royaltiesError && (
+                <div className="p-4 bg-red-500/20 border border-red-400/40 rounded-lg">
+                  <p className="text-red-200 text-sm">{royaltiesError}</p>
+                </div>
+              )}
+
+              {/* Royalties Stats */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 sm:p-6 border border-white/20">
+                  <div className="flex items-center gap-2 mb-2">
+                    <DollarSign size={20} className="text-white" />
+                    <h3 className="text-white/80 drop-shadow text-sm sm:text-base">
+                      {text.totalRoyalties}
+                    </h3>
+                  </div>
+                  <p className="text-2xl sm:text-3xl text-white drop-shadow truncate">
+                    {royaltiesLoading
+                      ? "—"
+                      : `€${royaltiesSummary.totalRoyalties}`}
+                  </p>
+                </div>
+
+                <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 sm:p-6 border border-white/20">
+                  <div className="flex items-center gap-2 mb-2">
+                    <DollarSign size={20} className="text-white" />
+                    <h3 className="text-white/80 drop-shadow text-sm sm:text-base">
+                      {text.thisMonth}
+                    </h3>
+                  </div>
+                  <p className="text-2xl sm:text-3xl text-white drop-shadow truncate">
+                    {royaltiesLoading ? "—" : `€${royaltiesSummary.thisMonth}`}
+                  </p>
+                </div>
+
+                <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 sm:p-6 border border-white/20">
+                  <div className="flex items-center gap-2 mb-2">
+                    <DollarSign size={20} className="text-white" />
+                    <h3 className="text-white/80 drop-shadow text-sm sm:text-base">
+                      Pending
+                    </h3>
+                  </div>
+                  <p className="text-2xl sm:text-3xl text-white drop-shadow truncate">
+                    {royaltiesLoading ? "—" : `€${royaltiesSummary.pending}`}
+                  </p>
+                </div>
+              </div>
+
+              {/* Revenue By Track */}
+              <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 sm:p-6 border border-white/20">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
+                  <h3 className="text-lg sm:text-xl text-white drop-shadow">
+                    {text.revenue} by Track
                   </h3>
 
                   <button
                     type="button"
-                    onClick={() => fetchRecentSubscribers(5)}
-                    className="cursor-pointer px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white/80 hover:bg-white/20 transition-all text-xs disabled:cursor-not-allowed"
-                    disabled={recentLoading}
+                    onClick={fetchRoyalties}
+                    className="cursor-pointer w-full sm:w-auto px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white/80 hover:bg-white/20 transition-all text-xs disabled:cursor-not-allowed"
+                    disabled={royaltiesLoading}
                   >
-                    {recentLoading
+                    {royaltiesLoading
                       ? "loading…"
                       : language === "english"
                       ? "Refresh"
@@ -4192,561 +4476,345 @@ export function ArtistDashboard({
                   </button>
                 </div>
 
-                {recentError && (
-                  <div className="mb-4 p-3 bg-red-500/20 border border-red-400/40 rounded-lg">
-                    <p className="text-red-200 text-sm">{recentError}</p>
-                  </div>
-                )}
-
-                {recentLoading ? (
+                {royaltiesLoading ? (
                   <div className="bg-white/5 rounded-lg p-6 text-center border border-white/20">
                     <p className="text-white/60 text-sm">Loading…</p>
                   </div>
-                ) : recentSubscribers.length === 0 ? (
+                ) : royaltiesTracks.length === 0 ? (
                   <div className="bg-white/5 rounded-lg p-6 text-center border border-white/20">
                     <p className="text-white/60 text-sm">
-                      {text.noSubscriptions}
+                      {language === "english"
+                        ? "No revenue data yet"
+                        : language === "spanish"
+                        ? "Aún no hay datos de ingresos"
+                        : "Encara no hi ha dades d'ingressos"}
                     </p>
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    {recentSubscribers.map((s, index) => {
-                      const displayName =
-                        s.username?.trim?.() ||
-                        `${s.name ?? ""} ${s.surname ?? ""}`.trim() ||
-                        `Subscriber ${index + 1}`;
-
-                      return (
-                        <div
-                          key={s.subscriptionId ?? s.fanId ?? index}
-                          className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-4 bg-white/5 rounded-lg border border-white/10"
-                        >
-                          <div className="flex items-center gap-3 min-w-0">
-                            <div className="w-10 h-10 bg-white/20 rounded-full overflow-hidden flex items-center justify-center flex-shrink-0">
-                              {s.profileImageUrl ? (
-                                <img
-                                  src={s.profileImageUrl}
-                                  alt={displayName}
-                                  className="w-full h-full object-cover"
-                                />
-                              ) : (
-                                <Users size={20} className="text-white" />
-                              )}
-                            </div>
-
-                            <div className="min-w-0">
-                              <p className="text-white drop-shadow truncate">
-                                {displayName}
-                              </p>
-                              {s.country && (
-                                <p className="text-white/50 text-xs truncate">
-                                  {s.country}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-
-                          <span className="text-white/60 text-sm flex-shrink-0">
-                            {daysAgoLabel(s.subscribedAt)}
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-
-              {/* Subscriptions by Location */}
-              <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl text-white drop-shadow">
-                    {text.byLocation}
-                  </h3>
-
-                  <button
-                    type="button"
-                    onClick={fetchSubscriptionsByLocation}
-                    className="cursor-pointer px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white/80 hover:bg-white/20 transition-all text-xs disabled:cursor-not-allowed"
-                    disabled={subsLocLoading}
-                  >
-                    {subsLocLoading
-                      ? "loading…"
-                      : language === "english"
-                      ? "Refresh"
-                      : language === "spanish"
-                      ? "Actualizar"
-                      : "Actualitzar"}
-                  </button>
-                </div>
-
-                {subsLocError && (
-                  <div className="mb-4 p-3 bg-red-500/20 border border-red-400/40 rounded-lg">
-                    <p className="text-red-200 text-sm">{subsLocError}</p>
-                  </div>
-                )}
-
-                {subsLocLoading ? (
-                  <div className="bg-white/5 rounded-lg p-6 text-center border border-white/20">
-                    <p className="text-white/60 text-sm">Loading…</p>
-                  </div>
-                ) : subsByLocation.length === 0 ? (
-                  <div className="bg-white/5 rounded-lg p-6 text-center border border-white/20">
-                    <p className="text-white/60 text-sm">
-                      {language === "english"
-                        ? "No subscriptions by location yet"
-                        : language === "spanish"
-                        ? "Aún no hay suscripciones por ubicación"
-                        : "Encara no hi ha subscripcions per ubicació"}
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {subsByLocation.map((loc, index) => (
+                    {royaltiesTracks.map((track) => (
                       <div
-                        key={`${loc.location}-${index}`}
-                        className="space-y-2"
+                        key={track.trackId}
+                        className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 bg-white/5 rounded-lg border border-white/10"
                       >
-                        <div className="flex items-center justify-between gap-3">
-                          <span className="text-white drop-shadow truncate">
-                            {loc.location || "Unknown"}
-                          </span>
-                          <span className="text-white/80 flex-shrink-0">
-                            {loc.subscribers}
-                          </span>
+                        <div className="flex items-center gap-4 min-w-0">
+                          <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <Music size={20} className="text-white" />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-white drop-shadow truncate">
+                              {track.name}
+                            </p>
+                            <p className="text-white/60 text-sm">
+                              {track.streams}{" "}
+                              {language === "english" ? "streams" : "streams"}
+                            </p>
+                          </div>
                         </div>
 
-                        <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden">
-                          <div
-                            className="bg-white/50 h-2 rounded-full transition-all"
-                            style={{ width: loc.percentage }}
-                          />
-                        </div>
-
-                        <div className="flex items-center justify-between text-white/60 text-sm">
-                          <span>{loc.percentage}</span>
-                          <span className="text-xs text-white/40">
-                            {language === "english"
-                              ? "Active subscribers"
-                              : language === "spanish"
-                              ? "Suscriptores activos"
-                              : "Subscriptors actius"}
-                          </span>
-                        </div>
+                        <span className="text-lg sm:text-xl text-white drop-shadow flex-shrink-0">
+                          €{track.revenue}
+                        </span>
                       </div>
                     ))}
                   </div>
                 )}
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Royalties Tab */}
-        {activeTab === "royalties" && (
-          <div className="space-y-6">
-            {/* Error */}
-            {royaltiesError && (
-              <div className="p-4 bg-red-500/20 border border-red-400/40 rounded-lg">
-                <p className="text-red-200 text-sm">{royaltiesError}</p>
-              </div>
-            )}
-
-            {/* Royalties Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
-                <div className="flex items-center gap-2 mb-2">
-                  <DollarSign size={20} className="text-white" />
-                  <h3 className="text-white/80 drop-shadow">
-                    {text.totalRoyalties}
-                  </h3>
-                </div>
-                <p className="text-3xl text-white drop-shadow">
-                  {royaltiesLoading
-                    ? "—"
-                    : `€${royaltiesSummary.totalRoyalties}`}
+          {/* Payout Tab */}
+          {activeTab === "payout" && (
+            <div className="space-y-6">
+              {/* Info / Overview */}
+              <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 sm:p-6 border border-white/20">
+                <h2 className="text-xl sm:text-2xl text-white drop-shadow-lg mb-3">
+                  {text.payout}
+                </h2>
+                <p className="text-white/80 text-sm">
+                  {language === "spanish" &&
+                    "Configura aquí los métodos de pago donde recibirás tus ingresos de suscripciones y royalties."}
+                  {language === "english" &&
+                    "Configure here the payment methods where you will receive your subscription and royalties earnings."}
+                  {language === "catalan" &&
+                    "Configura aquí els mètodes de pagament on rebràs els teus ingressos de subscripcions i royalties."}
                 </p>
               </div>
 
-              <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
-                <div className="flex items-center gap-2 mb-2">
-                  <DollarSign size={20} className="text-white" />
-                  <h3 className="text-white/80 drop-shadow">
-                    {text.thisMonth}
-                  </h3>
-                </div>
-                <p className="text-3xl text-white drop-shadow">
-                  {royaltiesLoading ? "—" : `€${royaltiesSummary.thisMonth}`}
-                </p>
-              </div>
+              {/* Payment Receiving Settings */}
+              <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 sm:p-6 md:p-8 border border-white/20">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+                  <h2 className="text-xl sm:text-2xl text-white drop-shadow-lg">
+                    {text.paymentMethodsTitle}
+                  </h2>
 
-              <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
-                <div className="flex items-center gap-2 mb-2">
-                  <DollarSign size={20} className="text-white" />
-                  <h3 className="text-white/80 drop-shadow">Pending</h3>
-                </div>
-                <p className="text-3xl text-white drop-shadow">
-                  {royaltiesLoading ? "—" : `€${royaltiesSummary.pending}`}
-                </p>
-              </div>
-            </div>
-
-            {/* Revenue By Track */}
-            <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl text-white drop-shadow">
-                  {text.revenue} by Track
-                </h3>
-                <button
-                  type="button"
-                  onClick={fetchRoyalties}
-                  className="cursor-pointer px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white/80 hover:bg-white/20 transition-all text-xs disabled:cursor-not-allowed"
-                  disabled={royaltiesLoading}
-                >
-                  {royaltiesLoading
-                    ? "loading…"
-                    : language === "english"
-                    ? "Refresh"
-                    : language === "spanish"
-                    ? "Actualizar"
-                    : "Actualitzar"}
-                </button>
-              </div>
-
-              {royaltiesLoading ? (
-                <div className="bg-white/5 rounded-lg p-6 text-center border border-white/20">
-                  <p className="text-white/60 text-sm">Loading…</p>
-                </div>
-              ) : royaltiesTracks.length === 0 ? (
-                <div className="bg-white/5 rounded-lg p-6 text-center border border-white/20">
-                  <p className="text-white/60 text-sm">
-                    {language === "english"
-                      ? "No revenue data yet"
+                  <button
+                    type="button"
+                    onClick={fetchMyPayoutSettings}
+                    disabled={payoutLoading || payoutSaving}
+                    className="cursor-pointer w-full sm:w-auto px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white/80 hover:bg-white/20 transition-all text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {payoutLoading
+                      ? "loading…"
+                      : language === "english"
+                      ? "Refresh"
                       : language === "spanish"
-                      ? "Aún no hay datos de ingresos"
-                      : "Encara no hi ha dades d'ingressos"}
-                  </p>
+                      ? "Actualizar"
+                      : "Actualitzar"}
+                  </button>
                 </div>
-              ) : (
-                <div className="space-y-3">
-                  {royaltiesTracks.map((track) => (
-                    <div
-                      key={track.trackId}
-                      className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 bg-white/5 rounded-lg border border-white/10"
-                    >
-                      <div className="flex items-center gap-4 min-w-0">
-                        <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                          <Music size={20} className="text-white" />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-white drop-shadow truncate">
-                            {track.name}
-                          </p>
-                          <p className="text-white/60 text-sm">
-                            {track.streams}{" "}
-                            {language === "english" ? "streams" : "streams"}
-                          </p>
-                        </div>
+
+                {payoutLoading && (
+                  <div className="mb-6 p-4 bg-white/5 border border-white/20 rounded-lg">
+                    <p className="text-white/60 text-sm">
+                      {language === "english"
+                        ? "Loading payout settings…"
+                        : language === "spanish"
+                        ? "Cargando configuración de pagos…"
+                        : "Carregant configuració de pagaments…"}
+                    </p>
+                  </div>
+                )}
+
+                {/* ✅ FORM */}
+                <form onSubmit={handleSavePayoutSettings} className="space-y-6">
+                  {/* Bank Account Section */}
+                  <div className="bg-white/5 backdrop-blur-sm rounded-lg p-4 sm:p-6 border border-white/10">
+                    <h3 className="text-lg sm:text-xl text-white drop-shadow mb-4 flex items-center gap-2">
+                      <DollarSign size={20} />
+                      {text.bankAccount}
+                    </h3>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-white/80 drop-shadow mb-2 text-sm">
+                          {text.accountHolderName}
+                        </label>
+                        <input
+                          type="text"
+                          value={bankAccountHolder}
+                          onChange={(e) => setBankAccountHolder(e.target.value)}
+                          placeholder="John Doe"
+                          disabled={payoutLoading || payoutSaving}
+                          className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all disabled:opacity-60"
+                        />
                       </div>
 
-                      <span className="text-xl text-white drop-shadow flex-shrink-0">
-                        €{track.revenue}
-                      </span>
+                      <div>
+                        <label className="block text-white/80 drop-shadow mb-2 text-sm">
+                          {text.bankNameLabel}
+                        </label>
+                        <input
+                          type="text"
+                          value={bankName}
+                          onChange={(e) => setBankName(e.target.value)}
+                          placeholder="Bank of America"
+                          disabled={payoutLoading || payoutSaving}
+                          className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all disabled:opacity-60"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-white/80 drop-shadow mb-2 text-sm">
+                          {text.accountNumberLabel}
+                        </label>
+                        <input
+                          type="text"
+                          value={accountNumber}
+                          onChange={(e) => setAccountNumber(e.target.value)}
+                          placeholder="123456789"
+                          disabled={payoutLoading || payoutSaving}
+                          className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all disabled:opacity-60"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-white/80 drop-shadow mb-2 text-sm">
+                          {text.routingNumberLabel}
+                        </label>
+                        <input
+                          type="text"
+                          value={routingNumber}
+                          onChange={(e) => setRoutingNumber(e.target.value)}
+                          placeholder="021000021"
+                          disabled={payoutLoading || payoutSaving}
+                          className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all disabled:opacity-60"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-white/80 drop-shadow mb-2 text-sm">
+                          {text.swiftCodeLabel}
+                        </label>
+                        <input
+                          type="text"
+                          value={swiftCode}
+                          onChange={(e) => setSwiftCode(e.target.value)}
+                          placeholder="BOFAUS3N"
+                          disabled={payoutLoading || payoutSaving}
+                          className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all disabled:opacity-60"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-white/80 drop-shadow mb-2 text-sm">
+                          {text.ibanLabel}
+                        </label>
+                        <input
+                          type="text"
+                          value={iban}
+                          onChange={(e) => setIban(e.target.value)}
+                          placeholder="GB29 NWBK 6016 1331 9268 19"
+                          disabled={payoutLoading || payoutSaving}
+                          className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all disabled:opacity-60"
+                        />
+                      </div>
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
+                  </div>
 
-        {/* Payout Tab */}
-        {activeTab === "payout" && (
-          <div className="space-y-6">
-            {/* Info / Overview */}
-            <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
-              <h2 className="text-2xl text-white drop-shadow-lg mb-3">
-                {text.payout}
-              </h2>
-              <p className="text-white/80 text-sm">
-                {language === "spanish" &&
-                  "Configura aquí los métodos de pago donde recibirás tus ingresos de suscripciones y royalties."}
-                {language === "english" &&
-                  "Configure here the payment methods where you will receive your subscription and royalties earnings."}
-                {language === "catalan" &&
-                  "Configura aquí els mètodes de pagament on rebràs els teus ingressos de subscripcions i royalties."}
-              </p>
-            </div>
+                  {/* Digital Payment Methods */}
+                  <div className="bg-white/5 backdrop-blur-sm rounded-lg p-4 sm:p-6 border border-white/10">
+                    <h3 className="text-lg sm:text-xl text-white drop-shadow mb-4 flex items-center gap-2">
+                      <Smartphone size={20} />
+                      {language === "spanish"
+                        ? "Métodos de Pago Digital"
+                        : language === "english"
+                        ? "Digital Payment Methods"
+                        : "Mètodes de Pagament Digital"}
+                    </h3>
 
-            {/* Payment Receiving Settings */}
-            <div className="bg-white/10 backdrop-blur-md rounded-xl p-8 border border-white/20">
-              <div className="flex items-center justify-between mb-6 gap-3">
-                <h2 className="text-2xl text-white drop-shadow-lg">
-                  {text.paymentMethodsTitle}
-                </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-white/80 drop-shadow mb-2 text-sm">
+                          {text.paypalEmailLabel}
+                        </label>
+                        <input
+                          type="email"
+                          value={paypalEmail}
+                          onChange={(e) => setPaypalEmail(e.target.value)}
+                          placeholder="artist@example.com"
+                          disabled={payoutLoading || payoutSaving}
+                          className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all disabled:opacity-60"
+                        />
+                      </div>
 
-                <button
-                  type="button"
-                  onClick={fetchMyPayoutSettings}
-                  disabled={payoutLoading || payoutSaving}
-                  className="cursor-pointer px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white/80 hover:bg-white/20 transition-all text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {payoutLoading
-                    ? "loading…"
-                    : language === "english"
-                    ? "Refresh"
-                    : language === "spanish"
-                    ? "Actualizar"
-                    : "Actualitzar"}
-                </button>
-              </div>
+                      <div>
+                        <label className="block text-white/80 drop-shadow mb-2 text-sm">
+                          {text.bizumPhoneLabel}
+                        </label>
+                        <input
+                          type="tel"
+                          value={bizumPhone}
+                          onChange={(e) => setBizumPhone(e.target.value)}
+                          placeholder="+34 600 000 000"
+                          disabled={payoutLoading || payoutSaving}
+                          className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all disabled:opacity-60"
+                        />
+                      </div>
 
-              {payoutLoading && (
-                <div className="mb-6 p-4 bg-white/5 border border-white/20 rounded-lg">
-                  <p className="text-white/60 text-sm">
-                    {language === "english"
-                      ? "Loading payout settings…"
-                      : language === "spanish"
-                      ? "Cargando configuración de pagos…"
-                      : "Carregant configuració de pagaments…"}
-                  </p>
-                </div>
-              )}
+                      <div>
+                        <label className="block text-white/80 drop-shadow mb-2 text-sm">
+                          {text.mobileMoneyProviderLabel}
+                        </label>
+                        <select
+                          value={mobileMoneyProvider}
+                          onChange={(e) =>
+                            setMobileMoneyProvider(e.target.value)
+                          }
+                          disabled={payoutLoading || payoutSaving}
+                          className="cursor-pointer w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black focus:outline-none focus:border-white/40 transition-all disabled:opacity-60"
+                        >
+                          <option value="" className="bg-white">
+                            {text.selectProvider}
+                          </option>
+                          <option value="MTN" className="bg-white">
+                            MTN Mobile Money
+                          </option>
+                          <option value="Vodafone" className="bg-white">
+                            Vodafone Cash
+                          </option>
+                          <option value="Airtel" className="bg-white">
+                            Airtel Money
+                          </option>
+                          <option value="Tigo" className="bg-white">
+                            Tigo Cash
+                          </option>
+                          <option value="M-Pesa" className="bg-white">
+                            M-Pesa
+                          </option>
+                        </select>
+                      </div>
 
-              {/* ✅ FORM */}
-              <form onSubmit={handleSavePayoutSettings} className="space-y-6">
-                {/* Bank Account Section */}
-                <div className="bg-white/5 backdrop-blur-sm rounded-lg p-6 border border-white/10">
-                  <h3 className="text-xl text-white drop-shadow mb-4 flex items-center gap-2">
+                      <div>
+                        <label className="block text-white/80 drop-shadow mb-2 text-sm">
+                          {text.mobileMoneyPhoneLabel}
+                        </label>
+                        <input
+                          type="tel"
+                          value={mobileMoneyPhone}
+                          onChange={(e) => setMobileMoneyPhone(e.target.value)}
+                          placeholder="+233 000 000 000"
+                          disabled={payoutLoading || payoutSaving}
+                          className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all disabled:opacity-60"
+                        />
+                      </div>
+
+                      <div className="md:col-span-2">
+                        <label className="block text-white/80 drop-shadow mb-2 text-sm">
+                          {text.orangeMoneyPhoneLabel}
+                        </label>
+                        <input
+                          type="tel"
+                          value={orangeMoneyPhone}
+                          onChange={(e) => setOrangeMoneyPhone(e.target.value)}
+                          placeholder="+225 00 00 00 00"
+                          disabled={payoutLoading || payoutSaving}
+                          className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all disabled:opacity-60"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Alerts */}
+                  {payoutError && (
+                    <div className="mb-6 p-4 bg-red-500/20 backdrop-blur-sm border border-red-400/40 rounded-lg">
+                      <p className="text-red-200 drop-shadow text-sm">
+                        {payoutError}
+                      </p>
+                    </div>
+                  )}
+
+                  {paymentSaved && (
+                    <div className="mb-6 p-4 bg-green-500/20 backdrop-blur-sm border border-green-400/40 rounded-lg">
+                      <p className="text-green-200 drop-shadow">
+                        {text.paymentDetailsSaved}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Save Button */}
+                  <button
+                    type="submit"
+                    disabled={payoutSaving || payoutLoading}
+                    className="cursor-pointer w-full px-6 py-4 bg-gradient-to-r from-green-500/40 to-emerald-500/40 backdrop-blur-md border-2 border-white/40 rounded-xl text-white hover:from-green-500/50 hover:to-emerald-500/50 hover:border-white/60 transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
                     <DollarSign size={20} />
-                    {text.bankAccount}
-                  </h3>
-
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-white/80 drop-shadow mb-2 text-sm">
-                        {text.accountHolderName}
-                      </label>
-                      <input
-                        type="text"
-                        value={bankAccountHolder}
-                        onChange={(e) => setBankAccountHolder(e.target.value)}
-                        placeholder="John Doe"
-                        disabled={payoutLoading || payoutSaving}
-                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all disabled:opacity-60"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-white/80 drop-shadow mb-2 text-sm">
-                        {text.bankNameLabel}
-                      </label>
-                      <input
-                        type="text"
-                        value={bankName}
-                        onChange={(e) => setBankName(e.target.value)}
-                        placeholder="Bank of America"
-                        disabled={payoutLoading || payoutSaving}
-                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all disabled:opacity-60"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-white/80 drop-shadow mb-2 text-sm">
-                        {text.accountNumberLabel}
-                      </label>
-                      <input
-                        type="text"
-                        value={accountNumber}
-                        onChange={(e) => setAccountNumber(e.target.value)}
-                        placeholder="123456789"
-                        disabled={payoutLoading || payoutSaving}
-                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all disabled:opacity-60"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-white/80 drop-shadow mb-2 text-sm">
-                        {text.routingNumberLabel}
-                      </label>
-                      <input
-                        type="text"
-                        value={routingNumber}
-                        onChange={(e) => setRoutingNumber(e.target.value)}
-                        placeholder="021000021"
-                        disabled={payoutLoading || payoutSaving}
-                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all disabled:opacity-60"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-white/80 drop-shadow mb-2 text-sm">
-                        {text.swiftCodeLabel}
-                      </label>
-                      <input
-                        type="text"
-                        value={swiftCode}
-                        onChange={(e) => setSwiftCode(e.target.value)}
-                        placeholder="BOFAUS3N"
-                        disabled={payoutLoading || payoutSaving}
-                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all disabled:opacity-60"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-white/80 drop-shadow mb-2 text-sm">
-                        {text.ibanLabel}
-                      </label>
-                      <input
-                        type="text"
-                        value={iban}
-                        onChange={(e) => setIban(e.target.value)}
-                        placeholder="GB29 NWBK 6016 1331 9268 19"
-                        disabled={payoutLoading || payoutSaving}
-                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all disabled:opacity-60"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Digital Payment Methods */}
-                <div className="bg-white/5 backdrop-blur-sm rounded-lg p-6 border border-white/10">
-                  <h3 className="text-xl text-white drop-shadow mb-4 flex items-center gap-2">
-                    <Smartphone size={20} />
-                    {language === "spanish"
-                      ? "Métodos de Pago Digital"
-                      : language === "english"
-                      ? "Digital Payment Methods"
-                      : "Mètodes de Pagament Digital"}
-                  </h3>
-
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-white/80 drop-shadow mb-2 text-sm">
-                        {text.paypalEmailLabel}
-                      </label>
-                      <input
-                        type="email"
-                        value={paypalEmail}
-                        onChange={(e) => setPaypalEmail(e.target.value)}
-                        placeholder="artist@example.com"
-                        disabled={payoutLoading || payoutSaving}
-                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all disabled:opacity-60"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-white/80 drop-shadow mb-2 text-sm">
-                        {text.bizumPhoneLabel}
-                      </label>
-                      <input
-                        type="tel"
-                        value={bizumPhone}
-                        onChange={(e) => setBizumPhone(e.target.value)}
-                        placeholder="+34 600 000 000"
-                        disabled={payoutLoading || payoutSaving}
-                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all disabled:opacity-60"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-white/80 drop-shadow mb-2 text-sm">
-                        {text.mobileMoneyProviderLabel}
-                      </label>
-                      <select
-                        value={mobileMoneyProvider}
-                        onChange={(e) => setMobileMoneyProvider(e.target.value)}
-                        disabled={payoutLoading || payoutSaving}
-                        className="cursor-pointer w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black focus:outline-none focus:border-white/40 transition-all disabled:opacity-60"
-                      >
-                        <option value="" className="bg-white">
-                          {text.selectProvider}
-                        </option>
-                        <option value="MTN" className="bg-white">
-                          MTN Mobile Money
-                        </option>
-                        <option value="Vodafone" className="bg-white">
-                          Vodafone Cash
-                        </option>
-                        <option value="Airtel" className="bg-white">
-                          Airtel Money
-                        </option>
-                        <option value="Tigo" className="bg-white">
-                          Tigo Cash
-                        </option>
-                        <option value="M-Pesa" className="bg-white">
-                          M-Pesa
-                        </option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-white/80 drop-shadow mb-2 text-sm">
-                        {text.mobileMoneyPhoneLabel}
-                      </label>
-                      <input
-                        type="tel"
-                        value={mobileMoneyPhone}
-                        onChange={(e) => setMobileMoneyPhone(e.target.value)}
-                        placeholder="+233 000 000 000"
-                        disabled={payoutLoading || payoutSaving}
-                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all disabled:opacity-60"
-                      />
-                    </div>
-
-                    <div className="md:col-span-2">
-                      <label className="block text-white/80 drop-shadow mb-2 text-sm">
-                        {text.orangeMoneyPhoneLabel}
-                      </label>
-                      <input
-                        type="tel"
-                        value={orangeMoneyPhone}
-                        onChange={(e) => setOrangeMoneyPhone(e.target.value)}
-                        placeholder="+225 00 00 00 00"
-                        disabled={payoutLoading || payoutSaving}
-                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-all disabled:opacity-60"
-                      />
-                    </div>
-                  </div>
-                </div>
-                {/* Alerts */}
-                {payoutError && (
-                  <div className="mb-6 p-4 bg-red-500/20 backdrop-blur-sm border border-red-400/40 rounded-lg">
-                    <p className="text-red-200 drop-shadow text-sm">
-                      {payoutError}
-                    </p>
-                  </div>
-                )}
-
-                {paymentSaved && (
-                  <div className="mb-6 p-4 bg-green-500/20 backdrop-blur-sm border border-green-400/40 rounded-lg">
-                    <p className="text-green-200 drop-shadow">
-                      {text.paymentDetailsSaved}
-                    </p>
-                  </div>
-                )}
-
-                {/* Save Button */}
-                <button
-                  type="submit"
-                  disabled={payoutSaving || payoutLoading}
-                  className="cursor-pointer w-full px-6 py-4 bg-gradient-to-r from-green-500/40 to-emerald-500/40 backdrop-blur-md border-2 border-white/40 rounded-xl text-white hover:from-green-500/50 hover:to-emerald-500/50 hover:border-white/60 transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <DollarSign size={20} />
-                  {payoutSaving
-                    ? language === "english"
-                      ? "Saving…"
-                      : language === "spanish"
-                      ? "Guardando…"
-                      : "Desant…"
-                    : text.savePaymentDetails}
-                </button>
-              </form>
+                    {payoutSaving
+                      ? language === "english"
+                        ? "Saving…"
+                        : language === "spanish"
+                        ? "Guardando…"
+                        : "Desant…"
+                      : text.savePaymentDetails}
+                  </button>
+                </form>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
+        {/* ✅ Bouton d’accessibilité : monté au plus haut niveau */}
+        <AccessibilityButton language={language} />
       </div>
-      {/* ✅ Bouton d’accessibilité : monté au plus haut niveau */}
-      <AccessibilityButton language={language} />
     </div>
   );
 }

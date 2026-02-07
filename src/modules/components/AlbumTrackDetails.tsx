@@ -496,458 +496,467 @@ export default function AlbumTracksEditor({
 
   // ========== JSX ==========
   return (
-    <div className="space-y-8">
-      {/* Formulaire d'ajout de nouvelles pistes */}
-      <div className="space-y-6">
-        <h3 className="text-xl text-white drop-shadow mb-2">
-          {text.albumTracksTitle || ""}
-        </h3>
+    <div className="relative w-full min-h-[100svh] md:min-h-screen overflow-hidden">
+      {/* ✅ Scroll container stable iOS */}
+      <div
+        className="
+          min-h-[100svh]
+          overflow-y-auto overscroll-contain
+          px-4 sm:px-6 md:px-8
+          pt-[calc(env(safe-area-inset-top)+1.25rem)]
+          pb-[calc(env(safe-area-inset-bottom)+1.25rem)]
+        "
+      >
+        <div className="space-y-8">
+          {/* Formulaire d'ajout de nouvelles pistes */}
+          <div className="space-y-6">
+            <h3 className="text-xl text-white drop-shadow mb-2">
+              {text.albumTracksTitle || ""}
+            </h3>
 
-        {tracks.map((track, index) => (
-          <div
-            key={track.id}
-            className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/20 space-y-4"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <h4 className="text-lg text-white drop-shadow">
-                {text.trackNumber} {index + 1}
-              </h4>
-              {tracks.length > 1 && (
-                <button
-                  type="button"
-                  onClick={() => handleRemoveTrackForm(track.id)}
-                  className="px-3 py-1.5 bg-red-500/80 backdrop-blur-sm text-white rounded-lg hover:bg-red-600/80 transition-all flex items-center gap-1 cursor-pointer text-xs"
-                >
-                  <X size={14} />
-                  {text.removeTrack}
-                </button>
-              )}
-            </div>
-
-            {/* Upload audio */}
-            <div className="relative">
-              {track.audioFile || track.audioUrlPreview ? (
-                <div className="relative rounded-xl overflow-hidden bg-white/5 border-2 border-white/20 p-6">
-                  <audio
-                    controls
-                    src={track.audioUrlPreview}
-                    className="w-full"
-                  >
-                    Votre navigateur ne supporte pas l’élément audio.
-                  </audio>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setTracks((prevTracks) =>
-                        prevTracks.map((t) =>
-                          t.id === track.id
-                            ? { ...t, audioFile: null, audioUrlPreview: "" } // reset audio
-                            : t
-                        )
-                      );
-                    }}
-                    className="cursor-pointer absolute top-0 right-0 bg-red-500/80 backdrop-blur-sm text-white p-2 rounded-lg hover:bg-red-600/80 transition-all"
-                  >
-                    <X size={20} />
-                  </button>
-                </div>
-              ) : (
-                <div
-                  className="border-2 border-dashed border-white/30 rounded-xl p-8 text-center bg-white/5 hover:bg-white/10 transition-all cursor-pointer"
-                  onDragOver={(e) => e.preventDefault()}
-                  onDrop={(e) => {
-                    e.preventDefault();
-                    const file = e.dataTransfer.files[0];
-                    if (file && file.type.startsWith("audio/")) {
-                      handleTrackAudioChange(track.id)({
-                        target: { files: [file] },
-                      } as any);
-                    }
-                  }}
-                >
-                  <input
-                    type="file"
-                    accept="audio/*"
-                    onChange={handleTrackAudioChange(track.id)}
-                    className="hidden"
-                    id={`album-track-upload-${track.id}`}
-                  />
-                  <label
-                    htmlFor={`album-track-upload-${track.id}`}
-                    className="cursor-pointer"
-                  >
-                    <Music size={32} className="mx-auto mb-3 text-white/60" />
-                    <p className="text-white drop-shadow text-sm">
-                      {track.audioFile
-                        ? (track.audioFile as File).name
-                        : track.audioUrlPreview
-                        ? track.audioUrlPreview
-                        : text.dragDrop}
-                    </p>
-                  </label>
-                </div>
-              )}
-            </div>
-
-            {/* Titre piste */}
-            <div>
-              <label className="block text-white/90 drop-shadow mb-2 text-sm">
-                {text.trackTitle}
-              </label>
-              <input
-                type="text"
-                value={track.title}
-                onChange={(e) =>
-                  setTracks((prev) =>
-                    prev.map((t) =>
-                      t.id === track.id ? { ...t, title: e.target.value } : t
-                    )
-                  )
-                }
-                className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
-              />
-            </div>
-
-            {/* Lyrics */}
-            <div>
-              <h5 className="text-sm text-white drop-shadow mb-2">
-                {text.uploadLyrics}
-              </h5>
-              <textarea
-                name="lyrics"
-                value={track.lyrics}
-                onChange={(e) =>
-                  setTracks((prev) =>
-                    prev.map((t) =>
-                      t.id === track.id ? { ...t, lyrics: e.target.value } : t
-                    )
-                  )
-                }
-                placeholder={text.lyricsPlaceholder}
-                className="w-full h-32 p-4 bg:white/10 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl 
-                   text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 
-                   transition-all resize-none"
-              />
-            </div>
-
-            {/* Mood */}
-            <div className="mt-1">
-              <label className="block text-white/80 drop-shadow mb-1 text-xs">
-                {text.trackMood}
-              </label>
-              <select
-                value={track.moodId}
-                onChange={(e) =>
-                  setTracks((prev) =>
-                    prev.map((t) =>
-                      t.id === track.id ? { ...t, moodId: e.target.value } : t
-                    )
-                  )
-                }
-                className="cursor-pointer w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg 
-                     text:black text-black text-sm focus:outline-none focus:border-white/40 transition-all"
+            {tracks.map((track, index) => (
+              <div
+                key={track.id}
+                className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/20 space-y-4"
               >
-                <option value="">-- {text.selectMoodPlaceholder} --</option>
-                {moods &&
-                  moods.map((mood) => (
-                    <option key={mood.id} value={mood.id}>
-                      {mood.name}
-                    </option>
-                  ))}
-              </select>
-            </div>
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="text-lg text-white drop-shadow">
+                    {text.trackNumber} {index + 1}
+                  </h4>
+                  {tracks.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveTrackForm(track.id)}
+                      className="px-3 py-1.5 bg-red-500/80 backdrop-blur-sm text-white rounded-lg hover:bg-red-600/80 transition-all flex items-center gap-1 cursor-pointer text-xs"
+                    >
+                      <X size={14} />
+                      {text.removeTrack}
+                    </button>
+                  )}
+                </div>
 
-            {/* Vidéo LSF */}
-            <div>
-              <label className="block text-white/80 drop-shadow mb-2 text-sm">
-                {text.signLanguageVideo}
-              </label>
-              {track.signLanguageVideoPreview ? (
-                <div className="relative rounded-lg bg-black border-2 border-white/20 p-0 aspect-video overflow-hidden">
-                  <video
-                    src={track.signLanguageVideoPreview}
-                    controls
-                    className="w-full h-full object-contain"
-                  />
-                  <button
-                    type="button"
-                    onClick={() =>
+                {/* Upload audio */}
+                <div className="relative">
+                  {track.audioFile || track.audioUrlPreview ? (
+                    <div className="relative rounded-xl overflow-hidden bg-white/5 border-2 border-white/20 p-6">
+                      <audio
+                        controls
+                        src={track.audioUrlPreview}
+                        className="w-full"
+                      >
+                        Votre navigateur ne supporte pas l’élément audio.
+                      </audio>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setTracks((prevTracks) =>
+                            prevTracks.map((t) =>
+                              t.id === track.id
+                                ? { ...t, audioFile: null, audioUrlPreview: "" }
+                                : t
+                            )
+                          );
+                        }}
+                        className="cursor-pointer absolute top-0 right-0 bg-red-500/80 backdrop-blur-sm text-white p-2 rounded-lg hover:bg-red-600/80 transition-all"
+                      >
+                        <X size={20} />
+                      </button>
+                    </div>
+                  ) : (
+                    <div
+                      className="border-2 border-dashed border-white/30 rounded-xl p-8 text-center bg-white/5 hover:bg-white/10 transition-all cursor-pointer"
+                      onDragOver={(e) => e.preventDefault()}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        const file = e.dataTransfer.files[0];
+                        if (file && file.type.startsWith("audio/")) {
+                          handleTrackAudioChange(track.id)({
+                            target: { files: [file] },
+                          } as any);
+                        }
+                      }}
+                    >
+                      <input
+                        type="file"
+                        accept="audio/*"
+                        onChange={handleTrackAudioChange(track.id)}
+                        className="hidden"
+                        id={`album-track-upload-${track.id}`}
+                      />
+                      <label
+                        htmlFor={`album-track-upload-${track.id}`}
+                        className="cursor-pointer"
+                      >
+                        <Music
+                          size={32}
+                          className="mx-auto mb-3 text-white/60"
+                        />
+                        <p className="text-white drop-shadow text-sm">
+                          {track.audioFile
+                            ? (track.audioFile as File).name
+                            : track.audioUrlPreview
+                            ? track.audioUrlPreview
+                            : text.dragDrop}
+                        </p>
+                      </label>
+                    </div>
+                  )}
+                </div>
+
+                {/* Titre piste */}
+                <div>
+                  <label className="block text-white/90 drop-shadow mb-2 text-sm">
+                    {text.trackTitle}
+                  </label>
+                  <input
+                    type="text"
+                    value={track.title}
+                    onChange={(e) =>
                       setTracks((prev) =>
                         prev.map((t) =>
                           t.id === track.id
-                            ? {
-                                ...t,
-                                signLanguageVideoFile: null,
-                                signLanguageVideoPreview: "",
-                                signLanguageVideoUrl: "",
-                              }
+                            ? { ...t, title: e.target.value }
                             : t
                         )
                       )
                     }
-                    className="absolute top-2 right-2 cursor-pointer bg-red-500/80 backdrop-blur-sm text-white p-2 rounded-lg hover:bg-red-600/80 transition-all"
-                  >
-                    <X size={14} />
-                  </button>
-                </div>
-              ) : (
-                <div className="border-2 border-dashed border-white/30 rounded-lg p-6 text-center bg-white/5 hover:bg-white/10 transition-all cursor-pointer h-[120px] flex items-center justify-center">
-                  <input
-                    type="file"
-                    accept="video/*"
-                    onChange={handleTrackSignLanguage(track.id)}
-                    className="hidden"
-                    id={`album-sign-language-${track.id}`}
+                    className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
                   />
-                  <label
-                    htmlFor={`album-sign-language-${track.id}`}
-                    className="cursor-pointer text-center"
-                  >
-                    <Upload size={24} className="mx-auto mb-2 text-white/60" />
-                    <p className="text-white/80 drop-shadow text-xs">
-                      {text.signLanguageVideoDragDrop}
-                    </p>
-                  </label>
                 </div>
-              )}
-            </div>
 
-            {/* Braille */}
-            <div>
-              <label className="block text-white/90 drop-shadow mb-2 text-sm">
-                {text.brailleFile}
-              </label>
-
-              {track.brailleFile ? (
-                <div className="relative rounded-lg p-4 sm:p-6 bg-white/10 border-2 border-white/20">
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                    <div className="flex items-center gap-3 min-w-0">
-                      <FileText
-                        size={32}
-                        className="text-white/80 flex-shrink-0"
-                      />
-
-                      <div className="min-w-0">
-                        <span className="text-white text-sm block truncate">
-                          {track.brailleFile.name}
-                        </span>
-                        <span className="text-white/50 text-xs block">
-                          {(track.brailleFile.size / 1024).toFixed(1)} KB
-                        </span>
-                      </div>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setTracks((prev) =>
-                          prev.map((t) =>
-                            t.id === track.id
-                              ? { ...t, brailleFile: null, brailleFileUrl: "" }
-                              : t
-                          )
+                {/* Lyrics */}
+                <div>
+                  <h5 className="text-sm text-white drop-shadow mb-2">
+                    {text.uploadLyrics}
+                  </h5>
+                  <textarea
+                    name="lyrics"
+                    value={track.lyrics}
+                    onChange={(e) =>
+                      setTracks((prev) =>
+                        prev.map((t) =>
+                          t.id === track.id
+                            ? { ...t, lyrics: e.target.value }
+                            : t
                         )
-                      }
-                      className="cursor-pointer flex-shrink-0 bg-red-500/80 backdrop-blur-sm text-white px-3 py-2 rounded-lg hover:bg-red-600/80 transition-all inline-flex items-center justify-center gap-2"
-                    >
-                      <X size={14} />
-                      <span className="text-xs sm:hidden">{text.remove}</span>
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div className="border-2 border-dashed border-white/30 rounded-lg p-6 text-center bg-white/5 hover:bg-white/10 transition-all cursor-pointer">
-                  <input
-                    type="file"
-                    accept=".brf,.brl,.txt"
-                    onChange={handleTrackBrailleFile(track.id)}
-                    className="hidden"
-                    id={`album-braille-upload-${track.id}`}
+                      )
+                    }
+                    placeholder={text.lyricsPlaceholder}
+                    className="w-full h-32 p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl 
+                       text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 
+                       transition-all resize-none"
                   />
-                  <label
-                    htmlFor={`album-braille-upload-${track.id}`}
-                    className="cursor-pointer"
-                  >
-                    <FileText
-                      size={32}
-                      className="mx-auto mb-2 text-white/60"
-                    />
-                    <p className="text-white/80 drop-shadow text-xs">
-                      {text.brailleFileDragDrop}
-                    </p>
-                  </label>
                 </div>
-              )}
-            </div>
-          </div>
-        ))}
 
-        {/* Bouton ajouter un formulaire de piste */}
-        {/* <button
-          type="button"
-          onClick={handleAddTrackForm}
-          className="w-full py-3 px-4 bg-white/10 backdrop-blur-md border border-dashed border-white/30 rounded-lg text-white text-sm drop-shadow hover:bg-white/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
-        >
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-          >
-            <line x1="12" y1="5" x2="12" y2="19" />
-            <line x1="5" y1="12" x2="19" y2="12" />
-          </svg>
-          {text.addTrack || "Ajouter une piste"}
-        </button> */}
+                {/* Mood */}
+                <div className="mt-1">
+                  <label className="block text-white/80 drop-shadow mb-1 text-xs">
+                    {text.trackMood}
+                  </label>
+                  <select
+                    value={track.moodId}
+                    onChange={(e) =>
+                      setTracks((prev) =>
+                        prev.map((t) =>
+                          t.id === track.id
+                            ? { ...t, moodId: e.target.value }
+                            : t
+                        )
+                      )
+                    }
+                    className="cursor-pointer w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg 
+                         text-black text-sm focus:outline-none focus:border-white/40 transition-all"
+                  >
+                    <option value="">-- {text.selectMoodPlaceholder} --</option>
+                    {moods &&
+                      moods.map((mood) => (
+                        <option key={mood.id} value={mood.id}>
+                          {mood.name}
+                        </option>
+                      ))}
+                  </select>
+                </div>
 
-        {successMessage && <CustomSuccess message={successMessage} />}
-        {errorMessage && <CustomAlert message={errorMessage} />}
-
-        <button
-          type="button"
-          onClick={handleSaveTracks}
-          disabled={isLoading}
-          className="w-full py-3 px-4 bg-white/30 backdrop-blur-md border border-white/40 rounded-lg text-white drop-shadow hover:bg-white/40 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
-        >
-          {isLoading && (
-            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-          )}
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-          >
-            <line x1="12" y1="5" x2="12" y2="19" />
-            <line x1="5" y1="12" x2="19" y2="12" />
-          </svg>
-          <span>{text.saveTracks || "Save Track"}</span>
-        </button>
-      </div>
-
-      {/* ========== SECTION TRACKS DÉJÀ ENREGISTRÉS (mini pagination) ========== */}
-      <div className="mt-4">
-        <h4 className="text-lg text-white drop-shadow mb-3">
-          {text.savedTracksTitle || "Tracks Already saved"}
-        </h4>
-
-        {savedTracks.length === 0 ? (
-          <p className="text-white/60 text-sm">
-            {text.noSavedTracks ||
-              "Aucun track enregistré pour cet ALBUM pour l’instant."}
-          </p>
-        ) : (
-          <>
-            <div className="space-y-3">
-              {pageItems.map((t) => (
-                <div
-                  key={t.id}
-                  className="bg-white/10 backdrop-blur-sm rounded-lg p-4 flex items-center justify-between"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center overflow-hidden">
-                      <Music size={18} className="text-white" />
+                {/* Vidéo LSF */}
+                <div>
+                  <label className="block text-white/80 drop-shadow mb-2 text-sm">
+                    {text.signLanguageVideo}
+                  </label>
+                  {track.signLanguageVideoPreview ? (
+                    <div className="relative rounded-lg bg-black border-2 border-white/20 p-0 aspect-video overflow-hidden">
+                      <video
+                        src={track.signLanguageVideoPreview}
+                        controls
+                        className="w-full h-full object-contain"
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setTracks((prev) =>
+                            prev.map((t) =>
+                              t.id === track.id
+                                ? {
+                                    ...t,
+                                    signLanguageVideoFile: null,
+                                    signLanguageVideoPreview: "",
+                                    signLanguageVideoUrl: "",
+                                  }
+                                : t
+                            )
+                          )
+                        }
+                        className="absolute top-2 right-2 cursor-pointer bg-red-500/80 backdrop-blur-sm text-white p-2 rounded-lg hover:bg-red-600/80 transition-all"
+                      >
+                        <X size={14} />
+                      </button>
                     </div>
-                    <div>
-                      <span className="text-white text-sm drop-shadow">
-                        {t.title}
-                      </span>
-                      <span className="block text-white/60 text-xs">
-                        {t.createdAt
-                          ? new Date(t.createdAt).toLocaleDateString()
-                          : ""}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    {t.audioUrl && (
-                      <>
-                        <audio
-                          id={`saved-track-audio-${t.id}`}
-                          src={t.audioUrl}
-                          className="hidden"
-                          onContextMenu={(e) => e.preventDefault()}
-                          onEnded={() => setCurrentPlayingTrackId(null)} // reset quand fini
+                  ) : (
+                    <div className="border-2 border-dashed border-white/30 rounded-lg p-6 text-center bg-white/5 hover:bg-white/10 transition-all cursor-pointer h-[120px] flex items-center justify-center">
+                      <input
+                        type="file"
+                        accept="video/*"
+                        onChange={handleTrackSignLanguage(track.id)}
+                        className="hidden"
+                        id={`album-sign-language-${track.id}`}
+                      />
+                      <label
+                        htmlFor={`album-sign-language-${track.id}`}
+                        className="cursor-pointer text-center"
+                      >
+                        <Upload
+                          size={24}
+                          className="mx-auto mb-2 text-white/60"
                         />
+                        <p className="text-white/80 drop-shadow text-xs">
+                          {text.signLanguageVideoDragDrop}
+                        </p>
+                      </label>
+                    </div>
+                  )}
+                </div>
+
+                {/* Braille */}
+                <div>
+                  <label className="block text-white/90 drop-shadow mb-2 text-sm">
+                    {text.brailleFile}
+                  </label>
+
+                  {track.brailleFile ? (
+                    <div className="relative rounded-lg p-4 sm:p-6 bg-white/10 border-2 border-white/20">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <FileText
+                            size={32}
+                            className="text-white/80 flex-shrink-0"
+                          />
+                          <div className="min-w-0">
+                            <span className="text-white text-sm block truncate">
+                              {track.brailleFile.name}
+                            </span>
+                            <span className="text-white/50 text-xs block">
+                              {(track.brailleFile.size / 1024).toFixed(1)} KB
+                            </span>
+                          </div>
+                        </div>
 
                         <button
                           type="button"
-                          onClick={() => {
-                            const audioEl = document.getElementById(
-                              `saved-track-audio-${t.id}`
-                            ) as HTMLAudioElement | null;
-
-                            if (!audioEl) return;
-
-                            // 🔁 si un autre track joue, on l’arrête
-                            if (
-                              currentPlayingTrackId &&
-                              currentPlayingTrackId !== t.id
-                            ) {
-                              const prevAudio = document.getElementById(
-                                `saved-track-audio-${currentPlayingTrackId}`
-                              ) as HTMLAudioElement | null;
-
-                              if (prevAudio) {
-                                prevAudio.pause();
-                                prevAudio.currentTime = 0;
-                              }
-                            }
-
-                            if (audioEl.paused) {
-                              audioEl.play();
-                              setCurrentPlayingTrackId(t.id);
-                            } else {
-                              audioEl.pause();
-                              setCurrentPlayingTrackId(null);
-                            }
-                          }}
-                          className="cursor-pointer text-white/70 hover:text-white transition"
+                          onClick={() =>
+                            setTracks((prev) =>
+                              prev.map((t) =>
+                                t.id === track.id
+                                  ? {
+                                      ...t,
+                                      brailleFile: null,
+                                      brailleFileUrl: "",
+                                    }
+                                  : t
+                              )
+                            )
+                          }
+                          className="cursor-pointer flex-shrink-0 bg-red-500/80 backdrop-blur-sm text-white px-3 py-2 rounded-lg hover:bg-red-600/80 transition-all inline-flex items-center justify-center gap-2"
                         >
-                          {currentPlayingTrackId === t.id ? (
-                            <Pause size={18} />
-                          ) : (
-                            <Play size={18} />
-                          )}
+                          <X size={14} />
+                          <span className="text-xs sm:hidden">
+                            {text.remove}
+                          </span>
                         </button>
-                      </>
-                    )}
-                  </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="border-2 border-dashed border-white/30 rounded-lg p-6 text-center bg-white/5 hover:bg-white/10 transition-all cursor-pointer">
+                      <input
+                        type="file"
+                        accept=".brf,.brl,.txt"
+                        onChange={handleTrackBrailleFile(track.id)}
+                        className="hidden"
+                        id={`album-braille-upload-${track.id}`}
+                      />
+                      <label
+                        htmlFor={`album-braille-upload-${track.id}`}
+                        className="cursor-pointer"
+                      >
+                        <FileText
+                          size={32}
+                          className="mx-auto mb-2 text-white/60"
+                        />
+                        <p className="text-white/80 drop-shadow text-xs">
+                          {text.brailleFileDragDrop}
+                        </p>
+                      </label>
+                    </div>
+                  )}
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
 
-            {/* Pagination */}
-            <div className="flex items-center justify-between mt-3">
-              <button
-                type="button"
-                disabled={page <= 1}
-                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                className="px-3 py-1.5 text-xs rounded-lg border border-white/20 bg-white/10 text-white/80 hover:bg-white/20 disabled:opacity-40 disabled:cursor-not-allowed"
+            {successMessage && <CustomSuccess message={successMessage} />}
+            {errorMessage && <CustomAlert message={errorMessage} />}
+
+            <button
+              type="button"
+              onClick={handleSaveTracks}
+              disabled={isLoading}
+              className="w-full py-3 px-4 bg-white/30 backdrop-blur-md border border-white/40 rounded-lg text-white drop-shadow hover:bg-white/40 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {isLoading && (
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              )}
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
               >
-                {text.prevPage || "Précédent"}
-              </button>
-              <span className="text-white/70 text-xs">
-                {text.pageLabel || "Page"} {page} / {totalPages}
-              </span>
-              <button
-                type="button"
-                disabled={page >= totalPages}
-                onClick={() =>
-                  setCurrentPage((p) => Math.min(totalPages, p + 1))
-                }
-                className="px-3 py-1.5 text-xs rounded-lg border border-white/20 bg-white/10 text-white/80 hover:bg-white/20 disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                {text.nextPage || "Suivant"}
-              </button>
-            </div>
-          </>
-        )}
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              <span>{text.saveTracks || "Save Track"}</span>
+            </button>
+          </div>
+
+          {/* ========== SECTION TRACKS DÉJÀ ENREGISTRÉS (mini pagination) ========== */}
+          <div className="mt-4">
+            <h4 className="text-lg text-white drop-shadow mb-3">
+              {text.savedTracksTitle || "Tracks Already saved"}
+            </h4>
+
+            {savedTracks.length === 0 ? (
+              <p className="text-white/60 text-sm">
+                {text.noSavedTracks ||
+                  "Aucun track enregistré pour cet ALBUM pour l’instant."}
+              </p>
+            ) : (
+              <>
+                <div className="space-y-3">
+                  {pageItems.map((t) => (
+                    <div
+                      key={t.id}
+                      className="bg-white/10 backdrop-blur-sm rounded-lg p-4 flex items-center justify-between"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center overflow-hidden">
+                          <Music size={18} className="text-white" />
+                        </div>
+                        <div>
+                          <span className="text-white text-sm drop-shadow">
+                            {t.title}
+                          </span>
+                          <span className="block text-white/60 text-xs">
+                            {t.createdAt
+                              ? new Date(t.createdAt).toLocaleDateString()
+                              : ""}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        {t.audioUrl && (
+                          <>
+                            <audio
+                              id={`saved-track-audio-${t.id}`}
+                              src={t.audioUrl}
+                              className="hidden"
+                              onContextMenu={(e) => e.preventDefault()}
+                              onEnded={() => setCurrentPlayingTrackId(null)}
+                            />
+
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const audioEl = document.getElementById(
+                                  `saved-track-audio-${t.id}`
+                                ) as HTMLAudioElement | null;
+
+                                if (!audioEl) return;
+
+                                if (
+                                  currentPlayingTrackId &&
+                                  currentPlayingTrackId !== t.id
+                                ) {
+                                  const prevAudio = document.getElementById(
+                                    `saved-track-audio-${currentPlayingTrackId}`
+                                  ) as HTMLAudioElement | null;
+
+                                  if (prevAudio) {
+                                    prevAudio.pause();
+                                    prevAudio.currentTime = 0;
+                                  }
+                                }
+
+                                if (audioEl.paused) {
+                                  audioEl.play();
+                                  setCurrentPlayingTrackId(t.id);
+                                } else {
+                                  audioEl.pause();
+                                  setCurrentPlayingTrackId(null);
+                                }
+                              }}
+                              className="cursor-pointer text-white/70 hover:text-white transition"
+                            >
+                              {currentPlayingTrackId === t.id ? (
+                                <Pause size={18} />
+                              ) : (
+                                <Play size={18} />
+                              )}
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Pagination */}
+                <div className="flex items-center justify-between mt-3">
+                  <button
+                    type="button"
+                    disabled={page <= 1}
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                    className="px-3 py-1.5 text-xs rounded-lg border border-white/20 bg-white/10 text-white/80 hover:bg-white/20 disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    {text.prevPage || "Précédent"}
+                  </button>
+                  <span className="text-white/70 text-xs">
+                    {text.pageLabel || "Page"} {page} / {totalPages}
+                  </span>
+                  <button
+                    type="button"
+                    disabled={page >= totalPages}
+                    onClick={() =>
+                      setCurrentPage((p) => Math.min(totalPages, p + 1))
+                    }
+                    className="px-3 py-1.5 text-xs rounded-lg border border-white/20 bg-white/10 text-white/80 hover:bg-white/20 disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    {text.nextPage || "Suivant"}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

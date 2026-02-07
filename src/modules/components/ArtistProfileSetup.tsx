@@ -505,39 +505,57 @@ export function ArtistProfileSetup({
 
   return (
     <div
-      className="fixed inset-0 w-screen h-screen bg-cover bg-center"
+      className="
+        relative w-full
+        min-h-[100svh] md:min-h-screen
+        overflow-hidden
+        bg-cover bg-center
+        text-white
+      "
       style={{
-        backgroundImage: `url("/image/4ac3eed398bb68113a14d0fa5efe7a6def6f7651.png")`,
+        backgroundImage:
+          'url("/image/4ac3eed398bb68113a14d0fa5efe7a6def6f7651.png")',
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
     >
-      {/* ✅ Bouton d’accessibilité : monté au plus haut niveau */}
       <AccessibilityButton language={language} />
 
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/40" />
 
-      {/* Content */}
-      <div className="relative w-full h-full overflow-y-auto">
-        <div className="min-h-full flex items-center justify-center p-6">
-          <div className="w-full max-w-5xl bg-white/10 backdrop-blur-md rounded-3xl border border-white/20 p-8 shadow-2xl">
+      {/* Scroll container (stable iOS) */}
+      <div
+        className="
+          relative z-10
+          min-h-[100svh]
+          overflow-y-auto overscroll-contain
+          px-4 sm:px-6
+          pt-[calc(env(safe-area-inset-top)+1.25rem)]
+          pb-[calc(env(safe-area-inset-bottom)+1.25rem)]
+        "
+      >
+        <div className="min-h-[calc(100svh-2.5rem)] flex items-center justify-center py-6">
+          <div className="w-full max-w-5xl bg-white/10 backdrop-blur-md rounded-3xl border border-white/20 p-6 sm:p-8 shadow-2xl">
             {/* Header */}
-            <div className="flex items-center gap-4 mb-8">
+            <div className="flex items-start gap-4 mb-8">
               <button
+                type="button"
                 onClick={(e) => {
                   e.preventDefault();
                   if (onSignUp) onSignUp();
                 }}
-                className="p-2 hover:bg-white/10 cursor-pointer rounded-lg transition-all"
+                className="p-2 hover:bg-white/10 cursor-pointer rounded-lg transition-all flex-shrink-0"
+                aria-label="Back"
               >
                 <ArrowLeft className="text-white" size={24} />
               </button>
-              <div>
-                <h1 className="text-3xl text-white drop-shadow-lg">
+
+              <div className="min-w-0">
+                <h1 className="text-2xl sm:text-3xl text-white drop-shadow-lg">
                   {content.title}
                 </h1>
-                <p className="text-white/70 drop-shadow mt-1">
+                <p className="text-white/70 drop-shadow mt-1 text-sm sm:text-base">
                   {content.subtitle}
                 </p>
               </div>
@@ -547,7 +565,7 @@ export function ArtistProfileSetup({
               <div className="grid lg:grid-cols-2 gap-8 mb-5">
                 {/* Profile Information Section */}
                 <div className="space-y-6">
-                  <h2 className="text-2xl text-white drop-shadow-lg flex items-center gap-2">
+                  <h2 className="text-xl sm:text-2xl text-white drop-shadow-lg flex items-center gap-2">
                     <Music size={24} />
                     {content.profileInfo}
                   </h2>
@@ -587,12 +605,14 @@ export function ArtistProfileSetup({
                           } as any);
                         }
                       }}
-                      className={`aspect-square max-w-xs border-2 border-dashed rounded-xl p-4 text-center transition-all cursor-pointer flex items-center justify-center overflow-hidden
-                      ${
-                        isDraggingPic
-                          ? "border-white/80 bg-white/15"
-                          : "border-white/30 bg-white/5 hover:bg-white/10"
-                      }`}
+                      className={`aspect-square w-full max-w-xs mx-auto sm:mx-0
+                        border-2 border-dashed rounded-xl p-4 text-center transition-all cursor-pointer
+                        flex items-center justify-center overflow-hidden
+                        ${
+                          isDraggingPic
+                            ? "border-white/80 bg-white/15"
+                            : "border-white/30 bg-white/5 hover:bg-white/10"
+                        }`}
                     >
                       {previewUrl ? (
                         <img
@@ -672,11 +692,11 @@ export function ArtistProfileSetup({
                       ))}
                     </select>
 
-                    <p className="text-white/50 text-2xl mt-2">
+                    <p className="text-white/50 text-xs sm:text-sm mt-2">
                       {language === "english"
                         ? "Hold Ctrl (Windows) or Cmd (Mac) to select multiple."
                         : language === "spanish"
-                        ? "Mantén pulsada la tecla Ctrl (Windows) o Cmd (Mac) para seleccionar varios généros."
+                        ? "Mantén pulsada la tecla Ctrl (Windows) o Cmd (Mac) para seleccionar varios géneros."
                         : "Mantèn premuda la tecla Ctrl (Windows) o Cmd (Mac) per seleccionar diversos gèneres."}
                     </p>
 
@@ -739,7 +759,7 @@ export function ArtistProfileSetup({
 
                 {/* Account Security Section */}
                 <div className="space-y-6">
-                  <h2 className="text-2xl text-white drop-shadow-lg flex items-center gap-2">
+                  <h2 className="text-xl sm:text-2xl text-white drop-shadow-lg flex items-center gap-2">
                     <Shield size={24} />
                     {content.accountSecurity}
                   </h2>
@@ -755,12 +775,15 @@ export function ArtistProfileSetup({
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder={content.passwordPlaceholder}
-                        className="w-full px-4 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-black placeholder-white/40 focus:outline-none focus:ring-2"
+                        className="w-full px-4 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-black placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/50"
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-full text-black/90 hover:text-black/100 cursor-pointer backdrop-blur-sm"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-full text-black/90 hover:text-black cursor-pointer backdrop-blur-sm"
+                        aria-label={
+                          showPassword ? "Hide password" : "Show password"
+                        }
                       >
                         {showPassword ? (
                           <EyeOff size={18} />
@@ -769,6 +792,7 @@ export function ArtistProfileSetup({
                         )}
                       </button>
                     </div>
+
                     {password && (
                       <p
                         className={`text-sm mt-2 ${
@@ -798,7 +822,12 @@ export function ArtistProfileSetup({
                         onClick={() =>
                           setShowConfirmPassword(!showConfirmPassword)
                         }
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-black/90 hover:text-black/100 p-1.5 rounded-full cursor-pointer backdrop-blur-sm"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-black/90 hover:text-black p-1.5 rounded-full cursor-pointer backdrop-blur-sm"
+                        aria-label={
+                          showConfirmPassword
+                            ? "Hide confirm password"
+                            : "Show confirm password"
+                        }
                       >
                         {showConfirmPassword ? (
                           <EyeOff size={20} />
@@ -807,6 +836,7 @@ export function ArtistProfileSetup({
                         )}
                       </button>
                     </div>
+
                     {confirmPassword && (
                       <p
                         className={`text-sm mt-2 ${
@@ -829,11 +859,11 @@ export function ArtistProfileSetup({
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="px-8 cursor-pointer py-4 bg-white/30 backdrop-blur-md border-2 border-white/40 rounded-xl text-white text-lg hover:bg-white/40 hover:border-white/60 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full sm:w-auto px-8 cursor-pointer py-4 bg-white/30 backdrop-blur-md border-2 border-white/40 rounded-xl text-white text-base sm:text-lg hover:bg-white/40 hover:border-white/60 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isLoading ? (
                     <div className="flex items-center justify-center gap-2">
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                       <span>{content.completeSetup}...</span>
                     </div>
                   ) : (

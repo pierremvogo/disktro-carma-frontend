@@ -99,7 +99,18 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   // Pendant les vérifications, on évite d'afficher le dashboard
   if (!isChecked) {
     return (
-      <div className="w-full min-h-screen flex items-center justify-center bg-gray-500 text-black">
+      <div
+        className="
+          relative w-full
+          min-h-[100svh] md:min-h-screen
+          overflow-hidden
+          bg-gray-500
+          text-black
+          flex items-center justify-center
+          pt-[env(safe-area-inset-top)]
+          pb-[env(safe-area-inset-bottom)]
+        "
+      >
         <div className="flex flex-col items-center gap-3">
           <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
           <p className="text-sm opacity-80">Checking authorization…</p>
