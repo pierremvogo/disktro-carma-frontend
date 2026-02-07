@@ -164,7 +164,13 @@ export function ArtistChoice({
 
   return (
     <div
-      className="fixed inset-0 w-screen h-screen bg-cover bg-center"
+      className="
+        relative w-full
+        min-h-[100svh] md:min-h-screen
+        overflow-hidden
+        bg-cover bg-center
+        text-white
+      "
       style={{
         backgroundImage:
           'url("/image/4ac3eed398bb68113a14d0fa5efe7a6def6f7651.png")',
@@ -174,15 +180,32 @@ export function ArtistChoice({
     >
       {/* ✅ Bouton d’accessibilité : monté au plus haut niveau */}
       <AccessibilityButton language={language} />
+
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/60" />
-      {/* TOP BAR */}
-      <div className="absolute top-2 left-2 right-2 z-20 flex items-center justify-between px-2 sm:px-4">
+
+      {/* ✅ TOP BAR (safe-area + fixed, ne scrolle pas) */}
+      <div
+        className="
+          fixed left-0 right-0 z-20
+          px-3 sm:px-4
+          flex items-center justify-between
+          top-[calc(env(safe-area-inset-top)+0.5rem)]
+        "
+      >
         {/* Back */}
         <button
           onClick={() => router.push("/home")}
           type="button"
-          className="flex items-center gap-2 text-white drop-shadow-2xl font-semibold hover:opacity-80 transition"
+          className="
+            flex items-center gap-2
+            text-white drop-shadow-2xl font-semibold
+            hover:opacity-80 transition
+            bg-white/10 backdrop-blur-md
+            border border-white/20
+            rounded-full
+            px-3 py-2
+          "
         >
           <svg
             width="20"
@@ -202,16 +225,36 @@ export function ArtistChoice({
         {/* Logout */}
         <button
           onClick={onLogout}
-          className="flex items-center gap-2 px-4 py-2 bg-red-500/40 backdrop-blur-md border border-red-300/60 rounded-xl text-white text-sm sm:text-base hover:bg-red-500/60 hover:border-white/70 transition-all shadow-lg"
+          className="
+            flex items-center gap-2
+            px-4 py-2
+            bg-red-500/40 backdrop-blur-md
+            border border-red-300/60
+            rounded-xl
+            text-white text-sm sm:text-base
+            hover:bg-red-500/60 hover:border-white/70
+            transition-all shadow-lg
+          "
           title={content.logout}
+          type="button"
         >
           <LogOut size={18} />
           <span className="drop-shadow">{content.logout}</span>
         </button>
       </div>
 
-      {/* Content */}
-      <div className="relative w-full h-full overflow-y-auto flex justify-center p-4 sm:p-6">
+      {/* ✅ Scroll container (stable iOS) */}
+      <div
+        className="
+          relative z-10
+          min-h-[100svh]
+          overflow-y-auto overscroll-contain
+          px-4 sm:px-6
+          pt-[calc(env(safe-area-inset-top)+5rem)]
+          pb-[calc(env(safe-area-inset-bottom)+1.25rem)]
+          flex justify-center
+        "
+      >
         <div className="w-full max-w-5xl flex flex-col gap-6 sm:gap-8">
           {/* Header */}
           <header className="flex flex-col items-center gap-4 text-center mb-4 sm:mb-8">
@@ -220,7 +263,7 @@ export function ArtistChoice({
               <Music className="text-white drop-shadow-lg" size={40} />
             </div>
 
-            {/* Title + Logout */}
+            {/* Title */}
             <div className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-6">
               <h1 className="text-3xl sm:text-4xl md:text-5xl text-white drop-shadow-2xl font-semibold">
                 {content.title}
@@ -288,6 +331,7 @@ export function ArtistChoice({
                 {/* Button */}
                 <button
                   onClick={() => router.push("/dashboard/artist")}
+                  type="button"
                   className="cursor-pointer w-full px-5 py-3 sm:px-6 sm:py-4 bg-gradient-to-r from-purple-500/50 to-pink-500/50 backdrop-blur-md border border-white/40 rounded-xl text-white text-base sm:text-lg hover:from-purple-500/60 hover:to-pink-500/60 hover:border-white/70 transition-all shadow-lg flex items-center justify-center gap-2 group-hover:scale-[1.02]"
                 >
                   {content.choose}
@@ -350,9 +394,8 @@ export function ArtistChoice({
 
                 {/* Button */}
                 <button
-                  onClick={() => {
-                    router.push("/dashboard/fan-streaming");
-                  }}
+                  onClick={() => router.push("/dashboard/fan-streaming")}
+                  type="button"
                   className="cursor-pointer w-full px-5 py-3 sm:px-6 sm:py-4 bg-gradient-to-r from-blue-500/50 to-cyan-500/50 backdrop-blur-md border border-white/40 rounded-xl text-white text-base sm:text-lg hover:from-blue-500/60 hover:to-cyan-500/60 hover:border-white/70 transition-all shadow-lg flex items-center justify-center gap-2 group-hover:scale-[1.02]"
                 >
                   {content.choose}

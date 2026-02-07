@@ -488,7 +488,13 @@ export function FanProfileSetup({
 
   return (
     <div
-      className="fixed inset-0 w-screen h-screen bg-cover bg-center"
+      className="
+        relative w-full
+        min-h-[100svh] md:min-h-screen
+        overflow-hidden
+        bg-cover bg-center
+        text-white
+      "
       style={{
         backgroundImage:
           'url("/image/4ac3eed398bb68113a14d0fa5efe7a6def6f7651.png")',
@@ -496,32 +502,44 @@ export function FanProfileSetup({
         backgroundPosition: "center",
       }}
     >
-      {/* ✅ Bouton d’accessibilité : monté au plus haut niveau */}
       <AccessibilityButton language={language} />
+
       {/* Overlay (même que Login) */}
       <div className="absolute inset-0 bg-black/50" />
 
-      {/* Content */}
-      <div className="relative w-full h-full overflow-y-auto">
-        <div className="min-h-full flex items-center justify-center p-6">
-          <div className="w-full max-w-5xl bg-white/10 backdrop-blur-md rounded-3xl border border-white/20 p-8 shadow-2xl">
+      {/* Scroll container stable iOS */}
+      <div
+        className="
+          relative z-10
+          min-h-[100svh]
+          overflow-y-auto overscroll-contain
+          px-4 sm:px-6
+          pt-[calc(env(safe-area-inset-top)+1.25rem)]
+          pb-[calc(env(safe-area-inset-bottom)+1.25rem)]
+        "
+      >
+        <div className="min-h-[calc(100svh-2.5rem)] flex items-center justify-center py-6">
+          <div className="w-full max-w-5xl bg-white/10 backdrop-blur-md rounded-3xl border border-white/20 p-6 sm:p-8 shadow-2xl">
             {/* Header */}
-            <div className="flex items-center gap-4 mb-8">
+            <div className="flex items-start gap-4 mb-8">
               <button
+                type="button"
                 onClick={(e) => {
                   e.preventDefault();
                   if (onSignUp) onSignUp();
                   else onBack();
                 }}
-                className="p-2 hover:bg-white/10 cursor-pointer rounded-lg transition-all"
+                className="p-2 hover:bg-white/10 cursor-pointer rounded-lg transition-all flex-shrink-0"
+                aria-label="Back"
               >
-                <ArrowLeft className="text-white " size={24} />
+                <ArrowLeft className="text-white" size={24} />
               </button>
-              <div>
-                <h1 className="text-3xl text-white drop-shadow-lg">
+
+              <div className="min-w-0">
+                <h1 className="text-2xl sm:text-3xl text-white drop-shadow-lg">
                   {content.title}
                 </h1>
-                <p className="text-white/70 drop-shadow mt-1">
+                <p className="text-white/70 drop-shadow mt-1 text-sm sm:text-base">
                   {content.subtitle}
                 </p>
               </div>
@@ -531,7 +549,7 @@ export function FanProfileSetup({
               <div className="grid lg:grid-cols-2 gap-8 mb-5">
                 {/* Profile Information Section */}
                 <div className="space-y-6">
-                  <h2 className="text-2xl text-white drop-shadow-lg flex items-center gap-2">
+                  <h2 className="text-xl sm:text-2xl text-white drop-shadow-lg flex items-center gap-2">
                     <User size={24} />
                     {content.profileInfo}
                   </h2>
@@ -563,12 +581,14 @@ export function FanProfileSetup({
                           } as any);
                         }
                       }}
-                      className={`aspect-square max-w-xs border-2 border-dashed rounded-xl p-4 text-center transition-all cursor-pointer flex items-center justify-center overflow-hidden
-      ${
-        isDraggingPic
-          ? "border-white/80 bg-white/15"
-          : "border-white/30 bg-white/5 hover:bg-white/10"
-      }`}
+                      className={`aspect-square w-full max-w-xs mx-auto sm:mx-0
+                        border-2 border-dashed rounded-xl p-4 text-center transition-all cursor-pointer
+                        flex items-center justify-center overflow-hidden
+                        ${
+                          isDraggingPic
+                            ? "border-white/80 bg-white/15"
+                            : "border-white/30 bg-white/5 hover:bg-white/10"
+                        }`}
                     >
                       <input
                         ref={fileInputRef}
@@ -611,7 +631,8 @@ export function FanProfileSetup({
                       className="w-full px-4 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-black placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/50"
                     />
                   </div>
-                  {/* Artist Country */}
+
+                  {/* Country */}
                   <div>
                     <label className="block text-white drop-shadow mb-2">
                       Country
@@ -663,7 +684,7 @@ export function FanProfileSetup({
 
                 {/* Account Security Section */}
                 <div className="space-y-6">
-                  <h2 className="text-2xl text-white drop-shadow-lg flex items-center gap-2">
+                  <h2 className="text-xl sm:text-2xl text-white drop-shadow-lg flex items-center gap-2">
                     <Shield size={24} />
                     {content.accountSecurity}
                   </h2>
@@ -679,14 +700,15 @@ export function FanProfileSetup({
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder={content.passwordPlaceholder}
-                        className="w-full px-4 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-black placeholder-white/40 focus:outline-none focus:ring-2"
+                        className="w-full px-4 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-black placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/50"
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 
-                       p-1.5 rounded-full 
-                       text-black/90 hover:text-black/100 cursor-pointer backdrop-blur-sm"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-full text-black/90 hover:text-black cursor-pointer backdrop-blur-sm"
+                        aria-label={
+                          showPassword ? "Hide password" : "Show password"
+                        }
                       >
                         {showPassword ? (
                           <EyeOff size={18} />
@@ -695,6 +717,7 @@ export function FanProfileSetup({
                         )}
                       </button>
                     </div>
+
                     {password && (
                       <p
                         className={`text-sm mt-2 ${
@@ -724,9 +747,12 @@ export function FanProfileSetup({
                         onClick={() =>
                           setShowConfirmPassword(!showConfirmPassword)
                         }
-                        className="absolute right-3 top-1/2 -translate-y-1/2 
-                       p-1.5 rounded-full 
-                       text-black/90 hover:text-black/100 cursor-pointer backdrop-blur-sm"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-full text-black/90 hover:text-black cursor-pointer backdrop-blur-sm"
+                        aria-label={
+                          showConfirmPassword
+                            ? "Hide confirm password"
+                            : "Show confirm password"
+                        }
                       >
                         {showConfirmPassword ? (
                           <EyeOff size={20} />
@@ -735,6 +761,7 @@ export function FanProfileSetup({
                         )}
                       </button>
                     </div>
+
                     {confirmPassword && (
                       <p
                         className={`text-sm mt-2 ${
@@ -747,47 +774,11 @@ export function FanProfileSetup({
                       </p>
                     )}
                   </div>
-
-                  {/* Two-Factor Authentication */}
-                  {/* <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
-                    <div className="flex items-center justify-between mb-4">
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <Lock className="text-white" size={20} />
-                          <h3 className="text-white drop-shadow">
-                            {content.twoFactor}
-                          </h3>
-                        </div>
-                        <p className="text-white/60 text-sm">
-                          {content.twoFactorDesc}
-                        </p>
-                      </div>
-                      {twoFactorEnabled && (
-                        <CheckCircle className="text-green-400" size={20} />
-                      )}
-                    </div>
-
-                    {!twoFactorEnabled ? (
-                      <button
-                        type="button"
-                        onClick={handleEnableTwoFactor}
-                        className="w-full cursor-pointer px-4 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-white hover:bg-white/30 transition-all"
-                      >
-                        {content.enable}
-                      </button>
-                    ) : (
-                      <div className="flex items-center gap-2 text-green-400 text-sm">
-                        <CheckCircle size={16} />
-                        {content.enabled}
-                      </div>
-                    )}
-                  </div> */}
                 </div>
               </div>
 
               {/* Messages d'erreur / succès */}
               {successMessage && <CustomSuccess message={successMessage} />}
-
               {errorMessage && <CustomAlert message={errorMessage} />}
 
               {/* Complete Button */}
@@ -795,11 +786,11 @@ export function FanProfileSetup({
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="px-8 cursor-pointer py-4 bg-white/30 backdrop-blur-md border-2 border-white/40 rounded-xl text-white text-lg hover:bg-white/40 hover:border-white/60 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full sm:w-auto px-8 cursor-pointer py-4 bg-white/30 backdrop-blur-md border-2 border-white/40 rounded-xl text-white text-base sm:text-lg hover:bg-white/40 hover:border-white/60 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isLoading ? (
                     <div className="flex items-center justify-center gap-2">
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                       <span>{content.completeSetup}...</span>
                     </div>
                   ) : (

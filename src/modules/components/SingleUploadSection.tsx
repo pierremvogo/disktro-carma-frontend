@@ -881,665 +881,698 @@ export function SingleUploadSection({
   // Rendu JSX (upload audio, artwork, mini-video, lyrics, accessibilité, creation info)
   // ==========
   return (
-    <div className="space-y-8">
-      {/* 1. Upload audio single */}
-      <div className="relative">
-        {audioPreviewUrl ? (
-          <div className="relative rounded-xl overflow-hidden bg-white/5 border-2 border-white/20 p-6">
-            <audio controls src={audioPreviewUrl} className="w-full">
-              Votre navigateur ne supporte pas l’élément audio.
-            </audio>
-            <button
-              type="button"
-              onClick={() => {
-                setAudioFile(null);
-                setAudioPreviewUrl("");
-              }}
-              className="cursor-pointer absolute top-0 right-0 bg-red-500/80 backdrop-blur-sm text-white p-2 rounded-lg hover:bg-red-600/80 transition-all"
-            >
-              <X size={20} />
-            </button>
-          </div>
-        ) : (
-          <div
-            className="border-2 border-dashed border-white/30 rounded-xl p-12 text-center bg-white/5 hover:bg-white/10 transition-all cursor-pointer"
-            onDrop={(e) => {
-              e.preventDefault();
-              const file = e.dataTransfer.files[0];
-              if (file && file.type.startsWith("audio/")) {
-                handleAudioFileChange({ target: { files: [file] } } as any);
-              }
-            }}
-            onDragOver={(e) => e.preventDefault()}
-          >
-            <input
-              type="file"
-              accept="audio/*"
-              onChange={handleAudioFileChange}
-              className="hidden"
-              id="single-audio-upload"
-            />
-            <label htmlFor="single-audio-upload" className="cursor-pointer">
-              <Music size={48} className="mx-auto mb-4 text-white/60" />
-              <p className="text-white drop-shadow mb-2 text-sm">
-                {text.dragDrop}
-              </p>
-            </label>
-          </div>
-        )}
-      </div>
-
-      {/* 2. Artwork + mini video */}
-      <div className="grid md:grid-cols-2 gap-6">
-        {/* Artwork Upload */}
-        <div>
-          <h3 className="text-xl text-white drop-shadow mb-4">
-            {text.uploadArtwork}
-          </h3>
-
-          {artworkPreview ? (
-            <div className="relative aspect-square rounded-xl overflow-hidden bg-white/5 border-2 border-white/20">
-              <img
-                src={artworkPreview}
-                alt="Artwork"
-                className="w-full h-full object-cover"
-              />
-              <button
-                type="button"
-                onClick={() => {
-                  setArtworkFile(null);
-                  setArtworkPreview("");
-                  setCoverUrl("");
-                }}
-                className="absolute cursor-pointer top-2 right-2 bg-red-500/80 backdrop-blur-sm text-white p-2 rounded-lg hover:bg-red-600/80 transition-all"
-              >
-                <X size={20} />
-              </button>
-            </div>
-          ) : (
-            <div
-              className="border-2 border-dashed border-white/30 rounded-xl p-8 text-center bg-white/5 hover:bg-white/10 transition-all cursor-pointer aspect-square flex items-center justify-center"
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={(e) => {
-                e.preventDefault();
-                const file = e.dataTransfer.files[0];
-                if (file && file.type.startsWith("image/")) {
-                  handleArtwork({ target: { files: [file] } } as any);
-                }
-              }}
-            >
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleArtwork}
-                className="hidden"
-                id="single-artwork-upload"
-              />
-              <label
-                htmlFor="single-artwork-upload"
-                className="cursor-pointer text-center"
-              >
-                <svg
-                  width="48"
-                  height="48"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  className="mx-auto mb-4 text-white/60"
-                >
-                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                  <circle cx="8.5" cy="8.5" r="1.5" />
-                  <polyline points="21 15 16 10 5 21" />
-                </svg>
-                <p className="text-white drop-shadow text-sm">
-                  {text.artworkDragDrop}
-                </p>
-              </label>
-            </div>
-          )}
-        </div>
-
-        {/* Mini Video Loop Upload */}
-        <div>
-          <h3 className="text-xl text-white drop-shadow mb-4">
-            {text.uploadMiniVideo}
-          </h3>
-          {miniVideoPreview ? (
-            <div className="relative aspect-square rounded-xl overflow-hidden bg-black border-2 border-white/20">
-              <video
-                src={miniVideoPreview}
-                loop
-                autoPlay
-                muted
-                className="w-full h-full object-cover"
-              />
-
-              <button
-                type="button"
-                onClick={() => {
-                  setMiniVideoFile(null);
-                  setMiniVideoPreview("");
-                  setMiniVideoLoopUrl("");
-                }}
-                className="cursor-pointer absolute top-2 right-2 bg-red-500/80 backdrop-blur-sm text-white p-2 rounded-lg hover:bg-red-600/80 transition-all"
-              >
-                <X size={20} />
-              </button>
-            </div>
-          ) : (
-            <div className="border-2 border-dashed border-white/30 rounded-xl p-8 text-center bgwhite/5 hover:bg-white/10 transition-all cursor-pointer aspect-square flex items-center justify-center">
-              <input
-                type="file"
-                accept="video/*"
-                onChange={handleMiniVideoLoop}
-                className="hidden"
-                id="single-mini-video-upload"
-              />
-              <label
-                htmlFor="single-mini-video-upload"
-                className="cursor-pointer text-center"
-              >
-                <svg
-                  width="48"
-                  height="48"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  className="mx-auto mb-4 text-white/60"
-                >
-                  <polygon points="23 7 16 12 23 17 23 7" />
-                  <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
-                </svg>
-                <p className="text-white drop-shadow text-sm">
-                  {text.miniVideoDragDrop}
-                </p>
-              </label>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* 3. Lyrics + mood + accessibilité */}
-      <div>
-        <h3 className="text-xl text-white drop-shadow mb-4">
-          {text.uploadLyrics}
-        </h3>
-        <textarea
-          name="lyrics"
-          value={creation.lyrics}
-          onChange={(e) =>
-            setCreation((prev) => ({ ...prev, lyrics: e.target.value }))
-          }
-          placeholder={text.lyricsPlaceholder}
-          className="w-full h-40 p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all resize-none"
-        />
-
-        <div className="mt-3">
-          <label className="block text-white/80 drop-shadow mb-1 text-xs">
-            {text.trackMood}
-          </label>
-
-          <select
-            value={creation.moodId}
-            onChange={(e) =>
-              setCreation((prev) => ({ ...prev, moodId: e.target.value }))
-            }
-            className="cursor-pointer w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg 
-                   text-black text-sm focus:outline-none focus:border-white/40 transition-all"
-          >
-            <option value="">-- {text.selectMoodPlaceholder} --</option>
-
-            {moods &&
-              moods.map((mood) => (
-                <option key={mood.id} value={mood.id}>
-                  {mood.name}
-                </option>
-              ))}
-          </select>
-        </div>
-
-        {/* Accessibilité */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-          {/* Sign Language Video */}
-          <div>
-            <label className="block text-white/90 drop-shadow mb-2 text-sm">
-              {text.signLanguageVideo}
-            </label>
-            {signLanguageVideoPreview ? (
-              <div className="relative rounded-lg bg-black border-2 border-white/20 p-6 flex items-center justify-between aspect-video">
-                <video
-                  src={signLanguageVideoPreview}
-                  controls
-                  className="h-full w-auto object-contain"
-                />
-
+    <div
+      className="
+        relative w-full
+        min-h-[100svh] md:min-h-screen
+        overflow-hidden
+      "
+    >
+      {/* ✅ Scroll container stable iOS */}
+      <div
+        className="
+          min-h-[100svh]
+          overflow-y-auto overscroll-contain
+          px-4 sm:px-6 md:px-8
+          pt-[calc(env(safe-area-inset-top)+1.25rem)]
+          pb-[calc(env(safe-area-inset-bottom)+1.25rem)]
+        "
+      >
+        <div className="space-y-8">
+          {/* 1. Upload audio single */}
+          <div className="relative">
+            {audioPreviewUrl ? (
+              <div className="relative rounded-xl overflow-hidden bg-white/5 border-2 border-white/20 p-6">
+                <audio controls src={audioPreviewUrl} className="w-full">
+                  Votre navigateur ne supporte pas l’élément audio.
+                </audio>
                 <button
                   type="button"
                   onClick={() => {
-                    setSignLanguageVideoFile(null);
-                    setSignLanguageVideoPreview("");
-                    setSignLanguageVideoUrl("");
+                    setAudioFile(null);
+                    setAudioPreviewUrl("");
                   }}
-                  className="cursor-pointer bg-red-500/80 backdrop-blur-sm text-white p-2 rounded-lg hover:bg-red-600/80 transition-all"
+                  className="cursor-pointer absolute top-0 right-0 bg-red-500/80 backdrop-blur-sm text-white p-2 rounded-lg hover:bg-red-600/80 transition-all"
                 >
                   <X size={20} />
                 </button>
               </div>
             ) : (
-              <div className="border-2 border-dashed border-white/30 rounded-lg p-6 text-center bg-white/5 hover:bg-white/10 transition-all cursor-pointer h-[120px] flex items-center justify-center">
-                <input
-                  type="file"
-                  accept="video/*"
-                  onChange={handleSignLanguageVideo}
-                  className="hidden"
-                  id="sign-language-upload-single"
-                />
-                <label
-                  htmlFor="sign-language-upload-single"
-                  className="cursor-pointer text-center"
-                >
-                  <Upload size={32} className="mx-auto mb-2 text-white/60" />
-                  <p className="text-white/80 drop-shadow text-xs">
-                    {text.signLanguageVideoDragDrop}
-                  </p>
-                </label>
-              </div>
-            )}
-          </div>
-          {/* Braille File */}
-          <div>
-            <label className="block text-white/90 drop-shadow mb-2 text-sm">
-              {text.brailleFile}
-            </label>
-            {brailleFile ? (
-              <div className="relative rounded-lg p-6 bg-white/10 border-2 border-white/20 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <FileText size={32} className="text-white/80" />
-                  <span className="text-white text-sm">{brailleFile.name}</span>
-                </div>
-                <button
-                  onClick={() => {
-                    setBrailleFile(null);
-                    setBrailleFileUrl("");
-                  }}
-                  className="bg-red-500/80 backdrop-blur-sm text-white p-2 rounded-lg hover:bg-red-600/80 transition-all"
-                >
-                  <X size={16} />
-                </button>
-              </div>
-            ) : (
-              <div className="border-2 border-dashed border-white/30 rounded-lg p-6 text-center bg-white/5 hover:bg-white/10 transition-all cursor-pointer">
-                <input
-                  type="file"
-                  accept=".brf,.brl,.txt"
-                  onChange={handleBrailleFile}
-                  className="hidden"
-                  id="braille-upload-single"
-                />
-                <label
-                  htmlFor="braille-upload-single"
-                  className="cursor-pointer"
-                >
-                  <FileText size={32} className="mx-auto mb-2 text-white/60" />
-                  <p className="text-white/80 drop-shadow text-xs">
-                    {text.brailleFileDragDrop}
-                  </p>
-                </label>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* 4. Creation Information */}
-      <div>
-        <h3 className="text-xl text-white drop-shadow mb-4">
-          {text.creationInfoSingle}
-        </h3>
-        <form onSubmit={handleAddTrack} className="space-y-6">
-          <div className="grid md:grid-cols-2 gap-4">
-            {/* Title */}
-            <div>
-              <label className="block text-white/90 drop-shadow mb-2 text-sm">
-                {text.trackTitle}
-              </label>
-              <input
-                type="text"
-                value={creation.trackTitle}
-                onChange={(e) =>
-                  setCreation((prev) => ({
-                    ...prev,
-                    trackTitle: e.target.value,
-                  }))
-                }
-                className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
-              />
-            </div>
-
-            {/* Authors */}
-            <div>
-              <label className="block text-white/90 drop-shadow mb-2 text-sm">
-                {text.authors}
-              </label>
-              <input
-                type="text"
-                value={creation.authors}
-                onChange={(e) =>
-                  setCreation((prev) => ({
-                    ...prev,
-                    authors: e.target.value,
-                  }))
-                }
-                className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
-              />
-            </div>
-
-            {/* Producers */}
-            <div>
-              <label className="block text-white/90 drop-shadow mb-2 text-sm">
-                {text.producers}
-              </label>
-              <input
-                type="text"
-                value={creation.producers}
-                onChange={(e) =>
-                  setCreation((prev) => ({
-                    ...prev,
-                    producers: e.target.value,
-                  }))
-                }
-                className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
-              />
-            </div>
-
-            {/* Lyricists */}
-            <div>
-              <label className="block text-white/90 drop-shadow mb-2 text-sm">
-                {text.lyricists}
-              </label>
-              <input
-                type="text"
-                value={creation.lyricists}
-                onChange={(e) =>
-                  setCreation((prev) => ({
-                    ...prev,
-                    lyricists: e.target.value,
-                  }))
-                }
-                className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
-              />
-            </div>
-
-            {/* Musicians Section */}
-            <div className="col-span-2">
-              <label className="block text-white/90 drop-shadow mb-3">
-                {text.musicians}
-              </label>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white/5 backdrop-blur-sm rounded-lg p-4 border border-white/10">
-                {/* Vocals */}
-                <div>
-                  <label className="block text-white/70 drop-shadow mb-2 text-sm">
-                    {text.musiciansVocals}
-                  </label>
-                  <input
-                    type="text"
-                    value={creation.musiciansVocals}
-                    onChange={(e) =>
-                      setCreation((prev) => ({
-                        ...prev,
-                        musiciansVocals: e.target.value,
-                      }))
-                    }
-                    className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
-                  />
-                </div>
-
-                {/* Piano / Keyboards */}
-                <div>
-                  <label className="block text-white/70 drop-shadow mb-2 text-sm">
-                    {text.musiciansPianoKeyboards}
-                  </label>
-                  <input
-                    type="text"
-                    value={creation.musiciansPianoKeyboards}
-                    onChange={(e) =>
-                      setCreation((prev) => ({
-                        ...prev,
-                        musiciansPianoKeyboards: e.target.value,
-                      }))
-                    }
-                    className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
-                  />
-                </div>
-
-                {/* Winds */}
-                <div>
-                  <label className="block text-white/70 drop-shadow mb-2 text-sm">
-                    {text.musiciansWinds}
-                  </label>
-                  <input
-                    type="text"
-                    value={creation.musiciansWinds}
-                    onChange={(e) =>
-                      setCreation((prev) => ({
-                        ...prev,
-                        musiciansWinds: e.target.value,
-                      }))
-                    }
-                    className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
-                  />
-                </div>
-
-                {/* Percussion */}
-                <div>
-                  <label className="block text-white/70 drop-shadow mb-2 text-sm">
-                    {text.musiciansPercussion}
-                  </label>
-                  <input
-                    type="text"
-                    value={creation.musiciansPercussion}
-                    onChange={(e) =>
-                      setCreation((prev) => ({
-                        ...prev,
-                        musiciansPercussion: e.target.value,
-                      }))
-                    }
-                    className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
-                  />
-                </div>
-
-                {/* Strings */}
-                <div className="md:col-span-2">
-                  <label className="block text-white/70 drop-shadow mb-2 text-sm">
-                    {text.musiciansStrings}
-                  </label>
-                  <input
-                    type="text"
-                    value={creation.musiciansStrings}
-                    onChange={(e) =>
-                      setCreation((prev) => ({
-                        ...prev,
-                        musiciansStrings: e.target.value,
-                      }))
-                    }
-                    className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Mixing Engineer */}
-            <div>
-              <label className="block text-white/90 drop-shadow mb-2 text-sm">
-                {text.mixingEngineer}
-              </label>
-              <input
-                type="text"
-                value={creation.mixingEngineer}
-                onChange={(e) =>
-                  setCreation((prev) => ({
-                    ...prev,
-                    mixingEngineer: e.target.value,
-                  }))
-                }
-                className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
-              />
-            </div>
-
-            {/* Mastering Engineer */}
-            <div>
-              <label className="block text-white/90 drop-shadow mb-2 text-sm">
-                {text.masteringEngineer}
-              </label>
-              <input
-                type="text"
-                value={creation.masteringEngineer}
-                onChange={(e) =>
-                  setCreation((prev) => ({
-                    ...prev,
-                    masteringEngineer: e.target.value,
-                  }))
-                }
-                className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
-              />
-            </div>
-          </div>
-
-          {successMessage && <CustomSuccess message={successMessage} />}
-          {errorMessage && <CustomAlert message={errorMessage} />}
-
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="cursor-pointer disabled:cursor-not-allowed w-full py-4 px-6 bg-white/30 backdrop-blur-md border border-white/40 rounded-lg text-white drop-shadow hover:bg-white/40 transition-all flex items-center justify-center gap-2"
-          >
-            {isLoading ? (
-              <div className="flex items-center justify-center gap-2">
-                <div className="w-5 h-5 border-2   border-white/30 border-t-white rounded-full animate-spin"></div>
-                <span>{text.uploadButtonSingle}...</span>
-              </div>
-            ) : (
-              <>
-                <Upload size={20} />
-                {text.uploadButtonSingle}
-              </>
-            )}
-          </button>
-        </form>
-      </div>
-      <div className="mt-8">
-        <h3 className="text-xl text-white drop-shadow mb-4">
-          {text.recentSingleUploads}
-        </h3>
-
-        <div className="space-y-3">
-          {singles && singles.length > 0 ? (
-            singles.slice(0, 5).map((single) => (
               <div
-                key={single.id}
-                className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/10 hover:bg-white/15 transition-all"
+                className="border-2 border-dashed border-white/30 rounded-xl p-12 text-center bg-white/5 hover:bg-white/10 transition-all cursor-pointer"
+                onDrop={(e) => {
+                  e.preventDefault();
+                  const file = e.dataTransfer.files[0];
+                  if (file && file.type.startsWith("audio/")) {
+                    handleAudioFileChange({ target: { files: [file] } } as any);
+                  }
+                }}
+                onDragOver={(e) => e.preventDefault()}
               >
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                  {/* Infos Single */}
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-12 h-12 sm:w-10 sm:h-10 bg-white/20 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
-                      {single.coverUrl ? (
-                        <img
-                          src={single.coverUrl}
-                          alt={single.title}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <Music size={20} className="text-white" />
-                      )}
-                    </div>
+                <input
+                  type="file"
+                  accept="audio/*"
+                  onChange={handleAudioFileChange}
+                  className="hidden"
+                  id="single-audio-upload"
+                />
+                <label htmlFor="single-audio-upload" className="cursor-pointer">
+                  <Music size={48} className="mx-auto mb-4 text-white/60" />
+                  <p className="text-white drop-shadow mb-2 text-sm">
+                    {text.dragDrop}
+                  </p>
+                </label>
+              </div>
+            )}
+          </div>
 
-                    <div className="min-w-0">
-                      <span className="text-white drop-shadow font-medium truncate block">
-                        {single.title}
-                      </span>
-                      <span className="block text-white/60 text-xs truncate">
-                        {single.authors || "—"}
-                      </span>
-                    </div>
+          {/* 2. Artwork + mini video */}
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Artwork Upload */}
+            <div>
+              <h3 className="text-xl text-white drop-shadow mb-4">
+                {text.uploadArtwork}
+              </h3>
+
+              {artworkPreview ? (
+                <div className="relative aspect-square rounded-xl overflow-hidden bg-white/5 border-2 border-white/20">
+                  <img
+                    src={artworkPreview}
+                    alt="Artwork"
+                    className="w-full h-full object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setArtworkFile(null);
+                      setArtworkPreview("");
+                      setCoverUrl("");
+                    }}
+                    className="absolute cursor-pointer top-2 right-2 bg-red-500/80 backdrop-blur-sm text-white p-2 rounded-lg hover:bg-red-600/80 transition-all"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+              ) : (
+                <div
+                  className="border-2 border-dashed border-white/30 rounded-xl p-8 text-center bg-white/5 hover:bg-white/10 transition-all cursor-pointer aspect-square flex items-center justify-center"
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    const file = e.dataTransfer.files[0];
+                    if (file && file.type.startsWith("image/")) {
+                      handleArtwork({ target: { files: [file] } } as any);
+                    }
+                  }}
+                >
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleArtwork}
+                    className="hidden"
+                    id="single-artwork-upload"
+                  />
+                  <label
+                    htmlFor="single-artwork-upload"
+                    className="cursor-pointer text-center"
+                  >
+                    <svg
+                      width="48"
+                      height="48"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      className="mx-auto mb-4 text-white/60"
+                    >
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                      <circle cx="8.5" cy="8.5" r="1.5" />
+                      <polyline points="21 15 16 10 5 21" />
+                    </svg>
+                    <p className="text-white drop-shadow text-sm">
+                      {text.artworkDragDrop}
+                    </p>
+                  </label>
+                </div>
+              )}
+            </div>
+
+            {/* Mini Video Loop Upload */}
+            <div>
+              <h3 className="text-xl text-white drop-shadow mb-4">
+                {text.uploadMiniVideo}
+              </h3>
+              {miniVideoPreview ? (
+                <div className="relative aspect-square rounded-xl overflow-hidden bg-black border-2 border-white/20">
+                  <video
+                    src={miniVideoPreview}
+                    loop
+                    autoPlay
+                    muted
+                    className="w-full h-full object-cover"
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMiniVideoFile(null);
+                      setMiniVideoPreview("");
+                      setMiniVideoLoopUrl("");
+                    }}
+                    className="cursor-pointer absolute top-2 right-2 bg-red-500/80 backdrop-blur-sm text-white p-2 rounded-lg hover:bg-red-600/80 transition-all"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+              ) : (
+                <div className="border-2 border-dashed border-white/30 rounded-xl p-8 text-center bg-white/5 hover:bg-white/10 transition-all cursor-pointer aspect-square flex items-center justify-center">
+                  <input
+                    type="file"
+                    accept="video/*"
+                    onChange={handleMiniVideoLoop}
+                    className="hidden"
+                    id="single-mini-video-upload"
+                  />
+                  <label
+                    htmlFor="single-mini-video-upload"
+                    className="cursor-pointer text-center"
+                  >
+                    <svg
+                      width="48"
+                      height="48"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      className="mx-auto mb-4 text-white/60"
+                    >
+                      <polygon points="23 7 16 12 23 17 23 7" />
+                      <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+                    </svg>
+                    <p className="text-white drop-shadow text-sm">
+                      {text.miniVideoDragDrop}
+                    </p>
+                  </label>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* 3. Lyrics + mood + accessibilité */}
+          <div>
+            <h3 className="text-xl text-white drop-shadow mb-4">
+              {text.uploadLyrics}
+            </h3>
+            <textarea
+              name="lyrics"
+              value={creation.lyrics}
+              onChange={(e) =>
+                setCreation((prev) => ({ ...prev, lyrics: e.target.value }))
+              }
+              placeholder={text.lyricsPlaceholder}
+              className="w-full h-40 p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all resize-none"
+            />
+
+            <div className="mt-3">
+              <label className="block text-white/80 drop-shadow mb-1 text-xs">
+                {text.trackMood}
+              </label>
+
+              <select
+                value={creation.moodId}
+                onChange={(e) =>
+                  setCreation((prev) => ({ ...prev, moodId: e.target.value }))
+                }
+                className="cursor-pointer w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg 
+                     text-black text-sm focus:outline-none focus:border-white/40 transition-all"
+              >
+                <option value="">-- {text.selectMoodPlaceholder} --</option>
+
+                {moods &&
+                  moods.map((mood) => (
+                    <option key={mood.id} value={mood.id}>
+                      {mood.name}
+                    </option>
+                  ))}
+              </select>
+            </div>
+
+            {/* Accessibilité */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              {/* Sign Language Video */}
+              <div>
+                <label className="block text-white/90 drop-shadow mb-2 text-sm">
+                  {text.signLanguageVideo}
+                </label>
+                {signLanguageVideoPreview ? (
+                  <div className="relative rounded-lg bg-black border-2 border-white/20 p-6 flex items-center justify-between aspect-video">
+                    <video
+                      src={signLanguageVideoPreview}
+                      controls
+                      className="h-full w-auto object-contain"
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSignLanguageVideoFile(null);
+                        setSignLanguageVideoPreview("");
+                        setSignLanguageVideoUrl("");
+                      }}
+                      className="cursor-pointer bg-red-500/80 backdrop-blur-sm text-white p-2 rounded-lg hover:bg-red-600/80 transition-all"
+                    >
+                      <X size={20} />
+                    </button>
                   </div>
-
-                  {/* Actions (streams + play + delete) */}
-                  <div className="flex items-center justify-between sm:justify-end gap-3">
-                    <span className="text-white/80 text-sm whitespace-nowrap">
-                      {(single as any).streamsCount
-                        ? `${(single as any).streamsCount} streams`
-                        : "0 streams"}
-                    </span>
-
-                    {/* Audio caché */}
-                    {single.audioUrl && (
-                      <audio
-                        id={`single-audio-${single.id}`}
-                        src={single.audioUrl}
-                        onContextMenu={(e) => e.preventDefault()}
-                        className="hidden"
+                ) : (
+                  <div className="border-2 border-dashed border-white/30 rounded-lg p-6 text-center bg-white/5 hover:bg-white/10 transition-all cursor-pointer h-[120px] flex items-center justify-center">
+                    <input
+                      type="file"
+                      accept="video/*"
+                      onChange={handleSignLanguageVideo}
+                      className="hidden"
+                      id="sign-language-upload-single"
+                    />
+                    <label
+                      htmlFor="sign-language-upload-single"
+                      className="cursor-pointer text-center"
+                    >
+                      <Upload
+                        size={32}
+                        className="mx-auto mb-2 text-white/60"
                       />
-                    )}
+                      <p className="text-white/80 drop-shadow text-xs">
+                        {text.signLanguageVideoDragDrop}
+                      </p>
+                    </label>
+                  </div>
+                )}
+              </div>
 
-                    {/* Boutons */}
-                    <div className="flex items-center gap-2">
-                      {/* Play / Pause */}
-                      <button
-                        type="button"
-                        disabled={!single.audioUrl}
-                        onClick={() => handleTogglePlaySingle(single.id)}
-                        className="p-2 rounded-lg bg-white/10 hover:bg-white/20 
-                             text-white/70 hover:text-white transition-all
-                             disabled:opacity-40 disabled:cursor-not-allowed"
-                        aria-label={
-                          currentPlayingId === single.id ? "Pause" : "Play"
+              {/* Braille File */}
+              <div>
+                <label className="block text-white/90 drop-shadow mb-2 text-sm">
+                  {text.brailleFile}
+                </label>
+                {brailleFile ? (
+                  <div className="relative rounded-lg p-6 bg-white/10 border-2 border-white/20 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <FileText size={32} className="text-white/80" />
+                      <span className="text-white text-sm">
+                        {brailleFile.name}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setBrailleFile(null);
+                        setBrailleFileUrl("");
+                      }}
+                      className="bg-red-500/80 backdrop-blur-sm text-white p-2 rounded-lg hover:bg-red-600/80 transition-all"
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="border-2 border-dashed border-white/30 rounded-lg p-6 text-center bg-white/5 hover:bg-white/10 transition-all cursor-pointer">
+                    <input
+                      type="file"
+                      accept=".brf,.brl,.txt"
+                      onChange={handleBrailleFile}
+                      className="hidden"
+                      id="braille-upload-single"
+                    />
+                    <label
+                      htmlFor="braille-upload-single"
+                      className="cursor-pointer"
+                    >
+                      <FileText
+                        size={32}
+                        className="mx-auto mb-2 text-white/60"
+                      />
+                      <p className="text-white/80 drop-shadow text-xs">
+                        {text.brailleFileDragDrop}
+                      </p>
+                    </label>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* 4. Creation Information */}
+          <div>
+            <h3 className="text-xl text-white drop-shadow mb-4">
+              {text.creationInfoSingle}
+            </h3>
+            <form onSubmit={handleAddTrack} className="space-y-6">
+              <div className="grid md:grid-cols-2 gap-4">
+                {/* Title */}
+                <div>
+                  <label className="block text-white/90 drop-shadow mb-2 text-sm">
+                    {text.trackTitle}
+                  </label>
+                  <input
+                    type="text"
+                    value={creation.trackTitle}
+                    onChange={(e) =>
+                      setCreation((prev) => ({
+                        ...prev,
+                        trackTitle: e.target.value,
+                      }))
+                    }
+                    className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
+                  />
+                </div>
+
+                {/* Authors */}
+                <div>
+                  <label className="block text-white/90 drop-shadow mb-2 text-sm">
+                    {text.authors}
+                  </label>
+                  <input
+                    type="text"
+                    value={creation.authors}
+                    onChange={(e) =>
+                      setCreation((prev) => ({
+                        ...prev,
+                        authors: e.target.value,
+                      }))
+                    }
+                    className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
+                  />
+                </div>
+
+                {/* Producers */}
+                <div>
+                  <label className="block text-white/90 drop-shadow mb-2 text-sm">
+                    {text.producers}
+                  </label>
+                  <input
+                    type="text"
+                    value={creation.producers}
+                    onChange={(e) =>
+                      setCreation((prev) => ({
+                        ...prev,
+                        producers: e.target.value,
+                      }))
+                    }
+                    className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
+                  />
+                </div>
+
+                {/* Lyricists */}
+                <div>
+                  <label className="block text-white/90 drop-shadow mb-2 text-sm">
+                    {text.lyricists}
+                  </label>
+                  <input
+                    type="text"
+                    value={creation.lyricists}
+                    onChange={(e) =>
+                      setCreation((prev) => ({
+                        ...prev,
+                        lyricists: e.target.value,
+                      }))
+                    }
+                    className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
+                  />
+                </div>
+
+                {/* Musicians Section */}
+                <div className="col-span-2">
+                  <label className="block text-white/90 drop-shadow mb-3">
+                    {text.musicians}
+                  </label>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white/5 backdrop-blur-sm rounded-lg p-4 border border-white/10">
+                    {/* Vocals */}
+                    <div>
+                      <label className="block text-white/70 drop-shadow mb-2 text-sm">
+                        {text.musiciansVocals}
+                      </label>
+                      <input
+                        type="text"
+                        value={creation.musiciansVocals}
+                        onChange={(e) =>
+                          setCreation((prev) => ({
+                            ...prev,
+                            musiciansVocals: e.target.value,
+                          }))
                         }
-                      >
-                        {currentPlayingId === single.id ? (
-                          <Pause size={18} />
-                        ) : (
-                          <Play size={18} />
-                        )}
-                      </button>
+                        className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
+                      />
+                    </div>
 
-                      {/* Delete */}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSingleToDelete(single);
-                          setIsDeleteModalOpen(true);
-                        }}
-                        className="cursor-pointer p-2 rounded-lg bg-red-500/80 hover:bg-red-600/80
-                             text-white transition-all"
-                        aria-label="Delete single"
-                      >
-                        <Trash size={18} />
-                      </button>
+                    {/* Piano / Keyboards */}
+                    <div>
+                      <label className="block text-white/70 drop-shadow mb-2 text-sm">
+                        {text.musiciansPianoKeyboards}
+                      </label>
+                      <input
+                        type="text"
+                        value={creation.musiciansPianoKeyboards}
+                        onChange={(e) =>
+                          setCreation((prev) => ({
+                            ...prev,
+                            musiciansPianoKeyboards: e.target.value,
+                          }))
+                        }
+                        className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
+                      />
+                    </div>
+
+                    {/* Winds */}
+                    <div>
+                      <label className="block text-white/70 drop-shadow mb-2 text-sm">
+                        {text.musiciansWinds}
+                      </label>
+                      <input
+                        type="text"
+                        value={creation.musiciansWinds}
+                        onChange={(e) =>
+                          setCreation((prev) => ({
+                            ...prev,
+                            musiciansWinds: e.target.value,
+                          }))
+                        }
+                        className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
+                      />
+                    </div>
+
+                    {/* Percussion */}
+                    <div>
+                      <label className="block text-white/70 drop-shadow mb-2 text-sm">
+                        {text.musiciansPercussion}
+                      </label>
+                      <input
+                        type="text"
+                        value={creation.musiciansPercussion}
+                        onChange={(e) =>
+                          setCreation((prev) => ({
+                            ...prev,
+                            musiciansPercussion: e.target.value,
+                          }))
+                        }
+                        className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
+                      />
+                    </div>
+
+                    {/* Strings */}
+                    <div className="md:col-span-2">
+                      <label className="block text-white/70 drop-shadow mb-2 text-sm">
+                        {text.musiciansStrings}
+                      </label>
+                      <input
+                        type="text"
+                        value={creation.musiciansStrings}
+                        onChange={(e) =>
+                          setCreation((prev) => ({
+                            ...prev,
+                            musiciansStrings: e.target.value,
+                          }))
+                        }
+                        className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
+                      />
                     </div>
                   </div>
                 </div>
+
+                {/* Mixing Engineer */}
+                <div>
+                  <label className="block text-white/90 drop-shadow mb-2 text-sm">
+                    {text.mixingEngineer}
+                  </label>
+                  <input
+                    type="text"
+                    value={creation.mixingEngineer}
+                    onChange={(e) =>
+                      setCreation((prev) => ({
+                        ...prev,
+                        mixingEngineer: e.target.value,
+                      }))
+                    }
+                    className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
+                  />
+                </div>
+
+                {/* Mastering Engineer */}
+                <div>
+                  <label className="block text-white/90 drop-shadow mb-2 text-sm">
+                    {text.masteringEngineer}
+                  </label>
+                  <input
+                    type="text"
+                    value={creation.masteringEngineer}
+                    onChange={(e) =>
+                      setCreation((prev) => ({
+                        ...prev,
+                        masteringEngineer: e.target.value,
+                      }))
+                    }
+                    className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
+                  />
+                </div>
               </div>
-            ))
-          ) : (
-            <p className="text-white/60 text-sm">{text.noSingleUploadedYet}</p>
-          )}
+
+              {successMessage && <CustomSuccess message={successMessage} />}
+              {errorMessage && <CustomAlert message={errorMessage} />}
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="cursor-pointer disabled:cursor-not-allowed w-full py-4 px-6 bg-white/30 backdrop-blur-md border border-white/40 rounded-lg text-white drop-shadow hover:bg-white/40 transition-all flex items-center justify-center gap-2"
+              >
+                {isLoading ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <span>{text.uploadButtonSingle}...</span>
+                  </div>
+                ) : (
+                  <>
+                    <Upload size={20} />
+                    {text.uploadButtonSingle}
+                  </>
+                )}
+              </button>
+            </form>
+          </div>
+
+          <div className="mt-8">
+            <h3 className="text-xl text-white drop-shadow mb-4">
+              {text.recentSingleUploads}
+            </h3>
+
+            <div className="space-y-3">
+              {singles && singles.length > 0 ? (
+                singles.slice(0, 5).map((single) => (
+                  <div
+                    key={single.id}
+                    className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/10 hover:bg-white/15 transition-all"
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                      {/* Infos Single */}
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-12 h-12 sm:w-10 sm:h-10 bg-white/20 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
+                          {single.coverUrl ? (
+                            <img
+                              src={single.coverUrl}
+                              alt={single.title}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <Music size={20} className="text-white" />
+                          )}
+                        </div>
+
+                        <div className="min-w-0">
+                          <span className="text-white drop-shadow font-medium truncate block">
+                            {single.title}
+                          </span>
+                          <span className="block text-white/60 text-xs truncate">
+                            {single.authors || "—"}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Actions (streams + play + delete) */}
+                      <div className="flex items-center justify-between sm:justify-end gap-3">
+                        <span className="text-white/80 text-sm whitespace-nowrap">
+                          {(single as any).streamsCount
+                            ? `${(single as any).streamsCount} streams`
+                            : "0 streams"}
+                        </span>
+
+                        {/* Audio caché */}
+                        {single.audioUrl && (
+                          <audio
+                            id={`single-audio-${single.id}`}
+                            src={single.audioUrl}
+                            onContextMenu={(e) => e.preventDefault()}
+                            className="hidden"
+                          />
+                        )}
+
+                        {/* Boutons */}
+                        <div className="flex items-center gap-2">
+                          {/* Play / Pause */}
+                          <button
+                            type="button"
+                            disabled={!single.audioUrl}
+                            onClick={() => handleTogglePlaySingle(single.id)}
+                            className="p-2 rounded-lg bg-white/10 hover:bg-white/20 
+                                 text-white/70 hover:text-white transition-all
+                                 disabled:opacity-40 disabled:cursor-not-allowed"
+                            aria-label={
+                              currentPlayingId === single.id ? "Pause" : "Play"
+                            }
+                          >
+                            {currentPlayingId === single.id ? (
+                              <Pause size={18} />
+                            ) : (
+                              <Play size={18} />
+                            )}
+                          </button>
+
+                          {/* Delete */}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSingleToDelete(single);
+                              setIsDeleteModalOpen(true);
+                            }}
+                            className="cursor-pointer p-2 rounded-lg bg-red-500/80 hover:bg-red-600/80
+                                 text-white transition-all"
+                            aria-label="Delete single"
+                          >
+                            <Trash size={18} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-white/60 text-sm">
+                  {text.noSingleUploadedYet}
+                </p>
+              )}
+            </div>
+          </div>
+
+          <ConfirmDeleteModal
+            text={text}
+            open={isDeleteModalOpen}
+            itemName={singleToDelete?.title}
+            isLoading={isLoading}
+            onCancel={() => {
+              setIsDeleteModalOpen(false);
+              setSingleToDelete(null);
+            }}
+            onConfirm={handleConfirmDelete}
+          />
         </div>
       </div>
-      <ConfirmDeleteModal
-        text={text}
-        open={isDeleteModalOpen}
-        itemName={singleToDelete?.title}
-        isLoading={isLoading}
-        onCancel={() => {
-          setIsDeleteModalOpen(false);
-          setSingleToDelete(null);
-        }}
-        onConfirm={handleConfirmDelete}
-      />
     </div>
   );
 }

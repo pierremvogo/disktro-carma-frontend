@@ -4,7 +4,7 @@ import type { TesterPayload } from "../testers/module";
 
 interface QuestionnaireProps {
   onBack: () => void;
-  onSubmit: () => void; // appelé quand la création du tester réussit
+  onSubmit: () => void;
   language: string;
   onShowLogin?: () => void;
   onSkipToSignUp?: () => void;
@@ -34,7 +34,6 @@ export function Questionnaire({
       errors: {
         generic: "Algo salió mal. Por favor, inténtalo de nuevo más tarde.",
       },
-
       title: "Únete a nuestro grupo de pruebas",
       subtitle: "Ayúdanos a construir el futuro de la música para todos",
       name: "Nombre",
@@ -45,8 +44,6 @@ export function Questionnaire({
       back: "Volver",
       requiredAgeAndLanguage:
         "Por favor, selecciona tu rango de edad e idioma.",
-      genericError:
-        "Ha ocurrido un error al enviar tu solicitud. Inténtalo de nuevo.",
       success:
         "Solicitud enviada con éxito. Por favor, revisa tu correo electrónico.",
       alreadyTester: "¿Ya eres tester?",
@@ -59,8 +56,6 @@ export function Questionnaire({
       errors: {
         generic: "Something went wrong. Please try again later.",
       },
-      noAlbumUploadedYet: "No album uploaded yet.",
-
       title: "Join Our Testing Group",
       subtitle: "Help us build the future of music for everybody",
       name: "Name",
@@ -70,8 +65,6 @@ export function Questionnaire({
       submit: "Submit Application",
       back: "Back",
       requiredAgeAndLanguage: "Please select your age range and language.",
-      genericError:
-        "An error occurred while submitting your application. Please try again.",
       success: "Application submitted successfully. Please check your Email!",
       alreadyTester: "Already a tester?",
       login: "Log in",
@@ -94,10 +87,8 @@ export function Questionnaire({
       back: "Tornar",
       requiredAgeAndLanguage:
         "Si us plau, selecciona el teu rang d'edat i idioma.",
-      genericError:
-        "S'ha produït un error en enviar la sol·licitud. Torna-ho a intentar.",
       success:
-        "ol·licitud enviada correctament. Si us plau, comprova el teu correu electrònic.",
+        "Sol·licitud enviada correctament. Si us plau, comprova el teu correu electrònic.",
       alreadyTester: "Ja ets tester?",
       login: "Inicia sessió",
       noAccount: "No tens compte?",
@@ -106,35 +97,26 @@ export function Questionnaire({
     },
   };
 
-  const text = content[language as keyof typeof content] || content["english"];
+  const text = content[language as keyof typeof content] || content.english;
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     setErrorMessage(null);
     setSuccessMessage(null);
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleSelectAgeRange = (range: string) => {
     setErrorMessage(null);
     setSuccessMessage(null);
-    setFormData((prev) => ({
-      ...prev,
-      ageRange: range,
-    }));
+    setFormData((prev) => ({ ...prev, ageRange: range }));
   };
 
   const handleSelectLanguage = (lang: string) => {
     setErrorMessage(null);
     setSuccessMessage(null);
-    setFormData((prev) => ({
-      ...prev,
-      language: lang,
-    }));
+    setFormData((prev) => ({ ...prev, language: lang }));
   };
 
   const isFormValid = useMemo(() => {
@@ -151,10 +133,6 @@ export function Questionnaire({
     setErrorMessage(null);
     setSuccessMessage(null);
     setSuccess(false);
-    if (!formData.ageRange || !formData.language) {
-      setErrorMessage(text.requiredAgeAndLanguage);
-      return;
-    }
 
     if (!isFormValid) {
       setErrorMessage(text.requiredAgeAndLanguage);
@@ -172,7 +150,6 @@ export function Questionnaire({
       setIsSubmitting(true);
       await ModuleObject.service.createTester(payload);
       setSuccessMessage(text.success);
-      // Optionnel : reset du formulaire
       setSuccess(true);
       setFormData({
         name: "",
@@ -180,7 +157,6 @@ export function Questionnaire({
         language: language || "english",
         email: "",
       });
-      // Notification au parent (ex: fermer modal, passer à l'étape suivante, etc.)
     } catch (err: any) {
       setErrorMessage(text.errors.generic);
     } finally {
@@ -189,15 +165,35 @@ export function Questionnaire({
   };
 
   return (
-    <div className="w-full h-full  overflow-y-auto px-4 py-2 flex flex-col justify-start relative">
+    <div
+      className="
+        relative w-full
+        min-h-[100svh] md:min-h-screen
+        overflow-hidden
+        pt-[calc(env(safe-area-inset-top)+1rem)]
+        pb-[calc(env(safe-area-inset-bottom)+1rem)]
+      "
+    >
+      {/* Back button (safe on notch, doesn't scroll) */}
       <button
         onClick={onBack}
         type="button"
-        className="absolute cursor-pointer top-2 left-2 flex items-center gap-2 text-white drop-shadow hover:opacity-70 transition-opacity"
+        className="
+          fixed z-50
+          left-4 sm:left-6
+          top-[calc(env(safe-area-inset-top)+1rem)]
+          flex items-center gap-2
+          text-white drop-shadow
+          hover:opacity-70 transition-opacity
+          bg-white/10 backdrop-blur-md
+          border border-white/20
+          rounded-full
+          px-3 py-2
+        "
       >
         <svg
-          width="20"
-          height="20"
+          width="18"
+          height="18"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -207,85 +203,94 @@ export function Questionnaire({
         >
           <path d="M19 12H5M12 19l-7-7 7-7" />
         </svg>
-        {text.back}
+        <span className="text-sm sm:text-base">{text.back}</span>
       </button>
 
-      <div className="max-w-lg mx-auto w-full pt-8">
-        <h2 className="text-white drop-shadow-lg mb-1">{text.title}</h2>
-        <p className="text-white/90 drop-shadow mb-3">{text.subtitle}</p>
+      {/* Scroll area */}
+      <div className="h-[100svh] md:h-auto overflow-y-auto overscroll-contain px-4 sm:px-6">
+        <div className="max-w-lg mx-auto w-full pt-12 pb-8">
+          <h2 className="text-white drop-shadow-lg mb-1 text-xl sm:text-2xl">
+            {text.title}
+          </h2>
+          <p className="text-white/90 drop-shadow mb-4 text-sm sm:text-base">
+            {text.subtitle}
+          </p>
 
-        <form onSubmit={handleSubmit} className="space-y-3">
-          <div>
-            <label htmlFor="name" className="block text-white drop-shadow mb-1">
-              {text.name}
-            </label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-2 rounded-lg bg-white/20 backdrop-blur-md border border-white/30 text-black placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50"
-            />
-          </div>
-
-          <div>
-            <label className="block text-white drop-shadow mb-1">
-              {text.ageRange}
-            </label>
-            <div className="flex gap-1.5">
-              {["-18", "-22", "-25", "-30", "-50", "+50"].map((range) => (
-                <button
-                  key={range}
-                  type="button"
-                  onClick={() => handleSelectAgeRange(range)}
-                  className={`flex-1 px-1 py-2 cursor-pointer rounded-lg transition-all ${
-                    formData.ageRange === range
-                      ? "bg-white/30 backdrop-blur-sm border-2 border-white/50"
-                      : "bg-white/10 backdrop-blur-sm border-2 border-white/20 hover:bg-white/20"
-                  }`}
-                >
-                  <span className="text-white drop-shadow text-xs">
-                    {range}
-                  </span>
-                </button>
-              ))}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label
+                htmlFor="name"
+                className="block text-white drop-shadow mb-1"
+              >
+                {text.name}
+              </label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-2 rounded-lg bg-white/20 backdrop-blur-md border border-white/30 text-black placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50"
+              />
             </div>
-          </div>
 
-          <div>
-            <label className="block text-white drop-shadow mb-1">
-              {text.language}
-            </label>
-            <div className="grid grid-cols-3 gap-2">
-              {["catalan", "spanish", "english"].map((lang) => (
-                <button
-                  key={lang}
-                  type="button"
-                  onClick={() => handleSelectLanguage(lang)}
-                  className={`px-3 py-2 cursor-pointer rounded-lg transition-all ${
-                    formData.language === lang
-                      ? "bg-white/30 backdrop-blur-sm border-2 border-white/50"
-                      : "bg-white/10 backdrop-blur-sm border-2 border-white/20 hover:bg-white/20"
-                  }`}
-                >
-                  <span className="text-white drop-shadow capitalize">
-                    {lang}
-                  </span>
-                </button>
-              ))}
+            <div>
+              <label className="block text-white drop-shadow mb-1">
+                {text.ageRange}
+              </label>
+              <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                {["-18", "-22", "-25", "-30", "-50", "+50"].map((range) => (
+                  <button
+                    key={range}
+                    type="button"
+                    onClick={() => handleSelectAgeRange(range)}
+                    className={`px-2 py-2 cursor-pointer rounded-lg transition-all ${
+                      formData.ageRange === range
+                        ? "bg-white/30 backdrop-blur-sm border-2 border-white/50"
+                        : "bg-white/10 backdrop-blur-sm border-2 border-white/20 hover:bg-white/20"
+                    }`}
+                  >
+                    <span className="text-white drop-shadow text-xs">
+                      {range}
+                    </span>
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
 
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-white drop-shadow mb-1"
-            >
-              {text.email}
-            </label>
-            <div className="flex flex-col gap-3 w-full">
+            <div>
+              <label className="block text-white drop-shadow mb-1">
+                {text.language}
+              </label>
+              <div className="grid grid-cols-3 gap-2">
+                {["catalan", "spanish", "english"].map((lang) => (
+                  <button
+                    key={lang}
+                    type="button"
+                    onClick={() => handleSelectLanguage(lang)}
+                    className={`px-3 py-2 cursor-pointer rounded-lg transition-all ${
+                      formData.language === lang
+                        ? "bg-white/30 backdrop-blur-sm border-2 border-white/50"
+                        : "bg-white/10 backdrop-blur-sm border-2 border-white/20 hover:bg-white/20"
+                    }`}
+                  >
+                    <span className="text-white drop-shadow capitalize">
+                      {lang}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label
+                htmlFor="email"
+                className="block text-white drop-shadow mb-1"
+              >
+                {text.email}
+              </label>
+
               <input
                 type="email"
                 id="email"
@@ -293,64 +298,63 @@ export function Questionnaire({
                 value={formData.email}
                 onChange={handleChange}
                 required
-                className="w-full sm:flex-1 px-4 py-2 rounded-lg bg-white/20 backdrop-blur-md border border-white/30 text-black placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50"
+                className="w-full px-4 py-2 rounded-lg bg-white/20 backdrop-blur-md border border-white/30 text-black placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50"
               />
-              {/* zone messages */}
+
               {errorMessage && (
-                <div className="mb-3 px-3 py-2 rounded-lg bg-red-500/70 text-white text-sm">
+                <div className="mt-3 px-3 py-2 rounded-lg bg-red-500/70 text-white text-sm">
                   {errorMessage}
                 </div>
               )}
+
               {successMessage && (
-                <div className="mb-3 px-3 py-2 rounded-lg bg-emerald-500/70 text-white text-sm">
+                <div className="mt-3 px-3 py-2 rounded-lg bg-emerald-500/70 text-white text-sm">
                   {successMessage}
                 </div>
               )}
-              {!success && (
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className={`w-full disabled:cursor-not-allowed sm:w-auto px-6 cursor-pointer py-2 bg-gradient-to-r from-purple-500/50 to-pink-500/50 backdrop-blur-md border-2 border-white/50 rounded-xl text-white drop-shadow-lg hover:from-purple-500/60 hover:to-pink-500/60 transition-all flex items-center justify-center gap-2 shadow-xl whitespace-nowrap ${
-                    isSubmitting ? "opacity-70 cursor-not-allowed" : ""
-                  }`}
-                >
-                  {isSubmitting ? (
-                    <span className="text-sm font-medium">Loading...</span>
-                  ) : (
-                    <>
-                      <svg
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <polyline points="20 6 9 17 4 12" />
-                      </svg>
-                      <span className="font-medium">{text.submit}</span>
-                    </>
-                  )}
-                </button>
-              )}
 
-              {success && (
-                <button
-                  onClick={() => onSubmit()}
-                  className={`w-full sm:w-auto px-6 cursor-pointer py-2 bg-gradient-to-r from-purple-500/50 to-pink-500/50 backdrop-blur-md border-2 border-white/50 rounded-xl text-white drop-shadow-lg hover:from-purple-500/60 hover:to-pink-500/60 transition-all flex items-center justify-center gap-2 shadow-xl whitespace-nowrap ${
-                    isSubmitting ? "opacity-70 cursor-not-allowed" : ""
-                  }`}
-                >
-                  <>
+              <div className="mt-4 flex flex-col sm:flex-row gap-3">
+                {!success ? (
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className={`w-full sm:w-auto px-6 cursor-pointer py-2 bg-gradient-to-r from-purple-500/50 to-pink-500/50 backdrop-blur-md border-2 border-white/50 rounded-xl text-white drop-shadow-lg hover:from-purple-500/60 hover:to-pink-500/60 transition-all flex items-center justify-center gap-2 shadow-xl whitespace-nowrap ${
+                      isSubmitting ? "opacity-70 cursor-not-allowed" : ""
+                    }`}
+                  >
+                    {isSubmitting ? (
+                      <span className="text-sm font-medium">Loading...</span>
+                    ) : (
+                      <>
+                        <svg
+                          width="20"
+                          height="20"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                        <span className="font-medium">{text.submit}</span>
+                      </>
+                    )}
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={onSubmit}
+                    className="w-full sm:w-auto px-6 cursor-pointer py-2 bg-gradient-to-r from-purple-500/50 to-pink-500/50 backdrop-blur-md border-2 border-white/50 rounded-xl text-white drop-shadow-lg hover:from-purple-500/60 hover:to-pink-500/60 transition-all flex items-center justify-center gap-2 shadow-xl whitespace-nowrap"
+                  >
                     <span className="font-medium">{text.continue}</span>
-                  </>
-                </button>
-              )}
+                  </button>
+                )}
+              </div>
             </div>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
   );

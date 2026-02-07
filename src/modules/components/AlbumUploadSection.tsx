@@ -695,467 +695,486 @@ export function AlbumUploadSection({
   // Rendu JSX
   // ==========
   return (
-    <div className="space-y-6">
-      {/* ALBUM Title */}
-      {!selectedAlbumId && (
-        <>
-          <div className="mb-6">
-            <label className="block text-white/90 drop-shadow mb-2">
-              {text.albumTitle}
-            </label>
-            <input
-              type="text"
-              value={albumCreation.trackTitle}
-              onChange={(e) =>
-                setAlbumCreation((prev) => ({
-                  ...prev,
-                  trackTitle: e.target.value,
-                }))
-              }
-              className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
-            />
-          </div>
-          <div className="grid md:grid-cols-2 gap-6">
-            <div>
-              <h3 className="text-xl text-white drop-shadow mb-4">
-                {text.uploadArtwork}
-              </h3>
-
-              {artworkPreview ? (
-                <div className="relative aspect-square rounded-xl overflow-hidden bg-white/5 border-2 border-white/20">
-                  <img
-                    src={artworkPreview}
-                    alt="Artwork"
-                    className="w-full h-full object-cover"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setArtworkFile(null);
-                      setArtworkPreview("");
-                      setCoverUrl("");
-                    }}
-                    className="absolute cursor-pointer top-2 right-2 bg-red-500/80 backdrop-blur-sm text-white p-2 rounded-lg hover:bg-red-600/80 transition-all"
-                  >
-                    <X size={20} />
-                  </button>
-                </div>
-              ) : (
-                <div
-                  className="border-2 border-dashed border-white/30 rounded-xl p-8 text-center bg-white/5 hover:bg-white/10 transition-all cursor-pointer aspect-square flex items-center justify-center"
-                  onDragOver={(e) => e.preventDefault()}
-                  onDrop={(e) => {
-                    e.preventDefault();
-                    const file = e.dataTransfer.files[0];
-                    if (file && file.type.startsWith("image/")) {
-                      handleArtwork({ target: { files: [file] } } as any);
-                    }
-                  }}
-                >
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleArtwork}
-                    className="hidden"
-                    id="single-artwork-upload"
-                  />
-                  <label
-                    htmlFor="single-artwork-upload"
-                    className="cursor-pointer text-center"
-                  >
-                    <svg
-                      width="48"
-                      height="48"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      className="mx-auto mb-4 text-white/60"
-                    >
-                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                      <circle cx="8.5" cy="8.5" r="1.5" />
-                      <polyline points="21 15 16 10 5 21" />
-                    </svg>
-                    <p className="text-white drop-shadow text-sm">
-                      {text.artworkDragDrop}
-                    </p>
-                  </label>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* ALBUM Tracks */}
-          <div className="space-y-6"></div>
-
-          {/* Creation Information ALBUM */}
-          <div className="mt-8">
-            <h3 className="text-xl text-white drop-shadow mb-4">
-              {text.creationInfoAlbum}
-            </h3>
-            <form onSubmit={handleAddAlbum} className="space-y-6">
-              <div className="grid md:grid-cols-2 gap-4">
-                {/* Title principal (même que ALBUM title) */}
-                <div>
-                  <label className="block text-white/90 drop-shadow mb-2 text-sm">
-                    {text.trackTitle}
-                  </label>
-                  <input
-                    type="text"
-                    value={albumCreation.trackTitle}
-                    onChange={(e) =>
-                      setAlbumCreation((prev) => ({
-                        ...prev,
-                        trackTitle: e.target.value,
-                      }))
-                    }
-                    className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
-                  />
-                </div>
-
-                {/* Authors */}
-                <div>
-                  <label className="block text-white/90 drop-shadow mb-2 text-sm">
-                    {text.authors}
-                  </label>
-                  <input
-                    type="text"
-                    value={albumCreation.authors}
-                    onChange={(e) =>
-                      setAlbumCreation((prev) => ({
-                        ...prev,
-                        authors: e.target.value,
-                      }))
-                    }
-                    className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
-                  />
-                </div>
-
-                {/* Producers */}
-                <div>
-                  <label className="block text-white/90 drop-shadow mb-2 text-sm">
-                    {text.producers}
-                  </label>
-                  <input
-                    type="text"
-                    value={albumCreation.producers}
-                    onChange={(e) =>
-                      setAlbumCreation((prev) => ({
-                        ...prev,
-                        producers: e.target.value,
-                      }))
-                    }
-                    className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
-                  />
-                </div>
-
-                {/* Lyricists */}
-                <div>
-                  <label className="block text-white/90 drop-shadow mb-2 text-sm">
-                    {text.lyricists}
-                  </label>
-                  <input
-                    type="text"
-                    value={albumCreation.lyricists}
-                    onChange={(e) =>
-                      setAlbumCreation((prev) => ({
-                        ...prev,
-                        lyricists: e.target.value,
-                      }))
-                    }
-                    className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
-                  />
-                </div>
-
-                {/* Musicians */}
-                <div className="col-span-2">
-                  <label className="block text-white/90 drop-shadow mb-3">
-                    {text.musicians}
-                  </label>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white/5 backdrop-blur-sm rounded-lg p-4 border border-white/10">
-                    {/* Vocals */}
-                    <div>
-                      <label className="block text-white/70 drop-shadow mb-2 text-sm">
-                        {text.musiciansVocals}
-                      </label>
-                      <input
-                        type="text"
-                        value={albumCreation.musiciansVocals}
-                        onChange={(e) =>
-                          setAlbumCreation((prev) => ({
-                            ...prev,
-                            musiciansVocals: e.target.value,
-                          }))
-                        }
-                        className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
-                      />
-                    </div>
-
-                    {/* Piano/Keyboards */}
-                    <div>
-                      <label className="block text-white/70 drop-shadow mb-2 text-sm">
-                        {text.musiciansPianoKeyboards}
-                      </label>
-                      <input
-                        type="text"
-                        value={albumCreation.musiciansPianoKeyboards}
-                        onChange={(e) =>
-                          setAlbumCreation((prev) => ({
-                            ...prev,
-                            musiciansPianoKeyboards: e.target.value,
-                          }))
-                        }
-                        className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
-                      />
-                    </div>
-
-                    {/* Winds */}
-                    <div>
-                      <label className="block text-white/70 drop-shadow mb-2 text-sm">
-                        {text.musiciansWinds}
-                      </label>
-                      <input
-                        type="text"
-                        value={albumCreation.musiciansWinds}
-                        onChange={(e) =>
-                          setAlbumCreation((prev) => ({
-                            ...prev,
-                            musiciansWinds: e.target.value,
-                          }))
-                        }
-                        className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
-                      />
-                    </div>
-
-                    {/* Percussion */}
-                    <div>
-                      <label className="block text-white/70 drop-shadow mb-2 text-sm">
-                        {text.musiciansPercussion}
-                      </label>
-                      <input
-                        type="text"
-                        value={albumCreation.musiciansPercussion}
-                        onChange={(e) =>
-                          setAlbumCreation((prev) => ({
-                            ...prev,
-                            musiciansPercussion: e.target.value,
-                          }))
-                        }
-                        className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
-                      />
-                    </div>
-
-                    {/* Strings */}
-                    <div className="md:col-span-2">
-                      <label className="block text-white/70 drop-shadow mb-2 text-sm">
-                        {text.musiciansStrings}
-                      </label>
-                      <input
-                        type="text"
-                        value={albumCreation.musiciansStrings}
-                        onChange={(e) =>
-                          setAlbumCreation((prev) => ({
-                            ...prev,
-                            musiciansStrings: e.target.value,
-                          }))
-                        }
-                        className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Mixing Engineer */}
-                <div>
-                  <label className="block text-white/90 drop-shadow mb-2 text-sm">
-                    {text.mixingEngineer}
-                  </label>
-                  <input
-                    type="text"
-                    value={albumCreation.mixingEngineer}
-                    onChange={(e) =>
-                      setAlbumCreation((prev) => ({
-                        ...prev,
-                        mixingEngineer: e.target.value,
-                      }))
-                    }
-                    className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
-                  />
-                </div>
-
-                {/* Mastering Engineer */}
-                <div>
-                  <label className="block text-white/90 drop-shadow mb-2 text-sm">
-                    {text.masteringEngineer}
-                  </label>
-                  <input
-                    type="text"
-                    value={albumCreation.masteringEngineer}
-                    onChange={(e) =>
-                      setAlbumCreation((prev) => ({
-                        ...prev,
-                        masteringEngineer: e.target.value,
-                      }))
-                    }
-                    className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
-                  />
-                </div>
+    <div className="relative w-full min-h-[100svh] md:min-h-screen overflow-hidden">
+      {/* ✅ Scroll container stable iOS */}
+      <div
+        className="
+          min-h-[100svh]
+          overflow-y-auto overscroll-contain
+          px-4 sm:px-6 md:px-8
+          pt-[calc(env(safe-area-inset-top)+1.25rem)]
+          pb-[calc(env(safe-area-inset-bottom)+1.25rem)]
+        "
+      >
+        <div className="space-y-6">
+          {/* ALBUM Title */}
+          {!selectedAlbumId && (
+            <>
+              <div className="mb-6">
+                <label className="block text-white/90 drop-shadow mb-2">
+                  {text.albumTitle}
+                </label>
+                <input
+                  type="text"
+                  value={albumCreation.trackTitle}
+                  onChange={(e) =>
+                    setAlbumCreation((prev) => ({
+                      ...prev,
+                      trackTitle: e.target.value,
+                    }))
+                  }
+                  className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
+                />
               </div>
 
-              {successMessage && <CustomSuccess message={successMessage} />}
-              {errorMessage && <CustomAlert message={errorMessage} />}
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <h3 className="text-xl text-white drop-shadow mb-4">
+                    {text.uploadArtwork}
+                  </h3>
 
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="disabled:cursor-not-allowed cursor-pointer w-full py-4 px-6 bg-white/30 backdrop-blur-md border border-white/40 rounded-lg text-white drop-shadow hover:bg-white/40 transition-all flex items-center justify-center gap-2"
-              >
-                {isLoading ? (
-                  <div className="flex items-center justify-center gap-2">
-                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                    <span>{text.uploadButtonAlbum}...</span>
-                  </div>
-                ) : (
-                  <>
-                    <Upload size={20} /> {text.uploadButtonAlbum}
-                  </>
-                )}
-              </button>
-            </form>
-          </div>
-          {/* Recent ALBUM Uploads */}
-          <div className="mt-8">
-            <h3 className="text-xl text-white drop-shadow mb-4">
-              {/* tu peux aussi créer text.recentAlbumUploads dans ton système de traduction */}
-              {text.recentAlbumUploads || "Recent ALBUM Uploads"}
-            </h3>
-
-            <div className="space-y-3">
-              {albums && albums.length > 0 ? (
-                albums.slice(0, 5).map((album) => (
-                  <div
-                    key={album.id}
-                    className="bg-white/10 backdrop-blur-sm rounded-lg p-4 flex items-center justify-between"
-                  >
-                    {/* Infos ALBUM (gauche) */}
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center overflow-hidden">
-                        {album.coverUrl ? (
-                          <img
-                            src={album.coverUrl}
-                            alt={album.title}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <Music size={20} className="text-white" />
-                        )}
-                      </div>
-                      <div>
-                        <span className="text-white drop-shadow">
-                          {album.title}
-                        </span>
-                        {album.authors && (
-                          <span className="block text-white/60 text-xs">
-                            {album.authors}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Boutons (droite) */}
-                    <div className="flex items-center gap-3">
-                      {/* Voir détails */}
-                      <button
-                        type="button"
-                        onClick={() =>
-                          handleViewAlbumDetails(album.id!, album.title!)
-                        }
-                        className="cursor-pointer p-2 rounded-lg bg-white/20 hover:bg-white/30 
-    text-white backdrop-blur-sm transition-all flex items-center justify-center"
-                      >
-                        <Eye size={18} />
-                      </button>
-
-                      {/* Supprimer avec modale */}
+                  {artworkPreview ? (
+                    <div className="relative aspect-square rounded-xl overflow-hidden bg-white/5 border-2 border-white/20">
+                      <img
+                        src={artworkPreview}
+                        alt="Artwork"
+                        className="w-full h-full object-cover"
+                      />
                       <button
                         type="button"
                         onClick={() => {
-                          setAlbumToDelete(album);
-                          setIsDeleteModalOpen(true);
+                          setArtworkFile(null);
+                          setArtworkPreview("");
+                          setCoverUrl("");
                         }}
-                        className="cursor-pointer p-2 rounded-lg bg-red-500/80 hover:bg-red-600/80 
-               text-white backdrop-blur-sm transition-all flex items-center justify-center"
+                        className="absolute cursor-pointer top-2 right-2 bg-red-500/80 backdrop-blur-sm text-white p-2 rounded-lg hover:bg-red-600/80 transition-all"
                       >
-                        <Trash size={18} />
+                        <X size={20} />
                       </button>
                     </div>
+                  ) : (
+                    <div
+                      className="border-2 border-dashed border-white/30 rounded-xl p-8 text-center bg-white/5 hover:bg-white/10 transition-all cursor-pointer aspect-square flex items-center justify-center"
+                      onDragOver={(e) => e.preventDefault()}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        const file = e.dataTransfer.files[0];
+                        if (file && file.type.startsWith("image/")) {
+                          handleArtwork({ target: { files: [file] } } as any);
+                        }
+                      }}
+                    >
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleArtwork}
+                        className="hidden"
+                        id="single-artwork-upload"
+                      />
+                      <label
+                        htmlFor="single-artwork-upload"
+                        className="cursor-pointer text-center"
+                      >
+                        <svg
+                          width="48"
+                          height="48"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          className="mx-auto mb-4 text-white/60"
+                        >
+                          <rect
+                            x="3"
+                            y="3"
+                            width="18"
+                            height="18"
+                            rx="2"
+                            ry="2"
+                          />
+                          <circle cx="8.5" cy="8.5" r="1.5" />
+                          <polyline points="21 15 16 10 5 21" />
+                        </svg>
+                        <p className="text-white drop-shadow text-sm">
+                          {text.artworkDragDrop}
+                        </p>
+                      </label>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* ALBUM Tracks */}
+              <div className="space-y-6"></div>
+
+              {/* Creation Information ALBUM */}
+              <div className="mt-8">
+                <h3 className="text-xl text-white drop-shadow mb-4">
+                  {text.creationInfoAlbum}
+                </h3>
+                <form onSubmit={handleAddAlbum} className="space-y-6">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    {/* Title principal (même que ALBUM title) */}
+                    <div>
+                      <label className="block text-white/90 drop-shadow mb-2 text-sm">
+                        {text.trackTitle}
+                      </label>
+                      <input
+                        type="text"
+                        value={albumCreation.trackTitle}
+                        onChange={(e) =>
+                          setAlbumCreation((prev) => ({
+                            ...prev,
+                            trackTitle: e.target.value,
+                          }))
+                        }
+                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
+                      />
+                    </div>
+
+                    {/* Authors */}
+                    <div>
+                      <label className="block text-white/90 drop-shadow mb-2 text-sm">
+                        {text.authors}
+                      </label>
+                      <input
+                        type="text"
+                        value={albumCreation.authors}
+                        onChange={(e) =>
+                          setAlbumCreation((prev) => ({
+                            ...prev,
+                            authors: e.target.value,
+                          }))
+                        }
+                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
+                      />
+                    </div>
+
+                    {/* Producers */}
+                    <div>
+                      <label className="block text-white/90 drop-shadow mb-2 text-sm">
+                        {text.producers}
+                      </label>
+                      <input
+                        type="text"
+                        value={albumCreation.producers}
+                        onChange={(e) =>
+                          setAlbumCreation((prev) => ({
+                            ...prev,
+                            producers: e.target.value,
+                          }))
+                        }
+                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
+                      />
+                    </div>
+
+                    {/* Lyricists */}
+                    <div>
+                      <label className="block text-white/90 drop-shadow mb-2 text-sm">
+                        {text.lyricists}
+                      </label>
+                      <input
+                        type="text"
+                        value={albumCreation.lyricists}
+                        onChange={(e) =>
+                          setAlbumCreation((prev) => ({
+                            ...prev,
+                            lyricists: e.target.value,
+                          }))
+                        }
+                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
+                      />
+                    </div>
+
+                    {/* Musicians */}
+                    <div className="col-span-2">
+                      <label className="block text-white/90 drop-shadow mb-3">
+                        {text.musicians}
+                      </label>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white/5 backdrop-blur-sm rounded-lg p-4 border border-white/10">
+                        {/* Vocals */}
+                        <div>
+                          <label className="block text-white/70 drop-shadow mb-2 text-sm">
+                            {text.musiciansVocals}
+                          </label>
+                          <input
+                            type="text"
+                            value={albumCreation.musiciansVocals}
+                            onChange={(e) =>
+                              setAlbumCreation((prev) => ({
+                                ...prev,
+                                musiciansVocals: e.target.value,
+                              }))
+                            }
+                            className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
+                          />
+                        </div>
+
+                        {/* Piano/Keyboards */}
+                        <div>
+                          <label className="block text-white/70 drop-shadow mb-2 text-sm">
+                            {text.musiciansPianoKeyboards}
+                          </label>
+                          <input
+                            type="text"
+                            value={albumCreation.musiciansPianoKeyboards}
+                            onChange={(e) =>
+                              setAlbumCreation((prev) => ({
+                                ...prev,
+                                musiciansPianoKeyboards: e.target.value,
+                              }))
+                            }
+                            className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
+                          />
+                        </div>
+
+                        {/* Winds */}
+                        <div>
+                          <label className="block text-white/70 drop-shadow mb-2 text-sm">
+                            {text.musiciansWinds}
+                          </label>
+                          <input
+                            type="text"
+                            value={albumCreation.musiciansWinds}
+                            onChange={(e) =>
+                              setAlbumCreation((prev) => ({
+                                ...prev,
+                                musiciansWinds: e.target.value,
+                              }))
+                            }
+                            className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
+                          />
+                        </div>
+
+                        {/* Percussion */}
+                        <div>
+                          <label className="block text-white/70 drop-shadow mb-2 text-sm">
+                            {text.musiciansPercussion}
+                          </label>
+                          <input
+                            type="text"
+                            value={albumCreation.musiciansPercussion}
+                            onChange={(e) =>
+                              setAlbumCreation((prev) => ({
+                                ...prev,
+                                musiciansPercussion: e.target.value,
+                              }))
+                            }
+                            className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
+                          />
+                        </div>
+
+                        {/* Strings */}
+                        <div className="md:col-span-2">
+                          <label className="block text-white/70 drop-shadow mb-2 text-sm">
+                            {text.musiciansStrings}
+                          </label>
+                          <input
+                            type="text"
+                            value={albumCreation.musiciansStrings}
+                            onChange={(e) =>
+                              setAlbumCreation((prev) => ({
+                                ...prev,
+                                musiciansStrings: e.target.value,
+                              }))
+                            }
+                            className="w-full p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all text-sm"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Mixing Engineer */}
+                    <div>
+                      <label className="block text-white/90 drop-shadow mb-2 text-sm">
+                        {text.mixingEngineer}
+                      </label>
+                      <input
+                        type="text"
+                        value={albumCreation.mixingEngineer}
+                        onChange={(e) =>
+                          setAlbumCreation((prev) => ({
+                            ...prev,
+                            mixingEngineer: e.target.value,
+                          }))
+                        }
+                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
+                      />
+                    </div>
+
+                    {/* Mastering Engineer */}
+                    <div>
+                      <label className="block text-white/90 drop-shadow mb-2 text-sm">
+                        {text.masteringEngineer}
+                      </label>
+                      <input
+                        type="text"
+                        value={albumCreation.masteringEngineer}
+                        onChange={(e) =>
+                          setAlbumCreation((prev) => ({
+                            ...prev,
+                            masteringEngineer: e.target.value,
+                          }))
+                        }
+                        className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all"
+                      />
+                    </div>
                   </div>
-                ))
-              ) : (
-                <p className="text-white/60 text-sm">
-                  {text.noAlbumUploadedYet ||
-                    "Aucun ALBUM uploadé pour l’instant."}
-                </p>
-              )}
-            </div>
-          </div>
-        </>
-      )}
-      {/* Éditeur de pistes pour l’ALBUM sélectionné */}
-      {selectedAlbumId && (
-        <div
-          className="
-        mt-10
-        rounded-xl
-        bg-white/5
-        backdrop-blur-sm
-        border border-white/15
-        p-6 md:p-8
-        space-y-4
-      "
-        >
-          <div className="flex items-center justify-between mb-2">
-            <div>
-              <h3 className="text-xl text-white font-semibold drop-shadow">
-                {text.albumTracksTitle || "Pistes de l'ALBUM"}
-              </h3>
-              <p className="text-white/70 text-sm">
-                <span className="font-medium text-white">
-                  {selectedAlbumTitle || "—"}
-                </span>
-              </p>
-            </div>
 
-            <button
-              type="button"
-              onClick={() => {
-                setSelectedAlbumId(null);
-                setSelectedAlbumTitle("");
-              }}
-              className="cursor-pointer px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 
-          text-white text-xs flex items-center gap-1"
+                  {successMessage && <CustomSuccess message={successMessage} />}
+                  {errorMessage && <CustomAlert message={errorMessage} />}
+
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="disabled:cursor-not-allowed cursor-pointer w-full py-4 px-6 bg-white/30 backdrop-blur-md border border-white/40 rounded-lg text-white drop-shadow hover:bg-white/40 transition-all flex items-center justify-center gap-2"
+                  >
+                    {isLoading ? (
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                        <span>{text.uploadButtonAlbum}...</span>
+                      </div>
+                    ) : (
+                      <>
+                        <Upload size={20} /> {text.uploadButtonAlbum}
+                      </>
+                    )}
+                  </button>
+                </form>
+              </div>
+
+              {/* Recent ALBUM Uploads */}
+              <div className="mt-8">
+                <h3 className="text-xl text-white drop-shadow mb-4">
+                  {text.recentAlbumUploads || "Recent ALBUM Uploads"}
+                </h3>
+
+                <div className="space-y-3">
+                  {albums && albums.length > 0 ? (
+                    albums.slice(0, 5).map((album) => (
+                      <div
+                        key={album.id}
+                        className="bg-white/10 backdrop-blur-sm rounded-lg p-4 flex items-center justify-between"
+                      >
+                        {/* Infos ALBUM (gauche) */}
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center overflow-hidden">
+                            {album.coverUrl ? (
+                              <img
+                                src={album.coverUrl}
+                                alt={album.title}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <Music size={20} className="text-white" />
+                            )}
+                          </div>
+                          <div>
+                            <span className="text-white drop-shadow">
+                              {album.title}
+                            </span>
+                            {album.authors && (
+                              <span className="block text-white/60 text-xs">
+                                {album.authors}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Boutons (droite) */}
+                        <div className="flex items-center gap-3">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleViewAlbumDetails(album.id!, album.title!)
+                            }
+                            className="cursor-pointer p-2 rounded-lg bg-white/20 hover:bg-white/30 
+      text-white backdrop-blur-sm transition-all flex items-center justify-center"
+                          >
+                            <Eye size={18} />
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setAlbumToDelete(album);
+                              setIsDeleteModalOpen(true);
+                            }}
+                            className="cursor-pointer p-2 rounded-lg bg-red-500/80 hover:bg-red-600/80 
+                 text-white backdrop-blur-sm transition-all flex items-center justify-center"
+                          >
+                            <Trash size={18} />
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-white/60 text-sm">
+                      {text.noAlbumUploadedYet ||
+                        "Aucun ALBUM uploadé pour l’instant."}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Éditeur de pistes pour l’ALBUM sélectionné */}
+          {selectedAlbumId && (
+            <div
+              className="
+          mt-10
+          rounded-xl
+          bg-white/5
+          backdrop-blur-sm
+          border border-white/15
+          p-6 md:p-8
+          space-y-4
+        "
             >
-              <X size={14} />
-              {text.closeTracksEditor || "Close"}
-            </button>
-          </div>
+              <div className="flex items-center justify-between mb-2">
+                <div>
+                  <h3 className="text-xl text-white font-semibold drop-shadow">
+                    {text.albumTracksTitle || "Pistes de l'ALBUM"}
+                  </h3>
+                  <p className="text-white/70 text-sm">
+                    <span className="font-medium text-white">
+                      {selectedAlbumTitle || "—"}
+                    </span>
+                  </p>
+                </div>
 
-          {/* Composant qui gère l'ajout de tracks pour cet ALBUM */}
-          <AlbumTracksEditor albumId={selectedAlbumId} text={text} />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedAlbumId(null);
+                    setSelectedAlbumTitle("");
+                  }}
+                  className="cursor-pointer px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 
+            text-white text-xs flex items-center gap-1"
+                >
+                  <X size={14} />
+                  {text.closeTracksEditor || "Close"}
+                </button>
+              </div>
+
+              <AlbumTracksEditor albumId={selectedAlbumId} text={text} />
+            </div>
+          )}
+
+          <ConfirmDeleteModal
+            text={text}
+            open={isDeleteModalOpen}
+            itemName={albumToDelete?.title}
+            isLoading={isLoading}
+            onCancel={() => {
+              setIsDeleteModalOpen(false);
+              setAlbumToDelete(null);
+            }}
+            onConfirm={handleConfirmDelete}
+          />
         </div>
-      )}
-
-      <ConfirmDeleteModal
-        text={text}
-        open={isDeleteModalOpen}
-        itemName={albumToDelete?.title}
-        isLoading={isLoading}
-        onCancel={() => {
-          setIsDeleteModalOpen(false);
-          setAlbumToDelete(null);
-        }}
-        onConfirm={handleConfirmDelete}
-      />
+      </div>
     </div>
   );
 }
