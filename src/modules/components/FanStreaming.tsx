@@ -2338,7 +2338,7 @@ Underneath the shining star`,
   };
 
   // Apply accessibility styles
-  const containerClasses = `fixed inset-0 w-screen h-screen bg-gradient-to-br from-purple-900/90 via-pink-900/90 to-blue-900/90 overflow-hidden ${
+  const containerClasses = `fixed inset-0 w-screen h-screen bg-gradient-to-br from-[#5A0B4D] via-[#4A1456] to-[#2D0E3E] overflow-hidden ${
     fontSize === "large"
       ? "text-lg"
       : fontSize === "xl"
