@@ -169,7 +169,13 @@ export default function ForgotPasswordForm({
   /* ================= JSX ================= */
   return (
     <div
-      className="fixed inset-0 w-screen h-screen bg-cover bg-center"
+      className="
+        relative w-full
+        min-h-[100svh] md:min-h-screen
+        overflow-hidden
+        bg-cover bg-center
+        text-white
+      "
       style={{
         backgroundImage:
           'url("/image/4ac3eed398bb68113a14d0fa5efe7a6def6f7651.png")',
@@ -177,16 +183,29 @@ export default function ForgotPasswordForm({
     >
       <div className="absolute inset-0 bg-black/50" />
 
-      <div className="relative w-full h-full flex items-center justify-center p-6">
-        <div className="w-full max-w-md mt-10">
-          <div className="bg-white/10 backdrop-blur-md rounded-3xl border border-white/20 p-8 shadow-2xl">
+      {/* ✅ Scroll container stable iOS */}
+      <div
+        className="
+          relative z-10
+          min-h-[100svh]
+          overflow-y-auto overscroll-contain
+          px-4 sm:px-6
+          pt-[calc(env(safe-area-inset-top)+1.25rem)]
+          pb-[calc(env(safe-area-inset-bottom)+1.25rem)]
+          flex items-center justify-center
+        "
+      >
+        <div className="w-full max-w-md">
+          <div className="bg-white/10 backdrop-blur-md rounded-3xl border border-white/20 p-6 sm:p-8 shadow-2xl">
             {/* Header */}
             <div className="flex flex-col items-center gap-3 mb-6 text-center">
               <Mail className="text-white" size={32} />
-              <h2 className="text-3xl text-white drop-shadow-lg">
+              <h2 className="text-2xl sm:text-3xl text-white drop-shadow-lg">
                 {text.title}
               </h2>
-              <p className="text-white/70 drop-shadow">{text.subtitle}</p>
+              <p className="text-white/70 drop-shadow text-sm sm:text-base">
+                {text.subtitle}
+              </p>
             </div>
 
             {successMessage && <CustomSuccess message={successMessage} />}
@@ -200,6 +219,7 @@ export default function ForgotPasswordForm({
 
                 {resendAvailable ? (
                   <button
+                    type="button"
                     onClick={handleResend}
                     disabled={isLoading}
                     className="text-white/80 hover:text-white underline text-sm disabled:opacity-50"
@@ -235,7 +255,7 @@ export default function ForgotPasswordForm({
                 <button
                   disabled={isLoading}
                   type="submit"
-                  className="w-full px-6 py-4 bg-white/30 backdrop-blur-md border-2 border-white/40 rounded-xl text-white text-lg hover:bg-white/40 transition-all shadow-lg disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="w-full px-6 py-4 bg-white/30 backdrop-blur-md border-2 border-white/40 rounded-xl text-white text-base sm:text-lg hover:bg-white/40 transition-all shadow-lg disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {isLoading ? (
                     <>
