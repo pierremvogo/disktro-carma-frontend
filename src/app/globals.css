@@ -105,3 +105,10 @@ html.reading-guide body::before {
   pointer-events: none;
   z-index: 9998;
 }
+.no-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE/Edge */
+  scrollbar-width: none; /* Firefox */
+}

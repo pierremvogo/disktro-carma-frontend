@@ -17,6 +17,7 @@ import { PlanModuleObject } from "../plan/module";
 import { StripeModuleObject } from "./stripe/module";
 import { LygosModuleObject } from "./lygos/module";
 import { Search } from "lucide-react";
+import { ArtistProfileModal } from "./previewProfileArtist/ArtistProfileModal";
 
 // Icon components
 const Music = ({ size = 24, className = "" }) => (
@@ -328,6 +329,18 @@ export function FanStreaming({ language }: FanStreamingProps) {
 
   const searchParams = useSearchParams();
 
+  const [selectedArtist, setSelectedArtist] = useState<any | null>(null);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+
+  const openArtistProfile = (artist: any) => {
+    setSelectedArtist(artist);
+    setIsProfileOpen(true);
+  };
+
+  const closeArtistProfile = () => {
+    setIsProfileOpen(false);
+  };
+
   useEffect(() => {
     const tab = searchParams.get("tab");
     const sub = searchParams.get("sub");
@@ -461,7 +474,7 @@ export function FanStreaming({ language }: FanStreamingProps) {
       setSubscribedArtists(
         mapped.filter((a: any) => a.isSubscribed).map((a: any) => String(a.id))
       );
-
+      console.log("ARTIST : ", mapped);
       setArtists(mapped);
     } catch (e) {
       console.error("fetchArtists error:", e);
@@ -3084,21 +3097,41 @@ pb-[env(safe-area-inset-bottom)]
                       />
                     </div>
 
-                    <h3 className="text-white drop-shadow mb-2">
+                    <h3 className="text-white drop-shadow mb-1">
                       {artist.name}
                     </h3>
 
-                    <p className="text-white/60 text-sm mb-1">
-                      {artist.genres && String(artist.genres).trim() !== ""
-                        ? artist.genres
-                        : "—"}
-                    </p>
+                    {(() => {
+                      const raw = artist.genres;
+
+                      // genres peut être: array ["pop","rap"] ou string "pop, rap"
+                      const list = Array.isArray(raw)
+                        ? raw
+                        : String(raw ?? "")
+                            .split(",")
+                            .map((s) => s.trim())
+                            .filter(Boolean);
+
+                      if (list.length === 0) {
+                        return <p className="text-white/60 text-sm mb-1">—</p>;
+                      }
+
+                      const shown = list.slice(0, 3);
+                      const hasMore = list.length > 3;
+
+                      return (
+                        <p className="text-white/60 text-sm mb-1">
+                          {shown.join(", ")}
+                          {hasMore ? "..." : ""}
+                        </p>
+                      );
+                    })()}
 
                     <p className="text-white/50 text-xs mb-4">
                       {artist.subscribers ?? 0} {text.subscribers}
                     </p>
 
-                    <button
+                    {/* <button
                       disabled={!artist.hasActivePlan}
                       onClick={() => {
                         if (!artist.hasActivePlan) return;
@@ -3134,6 +3167,30 @@ pb-[env(safe-area-inset-bottom)]
                           ? text.subscribed
                           : text.subscribe
                         : text.paymentSoon}
+                    </button> */}
+
+                    <button
+                      type="button"
+                      onClick={() => openArtistProfile(artist)}
+                      className="
+                                  w-full px-4 py-2
+                                  rounded-lg
+                                  bg-white/15 hover:bg-white/25
+                                  border border-white/20
+                                  text-white
+                                  transition-all
+                                  cursor-pointer
+                                  flex items-center justify-center gap-2
+                                "
+                      aria-label={`View profile of ${artist.name}`}
+                    >
+                      <User size={16} className="text-white/90" />
+
+                      {language === "spanish"
+                        ? "Ver perfil"
+                        : language === "catalan"
+                        ? "Veure perfil"
+                        : "View profile"}
                     </button>
                   </div>
                 ))}
@@ -5259,6 +5316,13 @@ pb-[env(safe-area-inset-bottom)]
           </aside>
         </div>
       )}
+
+      <ArtistProfileModal
+        isOpen={isProfileOpen}
+        onClose={closeArtistProfile}
+        artist={selectedArtist}
+      />
+
       <audio ref={audioRef} preload="none" />
     </div>
   );
