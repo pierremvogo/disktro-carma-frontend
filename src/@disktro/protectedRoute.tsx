@@ -104,16 +104,33 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
           relative w-full
           min-h-[100svh] md:min-h-screen
           overflow-hidden
-          bg-gray-500
-          text-black
           flex items-center justify-center
           pt-[env(safe-area-inset-top)]
           pb-[env(safe-area-inset-bottom)]
+          bg-gradient-to-br from-[#5A0B4D] via-[#4A1456] to-[#2D0E3E]
+          text-white
         "
       >
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-          <p className="text-sm opacity-80">Checking authorization…</p>
+        {/* Overlay soft */}
+        <div className="absolute inset-0 bg-black/40" />
+
+        {/* Loader Card */}
+        <div
+          className="relative z-10 flex flex-col items-center gap-4 px-6 py-5 rounded-2xl
+                        bg-white/10 backdrop-blur-xl
+                        border border-white/20
+                        shadow-2xl"
+        >
+          {/* Spinner */}
+          <div className="relative w-10 h-10">
+            <div className="absolute inset-0 rounded-full border-2 border-white/20" />
+            <div className="absolute inset-0 rounded-full border-2 border-white border-t-transparent animate-spin" />
+          </div>
+
+          {/* Text */}
+          <p className="text-sm sm:text-base text-white/85 drop-shadow text-center">
+            Checking authorization…
+          </p>
         </div>
       </div>
     );
