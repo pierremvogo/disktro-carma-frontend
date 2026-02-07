@@ -1572,7 +1572,7 @@ export function FanStreaming({ language }: FanStreamingProps) {
       },
       noAlbumUploadedYet: "No album uploaded yet.",
 
-      title: "Bokk Music For Everybody",
+      title: "Bokk music with everybody",
       discover: "Discover",
       myMusic: "My Music",
       artists: "Artists",
@@ -2338,15 +2338,20 @@ Underneath the shining star`,
   };
 
   // Apply accessibility styles
-  const containerClasses = `fixed inset-0 w-screen h-screen bg-gradient-to-br from-[#5A0B4D] via-[#4A1456] to-[#2D0E3E] overflow-hidden ${
-    fontSize === "large"
-      ? "text-lg"
-      : fontSize === "xl"
-      ? "text-xl"
-      : fontSize === "small"
-      ? "text-sm"
-      : ""
-  } ${highContrast ? "contrast-150" : ""} ${dyslexiaFont ? "font-mono" : ""}`;
+  const containerClasses = `fixed inset-0 w-screen h-screen bg-gradient-to-br from-[#5A0B4D] via-[#4A1456] to-[#2D0E3E] overflow-hidden relative w-full
+min-h-[100svh] md:min-h-screen
+overflow-hidden
+pt-[env(safe-area-inset-top)]
+pb-[env(safe-area-inset-bottom)]
+ ${
+   fontSize === "large"
+     ? "text-lg"
+     : fontSize === "xl"
+     ? "text-xl"
+     : fontSize === "small"
+     ? "text-sm"
+     : ""
+ } ${highContrast ? "contrast-150" : ""} ${dyslexiaFont ? "font-mono" : ""}`;
 
   const buttonSizeClasses = largerTargets
     ? "min-h-[48px] min-w-[48px] px-6 py-3"
@@ -2399,41 +2404,6 @@ Underneath the shining star`,
       </svg>
 
       {/* Accessibility Floating Button */}
-      {/* <button
-        onClick={() => setShowAccessibility(true)}
-        className={`
-                    fixed
-                    top-20 sm:top-24
-                    left-4 sm:left-6
-                    z-50
-
-                    bg-white/20 backdrop-blur-md
-                    rounded-full p-3 sm:p-4
-                    border border-white/30
-                    hover:bg-white/30
-                    shadow-xl
-                    ${animationClasses}
-                    ${buttonSizeClasses}
-                  `}
-        aria-label={text.accessibility}
-        title={text.accessibility}
-      >
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="text-white"
-        >
-          <circle cx="12" cy="12" r="10" />
-          <path d="M12 16v-4" />
-          <path d="M12 8h.01" />
-        </svg>
-      </button> */}
 
       {/* Reading Guide */}
       {readingGuide && (
@@ -2445,7 +2415,10 @@ Underneath the shining star`,
 
       {/* Visual Notifications */}
       {notification && visualNotifications && (
-        <div className="fixed top-20 right-6 z-50 bg-white/20 backdrop-blur-xl border-2 border-white/40 rounded-xl p-4 shadow-2xl animate-bounce">
+        <div
+          className="fixed right-6 z-50 bg-white/20 backdrop-blur-xl border-2 border-white/40 rounded-xl p-4 shadow-2xl animate-bounce"
+          style={{ top: "calc(env(safe-area-inset-top) + 80px)" }}
+        >
           <div className="flex items-center gap-3">
             <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse" />
             <span className="text-white drop-shadow">{notification}</span>
@@ -2455,7 +2428,10 @@ Underneath the shining star`,
 
       {/* Keyboard Navigation Hints */}
       {keyboardNav && !showAccessibility && (
-        <div className="fixed bottom-6 right-6 z-40 bg-black/80 backdrop-blur-md border border-white/30 rounded-xl p-4 text-xs text-white/80">
+        <div
+          className="fixed right-6 z-40 bg-black/80 backdrop-blur-md border border-white/30 rounded-xl p-4 text-xs text-white/80"
+          style={{ bottom: "calc(env(safe-area-inset-bottom) + 24px)" }}
+        >
           <div className="space-y-1">
             <div>
               <kbd className="bg-white/20 px-2 py-1 rounded">ESC</kbd>{" "}
@@ -2483,51 +2459,73 @@ Underneath the shining star`,
 
       {/* Header */}
       <div
-        className={`absolute top-0 left-0 right-0 z-20 bg-black/20 backdrop-blur-md border-b border-white/10 ${
+        className={`fixed left-0 right-0 z-20 bg-black/20 backdrop-blur-md border-b border-white/10 ${
           focusMode ? "opacity-80" : ""
         }`}
+        style={{ top: "env(safe-area-inset-top)" }}
       >
         {/* ✅ LIGNE 1 : Back + Title + Profile/Logout */}
         <div className="flex items-center justify-between gap-3 px-4 sm:px-6 py-2">
           <div className="flex items-center gap-3 min-w-0">
+            {/* ✅ Accessibility button (same design as your new one) */}
             <button
               onClick={() => setShowAccessibility(true)}
-              className={`
-                          flex items-center justify-center
-                          h-9 w-9 sm:h-10 sm:w-10
-                          rounded-full
-                          bg-white/15 backdrop-blur-md
-                          border border-white/25
-                          hover:bg-white/25
-                          transition-all
-                          shadow-md
-                          ${animationClasses}
-                        `}
               aria-label={text.accessibility}
               title={text.accessibility}
               type="button"
+              className={`
+      relative
+      h-9 w-9 sm:h-10 sm:w-10
+      rounded-full
+      shadow-md
+      transition-all
+      hover:scale-105
+      focus:outline-none
+      focus:ring-4 focus:ring-white/30
+      select-none
+      ${animationClasses}
+    `}
+              style={{
+                background: "rgba(168, 85, 145, 0.4)",
+                backdropFilter: "blur(10px)",
+                border: "2px solid rgba(255, 255, 255, 0.2)",
+              }}
             >
+              {/* highlight radial */}
+              <div
+                className="absolute inset-0 rounded-full pointer-events-none"
+                style={{
+                  background:
+                    "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15) 0%, transparent 60%)",
+                }}
+              />
+
+              {/* stickman icon */}
               <svg
-                width="18"
-                height="18"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="2"
+                strokeWidth="2.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="text-white"
+                className="absolute top-1/2 left-1/2 h-5 w-5 sm:h-6 sm:w-6 -translate-x-1/2 -translate-y-1/2 text-white"
+                aria-hidden="true"
               >
-                <circle cx="12" cy="12" r="10" />
-                <path d="M12 16v-4" />
-                <path d="M12 8h.01" />
+                <circle cx="12" cy="5" r="2.5" />
+                <line x1="12" y1="7.5" x2="12" y2="14" />
+                <line x1="12" y1="9.5" x2="8" y2="12" />
+                <line x1="12" y1="9.5" x2="16" y2="12" />
+                <line x1="12" y1="14" x2="9" y2="19" />
+                <line x1="12" y1="14" x2="15" y2="19" />
               </svg>
             </button>
+
             {isArtist && (
               <button
                 onClick={() => router.push("/dashboard/artist/select")}
                 className={`flex cursor-pointer items-center gap-2 text-white drop-shadow hover:opacity-70 ${animationClasses} ${buttonSizeClasses}`}
                 aria-label={text.back}
+                type="button"
               >
                 <svg
                   width="18"
@@ -2547,13 +2545,13 @@ Underneath the shining star`,
 
             <h1
               className="
-                          text-lg sm:text-xl
-                          font-semibold
-                          bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400
-                          bg-clip-text text-transparent
-                          drop-shadow
-                          truncate
-                        "
+      text-lg sm:text-xl
+      font-semibold
+      bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400
+      bg-clip-text text-transparent
+      drop-shadow
+      truncate
+    "
             >
               {text.title}
             </h1>
@@ -2750,154 +2748,22 @@ Underneath the shining star`,
 
       {/* Main Content */}
       <div
-        className={`absolute pt-10 sm:top-[90px] top-[100px] mt-5 left-0 right-0 overflow-y-auto px-6 ${
-          currentSong ? "bottom-28" : "bottom-20"
-        }`}
+        className={`
+    absolute left-0 right-0
+    overflow-y-auto overscroll-contain
+    px-4 sm:px-6
+    top-[calc(env(safe-area-inset-top)+100px)]
+    sm:top-[calc(env(safe-area-inset-top)+90px)]
+    ${
+      currentSong
+        ? "bottom-[calc(env(safe-area-inset-bottom)+112px)]"
+        : "bottom-[calc(env(safe-area-inset-bottom)+80px)]"
+    }
+  `}
       >
         {/* Discover Tab */}
         {selectedTab === "discover" && (
           <div className="space-y-8 max-w-6xl mx-auto">
-            {/* Browse by Genre Section */}
-            {/* <div>
-              <h2 className="text-2xl text-white drop-shadow-lg mb-4">
-                {language === "spanish" && "Explorar por Género"}
-                {language === "english" && "Browse by Genre"}
-                {language === "catalan" && "Explorar per Gènere"}
-              </h2>
-              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                {[
-                  {
-                    name:
-                      language === "spanish"
-                        ? "Rock"
-                        : language === "catalan"
-                        ? "Rock"
-                        : "Rock",
-                    color: "from-red-500/40 to-orange-500/40",
-                  },
-                  {
-                    name:
-                      language === "spanish"
-                        ? "Pop"
-                        : language === "catalan"
-                        ? "Pop"
-                        : "Pop",
-                    color: "from-pink-500/40 to-purple-500/40",
-                  },
-                  {
-                    name:
-                      language === "spanish"
-                        ? "Jazz"
-                        : language === "catalan"
-                        ? "Jazz"
-                        : "Jazz",
-                    color: "from-blue-500/40 to-cyan-500/40",
-                  },
-                  {
-                    name:
-                      language === "spanish"
-                        ? "Clásica"
-                        : language === "catalan"
-                        ? "Clàssica"
-                        : "Classical",
-                    color: "from-amber-500/40 to-yellow-500/40",
-                  },
-                  {
-                    name:
-                      language === "spanish"
-                        ? "Electrónica"
-                        : language === "catalan"
-                        ? "Electrònica"
-                        : "Electronic",
-                    color: "from-purple-500/40 to-fuchsia-500/40",
-                  },
-                  {
-                    name:
-                      language === "spanish"
-                        ? "Hip Hop"
-                        : language === "catalan"
-                        ? "Hip Hop"
-                        : "Hip Hop",
-                    color: "from-gray-500/40 to-slate-500/40",
-                  },
-                  {
-                    name:
-                      language === "spanish"
-                        ? "Reggae"
-                        : language === "catalan"
-                        ? "Reggae"
-                        : "Reggae",
-                    color: "from-green-500/40 to-emerald-500/40",
-                  },
-                  {
-                    name:
-                      language === "spanish"
-                        ? "R&B"
-                        : language === "catalan"
-                        ? "R&B"
-                        : "R&B",
-                    color: "from-rose-500/40 to-red-500/40",
-                  },
-                  {
-                    name:
-                      language === "spanish"
-                        ? "Country"
-                        : language === "catalan"
-                        ? "Country"
-                        : "Country",
-                    color: "from-orange-500/40 to-amber-500/40",
-                  },
-                  {
-                    name:
-                      language === "spanish"
-                        ? "Latina"
-                        : language === "catalan"
-                        ? "Llatina"
-                        : "Latin",
-                    color: "from-red-500/40 to-pink-500/40",
-                  },
-                  {
-                    name:
-                      language === "spanish"
-                        ? "Indie"
-                        : language === "catalan"
-                        ? "Indie"
-                        : "Indie",
-                    color: "from-teal-500/40 to-cyan-500/40",
-                  },
-                  {
-                    name:
-                      language === "spanish"
-                        ? "Metal"
-                        : language === "catalan"
-                        ? "Metal"
-                        : "Metal",
-                    color: "from-zinc-500/40 to-gray-500/40",
-                  },
-                ].map((genre) => (
-                  <button
-                    key={genre.name}
-                    onClick={() => openGenreDrawer(genre.name)}
-                    className={`
-        bg-gradient-to-br ${genre.color}
-        backdrop-blur-md rounded-2xl p-6
-        border border-white/20
-        hover:scale-105 transition-all
-        cursor-pointer
-        flex items-center justify-center
-        min-h-[120px]
-        focus:outline-none focus:ring-2 focus:ring-white/40
-      `}
-                    aria-label={`Browse genre ${genre.name}`}
-                  >
-                    <h3 className="text-white drop-shadow text-center">
-                      {genre.name}
-                    </h3>
-                  </button>
-                ))}
-              </div>
-            </div> */}
-
             {/* Browse by Mood Section */}
             <div>
               <h2 className="text-2xl text-white drop-shadow-lg mb-4">
@@ -4257,7 +4123,7 @@ Underneath the shining star`,
       {/* Accessibility Panel */}
       {showAccessibility && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-black/80 backdrop-blur-xl rounded-2xl border border-white/30 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-black/80 backdrop-blur-xl rounded-2xl border border-white/30 max-w-4xl w-full max-h-[90vh] overflow-y-auto overscroll-contain">
             <div className="sticky top-0 bg-black/90 backdrop-blur-xl p-6 border-b border-white/20 flex items-center justify-between z-10">
               <h2 className="text-2xl text-white drop-shadow-lg flex items-center gap-3">
                 <svg
@@ -4990,7 +4856,10 @@ Underneath the shining star`,
 
       {/*Player */}
       {currentSong && (
-        <div className="absolute bottom-0 left-0 right-0 z-20 bg-black/40 backdrop-blur-xl border-t border-white/10">
+        <div
+          className="fixed left-0 right-0 z-20 bg-black/40 backdrop-blur-xl border-t border-white/10"
+          style={{ bottom: "env(safe-area-inset-bottom)" }}
+        >
           <div className="px-3 sm:px-4 py-3">
             {/* ===== DESKTOP: 3 columns (left / center / right) ===== */}
             <div className="hidden md:grid grid-cols-[1fr_auto_1fr] items-center gap-3">
@@ -5376,7 +5245,7 @@ Underneath the shining star`,
             </div>
 
             {/* Body */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-3">
+            <div className="flex-1 overflow-y-auto overscroll-contain p-4 space-y-3">
               {/* Loading state */}
               {loadingTracks && (
                 <div className="bg-white/10 border border-white/15 rounded-xl p-4">
