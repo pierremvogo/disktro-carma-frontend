@@ -447,8 +447,6 @@ export function FanStreaming({ language }: FanStreamingProps) {
         setArtists([]);
         return;
       }
-
-      // ✅ exemple: ArtistModuleObject.service.getAllArtists(token)
       const res = await ArtistModuleObject.service.getArtistsForFan(token);
       const raw = res.data ?? [];
 
@@ -469,6 +467,9 @@ export function FanStreaming({ language }: FanStreamingProps) {
 
         // ✅ FIX CRITIQUE ICI
         hasActivePlan: Boolean(a.hasActivePlan), // 0 -> false, 1 -> true
+        bio: a.bio,
+        country: a.country,
+        videoIntroUrl: a.videoIntroUrl,
       }));
 
       setSubscribedArtists(

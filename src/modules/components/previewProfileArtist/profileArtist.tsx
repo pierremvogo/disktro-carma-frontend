@@ -135,6 +135,12 @@ export default function ArtistProfile() {
       </main>
 
       <MusicPlayer />
+
+      {/* <ArtistProfileSidebar
+        isOpen={isSidebarOpen}
+        onClose={handleCloseSidebar}
+        artist={selectedArtist}
+      /> */}
     </div>
   );
 }
