@@ -16,6 +16,7 @@ interface API_URLS {
   GET_SUBSCRIPTIONS: string;
   UPDATE_SUBSCRIPTION: string;
   DELETE_SUBSCRIPTION: string;
+  GET_SUBSCRIPTION_BY_USER_AND_ARTIST: string;
 
   // ✅ NEW for artist dashboard
   GET_MY_RECENT_ACTIVE_SUBSCRIBERS: string;
@@ -34,6 +35,7 @@ const API_URLS: API_URLS = {
   // ✅ corrected param names
   GET_SUBSCRIPTION_BY_USER: `${BASE_API_URL}/subscription/user/:userId`,
   GET_SUBSCRIPTION_BY_PLAN: `${BASE_API_URL}/subscription/plan/:planId`,
+  GET_SUBSCRIPTION_BY_USER_AND_ARTIST: `${BASE_API_URL}/subscription/user/:userId/:artistId`,
 
   GET_SUBSCRIPTIONS: `${BASE_API_URL}/subscription`,
   UPDATE_SUBSCRIPTION: `${BASE_API_URL}/subscription/update/:id`,
@@ -64,6 +66,18 @@ class ServiceObject {
     token: string
   ): Promise<any> => {
     const url = formatURL(API_URLS.GET_SUBSCRIPTION_BY_USER, { userId });
+    return BaseMethods.getRequest(url, true, {}, token);
+  };
+
+  static getSubscriptionByUserAndArtist = (
+    userId: string,
+    artistId: string,
+    token: string
+  ): Promise<any> => {
+    const url = formatURL(API_URLS.GET_SUBSCRIPTION_BY_USER_AND_ARTIST, {
+      userId,
+      artistId,
+    });
     return BaseMethods.getRequest(url, true, {}, token);
   };
 
