@@ -45,6 +45,58 @@ export function ScreenEmbed() {
   const USER_DATA_KEY = UserModule.localState.USER_DATA;
   const USER_ROLE_KEY = UserModule.localState.USER_ROLE;
 
+  const bbokMessage = {
+    english: {
+      title: "Welcome to Bbok",
+      p: [
+        "Bbok is a music streaming service and fan-subscription platform built for music lovers.",
+        "It allows artists to share exclusive content with their most dedicated fans and build a closer, more personal connection.",
+        "We are currently welcoming artists to contact us and help us test the platform’s features, shape its future, and grow together.",
+        "Accessibility is at the heart of Bbok.",
+        "We have made a strong commitment to inclusion by developing features such as Sign Language support, Braille compatibility, Deuteranopia-friendly design, and many more accessibility tools — because music is better when everybody is included.",
+      ],
+      tags: ["#artists4artists", "#musicwitheverybody"],
+      sign: ["Love,", "Kabife Pabbil"],
+      psLabel: "PS:",
+      psText:
+        "You can check out my YouTube channel if you’d like to know more about me as an artist:",
+    },
+
+    spanish: {
+      title: "Bienvenido a Bbok",
+      p: [
+        "Bbok es un servicio de streaming musical y una plataforma de suscripción para fans, creada para amantes de la música.",
+        "Permite a los artistas compartir contenido exclusivo con sus fans más fieles y construir una conexión más cercana y personal.",
+        "Actualmente invitamos a artistas a contactarnos y ayudarnos a probar las funciones de la plataforma, dar forma a su futuro y crecer juntos.",
+        "La accesibilidad está en el corazón de Bbok.",
+        "Hemos asumido un fuerte compromiso con la inclusión desarrollando funciones como soporte de Lengua de Señas, compatibilidad con Braille, diseño adaptado para deuteranopía y muchas más herramientas de accesibilidad — porque la música es mejor cuando todos están incluidos.",
+      ],
+      tags: ["#artists4artists", "#musicwitheverybody"],
+      sign: ["Con cariño,", "Kabife Pabbil"],
+      psLabel: "PD:",
+      psText:
+        "Puedes visitar mi canal de YouTube si quieres saber más sobre mí como artista:",
+    },
+
+    catalan: {
+      title: "Benvingut/da a Bbok",
+      p: [
+        "Bbok és un servei d’streaming musical i una plataforma de subscripció per a fans, creada per als amants de la música.",
+        "Permet als artistes compartir contingut exclusiu amb els seus fans més fidels i construir una connexió més propera i personal.",
+        "Actualment convidem artistes a contactar amb nosaltres i ajudar-nos a provar les funcionalitats de la plataforma, donar forma al seu futur i créixer plegats.",
+        "L’accessibilitat és al cor de Bbok.",
+        "Hem fet un compromís ferm amb la inclusió desenvolupant funcionalitats com suport per a Llengua de Signes, compatibilitat amb Braille, disseny adaptat per a la deuteranòpia i moltes més eines d’accessibilitat — perquè la música és millor quan tothom hi és inclòs.",
+      ],
+      tags: ["#artists4artists", "#musicwitheverybody"],
+      sign: ["Amb estima,", "Kabife Pabbil"],
+      psLabel: "PS:",
+      psText:
+        "Pots visitar el meu canal de YouTube si vols saber més de mi com a artista:",
+    },
+  };
+
+  const ytLink = "https://youtube.com/@kabifepabbil";
+
   // Charger la langue depuis localStorage au montage
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -601,9 +653,9 @@ export function ScreenEmbed() {
 
               {/* Middle Panel */}
               <div className="relative z-10 w-full max-w-4xl mt-4 md:mt-2 lg:mt-2">
-                <div className="w-full h-full bg-white/10 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden border border-white/20 flex flex-col">
+                <div className="w-full h-full  shadow-2xl overflow-hidden border-white/20 flex flex-col">
                   {/* MAIN CONTENT */}
-                  <div className="flex-1 relative bg-gradient-to-br from-purple-500/20 via-pink-500/20 to-blue-500/20 flex items-center justify-center p-4 sm:p-6 md:p-8">
+                  <div className="flex-1 relative flex items-center justify-center p-4 sm:p-6 md:p-8">
                     {showUserType ? (
                       <UserType
                         onBack={() => {
@@ -649,10 +701,65 @@ export function ScreenEmbed() {
                       />
                     ) : (
                       <div className="text-center text-white space-y-4 px-2 sm:px-4">
-                        <div className="space-y-2">
-                          <h2 className="text-2xl sm:text-3xl md:text-4xl drop-shadow-lg">
-                            {messages[language]}
-                          </h2>
+                        <div className="space-y-4 text-left max-w-2xl mx-auto">
+                          {(() => {
+                            const t =
+                              bbokMessage[
+                                language as keyof typeof bbokMessage
+                              ] || bbokMessage.english;
+
+                            return (
+                              <>
+                                {/* Title */}
+                                <h2 className="text-2xl sm:text-3xl md:text-4xl drop-shadow-lg font-semibold text-center">
+                                  {t.title}
+                                </h2>
+
+                                {/* Paragraphs */}
+                                <div className="space-y-3 text-sm sm:text-base leading-relaxed text-white/90">
+                                  {t.p.map((paragraph, index) => (
+                                    <p key={index}>{paragraph}</p>
+                                  ))}
+                                </div>
+
+                                {/* Tags */}
+                                <div className="flex flex-wrap gap-2 pt-2">
+                                  {t.tags.map((tag) => (
+                                    <span
+                                      key={tag}
+                                      className="text-xs sm:text-sm px-3 py-1 rounded-full bg-white/10 border border-white/20"
+                                    >
+                                      {tag}
+                                    </span>
+                                  ))}
+                                </div>
+
+                                {/* Signature */}
+                                <div className="pt-4">
+                                  <p className="text-white/90">{t.sign[0]}</p>
+                                  <p className="font-semibold">{t.sign[1]}</p>
+                                </div>
+
+                                {/* PS + Link */}
+                                <div className="pt-3 text-sm sm:text-base text-white/90">
+                                  <p>
+                                    <span className="font-semibold">
+                                      {t.psLabel}
+                                    </span>{" "}
+                                    {t.psText}
+                                  </p>
+                                  <a
+                                    href="https://youtube.com/@kabifepabbil"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="underline hover:opacity-80 break-all"
+                                  >
+                                    https://youtube.com/@kabifepabbil
+                                  </a>
+                                </div>
+                              </>
+                            );
+                          })()}
                         </div>
 
                         {/* MEDIA CARD */}
