@@ -701,7 +701,7 @@ export function ScreenEmbed() {
                       />
                     ) : (
                       <div className="text-center text-white space-y-4 px-2 sm:px-4">
-                        <div className="space-y-4 text-left max-w-2xl mx-auto">
+                        <div className="space-y-4 text-left max-w-2xl mx-auto font-bold text-justify">
                           {(() => {
                             const t =
                               bbokMessage[
@@ -711,23 +711,28 @@ export function ScreenEmbed() {
                             return (
                               <>
                                 {/* Title */}
-                                <h2 className="text-2xl sm:text-3xl md:text-4xl drop-shadow-lg font-semibold text-center">
+                                <h2 className="text-2xl sm:text-3xl md:text-4xl drop-shadow-lg text-center font-bold">
                                   {t.title}
                                 </h2>
 
                                 {/* Paragraphs */}
-                                <div className="space-y-3 text-sm sm:text-base leading-relaxed text-white/90">
+                                <div className="space-y-3 text-sm sm:text-base leading-relaxed text-white/90 font-bold text-justify">
                                   {t.p.map((paragraph, index) => (
                                     <p key={index}>{paragraph}</p>
                                   ))}
                                 </div>
 
                                 {/* Tags */}
-                                <div className="flex flex-wrap gap-2 pt-2">
+                                <div className="flex flex-wrap gap-2 pt-2 justify-center">
                                   {t.tags.map((tag) => (
                                     <span
                                       key={tag}
-                                      className="text-xs sm:text-sm px-3 py-1 rounded-full bg-white/10 border border-white/20"
+                                      className="
+                text-xs sm:text-sm px-3 py-1
+                rounded-full
+                bg-white/10 border border-white/20
+                font-bold
+              "
                                     >
                                       {tag}
                                     </span>
@@ -735,24 +740,21 @@ export function ScreenEmbed() {
                                 </div>
 
                                 {/* Signature */}
-                                <div className="pt-4">
+                                <div className="pt-4 font-bold text-justify">
                                   <p className="text-white/90">{t.sign[0]}</p>
-                                  <p className="font-semibold">{t.sign[1]}</p>
+                                  <p>{t.sign[1]}</p>
                                 </div>
 
                                 {/* PS + Link */}
-                                <div className="pt-3 text-sm sm:text-base text-white/90">
+                                <div className="pt-3 text-sm sm:text-base text-white/90 font-bold text-justify">
                                   <p>
-                                    <span className="font-semibold">
-                                      {t.psLabel}
-                                    </span>{" "}
-                                    {t.psText}
+                                    <span>{t.psLabel}</span> {t.psText}
                                   </p>
                                   <a
                                     href="https://youtube.com/@kabifepabbil"
                                     target="_blank"
                                     rel="noreferrer"
-                                    className="underline hover:opacity-80 break-all"
+                                    className="underline hover:opacity-80 break-all font-bold"
                                   >
                                     https://youtube.com/@kabifepabbil
                                   </a>
@@ -763,122 +765,6 @@ export function ScreenEmbed() {
                         </div>
 
                         {/* MEDIA CARD */}
-                        <div className="mt-6 sm:mt-8 bg-white/10 backdrop-blur-md rounded-xl p-4 sm:p-6 max-w-md mx-auto border border-white/20 relative">
-                          {/* Arrow Left */}
-                          {canScrollLeft && (
-                            <button
-                              type="button"
-                              onClick={() => scrollByAmount(-300)}
-                              className="flex items-center justify-center absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 text-white p-2 rounded-full backdrop-blur-md shadow-md hover:bg-black/60 transition"
-                              aria-label="Scroll left"
-                            >
-                              ←
-                            </button>
-                          )}
-
-                          {/* Arrow Right */}
-                          {canScrollRight && (
-                            <button
-                              type="button"
-                              onClick={() => scrollByAmount(300)}
-                              className="flex items-center justify-center absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 text-white p-2 rounded-full backdrop-blur-md shadow-md hover:bg-black/60 transition"
-                              aria-label="Scroll right"
-                            >
-                              →
-                            </button>
-                          )}
-
-                          {/* Scrollable Zone (Pointer events = mobile + desktop) */}
-                          <div
-                            ref={mediaScrollRef}
-                            onScroll={handleMediaScroll}
-                            onPointerDown={(e) => {
-                              const el = mediaScrollRef.current;
-                              if (!el) return;
-                              el.setPointerCapture(e.pointerId);
-                              setIsDragging(true);
-                              dragData.current = {
-                                startX: e.clientX,
-                                scrollLeft: el.scrollLeft,
-                              };
-                            }}
-                            onPointerMove={(e) => {
-                              if (!isDragging) return;
-                              const el = mediaScrollRef.current;
-                              if (!el) return;
-                              e.preventDefault();
-                              const walk =
-                                (e.clientX - dragData.current.startX) * 1.2;
-                              el.scrollLeft =
-                                dragData.current.scrollLeft - walk;
-                            }}
-                            onPointerUp={() => setIsDragging(false)}
-                            onPointerCancel={() => setIsDragging(false)}
-                            className={`
-                              flex gap-4
-                              overflow-x-auto
-                              snap-x snap-mandatory
-                              pb-2
-                              no-scrollbar
-                              touch-pan-x select-none
-                              ${isDragging ? "cursor-grabbing" : "cursor-grab"}
-                            `}
-                            style={{ scrollBehavior: "smooth" }}
-                          >
-                            {/* Videos */}
-                            {videos.map((url, index) => (
-                              <div
-                                key={index}
-                                className="min-w-full snap-center"
-                              >
-                                <div className="aspect-video bg-black rounded-lg mb-3 overflow-hidden">
-                                  <video
-                                    ref={(el) => {
-                                      videoRefs.current[index] = el;
-                                    }}
-                                    className="w-full h-full object-cover"
-                                    src={url}
-                                    controls
-                                    muted
-                                    playsInline
-                                    preload="metadata"
-                                    onEnded={() => {
-                                      const el = mediaScrollRef.current;
-                                      if (!el) return;
-                                      const next = Math.min(
-                                        index + 1,
-                                        videos.length - 1
-                                      );
-                                      el.scrollTo({
-                                        left: next * el.clientWidth,
-                                        behavior: "smooth",
-                                      });
-                                    }}
-                                  />
-                                </div>
-                                <p className="text-xs sm:text-sm opacity-80 drop-shadow text-center">
-                                  #{index + 1}
-                                </p>
-                              </div>
-                            ))}
-
-                            {/* Image Slide */}
-                            <div className="min-w-full snap-center">
-                              <div className="aspect-video bg-black/20 backdrop-blur-sm rounded-lg mb-3 flex items-center justify-center overflow-hidden">
-                                <ImageWithFallback
-                                  src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&q=80"
-                                  alt="Second visual"
-                                  className="w-full h-full object-cover rounded-lg opacity-80"
-                                />
-                              </div>
-                            </div>
-                          </div>
-
-                          <p className="text-[11px] sm:text-xs opacity-70 mt-2 text-center">
-                            Drag horizontally with your cursor or swipe on
-                            mobile to explore media.
-                          </p>
-                        </div>
                       </div>
                     )}
                   </div>
