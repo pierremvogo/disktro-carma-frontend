@@ -487,38 +487,41 @@ export function FanProfileSetup({
   };
 
   return (
-    <div
-      className="
-        relative w-full
-        min-h-[100svh] md:min-h-screen
-        overflow-hidden
-        bg-cover bg-center
-        text-white
-      "
-      style={{
-        backgroundImage:
-          'url("/image/4ac3eed398bb68113a14d0fa5efe7a6def6f7651.png")',
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}
-    >
-      <AccessibilityButton language={language} />
+    <div className="relative w-full h-[100dvh] overflow-hidden text-white">
+      {/* ================= FIXED BACKGROUND ================= */}
+      <div
+        className="fixed inset-0 -z-10 bg-cover bg-center"
+        style={{
+          backgroundImage:
+            'url("/image/4ac3eed398bb68113a14d0fa5efe7a6def6f7651.png")',
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          transform: "scale(1.03)",
+        }}
+      />
 
-      {/* Overlay (même que Login) */}
-      <div className="absolute inset-0 bg-black/50" />
+      {/* ================= FIXED OVERLAY ================= */}
+      <div className="fixed inset-0 -z-10 bg-black/50" />
 
-      {/* Scroll container stable iOS */}
+      {/* ================= ACCESSIBILITY BUTTON ================= */}
+      <div className="relative z-20">
+        <AccessibilityButton language={language} />
+      </div>
+
+      {/* ================= SCROLL CONTAINER ================= */}
       <div
         className="
           relative z-10
-          min-h-[100svh]
+          h-[100dvh]
           overflow-y-auto overscroll-contain
+          touch-pan-y
           px-4 sm:px-6
           pt-[calc(env(safe-area-inset-top)+1.25rem)]
           pb-[calc(env(safe-area-inset-bottom)+1.25rem)]
         "
+        style={{ WebkitOverflowScrolling: "touch" }}
       >
-        <div className="min-h-[calc(100svh-2.5rem)] flex items-center justify-center py-6">
+        <div className="min-h-full flex items-center justify-center py-6">
           <div className="w-full max-w-5xl bg-white/10 backdrop-blur-md rounded-3xl border border-white/20 p-6 sm:p-8 shadow-2xl">
             {/* Header */}
             <div className="flex items-start gap-4 mb-8">

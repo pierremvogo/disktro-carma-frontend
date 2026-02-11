@@ -165,16 +165,8 @@ export function Questionnaire({
   };
 
   return (
-    <div
-      className="
-        relative w-full
-        min-h-[100svh] md:min-h-screen
-        overflow-hidden
-        pt-[calc(env(safe-area-inset-top)+1rem)]
-        pb-[calc(env(safe-area-inset-bottom)+1rem)]
-      "
-    >
-      {/* Back button (safe on notch, doesn't scroll) */}
+    <div className="relative w-full h-[100dvh] overflow-hidden">
+      {/* ✅ FIXED BACK BUTTON (ne scroll pas) */}
       <button
         onClick={onBack}
         type="button"
@@ -206,9 +198,20 @@ export function Questionnaire({
         <span className="text-sm sm:text-base">{text.back}</span>
       </button>
 
-      {/* Scroll area */}
-      <div className="h-[100svh] md:h-auto overflow-y-auto overscroll-contain px-4 sm:px-6">
-        <div className="max-w-lg mx-auto w-full pt-12 pb-8">
+      {/* ✅ SCROLL AREA (SEUL CE CONTAINER SCROLLE) */}
+      <div
+        className="
+          relative z-10
+          h-[100dvh]
+          overflow-y-auto overscroll-contain
+          touch-pan-y
+          px-4 sm:px-6
+          pt-[calc(env(safe-area-inset-top)+1rem+3.25rem)]
+          pb-[calc(env(safe-area-inset-bottom)+1rem)]
+        "
+        style={{ WebkitOverflowScrolling: "touch" }}
+      >
+        <div className="max-w-lg mx-auto w-full pt-2 pb-8">
           <h2 className="text-white drop-shadow-lg mb-1 text-xl sm:text-2xl">
             {text.title}
           </h2>

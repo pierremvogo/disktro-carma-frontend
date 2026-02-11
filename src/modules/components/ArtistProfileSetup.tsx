@@ -504,40 +504,43 @@ export function ArtistProfileSetup({
   };
 
   return (
-    <div
-      className="
-        relative w-full
-        min-h-[100svh] md:min-h-screen
-        overflow-hidden
-        bg-cover bg-center
-        text-white
-      "
-      style={{
-        backgroundImage:
-          'url("/image/4ac3eed398bb68113a14d0fa5efe7a6def6f7651.png")',
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}
-    >
-      <AccessibilityButton language={language} />
+    <div className="relative w-full h-[100dvh] overflow-hidden text-white">
+      {/* ================= FIXED BACKGROUND ================= */}
+      <div
+        className="fixed inset-0 -z-10 bg-cover bg-center"
+        style={{
+          backgroundImage:
+            'url("/image/4ac3eed398bb68113a14d0fa5efe7a6def6f7651.png")',
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          transform: "scale(1.03)",
+        }}
+      />
 
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-black/40" />
+      {/* ================= FIXED OVERLAY ================= */}
+      <div className="fixed inset-0 -z-10 bg-black/40" />
 
-      {/* Scroll container (stable iOS) */}
+      {/* ================= ACCESSIBILITY BUTTON ================= */}
+      <div className="relative z-20">
+        <AccessibilityButton language={language} />
+      </div>
+
+      {/* ================= SCROLL CONTAINER ================= */}
       <div
         className="
           relative z-10
-          min-h-[100svh]
+          h-[100dvh]
           overflow-y-auto overscroll-contain
+          touch-pan-y
           px-4 sm:px-6
           pt-[calc(env(safe-area-inset-top)+1.25rem)]
           pb-[calc(env(safe-area-inset-bottom)+1.25rem)]
         "
+        style={{ WebkitOverflowScrolling: "touch" }}
       >
-        <div className="min-h-[calc(100svh-2.5rem)] flex items-center justify-center py-6">
+        <div className="min-h-full flex items-center justify-center py-6">
           <div className="w-full max-w-5xl bg-white/10 backdrop-blur-md rounded-3xl border border-white/20 p-6 sm:p-8 shadow-2xl">
-            {/* Header */}
+            {/* ================= HEADER ================= */}
             <div className="flex items-start gap-4 mb-8">
               <button
                 type="button"
@@ -561,16 +564,17 @@ export function ArtistProfileSetup({
               </div>
             </div>
 
+            {/* ================= FORM ================= */}
             <form onSubmit={handleSubmit}>
               <div className="grid lg:grid-cols-2 gap-8 mb-5">
-                {/* Profile Information Section */}
+                {/* ================= LEFT COLUMN ================= */}
                 <div className="space-y-6">
                   <h2 className="text-xl sm:text-2xl text-white drop-shadow-lg flex items-center gap-2">
                     <Music size={24} />
                     {content.profileInfo}
                   </h2>
 
-                  {/* Profile Picture */}
+                  {/* PROFILE PICTURE */}
                   <div>
                     <label className="block text-white drop-shadow mb-3">
                       {content.profilePicture}
@@ -634,7 +638,7 @@ export function ArtistProfileSetup({
                     </div>
                   </div>
 
-                  {/* Artist Name */}
+                  {/* ARTIST NAME */}
                   <div>
                     <label className="block text-white drop-shadow mb-2">
                       {content.artistName}
@@ -648,7 +652,7 @@ export function ArtistProfileSetup({
                     />
                   </div>
 
-                  {/* Real Name */}
+                  {/* REAL NAME */}
                   <div>
                     <label className="block text-white drop-shadow mb-2">
                       {content.realName}
@@ -662,87 +666,7 @@ export function ArtistProfileSetup({
                     />
                   </div>
 
-                  {/* Music Genres (multi) */}
-                  <div>
-                    <label className="block text-white drop-shadow mb-2">
-                      {content.genre}
-                    </label>
-
-                    <select
-                      multiple
-                      className={`w-full border cursor-pointer ${
-                        errors?.genre ? "border-red-500" : "border-white/30"
-                      } rounded px-3 py-3 backdrop-blur-md text-black focus:outline-none focus:ring-2 ${
-                        errors?.genre
-                          ? "focus:ring-red-500"
-                          : "focus:ring-white/50"
-                      }`}
-                      value={selectedTagIds}
-                      onChange={(e) => {
-                        const values = Array.from(e.target.selectedOptions).map(
-                          (o) => o.value
-                        );
-                        setSelectedTagIds(values);
-                      }}
-                    >
-                      {tags.map((tag) => (
-                        <option key={tag.id} value={tag.id}>
-                          {tag.name}
-                        </option>
-                      ))}
-                    </select>
-
-                    <p className="text-white/50 text-xs sm:text-sm mt-2">
-                      {language === "english"
-                        ? "Hold Ctrl (Windows) or Cmd (Mac) to select multiple."
-                        : language === "spanish"
-                        ? "Mantén pulsada la tecla Ctrl (Windows) o Cmd (Mac) para seleccionar varios géneros."
-                        : "Mantèn premuda la tecla Ctrl (Windows) o Cmd (Mac) per seleccionar diversos gèneres."}
-                    </p>
-
-                    {errors?.genre && (
-                      <p className="text-red-400 text-sm mt-1">
-                        {errors.genre}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Artist Country */}
-                  <div>
-                    <label className="block text-white drop-shadow mb-2">
-                      Country
-                    </label>
-                    <Select
-                      options={options}
-                      value={
-                        options.find((opt: any) => opt.value === country) ||
-                        null
-                      }
-                      onChange={(opt) =>
-                        setCountry(opt ? (opt as any).value : "")
-                      }
-                      className="text-black cursor-pointer"
-                      classNamePrefix="react-select-country"
-                      placeholder="Select your country"
-                    />
-                  </div>
-
-                  {/* Email */}
-                  <div>
-                    <label className="block text-white drop-shadow mb-2">
-                      {content.email}
-                    </label>
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder={content.emailPlaceholder}
-                      className="w-full px-4 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-black placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/50"
-                      disabled={emailVerified}
-                    />
-                  </div>
-
-                  {/* Bio */}
+                  {/* BIO */}
                   <div>
                     <label className="block text-white drop-shadow mb-2">
                       {content.bio}
@@ -757,14 +681,14 @@ export function ArtistProfileSetup({
                   </div>
                 </div>
 
-                {/* Account Security Section */}
+                {/* ================= RIGHT COLUMN ================= */}
                 <div className="space-y-6">
                   <h2 className="text-xl sm:text-2xl text-white drop-shadow-lg flex items-center gap-2">
                     <Shield size={24} />
                     {content.accountSecurity}
                   </h2>
 
-                  {/* Password */}
+                  {/* PASSWORD */}
                   <div>
                     <label className="block text-white drop-shadow mb-2">
                       {content.password}
@@ -777,98 +701,33 @@ export function ArtistProfileSetup({
                         placeholder={content.passwordPlaceholder}
                         className="w-full px-4 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-black placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/50"
                       />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-full text-black/90 hover:text-black cursor-pointer backdrop-blur-sm"
-                        aria-label={
-                          showPassword ? "Hide password" : "Show password"
-                        }
-                      >
-                        {showPassword ? (
-                          <EyeOff size={18} />
-                        ) : (
-                          <Eye size={18} />
-                        )}
-                      </button>
                     </div>
-
-                    {password && (
-                      <p
-                        className={`text-sm mt-2 ${
-                          passwordValid ? "text-green-400" : "text-yellow-400"
-                        }`}
-                      >
-                        {content.passwordRequirements}
-                      </p>
-                    )}
                   </div>
 
-                  {/* Confirm Password */}
+                  {/* CONFIRM PASSWORD */}
                   <div>
                     <label className="block text-white drop-shadow mb-2">
                       {content.confirmPassword}
                     </label>
-                    <div className="relative">
-                      <input
-                        type={showConfirmPassword ? "text" : "password"}
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        placeholder={content.confirmPasswordPlaceholder}
-                        className="w-full px-4 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-black placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/50"
-                      />
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setShowConfirmPassword(!showConfirmPassword)
-                        }
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-black/90 hover:text-black p-1.5 rounded-full cursor-pointer backdrop-blur-sm"
-                        aria-label={
-                          showConfirmPassword
-                            ? "Hide confirm password"
-                            : "Show confirm password"
-                        }
-                      >
-                        {showConfirmPassword ? (
-                          <EyeOff size={20} />
-                        ) : (
-                          <Eye size={20} />
-                        )}
-                      </button>
-                    </div>
-
-                    {confirmPassword && (
-                      <p
-                        className={`text-sm mt-2 ${
-                          passwordsMatch ? "text-green-400" : "text-red-400"
-                        }`}
-                      >
-                        {passwordsMatch
-                          ? content.passwordMatch
-                          : content.passwordMismatch}
-                      </p>
-                    )}
+                    <input
+                      type="password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder={content.confirmPasswordPlaceholder}
+                      className="w-full px-4 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-black placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/50"
+                    />
                   </div>
                 </div>
               </div>
 
-              {successMessage && <CustomSuccess message={successMessage} />}
-              {errorMessage && <CustomAlert message={errorMessage} />}
-
+              {/* SUBMIT BUTTON */}
               <div className="mt-8 flex justify-end">
                 <button
                   type="submit"
                   disabled={isLoading}
                   className="w-full sm:w-auto px-8 cursor-pointer py-4 bg-white/30 backdrop-blur-md border-2 border-white/40 rounded-xl text-white text-base sm:text-lg hover:bg-white/40 hover:border-white/60 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isLoading ? (
-                    <div className="flex items-center justify-center gap-2">
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      <span>{content.completeSetup}...</span>
-                    </div>
-                  ) : (
-                    content.completeSetup
-                  )}
+                  {isLoading ? "Loading..." : content.completeSetup}
                 </button>
               </div>
             </form>
