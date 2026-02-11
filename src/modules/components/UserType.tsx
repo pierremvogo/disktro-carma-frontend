@@ -61,10 +61,10 @@ export function UserType({
       className="
         relative w-full
         min-h-[100svh] md:min-h-screen
-        flex flex-col items-center justify-center
+        flex flex-col items-center justify-start
         px-4 sm:px-6 md:px-8
-        py-10
-        pt-[calc(env(safe-area-inset-top)+2.5rem)]
+        py-15
+        pt-[calc(env(safe-area-inset-top)+7rem)]
         pb-[calc(env(safe-area-inset-bottom)+2.5rem)]
       "
     >
@@ -101,7 +101,7 @@ export function UserType({
       </button>
 
       <div className="w-full max-w-2xl text-center">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl text-white drop-shadow-lg mb-8 sm:mb-10 md:mb-12">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl mt-12 text-white drop-shadow-lg mb-8 sm:mb-10 md:mb-12">
           {text.title}
         </h2>
 
