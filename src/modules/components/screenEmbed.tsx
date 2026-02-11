@@ -35,7 +35,15 @@ export function ScreenEmbed() {
   const [canScrollRight, setCanScrollRight] = useState(false);
 
   const [isDragging, setIsDragging] = useState(false);
-  const dragData = useRef({ startX: 0, scrollLeft: 0 });
+  // const dragData = useRef({ startX: 0, scrollLeft: 0 });
+
+  const dragData = useRef({
+    startX: 0,
+    startY: 0,
+    scrollLeft: 0,
+    locked: false, // est-ce qu'on a décidé horizontal/vertical ?
+    isHorizontal: false, // true => on gère le drag horizontal
+  });
 
   // ✅ NEW: index actif + refs vidéos
   const [activeMediaIndex, setActiveMediaIndex] = useState(0);
@@ -207,15 +215,15 @@ export function ScreenEmbed() {
     setActiveMediaIndex(index);
   };
 
-  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-    const el = mediaScrollRef.current;
-    if (!el) return;
-    setIsDragging(true);
-    dragData.current = {
-      startX: e.pageX - el.offsetLeft,
-      scrollLeft: el.scrollLeft,
-    };
-  };
+  // const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+  //   const el = mediaScrollRef.current;
+  //   if (!el) return;
+  //   setIsDragging(true);
+  //   dragData.current = {
+  //     startX: e.pageX - el.offsetLeft,
+  //     scrollLeft: el.scrollLeft,
+  //   };
+  // };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!isDragging) return;
@@ -410,7 +418,7 @@ export function ScreenEmbed() {
 
   // 🧩 EMBEDDED SCREEN
   return (
-    <div className="relative w-full min-h-[100svh] md:min-h-screen overflow-hidden text-white">
+    <div className="relative w-full h-[100dvh] overflow-hidden text-white">
       {/* ✅ Background image (boost colors) */}
       <div
         className="absolute inset-0 bg-cover bg-center"
@@ -430,11 +438,11 @@ export function ScreenEmbed() {
       <AccessibilityButton language={language} />
 
       {/* ✅ WRAPPER PRINCIPAL */}
-      <div className="relative z-10 flex flex-col w-full min-h-[100svh] md:min-h-screen pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] min-h-0">
-        {/* ✅ HEADER FIXE (ne scroll plus) */}
+      <div className="relative z-10 flex flex-col w-full h-full min-h-0 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
+        {/* ✅ HEADER (STICKY, robuste sur Android) */}
         <div
           className="
-            fixed top-0 left-0 right-0 z-[60]
+            sticky top-0 z-[60]
             w-full
             bg-black/25 backdrop-blur-md
             border-b border-white/10
@@ -504,6 +512,45 @@ export function ScreenEmbed() {
 
               {/* Controls */}
               <div className="mt-3 flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+                <button
+                  onClick={() => {
+                    setShowUserType(false);
+                    setShowQuestionnaire(false);
+                    setShowLogin(false);
+                    setShowArtistChoice(false);
+                    setShowFanStreaming(false);
+                    setShowArtistProfileSetup(false);
+                    setShowFanProfileSetup(false);
+                  }}
+                  className="
+                              flex cursor-pointer items-center gap-2
+                              px-3 sm:px-4 py-2
+                              bg-white/15 backdrop-blur-md
+                              border border-white/25
+                              rounded-lg
+                              text-white text-xs sm:text-sm
+                              drop-shadow
+                              hover:bg-white/25 transition-all
+                              focus:outline-none focus:ring-2 focus:ring-blue-500
+                            "
+                  aria-label="Home"
+                  type="button"
+                >
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M3 9l9-7 9 7" />
+                    <path d="M9 22V12h6v10" />
+                  </svg>
+                  Home
+                </button>
                 <button
                   onClick={() => {
                     setShowQuestionnaire(true);
@@ -644,16 +691,18 @@ export function ScreenEmbed() {
           </div>
         </div>
 
-        {/* ✅ CONTENT SCROLL (passe sous le header fixe) */}
+        {/* ✅ CONTENT SCROLL (interne) */}
         <div
           className="
             flex-1 min-h-0 w-full
             overflow-y-auto overscroll-contain
             px-4 md:px-8 pb-6
             touch-pan-y
-            pt-32 sm:pt-28
           "
-          style={{ WebkitOverflowScrolling: "touch" }}
+          style={{
+            WebkitOverflowScrolling: "touch",
+            overscrollBehaviorY: "contain",
+          }}
         >
           <div className="relative w-full max-w-7xl mx-auto flex flex-col items-center gap-8 md:gap-10 min-h-0">
             <div className="relative w-full flex items-center justify-center min-h-0">
@@ -768,122 +817,7 @@ export function ScreenEmbed() {
                         </div>
 
                         {/* ================= MEDIA CARD ================= */}
-                        <div className="mt-6 sm:mt-8 bg-white/10 backdrop-blur-md rounded-xl p-4 sm:p-6 max-w-md mx-auto border border-white/20 relative">
-                          {/* Arrow Left */}
-                          {canScrollLeft && (
-                            <button
-                              type="button"
-                              onClick={() => scrollByAmount(-300)}
-                              className="flex items-center justify-center absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 text-white p-2 rounded-full backdrop-blur-md shadow-md hover:bg-black/60 transition"
-                              aria-label="Scroll left"
-                            >
-                              ←
-                            </button>
-                          )}
-
-                          {/* Arrow Right */}
-                          {canScrollRight && (
-                            <button
-                              type="button"
-                              onClick={() => scrollByAmount(300)}
-                              className="flex items-center justify-center absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 text-white p-2 rounded-full backdrop-blur-md shadow-md hover:bg-black/60 transition"
-                              aria-label="Scroll right"
-                            >
-                              →
-                            </button>
-                          )}
-
-                          {/* Scrollable Zone */}
-                          <div
-                            ref={mediaScrollRef}
-                            onScroll={handleMediaScroll}
-                            onPointerDown={(e) => {
-                              const el = mediaScrollRef.current;
-                              if (!el) return;
-                              el.setPointerCapture(e.pointerId);
-                              setIsDragging(true);
-                              dragData.current = {
-                                startX: e.clientX,
-                                scrollLeft: el.scrollLeft,
-                              };
-                            }}
-                            onPointerMove={(e) => {
-                              if (!isDragging) return;
-                              const el = mediaScrollRef.current;
-                              if (!el) return;
-                              e.preventDefault();
-                              const walk =
-                                (e.clientX - dragData.current.startX) * 1.2;
-                              el.scrollLeft =
-                                dragData.current.scrollLeft - walk;
-                            }}
-                            onPointerUp={() => setIsDragging(false)}
-                            onPointerCancel={() => setIsDragging(false)}
-                            className={`
-                              flex gap-4
-                              overflow-x-auto
-                              snap-x snap-mandatory
-                              pb-2
-                              no-scrollbar
-                              touch-pan-x select-none
-                              ${isDragging ? "cursor-grabbing" : "cursor-grab"}
-                            `}
-                            style={{ scrollBehavior: "smooth" }}
-                          >
-                            {/* Videos */}
-                            {videos.map((url, index) => (
-                              <div
-                                key={index}
-                                className="min-w-full snap-center"
-                              >
-                                <div className="aspect-video bg-black rounded-lg mb-3 overflow-hidden">
-                                  <video
-                                    ref={(el) => {
-                                      videoRefs.current[index] = el;
-                                    }}
-                                    className="w-full h-full object-cover"
-                                    src={url}
-                                    controls
-                                    muted
-                                    playsInline
-                                    preload="metadata"
-                                    onEnded={() => {
-                                      const el = mediaScrollRef.current;
-                                      if (!el) return;
-                                      const next = Math.min(
-                                        index + 1,
-                                        videos.length - 1
-                                      );
-                                      el.scrollTo({
-                                        left: next * el.clientWidth,
-                                        behavior: "smooth",
-                                      });
-                                    }}
-                                  />
-                                </div>
-                                <p className="text-xs sm:text-sm opacity-80 drop-shadow text-center">
-                                  #{index + 1}
-                                </p>
-                              </div>
-                            ))}
-
-                            {/* Image Slide */}
-                            <div className="min-w-full snap-center">
-                              <div className="aspect-video bg-black/20 backdrop-blur-sm rounded-lg mb-3 flex items-center justify-center overflow-hidden">
-                                <ImageWithFallback
-                                  src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&q=80"
-                                  alt="Second visual"
-                                  className="w-full h-full object-cover rounded-lg opacity-80"
-                                />
-                              </div>
-                            </div>
-                          </div>
-
-                          <p className="text-[11px] sm:text-xs opacity-70 mt-2 text-center">
-                            Drag horizontally with your cursor or swipe on
-                            mobile to explore media.
-                          </p>
-                        </div>
+                        {/*  */}
                       </div>
                     )}
                   </div>
