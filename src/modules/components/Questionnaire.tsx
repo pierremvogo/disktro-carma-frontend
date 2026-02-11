@@ -206,7 +206,7 @@ export function Questionnaire({
           overflow-y-auto overscroll-contain
           touch-pan-y
           px-4 sm:px-6
-          pt-[calc(env(safe-area-inset-top)+1rem+3.25rem)]
+          pt-[calc(env(safe-area-inset-top)+1rem+8.25rem)]
           pb-[calc(env(safe-area-inset-bottom)+1rem)]
         "
         style={{ WebkitOverflowScrolling: "touch" }}
