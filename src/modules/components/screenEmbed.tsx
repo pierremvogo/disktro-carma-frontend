@@ -310,49 +310,53 @@ export function ScreenEmbed() {
   // 🧩 ARTIST CHOICE FULL SCREEN
   if (showArtistChoice) {
     return (
-      <ArtistChoice
-        onGoToArtistDashboard={() => {
-          setShowArtistChoice(false);
-          setShowArtistDashboard(true);
-        }}
-        onGoToFanStreaming={() => {
-          setShowArtistChoice(false);
-          setShowFanStreaming(true);
-        }}
-        language={language}
-        onLogout={() => {
-          setShowArtistChoice(false);
-          setIsArtist(false);
-        }}
-      />
+      <FullScreenScroll>
+        <ArtistChoice
+          onGoToArtistDashboard={() => {
+            setShowArtistChoice(false);
+            setShowArtistDashboard(true);
+          }}
+          onGoToFanStreaming={() => {
+            setShowArtistChoice(false);
+            setShowFanStreaming(true);
+          }}
+          language={language}
+          onLogout={() => {
+            setShowArtistChoice(false);
+            setIsArtist(false);
+          }}
+        />
+      </FullScreenScroll>
     );
   }
 
   // 🧩 LOGIN FULL SCREEN
   if (showLogin) {
     return (
-      <Login
-        onBack={() => {
-          setShowLogin(false);
-          setShowUserType(false);
-          setShowQuestionnaire(false);
-        }}
-        onLoginAsFan={() => {
-          setShowLogin(false);
-          setIsArtist(false);
-          setShowFanStreaming(true);
-        }}
-        onLoginAsArtist={() => {
-          setShowLogin(false);
-          setIsArtist(true);
-          setShowArtistChoice(true);
-        }}
-        language={language}
-        onSignUp={() => {
-          setShowLogin(false);
-          setShowUserType(true);
-        }}
-      />
+      <FullScreenScroll>
+        <Login
+          onBack={() => {
+            setShowLogin(false);
+            setShowUserType(false);
+            setShowQuestionnaire(false);
+          }}
+          onLoginAsFan={() => {
+            setShowLogin(false);
+            setIsArtist(false);
+            setShowFanStreaming(true);
+          }}
+          onLoginAsArtist={() => {
+            setShowLogin(false);
+            setIsArtist(true);
+            setShowArtistChoice(true);
+          }}
+          language={language}
+          onSignUp={() => {
+            setShowLogin(false);
+            setShowUserType(true);
+          }}
+        />
+      </FullScreenScroll>
     );
   }
 
@@ -412,6 +416,22 @@ export function ScreenEmbed() {
     return (
       <div className="fixed inset-0 w-screen h-screen">
         <FanStreaming language={language} />
+      </div>
+    );
+  }
+
+  function FullScreenScroll({ children }: { children: React.ReactNode }) {
+    return (
+      <div
+        className="
+          fixed inset-0 w-screen h-[100dvh]
+          overflow-y-auto overscroll-contain
+          touch-pan-y
+        "
+        style={{ WebkitOverflowScrolling: "touch" }}
+      >
+        {/* Important : un contenu qui peut dépasser */}
+        <div className="min-h-[100dvh]">{children}</div>
       </div>
     );
   }
@@ -718,48 +738,52 @@ export function ScreenEmbed() {
                   {/* MAIN CONTENT */}
                   <div className="flex-1 relative flex flex-col items-center justify-start p-4 sm:p-6 md:p-8 min-h-0">
                     {showUserType ? (
-                      <UserType
-                        onBack={() => {
-                          setShowUserType(false);
-                          setShowQuestionnaire(false);
-                        }}
-                        onSelectArtist={() => {
-                          setShowUserType(false);
-                          setShowArtistProfileSetup(true);
-                        }}
-                        onSelectFan={() => {
-                          setShowUserType(false);
-                          setShowFanProfileSetup(true);
-                        }}
-                        language={language}
-                        onGoToQuestionnaire={() => {
-                          setShowUserType(false);
-                          setShowQuestionnaire(true);
-                        }}
-                        onGoToWelcome={() => {
-                          setShowUserType(false);
-                        }}
-                      />
+                      <FullScreenScroll>
+                        <UserType
+                          onBack={() => {
+                            setShowUserType(false);
+                            setShowQuestionnaire(false);
+                          }}
+                          onSelectArtist={() => {
+                            setShowUserType(false);
+                            setShowArtistProfileSetup(true);
+                          }}
+                          onSelectFan={() => {
+                            setShowUserType(false);
+                            setShowFanProfileSetup(true);
+                          }}
+                          language={language}
+                          onGoToQuestionnaire={() => {
+                            setShowUserType(false);
+                            setShowQuestionnaire(true);
+                          }}
+                          onGoToWelcome={() => {
+                            setShowUserType(false);
+                          }}
+                        />
+                      </FullScreenScroll>
                     ) : showQuestionnaire ? (
-                      <Questionnaire
-                        onBack={() => {
-                          setShowQuestionnaire(false);
-                          setShowUserType(false);
-                        }}
-                        onSubmit={() => {
-                          setShowQuestionnaire(false);
-                          setShowLogin(true);
-                        }}
-                        language={language}
-                        onShowLogin={() => {
-                          setShowQuestionnaire(false);
-                          setShowLogin(true);
-                        }}
-                        onSkipToSignUp={() => {
-                          setShowQuestionnaire(false);
-                          setShowUserType(true);
-                        }}
-                      />
+                      <FullScreenScroll>
+                        <Questionnaire
+                          onBack={() => {
+                            setShowQuestionnaire(false);
+                            setShowUserType(false);
+                          }}
+                          onSubmit={() => {
+                            setShowQuestionnaire(false);
+                            setShowLogin(true);
+                          }}
+                          language={language}
+                          onShowLogin={() => {
+                            setShowQuestionnaire(false);
+                            setShowLogin(true);
+                          }}
+                          onSkipToSignUp={() => {
+                            setShowQuestionnaire(false);
+                            setShowUserType(true);
+                          }}
+                        />
+                      </FullScreenScroll>
                     ) : (
                       <div className="text-center text-white space-y-6 px-2 sm:px-4 w-full">
                         {/* ================= TEXT CONTENT ================= */}
