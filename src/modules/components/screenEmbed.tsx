@@ -444,7 +444,7 @@ export function ScreenEmbed() {
     <div className="relative w-full h-[100dvh] overflow-hidden text-white">
       {/* ✅ Background image (boost colors) */}
       <div
-        className="absolute inset-0 bg-cover bg-center"
+        className="absolute inset-0 bg-cover bg-center origin-center"
         style={{
           backgroundImage:
             'url("/image/4ac3eed398bb68113a14d0fa5efe7a6def6f7651.png")',
@@ -452,6 +452,7 @@ export function ScreenEmbed() {
           transform: "scale(1.03)",
         }}
       />
+
       {/* ✅ Gradient tint */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#5A0B4D]/30 via-[#4A1456]/25 to-[#2D0E3E]/30" />
       {/* ✅ Lighter overlay than before */}
@@ -465,250 +466,153 @@ export function ScreenEmbed() {
         {/* ✅ HEADER (STICKY, robuste sur Android) */}
         <div
           className="
-            sticky top-0 z-[60]
-            w-full
-            bg-black/25 backdrop-blur-md
-            border-b border-white/10
-          "
+    sticky top-0 z-[60]
+    w-full
+     backdrop-blur-md
+    border-b border-white/10
+  "
           style={{ WebkitBackdropFilter: "blur(12px)" }}
         >
           <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6">
             <div className="pt-[calc(env(safe-area-inset-top)+0.75rem)] pb-3">
-              {/* Langs */}
-              <nav
-                aria-label={
-                  language === "spanish"
-                    ? "Selección de idioma"
-                    : language === "english"
-                    ? "Language selection"
-                    : "Selecció d'idioma"
-                }
-                className="w-full"
+              {/* ✅ 1 seul layout : mobile colonne centrée, desktop ligne (2 colonnes) */}
+              <div
+                className="
+          flex flex-col items-center justify-center gap-3
+          md:grid md:grid-cols-[1fr_auto] md:items-center md:gap-0
+        "
               >
-                <div
-                  className="flex flex-wrap items-center justify-center gap-2 sm:gap-4"
-                  role="group"
-                >
-                  <button
-                    onClick={() => changeLanguage("spanish")}
-                    className={`text-white cursor-pointer drop-shadow hover:opacity-80 transition-opacity underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent rounded px-2 py-1 text-xs sm:text-sm ${
-                      language === "spanish"
-                        ? "opacity-100 font-bold"
-                        : "opacity-70"
-                    }`}
-                    aria-label="Español"
-                    aria-current={language === "spanish" ? "true" : "false"}
-                    type="button"
-                  >
-                    Spanish
-                  </button>
+                {/* ✅ Bloc boutons (centré, même sur desktop) */}
+                <div className="w-full md:w-auto md:justify-self-center">
+                  <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+                    {/* Home */}
+                    <button
+                      onClick={() => {
+                        setShowUserType(false);
+                        setShowQuestionnaire(false);
+                        setShowLogin(false);
+                        setShowArtistChoice(false);
+                        setShowFanStreaming(false);
+                        setShowArtistProfileSetup(false);
+                        setShowFanProfileSetup(false);
+                      }}
+                      className="flex cursor-pointer items-center gap-2 px-3 sm:px-4 py-2 bg-white/15 backdrop-blur-md border border-white/25 rounded-lg text-white text-xs sm:text-sm drop-shadow hover:bg-white/25 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      type="button"
+                      aria-label="Home"
+                    >
+                      Home
+                    </button>
 
-                  <button
-                    onClick={() => changeLanguage("english")}
-                    className={`text-white cursor-pointer drop-shadow hover:opacity-80 transition-opacity underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent rounded px-2 py-1 text-xs sm:text-sm ${
-                      language === "english"
-                        ? "opacity-100 font-bold"
-                        : "opacity-70"
-                    }`}
-                    aria-label="English"
-                    aria-current={language === "english" ? "true" : "false"}
-                    type="button"
-                  >
-                    English
-                  </button>
+                    {/* Test Group */}
+                    <button
+                      onClick={() => {
+                        setShowQuestionnaire(true);
+                        setShowUserType(false);
+                      }}
+                      className="flex cursor-pointer items-center gap-2 px-3 sm:px-4 py-2 bg-white/15 backdrop-blur-md border border-white/25 rounded-lg text-white text-xs sm:text-sm drop-shadow hover:bg-white/25 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      type="button"
+                    >
+                      Test Group
+                    </button>
 
-                  <button
-                    onClick={() => changeLanguage("catalan")}
-                    className={`text-white cursor-pointer drop-shadow hover:opacity-80 transition-opacity underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent rounded px-2 py-1 text-xs sm:text-sm ${
-                      language === "catalan"
-                        ? "opacity-100 font-bold"
-                        : "opacity-70"
-                    }`}
-                    aria-label="Català"
-                    aria-current={language === "catalan" ? "true" : "false"}
-                    type="button"
-                  >
-                    Catalan
-                  </button>
+                    {/* Sign Up */}
+                    <button
+                      onClick={() => setShowUserType(true)}
+                      className="flex cursor-pointer items-center gap-2 px-3 sm:px-4 py-2 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-white text-xs sm:text-sm drop-shadow hover:bg-white/30 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      type="button"
+                      aria-label={
+                        signUpText[language as keyof typeof signUpText]
+                      }
+                    >
+                      {signUpText[language as keyof typeof signUpText]}
+                    </button>
+
+                    {/* Login / Dashboard */}
+                    {!isLoggedIn ? (
+                      <button
+                        onClick={() => setShowLogin(true)}
+                        className="flex cursor-pointer items-center gap-2 px-3 sm:px-4 py-2 bg-white/15 backdrop-blur-md border border-white/25 rounded-lg text-white text-xs sm:text-sm drop-shadow hover:bg-white/25 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        type="button"
+                        aria-label={
+                          loginText[language as keyof typeof loginText]
+                        }
+                      >
+                        {loginText[language as keyof typeof loginText]}
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          if (getUserRole() == "artist")
+                            setShowArtistChoice(true);
+                          else setShowFanStreaming(true);
+                        }}
+                        className="flex cursor-pointer items-center gap-2 px-3 sm:px-4 py-2 bg-white/15 backdrop-blur-md border border-white/25 rounded-lg text-white text-xs sm:text-sm drop-shadow hover:bg-white/25 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        type="button"
+                        aria-label="Dashboard"
+                      >
+                        Dashboard
+                      </button>
+                    )}
+                  </div>
                 </div>
-              </nav>
 
-              {/* Controls */}
-              <div className="mt-3 flex flex-wrap items-center justify-center gap-2 sm:gap-3">
-                <button
-                  onClick={() => {
-                    setShowUserType(false);
-                    setShowQuestionnaire(false);
-                    setShowLogin(false);
-                    setShowArtistChoice(false);
-                    setShowFanStreaming(false);
-                    setShowArtistProfileSetup(false);
-                    setShowFanProfileSetup(false);
-                  }}
-                  className="
-                              flex cursor-pointer items-center gap-2
-                              px-3 sm:px-4 py-2
-                              bg-white/15 backdrop-blur-md
-                              border border-white/25
-                              rounded-lg
-                              text-white text-xs sm:text-sm
-                              drop-shadow
-                              hover:bg-white/25 transition-all
-                              focus:outline-none focus:ring-2 focus:ring-blue-500
-                            "
-                  aria-label="Home"
-                  type="button"
-                >
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+                {/* ✅ Bloc langues (extrême droite sur desktop, centré sur mobile) */}
+                <div className="w-full lg:w-auto lg:justify-self-end">
+                  <nav
+                    aria-label={
+                      language === "spanish"
+                        ? "Selección de idioma"
+                        : language === "english"
+                        ? "Language selection"
+                        : "Selecció d'idioma"
+                    }
+                    className="w-full"
                   >
-                    <path d="M3 9l9-7 9 7" />
-                    <path d="M9 22V12h6v10" />
-                  </svg>
-                  Home
-                </button>
-                <button
-                  onClick={() => {
-                    setShowQuestionnaire(true);
-                    setShowUserType(false);
-                  }}
-                  className="
-                    flex cursor-pointer items-center gap-2
-                    px-3 sm:px-4 py-2
-                    bg-white/15 backdrop-blur-md
-                    border border-white/25
-                    rounded-lg
-                    text-white text-xs sm:text-sm
-                    drop-shadow
-                    hover:bg-white/25 transition-all
-                    focus:outline-none focus:ring-2 focus:ring-blue-500
-                  "
-                  type="button"
-                >
-                  Test Group
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M5 12h14M12 5l7 7-7 7" />
-                  </svg>
-                </button>
+                    <div className="flex flex-wrap items-center justify-center lg:justify-end gap-3 text-xs sm:text-sm">
+                      <button
+                        onClick={() => changeLanguage("spanish")}
+                        className={`text-white underline ${
+                          language === "spanish"
+                            ? "font-bold opacity-100"
+                            : "opacity-70"
+                        }`}
+                        type="button"
+                        aria-label="Español"
+                        aria-current={language === "spanish" ? "true" : "false"}
+                      >
+                        Spanish
+                      </button>
 
-                <button
-                  onClick={() => setShowUserType(true)}
-                  className="
-                    flex cursor-pointer items-center gap-2
-                    px-3 sm:px-4 py-2
-                    bg-white/20 backdrop-blur-md
-                    border border-white/30
-                    rounded-lg
-                    text-white text-xs sm:text-sm
-                    drop-shadow
-                    hover:bg-white/30 transition-all
-                    focus:outline-none focus:ring-2 focus:ring-blue-500
-                  "
-                  aria-label={signUpText[language as keyof typeof signUpText]}
-                  type="button"
-                >
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                    <circle cx="9" cy="7" r="4" />
-                    <line x1="19" y1="8" x2="19" y2="14" />
-                    <line x1="22" y1="11" x2="16" y2="11" />
-                  </svg>
-                  {signUpText[language as keyof typeof signUpText]}
-                </button>
+                      <button
+                        onClick={() => changeLanguage("english")}
+                        className={`text-white underline ${
+                          language === "english"
+                            ? "font-bold opacity-100"
+                            : "opacity-70"
+                        }`}
+                        type="button"
+                        aria-label="English"
+                        aria-current={language === "english" ? "true" : "false"}
+                      >
+                        English
+                      </button>
 
-                {!isLoggedIn ? (
-                  <button
-                    onClick={() => setShowLogin(true)}
-                    className="
-                      flex cursor-pointer items-center gap-2
-                      px-3 sm:px-4 py-2
-                      bg-white/15 backdrop-blur-md
-                      border border-white/25
-                      rounded-lg
-                      text-white text-xs sm:text-sm
-                      drop-shadow
-                      hover:bg-white/25 transition-all
-                      focus:outline-none focus:ring-2 focus:ring-blue-500
-                    "
-                    aria-label={loginText[language as keyof typeof loginText]}
-                    type="button"
-                  >
-                    <svg
-                      width="18"
-                      height="18"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
-                      <polyline points="10 17 15 12 10 7" />
-                      <line x1="15" y1="12" x2="3" y2="12" />
-                    </svg>
-                    {loginText[language as keyof typeof loginText]}
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => {
-                      if (getUserRole() == "artist") setShowArtistChoice(true);
-                      else setShowFanStreaming(true);
-                    }}
-                    className="
-                      flex cursor-pointer items-center gap-2
-                      px-3 sm:px-4 py-2
-                      bg-white/15 backdrop-blur-md
-                      border border-white/25
-                      rounded-lg
-                      text-white text-xs sm:text-sm
-                      drop-shadow
-                      hover:bg-white/25 transition-all
-                      focus:outline-none focus:ring-2 focus:ring-blue-500
-                    "
-                    aria-label="Dashboard"
-                    type="button"
-                  >
-                    <svg
-                      width="18"
-                      height="18"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M3 13h8V3H3v10zM13 21h8V11h-8v10zM13 3h8v6h-8V3zM3 17h8v4H3v-4z" />
-                    </svg>
-                    Dashboard
-                  </button>
-                )}
+                      <button
+                        onClick={() => changeLanguage("catalan")}
+                        className={`text-white underline ${
+                          language === "catalan"
+                            ? "font-bold opacity-100"
+                            : "opacity-70"
+                        }`}
+                        type="button"
+                        aria-label="Català"
+                        aria-current={language === "catalan" ? "true" : "false"}
+                      >
+                        Catalan
+                      </button>
+                    </div>
+                  </nav>
+                </div>
               </div>
             </div>
           </div>
