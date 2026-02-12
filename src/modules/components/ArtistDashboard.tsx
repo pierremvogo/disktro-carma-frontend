@@ -2652,20 +2652,23 @@ export function ArtistDashboard({
   return (
     <div
       className="
-    relative w-full
-    min-h-[100svh] md:min-h-screen
-    overflow-hidden
-    bg-gradient-to-br from-slate-900 via-purple-900 to-black
-  "
+      relative w-full h-[100dvh]
+      overflow-hidden
+      bg-gradient-to-br from-slate-900 via-purple-900 to-black
+      text-white
+    "
     >
       <div
         className="
-      min-h-[100svh]
-      overflow-y-auto overscroll-contain
-      px-4 sm:px-6 md:px-8
-      pt-[calc(env(safe-area-inset-top)+1.25rem)]
-      pb-[calc(env(safe-area-inset-bottom)+1.25rem)]
-    "
+    relative z-10
+    h-[100dvh]
+    overflow-y-auto overscroll-contain
+    touch-pan-y
+    px-4 sm:px-6 md:px-8
+    pt-[calc(env(safe-area-inset-top)+1.25rem)]
+    pb-[calc(env(safe-area-inset-bottom)+1.25rem)]
+  "
+        style={{ WebkitOverflowScrolling: "touch" }}
       >
         {isArtist && (
           <button
