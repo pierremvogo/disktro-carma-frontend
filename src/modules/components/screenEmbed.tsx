@@ -12,6 +12,7 @@ import { ArtistChoice } from "./ArtistChoice";
 import { AccessibilityButton } from "./accessibilityButton/AccessibilityButton";
 import { UserModuleObject as UserModule } from "../module";
 import { getUserRole } from "@/@disktro/utils";
+import { useRouter } from "next/navigation";
 
 type Language = "english" | "spanish" | "catalan";
 const LANGUAGE_STORAGE_KEY = "disktro_language";
@@ -310,23 +311,25 @@ export function ScreenEmbed() {
   // 🧩 ARTIST CHOICE FULL SCREEN
   if (showArtistChoice) {
     return (
-      <FullScreenScroll>
-        <ArtistChoice
-          onGoToArtistDashboard={() => {
-            setShowArtistChoice(false);
-            setShowArtistDashboard(true);
-          }}
-          onGoToFanStreaming={() => {
-            setShowArtistChoice(false);
-            setShowFanStreaming(true);
-          }}
-          language={language}
-          onLogout={() => {
-            setShowArtistChoice(false);
-            setIsArtist(false);
-          }}
-        />
-      </FullScreenScroll>
+      <ArtistChoice
+        onGoToArtistDashboard={() => {
+          setShowArtistChoice(false);
+          setShowArtistDashboard(true);
+        }}
+        onGoToFanStreaming={() => {
+          setShowArtistChoice(false);
+          setShowFanStreaming(true);
+        }}
+        onBack={() => {
+          setShowArtistChoice(false);
+          setIsArtist(false);
+        }}
+        language={language}
+        onLogout={() => {
+          setShowArtistChoice(false);
+          setIsArtist(false);
+        }}
+      />
     );
   }
 

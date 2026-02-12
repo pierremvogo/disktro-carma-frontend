@@ -2,6 +2,7 @@
 import { useRouter } from "next/navigation";
 import React from "react";
 import { AccessibilityButton } from "./accessibilityButton/AccessibilityButton";
+import { ArtistModuleObject as ModuleObject } from "../artist/module";
 
 // Icon components
 const Music = ({ size = 24, className = "" }) => (
@@ -114,6 +115,7 @@ interface ArtistChoiceProps {
   onGoToFanStreaming?: () => void;
   language: string;
   onLogout?: () => void;
+  onBack?: () => void;
 }
 
 export function ArtistChoice({
@@ -121,8 +123,17 @@ export function ArtistChoice({
   onGoToFanStreaming,
   language,
   onLogout,
+  onBack,
 }: ArtistChoiceProps) {
   const router = useRouter();
+
+  const handleLogout = () => {
+    localStorage.removeItem(ModuleObject.localState.ACCESS_TOKEN);
+    localStorage.removeItem(ModuleObject.localState.USER_ID);
+    localStorage.removeItem(ModuleObject.localState.USER_DATA);
+    localStorage.removeItem(ModuleObject.localState.USER_ROLE);
+    router.push("/home");
+  };
 
   const text = {
     spanish: {
@@ -163,31 +174,31 @@ export function ArtistChoice({
   const content = text[language as keyof typeof text] || text.english;
 
   return (
-    <div
-      className="
-        relative w-full
-        min-h-[100svh] md:min-h-screen
-        overflow-hidden
-        bg-cover bg-center
-        text-white
-      "
-      style={{
-        backgroundImage:
-          'url("/image/4ac3eed398bb68113a14d0fa5efe7a6def6f7651.png")',
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}
-    >
-      {/* ✅ Bouton d’accessibilité : monté au plus haut niveau */}
-      <AccessibilityButton language={language} />
+    <div className="relative w-full h-[100dvh] overflow-hidden text-white">
+      {/* ================= FIXED BACKGROUND ================= */}
+      <div
+        className="fixed inset-0 -z-10 bg-cover bg-center"
+        style={{
+          backgroundImage:
+            'url("/image/4ac3eed398bb68113a14d0fa5efe7a6def6f7651.png")',
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          transform: "scale(1.03)",
+        }}
+      />
 
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-black/60" />
+      {/* ================= FIXED OVERLAY ================= */}
+      <div className="fixed inset-0 -z-10 bg-black/60" />
+
+      {/* ✅ Bouton d’accessibilité : monté au plus haut niveau */}
+      <div className="relative z-30">
+        <AccessibilityButton language={language} />
+      </div>
 
       {/* ✅ TOP BAR (safe-area + fixed, ne scrolle pas) */}
       <div
         className="
-          fixed left-0 right-0 z-20
+          fixed left-0 right-0 z-40
           px-3 sm:px-4
           flex items-center justify-between
           top-[calc(env(safe-area-inset-top)+0.5rem)]
@@ -195,7 +206,7 @@ export function ArtistChoice({
       >
         {/* Back */}
         <button
-          onClick={() => router.push("/home")}
+          onClick={() => onBack}
           type="button"
           className="
             flex items-center gap-2
@@ -224,7 +235,7 @@ export function ArtistChoice({
 
         {/* Logout */}
         <button
-          onClick={onLogout}
+          onClick={() => handleLogout()}
           className="
             flex items-center gap-2
             px-4 py-2
@@ -243,17 +254,19 @@ export function ArtistChoice({
         </button>
       </div>
 
-      {/* ✅ Scroll container (stable iOS) */}
+      {/* ✅ SCROLL CONTAINER (SEUL CE CONTAINER SCROLLE) */}
       <div
         className="
           relative z-10
-          min-h-[100svh]
+          h-[100dvh]
           overflow-y-auto overscroll-contain
+          touch-pan-y
           px-4 sm:px-6
           pt-[calc(env(safe-area-inset-top)+5rem)]
           pb-[calc(env(safe-area-inset-bottom)+1.25rem)]
           flex justify-center
         "
+        style={{ WebkitOverflowScrolling: "touch" }}
       >
         <div className="w-full max-w-5xl flex flex-col gap-6 sm:gap-8">
           {/* Header */}
