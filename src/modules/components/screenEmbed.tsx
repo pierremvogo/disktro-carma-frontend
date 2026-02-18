@@ -65,7 +65,7 @@ export function ScreenEmbed() {
         "We have made a strong commitment to inclusion by developing features such as Sign Language support, Braille compatibility, Deuteranopia-friendly design, and many more accessibility tools — because music is better when everybody is included.",
       ],
       tags: ["#artists4artists", "#musicwitheverybody"],
-      sign: ["Love,", "Kabife Pabbil"],
+      sign: ["Love,", "Team Bbok"],
       psLabel: "PS:",
       psText:
         "You can check out my YouTube channel if you’d like to know more about me as an artist:",
@@ -81,7 +81,7 @@ export function ScreenEmbed() {
         "Hemos asumido un fuerte compromiso con la inclusión desarrollando funciones como soporte de Lengua de Señas, compatibilidad con Braille, diseño adaptado para deuteranopía y muchas más herramientas de accesibilidad — porque la música es mejor cuando todos están incluidos.",
       ],
       tags: ["#artists4artists", "#musicwitheverybody"],
-      sign: ["Con cariño,", "Kabife Pabbil"],
+      sign: ["Con cariño,", "Team Bbok"],
       psLabel: "PD:",
       psText:
         "Puedes visitar mi canal de YouTube si quieres saber más sobre mí como artista:",
@@ -97,7 +97,7 @@ export function ScreenEmbed() {
         "Hem fet un compromís ferm amb la inclusió desenvolupant funcionalitats com suport per a Llengua de Signes, compatibilitat amb Braille, disseny adaptat per a la deuteranòpia i moltes més eines d’accessibilitat — perquè la música és millor quan tothom hi és inclòs.",
       ],
       tags: ["#artists4artists", "#musicwitheverybody"],
-      sign: ["Amb estima,", "Kabife Pabbil"],
+      sign: ["Amb estima,", "Team Bbok"],
       psLabel: "PS:",
       psText:
         "Pots visitar el meu canal de YouTube si vols saber més de mi com a artista:",
