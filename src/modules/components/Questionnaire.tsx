@@ -58,7 +58,7 @@ export function Questionnaire({
       },
       title: "Join Our Testing Group",
       subtitle: "Help us build the future of music for everybody",
-      name: "Name",
+      name: "Full Name",
       ageRange: "Age Range",
       language: "Language",
       email: "Email",
