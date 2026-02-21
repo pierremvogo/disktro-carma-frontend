@@ -479,9 +479,31 @@ export function ScreenEmbed() {
               <div
                 className="
           flex flex-col items-center justify-center gap-3
-          md:grid md:grid-cols-[1fr_auto] md:items-center md:gap-0
+          md:grid md:grid-cols-[auto_1fr_auto] md:items-center
         "
               >
+                {/* ✅ Logo (gauche sur desktop, centré sur mobile) */}
+                <div className="w-full md:w-auto md:justify-self-start flex justify-center md:justify-start">
+                  <button
+                    onClick={() => {
+                      setShowUserType(false);
+                      setShowQuestionnaire(false);
+                      setShowLogin(false);
+                      setShowArtistChoice(false);
+                      setShowFanStreaming(false);
+                      setShowArtistProfileSetup(false);
+                      setShowFanProfileSetup(false);
+                    }}
+                    className="cursor-pointer"
+                    aria-label="Home"
+                  >
+                    <img
+                      src="/logo_vector.svg"
+                      alt="Logo"
+                      className="h-8 sm:h-9 md:h-10 w-auto"
+                    />
+                  </button>
+                </div>
                 {/* ✅ Bloc boutons (centré, même sur desktop) */}
                 <div className="w-full md:w-auto md:justify-self-center">
                   <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
