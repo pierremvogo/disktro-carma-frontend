@@ -12,6 +12,7 @@ import { ArtistChoice } from "./ArtistChoice";
 import { AccessibilityButton } from "./accessibilityButton/AccessibilityButton";
 import { UserModuleObject as UserModule } from "../module";
 import { getUserRole } from "@/@disktro/utils";
+import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 
 type Language = "english" | "spanish" | "catalan";
@@ -38,6 +39,8 @@ export function ScreenEmbed() {
   const [isDragging, setIsDragging] = useState(false);
   // const dragData = useRef({ startX: 0, scrollLeft: 0 });
 
+  const router = useRouter();
+
   const dragData = useRef({
     startX: 0,
     startY: 0,
@@ -53,6 +56,23 @@ export function ScreenEmbed() {
   const USER_ID_KEY = UserModule.localState.USER_ID;
   const USER_DATA_KEY = UserModule.localState.USER_DATA;
   const USER_ROLE_KEY = UserModule.localState.USER_ROLE;
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const view = searchParams.get("view");
+
+    if (view === "login") {
+      setShowLogin(true);
+      setShowUserType(false);
+      setShowQuestionnaire(false);
+    }
+
+    if (view === "signup") {
+      setShowUserType(true);
+      setShowLogin(false);
+      setShowQuestionnaire(false);
+    }
+  }, [searchParams]);
 
   const bbokMessage = {
     english: {
@@ -342,6 +362,7 @@ export function ScreenEmbed() {
             setShowLogin(false);
             setShowUserType(false);
             setShowQuestionnaire(false);
+            setShowUserType(true);
           }}
           onLoginAsFan={() => {
             setShowLogin(false);
@@ -552,7 +573,7 @@ export function ScreenEmbed() {
                     {/* Login / Dashboard */}
                     {!isLoggedIn ? (
                       <button
-                        onClick={() => setShowLogin(true)}
+                        onClick={() => router.replace("/home/?view=login")}
                         className="flex cursor-pointer items-center gap-2 px-3 sm:px-4 py-2 bg-white/15 backdrop-blur-md border border-white/25 rounded-lg text-white text-xs sm:text-sm drop-shadow hover:bg-white/25 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
                         type="button"
                         aria-label={
@@ -593,7 +614,7 @@ export function ScreenEmbed() {
                     <div className="flex flex-wrap items-center justify-center lg:justify-end gap-3 text-xs sm:text-sm">
                       <button
                         onClick={() => changeLanguage("spanish")}
-                        className={`text-white underline ${
+                        className={`cursor-pointer text-white underline ${
                           language === "spanish"
                             ? "font-bold opacity-100"
                             : "opacity-70"
@@ -607,7 +628,7 @@ export function ScreenEmbed() {
 
                       <button
                         onClick={() => changeLanguage("english")}
-                        className={`text-white underline ${
+                        className={`cursor-pointer text-white underline ${
                           language === "english"
                             ? "font-bold opacity-100"
                             : "opacity-70"
@@ -621,7 +642,7 @@ export function ScreenEmbed() {
 
                       <button
                         onClick={() => changeLanguage("catalan")}
-                        className={`text-white underline ${
+                        className={`cursor-pointer text-white underline ${
                           language === "catalan"
                             ? "font-bold opacity-100"
                             : "opacity-70"
