@@ -61,6 +61,7 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
       setShowLogin(false);
       setShowUserType(false);
       setShowQuestionnaire(false);
+      setShowArtistChoice(false);
     }
 
     if (initialView === "question") {
@@ -86,6 +87,10 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
       setShowLogin(false);
       setShowQuestionnaire(false);
       setShowArtistChoice(false);
+      setShowArtistDashboard(false);
+      setShowArtistProfileSetup(false);
+      setShowFanProfileSetup(false);
+      setShowFanStreaming(false);
     }
   }, [initialView]);
 

@@ -2628,7 +2628,7 @@ export function ArtistDashboard({
     localStorage.removeItem(ModuleObject.localState.USER_ID);
     localStorage.removeItem(ModuleObject.localState.USER_DATA);
     localStorage.removeItem(ModuleObject.localState.USER_ROLE);
-    router.push("/home");
+    router.replace("/home?view=logout");
   };
   useEffect(() => {
     if (typeof window === "undefined") return;

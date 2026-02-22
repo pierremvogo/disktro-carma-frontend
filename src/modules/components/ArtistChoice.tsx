@@ -198,6 +198,7 @@ export function ArtistChoice({
       {/* ✅ TOP BAR (safe-area + fixed, ne scrolle pas) */}
       <div
         className="
+          m-2
           fixed left-0 right-0 z-40
           px-3 sm:px-4
           flex items-center justify-between
@@ -206,7 +207,7 @@ export function ArtistChoice({
       >
         {/* Back */}
         <button
-          onClick={() => onBack}
+          onClick={() => router.replace("/home/?view=home")}
           type="button"
           className="
             cursor-pointer
