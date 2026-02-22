@@ -1192,7 +1192,7 @@ export function FanStreaming({ language }: FanStreamingProps) {
     localStorage.removeItem(ModuleObject.localState.USER_DATA);
     localStorage.removeItem(ModuleObject.localState.USER_ROLE);
     localStorage.removeItem(ModuleObject.localState.FAVORITES_KEY);
-    router.push("/home");
+    router.replace("/home?view=logout");
   };
 
   const [newReleases, setNewReleases] = useState<any[]>([]);

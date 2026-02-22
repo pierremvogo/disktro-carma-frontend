@@ -279,7 +279,7 @@ export function Login({
 
       {/* Back button (safe on notch, doesn't scroll) */}
       <button
-        onClick={onBack}
+        onClick={() => router.replace("/home/?view=home")}
         type="button"
         className="
           cursor-pointer
