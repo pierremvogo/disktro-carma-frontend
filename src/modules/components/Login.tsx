@@ -282,6 +282,7 @@ export function Login({
         onClick={onBack}
         type="button"
         className="
+          cursor-pointer
           fixed z-50
           left-4 sm:left-6
           top-[calc(env(safe-area-inset-top)+1rem)]

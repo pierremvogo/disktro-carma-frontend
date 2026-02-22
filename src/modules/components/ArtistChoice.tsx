@@ -132,7 +132,7 @@ export function ArtistChoice({
     localStorage.removeItem(ModuleObject.localState.USER_ID);
     localStorage.removeItem(ModuleObject.localState.USER_DATA);
     localStorage.removeItem(ModuleObject.localState.USER_ROLE);
-    router.push("/home");
+    router.replace("/home?view=logout");
   };
 
   const text = {
@@ -209,6 +209,7 @@ export function ArtistChoice({
           onClick={() => onBack}
           type="button"
           className="
+            cursor-pointer
             flex items-center gap-2
             text-white drop-shadow-2xl font-semibold
             hover:opacity-80 transition
@@ -237,6 +238,7 @@ export function ArtistChoice({
         <button
           onClick={() => handleLogout()}
           className="
+            cursor-pointer
             flex items-center gap-2
             px-4 py-2
             bg-red-500/40 backdrop-blur-md

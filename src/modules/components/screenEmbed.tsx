@@ -57,6 +57,18 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
   const USER_ROLE_KEY = UserModule.localState.USER_ROLE;
 
   useEffect(() => {
+    if (initialView === "home") {
+      setShowLogin(false);
+      setShowUserType(false);
+      setShowQuestionnaire(false);
+    }
+
+    if (initialView === "question") {
+      setShowLogin(false);
+      setShowUserType(false);
+      setShowQuestionnaire(true);
+    }
+
     if (initialView === "login") {
       setShowLogin(true);
       setShowUserType(false);
@@ -67,6 +79,13 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
       setShowUserType(true);
       setShowLogin(false);
       setShowQuestionnaire(false);
+    }
+
+    if (initialView === "logout") {
+      setShowUserType(false);
+      setShowLogin(false);
+      setShowQuestionnaire(false);
+      setShowArtistChoice(false);
     }
   }, [initialView]);
 
@@ -526,15 +545,7 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
                   <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
                     {/* Home */}
                     <button
-                      onClick={() => {
-                        setShowUserType(false);
-                        setShowQuestionnaire(false);
-                        setShowLogin(false);
-                        setShowArtistChoice(false);
-                        setShowFanStreaming(false);
-                        setShowArtistProfileSetup(false);
-                        setShowFanProfileSetup(false);
-                      }}
+                      onClick={() => router.replace("/home/?view=home")}
                       className="flex cursor-pointer items-center gap-2 px-3 sm:px-4 py-2 bg-white/15 backdrop-blur-md border border-white/25 rounded-lg text-white text-xs sm:text-sm drop-shadow hover:bg-white/25 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
                       type="button"
                       aria-label="Home"
@@ -544,10 +555,7 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
 
                     {/* Test Group */}
                     <button
-                      onClick={() => {
-                        setShowQuestionnaire(true);
-                        setShowUserType(false);
-                      }}
+                      onClick={() => router.replace("/home/?view=question")}
                       className="flex cursor-pointer items-center gap-2 px-3 sm:px-4 py-2 bg-white/15 backdrop-blur-md border border-white/25 rounded-lg text-white text-xs sm:text-sm drop-shadow hover:bg-white/25 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
                       type="button"
                     >
@@ -556,7 +564,7 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
 
                     {/* Sign Up */}
                     <button
-                      onClick={() => setShowUserType(true)}
+                      onClick={() => router.replace("/home/?view=signup")}
                       className="flex cursor-pointer items-center gap-2 px-3 sm:px-4 py-2 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-white text-xs sm:text-sm drop-shadow hover:bg-white/30 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
                       type="button"
                       aria-label={
