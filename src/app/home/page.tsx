@@ -1,8 +1,10 @@
 import { ScreenEmbed } from "@/modules/components/screenEmbed";
-import React from "react";
 
-const page = () => {
-  return <ScreenEmbed />;
-};
-
-export default page;
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ view?: string }>;
+}) {
+  const { view } = await searchParams;
+  return <ScreenEmbed initialView={view} />;
+}
