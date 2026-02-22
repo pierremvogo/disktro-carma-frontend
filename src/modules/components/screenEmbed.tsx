@@ -12,13 +12,12 @@ import { ArtistChoice } from "./ArtistChoice";
 import { AccessibilityButton } from "./accessibilityButton/AccessibilityButton";
 import { UserModuleObject as UserModule } from "../module";
 import { getUserRole } from "@/@disktro/utils";
-import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 
 type Language = "english" | "spanish" | "catalan";
 const LANGUAGE_STORAGE_KEY = "disktro_language";
 
-export function ScreenEmbed() {
+export function ScreenEmbed({ initialView }: { initialView?: string }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [language, setLanguage] = useState<Language>("english");
   const [showQuestionnaire, setShowQuestionnaire] = useState(false);
@@ -56,23 +55,20 @@ export function ScreenEmbed() {
   const USER_ID_KEY = UserModule.localState.USER_ID;
   const USER_DATA_KEY = UserModule.localState.USER_DATA;
   const USER_ROLE_KEY = UserModule.localState.USER_ROLE;
-  const searchParams = useSearchParams();
 
   useEffect(() => {
-    const view = searchParams.get("view");
-
-    if (view === "login") {
+    if (initialView === "login") {
       setShowLogin(true);
       setShowUserType(false);
       setShowQuestionnaire(false);
     }
 
-    if (view === "signup") {
+    if (initialView === "signup") {
       setShowUserType(true);
       setShowLogin(false);
       setShowQuestionnaire(false);
     }
-  }, [searchParams]);
+  }, [initialView]);
 
   const bbokMessage = {
     english: {
