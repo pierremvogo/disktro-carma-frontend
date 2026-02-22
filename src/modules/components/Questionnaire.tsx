@@ -316,12 +316,12 @@ export function Questionnaire({
                 </div>
               )}
 
-              <div className="mt-4 flex flex-col sm:flex-row gap-3">
+              <div className="mt-4 flex flex-col sm:flex-row gap-3 sm:justify-end">
                 {!success ? (
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className={`w-full sm:w-auto px-6 cursor-pointer py-2 bg-gradient-to-r from-purple-500/50 to-pink-500/50 backdrop-blur-md border-2 border-white/50 rounded-xl text-white drop-shadow-lg hover:from-purple-500/60 hover:to-pink-500/60 transition-all flex items-center justify-center gap-2 shadow-xl whitespace-nowrap ${
+                    className={`disabled:cursor-not-allowed w-full sm:w-auto px-6 cursor-pointer py-2 bg-gradient-to-r from-purple-500/50 to-pink-500/50 backdrop-blur-md border-2 border-white/50 rounded-xl text-white drop-shadow-lg hover:from-purple-500/60 hover:to-pink-500/60 transition-all flex items-center justify-center gap-2 shadow-xl whitespace-nowrap ${
                       isSubmitting ? "opacity-70 cursor-not-allowed" : ""
                     }`}
                   >

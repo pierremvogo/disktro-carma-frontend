@@ -1,4 +1,5 @@
 import React from "react";
+import { useRouter } from "next/navigation";
 
 interface UserTypeProps {
   onBack: () => void;
@@ -48,6 +49,7 @@ export function UserType({
         "Tornar a la pàgina de benvinguda per gaudir de les nostres actuacions!",
     },
   };
+  const router = useRouter();
 
   const text = content[language as keyof typeof content];
 
@@ -150,7 +152,7 @@ export function UserType({
         <div className="mt-8">
           <button
             type="button"
-            onClick={onGoToQuestionnaire}
+            onClick={() => router.replace("/home/?view=question")}
             className="cursor-pointer text-sm text-white/90 drop-shadow hover:opacity-70 transition-opacity"
           >
             {text.questionnaireLink}
@@ -160,7 +162,7 @@ export function UserType({
         <div className="mt-4">
           <button
             type="button"
-            onClick={onGoToWelcome}
+            onClick={() => router.replace("/home/?view=home")}
             className="cursor-pointer text-sm text-white/90 drop-shadow hover:opacity-70 transition-opacity"
           >
             {text.welcomeLink}
