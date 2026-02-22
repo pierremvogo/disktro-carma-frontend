@@ -110,6 +110,7 @@ export function UserType({
             onClick={() => handleSelection("artist")}
             type="button"
             className="
+              cursor-pointer
               w-full
               px-6 sm:px-8
               py-8 sm:py-10 md:py-12
@@ -129,6 +130,7 @@ export function UserType({
             onClick={() => handleSelection("fan")}
             type="button"
             className="
+              cursor-pointer
               w-full
               px-6 sm:px-8
               py-8 sm:py-10 md:py-12
@@ -149,7 +151,7 @@ export function UserType({
           <button
             type="button"
             onClick={onGoToQuestionnaire}
-            className="text-sm text-white/90 drop-shadow hover:opacity-70 transition-opacity"
+            className="cursor-pointer text-sm text-white/90 drop-shadow hover:opacity-70 transition-opacity"
           >
             {text.questionnaireLink}
           </button>
@@ -159,7 +161,7 @@ export function UserType({
           <button
             type="button"
             onClick={onGoToWelcome}
-            className="text-sm text-white/90 drop-shadow hover:opacity-70 transition-opacity"
+            className="cursor-pointer text-sm text-white/90 drop-shadow hover:opacity-70 transition-opacity"
           >
             {text.welcomeLink}
           </button>

@@ -6,6 +6,8 @@ import CustomAlert from "@/@disktro/CustomAlert";
 import CustomSuccess from "@/@disktro/CustomSuccess";
 import { UserModuleObject as ModuleObject } from "../module";
 
+import { useRouter } from "next/navigation";
+
 // Icône Mail
 const Mail = ({ size = 24, className = "" }) => (
   <svg
@@ -38,6 +40,8 @@ export default function ForgotPasswordForm({
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [resendAvailable, setResendAvailable] = useState(false);
+
+  const router = useRouter();
 
   /* ================= TRANSLATIONS ================= */
   const content = {
@@ -265,6 +269,13 @@ export default function ForgotPasswordForm({
                   ) : (
                     text.submitButton
                   )}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => router.replace("/home/?view=login")}
+                  className="cursor-pointer w-full text-white/70 hover:text-white text-sm transition-all"
+                >
+                  Cancel
                 </button>
               </form>
             )}

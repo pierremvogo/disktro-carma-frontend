@@ -431,10 +431,14 @@ export function Login({
                   <button
                     type="button"
                     onClick={() => {
-                      if (onSignUp) onSignUp();
-                      else onBack();
+                      setEmail("");
+                      setPassword("");
+                      setErrorMessage("");
+                      setSuccessMessage("");
+                      setSuccess(false);
+                      router.replace("/home?view=signup");
                     }}
-                    className="text-white hover:underline"
+                    className="cursor-pointer text-white hover:underline"
                   >
                     {content.signUp}
                   </button>
