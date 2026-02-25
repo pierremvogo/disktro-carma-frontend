@@ -595,7 +595,7 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
                       <button
                         onClick={() => {
                           if (getUserRole() == "artist")
-                            setShowArtistChoice(true);
+                            router.push("/dashboard/artist/select");
                           else setShowFanStreaming(true);
                         }}
                         className="flex cursor-pointer items-center gap-2 px-3 sm:px-4 py-2 bg-white/15 backdrop-blur-md border border-white/25 rounded-lg text-white text-xs sm:text-sm drop-shadow hover:bg-white/25 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
