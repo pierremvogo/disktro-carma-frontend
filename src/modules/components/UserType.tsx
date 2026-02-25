@@ -72,7 +72,7 @@ export function UserType({
     >
       {/* Back button (safe on notch + always visible) */}
       <button
-        onClick={onBack}
+        onClick={() => router.replace("/home/?view=home")}
         type="button"
         className="
           fixed z-50
