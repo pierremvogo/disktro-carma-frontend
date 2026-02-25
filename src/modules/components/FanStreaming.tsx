@@ -332,6 +332,205 @@ export function FanStreaming({ language }: FanStreamingProps) {
   const [selectedArtist, setSelectedArtist] = useState<any | null>(null);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
+  const [newReleases, setNewReleases] = useState<any[]>([]);
+  const [newReleasesLoading, setNewReleasesLoading] = useState(false);
+  const [newReleasesError, setNewReleasesError] = useState<string | null>(null);
+
+  // ====================== SEARCH HANDLER (COMPLET) ======================
+
+  // 1) Helpers
+  const normalizeText = (v: any) => {
+    return (
+      String(v ?? "")
+        .toLowerCase()
+        .trim()
+        // retire accents (é -> e, ñ -> n, etc.)
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+    );
+  };
+
+  const contains = (haystack: any, needle: string) => {
+    if (!needle) return true;
+    return normalizeText(haystack).includes(needle);
+  };
+
+  // 2) Debounced query (évite de filtrer à chaque touche)
+  const [debouncedQuery, setDebouncedQuery] = useState("");
+
+  useEffect(() => {
+    const t = window.setTimeout(() => {
+      setDebouncedQuery(normalizeText(searchQuery));
+    }, 250); // ajuste (200-400ms)
+    return () => window.clearTimeout(t);
+  }, [searchQuery]);
+
+  // 3) Handler input
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const clearSearch = () => setSearchQuery("");
+
+  // 4) (Optionnel) Raccourci Ctrl+K / Cmd+K pour focus la search
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      const isMac = navigator.platform.toLowerCase().includes("mac");
+      const metaOrCtrl = isMac ? e.metaKey : e.ctrlKey;
+
+      if (metaOrCtrl && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      }
+
+      if (
+        e.key === "Escape" &&
+        document.activeElement === searchInputRef.current
+      ) {
+        clearSearch();
+        searchInputRef.current?.blur();
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
+
+  // 5) Filtrage par onglet (useMemo = performant)
+  const filteredArtists = React.useMemo(() => {
+    if (!debouncedQuery) return artists;
+    return (artists ?? []).filter((a: any) => {
+      const genresAsString = Array.isArray(a?.genres)
+        ? a.genres.join(", ")
+        : a?.genres;
+      return (
+        contains(a?.name, debouncedQuery) ||
+        contains(genresAsString, debouncedQuery) ||
+        contains(a?.bio, debouncedQuery) ||
+        contains(a?.country, debouncedQuery)
+      );
+    });
+  }, [artists, debouncedQuery]);
+
+  const filteredFeatured = React.useMemo(() => {
+    if (!debouncedQuery) return featuredSongs;
+    return (featuredSongs ?? []).filter((t: any) => {
+      return (
+        contains(t?.title, debouncedQuery) ||
+        contains(t?.artist, debouncedQuery) ||
+        contains(t?.album, debouncedQuery) ||
+        contains(t?.collectionTitle, debouncedQuery)
+      );
+    });
+  }, [featuredSongs, debouncedQuery]);
+
+  const filteredNewReleases = React.useMemo(() => {
+    if (!debouncedQuery) return newReleases;
+    return (newReleases ?? []).filter((t: any) => {
+      return (
+        contains(t?.title, debouncedQuery) ||
+        contains(t?.artist, debouncedQuery) ||
+        contains(t?.album, debouncedQuery) ||
+        contains(t?.createdAt, debouncedQuery)
+      );
+    });
+  }, [newReleases, debouncedQuery]);
+
+  const filteredUserPlaylists = React.useMemo(() => {
+    if (!debouncedQuery) return userPlaylists;
+
+    return (userPlaylists ?? []).filter((p: any) => {
+      const tracks = p?.tracks ?? [];
+      const tracksMatch = tracks.some((tr: any) => {
+        return (
+          contains(tr?.title, debouncedQuery) ||
+          contains(tr?.artistName, debouncedQuery) ||
+          contains(tr?.userId, debouncedQuery)
+        );
+      });
+
+      return contains(p?.nom ?? p?.name, debouncedQuery) || tracksMatch;
+    });
+  }, [userPlaylists, debouncedQuery]);
+
+  const filteredEditorPlaylists = React.useMemo(() => {
+    if (!debouncedQuery) return editorPlaylists;
+
+    return (editorPlaylists ?? []).filter((p: any) => {
+      const songs = p?.songs ?? [];
+      const songsMatch = songs.some((s: any) => {
+        return (
+          contains(s?.title, debouncedQuery) ||
+          contains(s?.artist, debouncedQuery)
+        );
+      });
+
+      return (
+        contains(p?.name, debouncedQuery) ||
+        contains(p?.description, debouncedQuery) ||
+        songsMatch
+      );
+    });
+  }, [editorPlaylists, debouncedQuery]);
+
+  const getFavoriteSongsList = () => {
+    return featuredSongs.filter((song) => favoriteSongs.includes(song.id));
+  };
+
+  const filteredFavoriteTracks = React.useMemo(() => {
+    // si tu utilises favoriteTracks (fetch backend) c’est mieux que mockSongs
+    const list =
+      (favoriteTracks?.length ? favoriteTracks : getFavoriteSongsList()) ?? [];
+
+    if (!debouncedQuery) return list;
+
+    return list.filter((t: any) => {
+      return (
+        contains(t?.title, debouncedQuery) ||
+        contains(t?.artistName ?? t?.artist, debouncedQuery) ||
+        contains(t?.album, debouncedQuery)
+      );
+    });
+  }, [favoriteTracks, favoriteTrackIds, debouncedQuery]);
+
+  // 6) (Optionnel) Si tu veux filtrer aussi dans le drawer (genre/mood results)
+  const filteredDrawerTracks = React.useMemo(() => {
+    if (!debouncedQuery) return savedTracks;
+    return (savedTracks ?? []).filter((t: any) => {
+      return (
+        contains(t?.title, debouncedQuery) ||
+        contains(t?.artistName ?? t?.userId ?? t?.artistId, debouncedQuery) ||
+        contains(t?.lyrics, debouncedQuery)
+      );
+    });
+  }, [savedTracks, debouncedQuery]);
+
+  // 7) (Optionnel) compteur résultats pour afficher "X results"
+  const searchStats = React.useMemo(() => {
+    if (!debouncedQuery) return null;
+
+    return {
+      artists: filteredArtists?.length ?? 0,
+      featured: filteredFeatured?.length ?? 0,
+      newReleases: filteredNewReleases?.length ?? 0,
+      playlists: filteredUserPlaylists?.length ?? 0,
+      editorPlaylists: filteredEditorPlaylists?.length ?? 0,
+      favorites: filteredFavoriteTracks?.length ?? 0,
+      drawer: filteredDrawerTracks?.length ?? 0,
+    };
+  }, [
+    debouncedQuery,
+    filteredArtists,
+    filteredFeatured,
+    filteredNewReleases,
+    filteredUserPlaylists,
+    filteredEditorPlaylists,
+    filteredFavoriteTracks,
+    filteredDrawerTracks,
+  ]);
+
   const openArtistProfile = (artist: any) => {
     setSelectedArtist(artist);
     setIsProfileOpen(true);
@@ -1194,10 +1393,6 @@ export function FanStreaming({ language }: FanStreamingProps) {
     localStorage.removeItem(ModuleObject.localState.FAVORITES_KEY);
     router.replace("/home?view=logout");
   };
-
-  const [newReleases, setNewReleases] = useState<any[]>([]);
-  const [newReleasesLoading, setNewReleasesLoading] = useState(false);
-  const [newReleasesError, setNewReleasesError] = useState<string | null>(null);
 
   // const formatDuration = (seconds?: number | null) => {
   //   if (seconds === null || seconds === undefined) return "";
@@ -2215,10 +2410,6 @@ Underneath the shining star`,
     },
   ];
 
-  const getFavoriteSongsList = () => {
-    return mockSongs.filter((song) => favoriteSongs.includes(song.id));
-  };
-
   // Mock data for exclusive gifts
   const exclusiveGifts = [
     {
@@ -2404,6 +2595,12 @@ pb-[env(safe-area-inset-bottom)]
             : "none",
       }}
     >
+      {searchStats && (
+        <div className="max-w-6xl mx-auto mb-3 text-white/70 text-xs">
+          “{searchQuery.trim()}” •{" "}
+          {Object.values(searchStats).reduce((a, b) => a + b, 0)} results
+        </div>
+      )}
       {/* SVG Filters for Color Blind Modes */}
       <svg className="hidden">
         <defs>
@@ -2671,14 +2868,17 @@ pb-[env(safe-area-inset-bottom)]
             {/* ✅ Desktop only (lg+) */}
             <div className="hidden md:block max-w-[420px] w-full flex-shrink-0">
               <div className="relative">
-                <Search
-                  size={16}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 pointer-events-none z-10"
-                />
+                {!searchQuery && (
+                  <Search
+                    size={16}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 pointer-events-none z-10"
+                  />
+                )}
                 <input
+                  ref={searchInputRef}
                   type="text"
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={handleSearchChange}
                   placeholder={text.search}
                   className="
             w-full py-2 pr-3 pl-9
@@ -2699,14 +2899,17 @@ pb-[env(safe-area-inset-bottom)]
           {/* ✅ Mobile + iPad only (< lg) */}
           <div className="md:hidden px-4 sm:px-6 pb-2">
             <div className="relative">
-              <Search
-                size={16}
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 pointer-events-none z-10"
-              />
+              {!searchQuery && (
+                <Search
+                  size={16}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 pointer-events-none z-10"
+                />
+              )}
               <input
+                ref={searchInputRef}
                 type="text"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={handleSearchChange}
                 placeholder={text.search}
                 className="
           w-full py-2 pr-3 pl-9
@@ -2871,7 +3074,7 @@ pb-[env(safe-area-inset-bottom)]
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {featuredSongs.slice(0, 3).map((song: any) => (
+                  {filteredFeatured.slice(0, 3).map((song: any) => (
                     <div
                       key={song.id}
                       className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 hover:bg-white/15 transition-all"
@@ -2941,7 +3144,7 @@ pb-[env(safe-area-inset-bottom)]
                     {newReleasesError}
                   </div>
                 ) : (
-                  (newReleases ?? []).map((song: any) => (
+                  (filteredNewReleases ?? []).map((song: any) => (
                     <div
                       key={song.id}
                       className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 hover:bg-white/15 transition-all"
@@ -3081,10 +3284,10 @@ pb-[env(safe-area-inset-bottom)]
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {(sortArtists
-                  ? [...artists].sort((a: any, b: any) =>
+                  ? [...filteredArtists].sort((a: any, b: any) =>
                       String(a.name ?? "").localeCompare(String(b.name ?? ""))
                     )
-                  : artists
+                  : filteredArtists
                 ).map((artist: any) => (
                   <div
                     key={artist.id}
@@ -3225,7 +3428,7 @@ pb-[env(safe-area-inset-bottom)]
 
                 {favoriteTrackIds.length > 0 ? (
                   <div className="space-y-2">
-                    {getFavoriteSongsList().map((song) => (
+                    {filteredFavoriteTracks.map((song) => (
                       <div
                         key={song.id}
                         className="bg-white/5 rounded-lg p-3 flex items-center gap-4 hover:bg-white/10 transition-all"
@@ -3350,10 +3553,10 @@ pb-[env(safe-area-inset-bottom)]
             {userPlaylists.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {(sortPlaylists
-                  ? [...userPlaylists].sort((a, b) =>
+                  ? [...filteredUserPlaylists].sort((a, b) =>
                       a.nom.localeCompare(b.nom)
                     )
-                  : userPlaylists
+                  : filteredUserPlaylists
                 ).map((playlist) => (
                   <div
                     key={playlist.id}
@@ -3519,7 +3722,7 @@ pb-[env(safe-area-inset-bottom)]
               !editorPlaylistsError &&
               (editorPlaylists?.length ?? 0) > 0 && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {editorPlaylists.map((playlist: any) => (
+                  {filteredEditorPlaylists.map((playlist: any) => (
                     <div
                       key={playlist.id}
                       className="bg-white/10 backdrop-blur-md rounded-2xl overflow-hidden border border-white/20 hover:bg-white/15 transition-all"
@@ -5193,7 +5396,7 @@ pb-[env(safe-area-inset-bottom)]
               {/* Tracks list */}
               {!loadingTracks &&
                 !tracksError &&
-                savedTracks.map((song: any) => {
+                filteredDrawerTracks.map((song: any) => {
                   const isCurrent = currentSong?.id === song.id;
                   const playing = isPlaying && isCurrent;
 
