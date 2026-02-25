@@ -1597,7 +1597,7 @@ export function FanStreaming({ language }: FanStreamingProps) {
       },
       noAlbumUploadedYet: "No album uploaded yet.",
 
-      title: "Bokk music with everybody",
+      title: "Bbok music with everybody",
       discover: "Discover",
       myMusic: "My Music",
       artists: "Artists",

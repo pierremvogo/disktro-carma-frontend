@@ -215,6 +215,7 @@ export function ArtistProfileSetup({
 
   const text = {
     spanish: {
+      countryPlaceholder: "Selecciona tu país...",
       title: "Configura Tu Perfil de Artista",
       subtitle: "Completa tu información para comenzar tu carrera musical",
       profileInfo: "Información de Artista",
@@ -265,6 +266,7 @@ export function ArtistProfileSetup({
       },
     },
     english: {
+      countryPlaceholder: "Select your country...",
       title: "Set Up Your Artist Profile",
       subtitle: "Complete your information to start your musical career",
       profileInfo: "Artist Information",
@@ -315,6 +317,7 @@ export function ArtistProfileSetup({
       },
     },
     catalan: {
+      countryPlaceholder: "Selecciona el teu país...",
       title: "Configura El Teu Perfil d'Artista",
       subtitle:
         "Completa la teva informació per començar la teva carrera musical",
@@ -384,12 +387,16 @@ export function ArtistProfileSetup({
     password && confirmPassword && password === confirmPassword;
   const passwordValid = password.length >= 8;
 
-  const [tags, setTags] = useState<{ id: string; name: string }[]>([]);
+  type Tag = { id: string; name: string };
+  type Option = { value: string; label: string };
+
+  const [tags, setTags] = useState<Tag[]>([]);
+
   const getTags = async () => {
     try {
       const res = await TagModuleObject.service.getTags();
-      setTags(res.data);
       await wait();
+      setTags(res.data);
     } catch (error) {
       console.log(error);
     }
@@ -398,6 +405,30 @@ export function ArtistProfileSetup({
   useEffect(() => {
     if (tags.length === 0) getTags();
   }, []);
+
+  // --- ADD: handlers for react-select ---
+  const tagOptions: Option[] = React.useMemo(
+    () => tags.map((t) => ({ value: t.id, label: t.name })),
+    [tags]
+  );
+
+  const selectedTagOptions: Option[] = React.useMemo(
+    () => tagOptions.filter((o) => selectedTagIds.includes(o.value)),
+    [tagOptions, selectedTagIds]
+  );
+
+  const handleTagsChange = (selected: readonly Option[] | null) => {
+    setSelectedTagIds((selected ?? []).map((s) => s.value));
+  };
+
+  // country select (react-select-country-list)
+  const selectedCountryOption = React.useMemo(() => {
+    return options.find((o: any) => o.value === country) || null;
+  }, [options, country]);
+
+  const handleCountryChange = (selected: any) => {
+    setCountry(selected?.value || "");
+  };
 
   const handleImageChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
@@ -666,6 +697,92 @@ export function ArtistProfileSetup({
                     />
                   </div>
 
+                  {/* TAGS (react-select multi) */}
+                  <div>
+                    <label className="block text-white drop-shadow mb-2">
+                      {/* si tu n’as pas de libellé dans text, tu peux mettre "Tags" */}
+                      {content.genre}
+                    </label>
+                    <Select<Option, true>
+                      isMulti
+                      options={tagOptions}
+                      value={selectedTagOptions}
+                      onChange={handleTagsChange}
+                      placeholder={content.genrePlaceholder}
+                      className="text-black"
+                      classNamePrefix="rs"
+                      menuPortalTarget={
+                        typeof window !== "undefined" ? document.body : null
+                      }
+                      menuPosition="fixed"
+                      styles={{
+                        menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                        menu: (base) => ({ ...base, zIndex: 9999 }),
+                        option: (base) => ({ ...base, color: "black" }),
+                        multiValueLabel: (base) => ({
+                          ...base,
+                          color: "black",
+                        }),
+                        singleValue: (base) => ({ ...base, color: "black" }),
+                        input: (base) => ({ ...base, color: "black" }),
+                      }}
+                    />
+                    {selectedTagIds.length > 0 && (
+                      <p className="text-white/70 text-sm mt-2">
+                        {selectedTagIds.length} selected
+                      </p>
+                    )}
+                  </div>
+
+                  {/* COUNTRY (react-select-country-list) */}
+                  <div>
+                    <label className="block text-white drop-shadow mb-2">
+                      Country
+                    </label>
+                    <Select
+                      options={options}
+                      value={selectedCountryOption}
+                      onChange={handleCountryChange}
+                      className="text-black"
+                      classNamePrefix="rs"
+                      placeholder={content.countryPlaceholder}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-white drop-shadow mb-2">
+                      {content.email}
+                    </label>
+
+                    <div className="relative">
+                      <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder={content.emailPlaceholder}
+                        className="w-full px-4 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-black placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/50"
+                      />
+
+                      <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                        {emailVerified ? (
+                          <span className="inline-flex items-center gap-1 text-green-300 text-sm">
+                            <CheckCircle size={18} />
+                            {content.emailVerified}
+                          </span>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={handleVerifyEmail}
+                            className="px-3 py-1.5 rounded-lg bg-white/20 hover:bg-white/30 border border-white/30 text-white text-sm"
+                            disabled={!email}
+                          >
+                            {content.sendVerification}
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
                   {/* BIO */}
                   <div>
                     <label className="block text-white drop-shadow mb-2">
@@ -688,7 +805,7 @@ export function ArtistProfileSetup({
                     {content.accountSecurity}
                   </h2>
 
-                  {/* PASSWORD */}
+                  {/* Password */}
                   <div>
                     <label className="block text-white drop-shadow mb-2">
                       {content.password}
@@ -701,33 +818,100 @@ export function ArtistProfileSetup({
                         placeholder={content.passwordPlaceholder}
                         className="w-full px-4 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-black placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/50"
                       />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-full text-black/90 hover:text-black cursor-pointer backdrop-blur-sm"
+                        aria-label={
+                          showPassword ? "Hide password" : "Show password"
+                        }
+                      >
+                        {showPassword ? (
+                          <EyeOff size={18} />
+                        ) : (
+                          <Eye size={18} />
+                        )}
+                      </button>
                     </div>
+
+                    {password && (
+                      <p
+                        className={`text-sm mt-2 ${
+                          passwordValid ? "text-green-400" : "text-yellow-400"
+                        }`}
+                      >
+                        {content.passwordRequirements}
+                      </p>
+                    )}
                   </div>
 
-                  {/* CONFIRM PASSWORD */}
+                  {/* Confirm Password */}
                   <div>
                     <label className="block text-white drop-shadow mb-2">
                       {content.confirmPassword}
                     </label>
-                    <input
-                      type="password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      placeholder={content.confirmPasswordPlaceholder}
-                      className="w-full px-4 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-black placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/50"
-                    />
+                    <div className="relative">
+                      <input
+                        type={showConfirmPassword ? "text" : "password"}
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        placeholder={content.confirmPasswordPlaceholder}
+                        className="w-full px-4 py-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-black placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/50"
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setShowConfirmPassword(!showConfirmPassword)
+                        }
+                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-full text-black/90 hover:text-black cursor-pointer backdrop-blur-sm"
+                        aria-label={
+                          showConfirmPassword
+                            ? "Hide confirm password"
+                            : "Show confirm password"
+                        }
+                      >
+                        {showConfirmPassword ? (
+                          <EyeOff size={20} />
+                        ) : (
+                          <Eye size={20} />
+                        )}
+                      </button>
+                    </div>
+
+                    {confirmPassword && (
+                      <p
+                        className={`text-sm mt-2 ${
+                          passwordsMatch ? "text-green-400" : "text-red-400"
+                        }`}
+                      >
+                        {passwordsMatch
+                          ? content.passwordMatch
+                          : content.passwordMismatch}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
 
-              {/* SUBMIT BUTTON */}
+              {/* Messages d'erreur / succès */}
+              {successMessage && <CustomSuccess message={successMessage} />}
+              {errorMessage && <CustomAlert message={errorMessage} />}
+
+              {/* Complete Button */}
               <div className="mt-8 flex justify-end">
                 <button
                   type="submit"
                   disabled={isLoading}
                   className="w-full sm:w-auto px-8 cursor-pointer py-4 bg-white/30 backdrop-blur-md border-2 border-white/40 rounded-xl text-white text-base sm:text-lg hover:bg-white/40 hover:border-white/60 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isLoading ? "Loading..." : content.completeSetup}
+                  {isLoading ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <span>{content.completeSetup}...</span>
+                    </div>
+                  ) : (
+                    content.completeSetup
+                  )}
                 </button>
               </div>
             </form>
