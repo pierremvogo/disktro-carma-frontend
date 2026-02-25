@@ -294,7 +294,7 @@ export function FanProfileSetup({
           generic: "An error occurred. Please try again.",
         },
         success: {
-          profileCreated: "Artist profile created successfully.",
+          profileCreated: "Fan profile created successfully.",
         },
       },
     },
