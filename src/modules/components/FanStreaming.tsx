@@ -3,7 +3,6 @@ import { FanProfile } from "./FanProfile";
 import { UserModuleObject as ModuleObject } from "../module";
 import { useSearchParams, useRouter } from "next/navigation";
 
-import { TagModuleObject } from "../tag/module";
 import { TrackModuleObject } from "../track/module";
 import { TrackStreamModuleObject } from "../trackSTreams/module";
 import { AlbumModuleObject } from "../album/module";
@@ -237,8 +236,6 @@ export function FanStreaming({ language }: FanStreamingProps) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerType, setDrawerType] = useState<DrawerType>("genre");
   const [drawerTitle, setDrawerTitle] = useState("");
-  const [showSignVideo, setShowSignVideo] = useState(false);
-  const [signVideoUrl, setSignVideoUrl] = useState<string | null>(null);
 
   const [subscribedArtists, setSubscribedArtists] = useState<string[]>([]);
   const [subscribingArtistId, setSubscribingArtistId] = useState<string | null>(
@@ -674,10 +671,8 @@ export function FanStreaming({ language }: FanStreamingProps) {
       setSubscribedArtists(
         mapped.filter((a: any) => a.isSubscribed).map((a: any) => String(a.id))
       );
-      console.log("ARTIST : ", mapped);
       setArtists(mapped);
     } catch (e) {
-      console.error("fetchArtists error:", e);
       setArtistsError(text.errors.generic);
       setArtists([]);
     } finally {
@@ -1038,7 +1033,6 @@ export function FanStreaming({ language }: FanStreamingProps) {
   const [selectedArtistForSubscription, setSelectedArtistForSubscription] =
     useState<any | null>(null);
 
-  const [paymentOption, setPaymentOption] = useState<"card" | "paypal">("card");
   const [cardNumber, setCardNumber] = useState("");
   const [cardHolder, setCardHolder] = useState("");
   const [cardExpiry, setCardExpiry] = useState("");
@@ -1364,19 +1358,6 @@ export function FanStreaming({ language }: FanStreamingProps) {
   const router = useRouter();
   const [isArtist, setIsArtist] = useState(false);
 
-  const stopPreviousAudio = (prevTrackId: string | null) => {
-    if (!prevTrackId) return;
-
-    const prevAudio = document.getElementById(
-      `fan-audio-${prevTrackId}`
-    ) as HTMLAudioElement | null;
-
-    if (prevAudio) {
-      prevAudio.pause();
-      prevAudio.currentTime = 0;
-    }
-  };
-
   // Show notification helper
   const showNotification = (message: string) => {
     if (visualNotifications) {
@@ -1393,14 +1374,6 @@ export function FanStreaming({ language }: FanStreamingProps) {
     localStorage.removeItem(ModuleObject.localState.FAVORITES_KEY);
     router.replace("/home?view=logout");
   };
-
-  // const formatDuration = (seconds?: number | null) => {
-  //   if (seconds === null || seconds === undefined) return "";
-  //   const s = Math.max(0, Math.floor(Number(seconds)));
-  //   const mm = String(Math.floor(s / 60));
-  //   const ss = String(s % 60).padStart(2, "0");
-  //   return `${mm}:${ss}`;
-  // };
 
   async function fetchNewReleases() {
     try {
@@ -1446,36 +1419,6 @@ export function FanStreaming({ language }: FanStreamingProps) {
   useEffect(() => {
     fetchNewReleases();
   }, []);
-
-  const handleNextFromQueue = async () => {
-    if (queue.length === 0) return;
-
-    const nextIndex = queueIndex + 1;
-    if (nextIndex >= queue.length) {
-      setIsPlaying(false);
-      setCurrentPlayingTrackId(null);
-      return;
-    }
-
-    setQueueIndex(nextIndex);
-    await handlePlaySong(queue[nextIndex], queue);
-  };
-
-  const handlePrevFromQueue = async () => {
-    if (queue.length === 0) return;
-
-    const audio = audioRef.current;
-    if (audio && audio.currentTime > 3) {
-      audio.currentTime = 0;
-      return;
-    }
-
-    const prevIndex = queueIndex - 1;
-    if (prevIndex < 0) return;
-
-    setQueueIndex(prevIndex);
-    await handlePlaySong(queue[prevIndex], queue);
-  };
 
   const handleNextFromQueue1 = () => {
     setQueueIndex((prevIndex) => {
@@ -2032,13 +1975,6 @@ export function FanStreaming({ language }: FanStreamingProps) {
   const [volume, setVolume] = useState(0.8); // 0..1
   const [isMuted, setIsMuted] = useState(false);
 
-  // const loadQueueAndPlay = (tracks: any[], startIndex = 0) => {
-  //   setQueue(tracks);
-  //   setQueueIndex(startIndex);
-  //   setCurrentSong(tracks[startIndex] ?? null);
-  //   setIsPlaying(true);
-  // };
-
   const formatTime = (sec = 0) => {
     const m = Math.floor(sec / 60);
     const s = Math.floor(sec % 60)
@@ -2194,221 +2130,11 @@ export function FanStreaming({ language }: FanStreamingProps) {
     }
   }
 
-  async function openGenreDrawer(genreName: string) {
-    setDrawerOpen(true);
-    setDrawerTitle(`Genre: ${genreName}`);
-    await handleSelectGenre(genreName);
-  }
-
   async function openMoodDrawer(moodName: string) {
     setDrawerOpen(true);
     setDrawerTitle(`Mood: ${moodName}`);
     await handleSelectMood(moodName);
   }
-
-  // Mock data for songs
-  const mockSongs = [
-    {
-      id: 1,
-      title: "Cosmic Journey",
-      artist: "Luna Ethereal",
-      album: "Starlight Dreams",
-      duration: "4:32",
-      streams: "1.2M",
-      cover:
-        "https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=300&q=80",
-      signLanguageVideo: "https://www.w3schools.com/html/mov_bbb.mp4", // Demo video
-      lyrics: `In the silence of the night
-Stars are shining bright
-Dreams are taking flight
-Everything feels right
-
-Waves are crashing down
-Lost but now I'm found
-Music is the sound
-That turns my world around
-
-Feel the rhythm in your soul
-Let the melody take control
-We are finally whole
-Together we will roll`,
-    },
-    {
-      id: 2,
-      title: "Urban Awakening",
-      artist: "Echo Mind",
-      album: "City Consciousness",
-      duration: "3:45",
-      streams: "890K",
-      cover:
-        "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300&q=80",
-      lyrics: `Walking through the city streets
-Feeling all the urban beats
-People rushing, never stopping
-Hearts are racing, never dropping`,
-    },
-    {
-      id: 3,
-      title: "Nature's Call",
-      artist: "Terra Sounds",
-      album: "Earth Rhythms",
-      duration: "5:18",
-      streams: "2.1M",
-      cover:
-        "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=300&q=80",
-      signLanguageVideo: "https://www.w3schools.com/html/movie.mp4", // Demo video
-      lyrics: `Listen to the whispers of the trees
-Dancing with the gentle breeze
-Mountains calling from afar
-Underneath the shining star`,
-    },
-    {
-      id: 4,
-      title: "Digital Dreams",
-      artist: "Cyber Soul",
-      album: "Future Waves",
-      duration: "4:05",
-      streams: "1.5M",
-      cover:
-        "https://images.unsplash.com/photo-1619983081563-430f63602796?w=300&q=80",
-    },
-    {
-      id: 5,
-      title: "Ocean Meditation",
-      artist: "Aqua Harmony",
-      album: "Deep Blue",
-      duration: "6:22",
-      streams: "3.2M",
-      cover:
-        "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=300&q=80",
-    },
-    {
-      id: 6,
-      title: "Mountain Echo",
-      artist: "Peak Vibes",
-      album: "Summit Sessions",
-      duration: "4:50",
-      streams: "1.8M",
-      cover:
-        "https://images.unsplash.com/photo-1498038432885-c6f3f1b912ee?w=300&q=80",
-    },
-  ];
-
-  // Mock data for editor's playlists
-  // const editorPlaylists = [
-  //   {
-  //     id: "ed1",
-  //     name:
-  //       language === "spanish"
-  //         ? "Viaje Sonoro"
-  //         : language === "english"
-  //         ? "Sonic Journey"
-  //         : "Viatge Sonor",
-  //     description:
-  //       language === "spanish"
-  //         ? "Las mejores pistas para explorar nuevos sonidos"
-  //         : language === "english"
-  //         ? "The best tracks to explore new sounds"
-  //         : "Les millors pistes per explorar nous sons",
-  //     cover:
-  //       "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&q=80",
-  //     songCount: 24,
-  //     songs: [mockSongs[0], mockSongs[2], mockSongs[4]],
-  //   },
-  //   {
-  //     id: "ed2",
-  //     name:
-  //       language === "spanish"
-  //         ? "Energía Urbana"
-  //         : language === "english"
-  //         ? "Urban Energy"
-  //         : "Energia Urbana",
-  //     description:
-  //       language === "spanish"
-  //         ? "Ritmos de la ciudad que inspiran"
-  //         : language === "english"
-  //         ? "City rhythms that inspire"
-  //         : "Ritmes de la ciutat que inspiren",
-  //     cover:
-  //       "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&q=80",
-  //     songCount: 18,
-  //     songs: [mockSongs[1], mockSongs[3], mockSongs[5]],
-  //   },
-  //   {
-  //     id: "ed3",
-  //     name:
-  //       language === "spanish"
-  //         ? "Naturaleza Serena"
-  //         : language === "english"
-  //         ? "Serene Nature"
-  //         : "Naturalesa Serena",
-  //     description:
-  //       language === "spanish"
-  //         ? "Melodías inspiradas en la naturaleza"
-  //         : language === "english"
-  //         ? "Melodies inspired by nature"
-  //         : "Melodies inspirades en la naturalesa",
-  //     cover:
-  //       "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=400&q=80",
-  //     songCount: 30,
-  //     songs: [mockSongs[2], mockSongs[4]],
-  //   },
-  //   {
-  //     id: "ed4",
-  //     name:
-  //       language === "spanish"
-  //         ? "Estrellas Nocturnas"
-  //         : language === "english"
-  //         ? "Night Stars"
-  //         : "Estrelles Nocturnes",
-  //     description:
-  //       language === "spanish"
-  //         ? "Música para las noches mágicas"
-  //         : language === "english"
-  //         ? "Music for magical nights"
-  //         : "Música per les nits màgiques",
-  //     cover:
-  //       "https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=400&q=80",
-  //     songCount: 22,
-  //     songs: [mockSongs[0], mockSongs[3]],
-  //   },
-  // ];
-
-  // Mock data for artists
-  const mockArtists = [
-    {
-      id: 1,
-      name: "Luna Ethereal",
-      subscribers: "245K",
-      genres: "Ambient, Electronic",
-      avatar:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&q=80",
-    },
-    {
-      id: 2,
-      name: "Echo Mind",
-      subscribers: "189K",
-      genres: "Hip Hop, Urban",
-      avatar:
-        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80",
-    },
-    {
-      id: 3,
-      name: "Terra Sounds",
-      subscribers: "312K",
-      genres: "World, Folk",
-      avatar:
-        "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&q=80",
-    },
-    {
-      id: 4,
-      name: "Cyber Soul",
-      subscribers: "198K",
-      genres: "Electronic, Synth",
-      avatar:
-        "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&q=80",
-    },
-  ];
 
   // Mock data for exclusive gifts
   const exclusiveGifts = [
@@ -2509,49 +2235,6 @@ Underneath the shining star`,
       setSubscribingArtistId(null);
     }
   }
-
-  async function requireSubscription(artistId: string): Promise<boolean> {
-    const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
-    if (!token) return false;
-
-    // ✅ déjà abonné côté state
-    if (subscribedArtists.includes(String(artistId))) return true;
-
-    const res = (await SubscriptionModuleObject.service.getStatus(
-      String(artistId),
-      token
-    )) as SubscriptionStatusResponse;
-
-    const ok = Boolean(res?.data?.isSubscribed);
-
-    if (ok) {
-      setSubscribedArtists((prev) =>
-        prev.includes(String(artistId)) ? prev : [...prev, String(artistId)]
-      );
-    }
-
-    return ok;
-  }
-
-  const openSubscribeModal = (artist: any) => {
-    startSubscription(artist);
-  };
-
-  const getSubscribedArtistsList = () => {
-    if (!Array.isArray(artists) || artists.length === 0) return [];
-    return artists.filter((artist: any) =>
-      subscribedArtists.includes(String(artist.id))
-    );
-  };
-
-  const getGiftsForSubscribedArtists = () => {
-    if (!Array.isArray(exclusiveGifts) || exclusiveGifts.length === 0)
-      return [];
-
-    return exclusiveGifts.filter((gift: any) =>
-      subscribedArtists.includes(String(gift.artistId))
-    );
-  };
 
   // Apply accessibility styles
   const containerClasses = `fixed inset-0 w-screen h-screen bg-gradient-to-br from-[#5A0B4D] via-[#4A1456] to-[#2D0E3E] overflow-hidden relative w-full

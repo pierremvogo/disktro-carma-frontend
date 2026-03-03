@@ -1,7 +1,6 @@
 import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 import { ArtistModuleObject as ModuleObject } from "../artist/module";
 import { useRouter } from "next/navigation";
-import { AccessibilitySettingsPanel } from "./AccessibilitySettingsPanel";
 import { MediaModuleObject as MediaModule } from "../file/module";
 import { UserModuleObject as UserModule } from "../module";
 import { getImageFile, getVideoFile } from "@/@disktro/utils";
@@ -419,13 +418,6 @@ export function ArtistDashboard({
   const [statsLoading, setStatsLoading] = useState(false);
   const [statsError, setStatsError] = useState<string | null>(null);
 
-  // Email and authentication states
-  const [email, setEmail] = useState<string>("artist@example.com");
-  const [isEmailVerified, setIsEmailVerified] = useState<boolean>(false);
-  const [showVerificationSent, setShowVerificationSent] =
-    useState<boolean>(false);
-  const [twoFactorEnabled, setTwoFactorEnabled] = useState<boolean>(false);
-
   // Payment receiving states
   const [bankAccountHolder, setBankAccountHolder] = useState<string>("");
   const [bankName, setBankName] = useState<string>("");
@@ -466,11 +458,6 @@ export function ArtistDashboard({
 
   const [file, setFile] = useState<File | null>(null);
 
-  const [signLanguageVideoUrl, setSignLanguageVideoUrl] = useState<
-    string | null
-  >(null);
-  const [signLanguageVideoPreview, setSignLanguageVideoPreview] = useState("");
-
   // Exclusive content states
   const [exclusiveContentType, setExclusiveContentType] =
     useState<string>("music");
@@ -481,7 +468,6 @@ export function ArtistDashboard({
   const [exclusiveContentFile, setExclusiveContentFile] = useState<File | null>(
     null
   );
-  const [brailleFilePreview, setBrailleFilePreview] = useState<string>("");
 
   // Ajoute ces states en haut du composant
   const [isDraggingPic, setIsDraggingPic] = useState(false);
@@ -530,15 +516,9 @@ export function ArtistDashboard({
     }>
   >([]);
   const [artwork, setArtwork] = useState<File | null>(null);
-  const [miniVideo, setMiniVideo] = useState<File | null>(null);
-  const [lyrics, setLyrics] = useState<string>("");
-  const [signLanguageVideo, setSignLanguageVideo] = useState<File | null>(null);
-  const [brailleFile, setBrailleFile] = useState<File | null>(null);
-  const [trackTitle, setTrackTitle] = useState<string>("");
   const [uploadType, setUploadType] = useState<"single" | "ep" | "album">(
     "single"
   );
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -1367,52 +1347,6 @@ export function ArtistDashboard({
     console.log("formData updated :", formData);
   }, [formData]);
 
-  const [artworkPreview, setArtworkPreview] = useState<string>("");
-
-  const handleArtwork = async (e: ChangeEvent<HTMLInputElement>) => {
-    const token = localStorage.getItem(ModuleObject.localState.ACCESS_TOKEN);
-    const file = e.target.files?.[0];
-
-    if (!file) return;
-
-    setErrorMessage("");
-    setSuccess(false);
-    setIsLoading(true);
-
-    // On garde le fichier en state
-    setArtwork(file);
-    // Preview local
-    setArtworkPreview(URL.createObjectURL(file));
-
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-      // upload via ton module Media
-      const res = await MediaModule.service.uploadImageFile(formData);
-
-      if (res && res.url) {
-        // stocker l'URL dans ton form (single / album / ep)
-        setFormData((prev: any) => ({
-          ...prev,
-          coverUrl: res.url, // 👉 adapte le nom: singleCoverUrl / albumCoverUrl...
-        }));
-        setSuccessMessage("Artwork uploadé avec succès.");
-        setSuccess(true);
-        setErrorMessage("");
-      } else {
-        setErrorMessage("Erreur lors de l'upload de l'artwork.");
-        setSuccess(false);
-      }
-    } catch (error) {
-      console.log((error as Error).message);
-      setErrorMessage(text.errors.generic);
-      setSuccess(false);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   // --- Ajouter un morceau ---
   async function handleAddTrack(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -1778,45 +1712,6 @@ export function ArtistDashboard({
       setIsLoading(false);
     }
   };
-
-  const [albumTracks, setAlbumTracks] = useState<
-    Array<{
-      file: File | null;
-      title: string;
-      lyrics: string;
-      signLanguageVideo: File | null;
-      brailleFile: File | null;
-
-      authors: string;
-      producers: string;
-      lyricists: string;
-      musiciansVocals: string;
-      musiciansPianoKeyboards: string;
-      musiciansWinds: string;
-      musiciansPercussion: string;
-      musiciansStrings: string;
-      mixingEngineer: string;
-      masteringEngineer: string;
-    }>
-  >([
-    {
-      file: null,
-      title: "",
-      lyrics: "",
-      signLanguageVideo: null,
-      brailleFile: null,
-      authors: "",
-      producers: "",
-      lyricists: "",
-      musiciansVocals: "",
-      musiciansPianoKeyboards: "",
-      musiciansWinds: "",
-      musiciansPercussion: "",
-      musiciansStrings: "",
-      mixingEngineer: "",
-      masteringEngineer: "",
-    },
-  ]);
 
   const content = {
     spanish: {
@@ -2583,21 +2478,6 @@ export function ArtistDashboard({
 
   const text = content[language as keyof typeof content];
 
-  // Calculate quarterly and annual prices based on monthly
-  const calculateQuarterlyPrice = () => {
-    if (!monthlyPrice) return "";
-    const monthly = parseFloat(monthlyPrice);
-    if (isNaN(monthly)) return "";
-    return (monthly * 4).toFixed(2);
-  };
-
-  const calculateAnnualPrice = () => {
-    if (!monthlyPrice) return "";
-    const monthly = parseFloat(monthlyPrice);
-    if (isNaN(monthly)) return "";
-    return (monthly * 12).toFixed(2);
-  };
-
   const filteredTracks = React.useMemo(() => {
     return tracksStats.filter((t) => {
       const matchesType = trackFilter === "all" ? true : t.type === trackFilter;
@@ -2608,19 +2488,8 @@ export function ArtistDashboard({
     });
   }, [tracksStats, trackFilter, trackSearch]);
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setUploadedFile(e.target.files[0]);
-    }
-  };
   const [isArtist, setIsArtist] = useState(false);
 
-  const handleUpload = () => {
-    if (uploadedFile) {
-      alert(`Uploading: ${uploadedFile.name}`);
-      setUploadedFile(null);
-    }
-  };
   const router = useRouter();
 
   const handleLogout = () => {

@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { Questionnaire } from "./Questionnaire";
 import { UserType } from "./UserType";
 import { ArtistDashboard } from "./ArtistDashboard";

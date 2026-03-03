@@ -1,6 +1,5 @@
 "use client";
 
-import Loader from "@/@disktro/Loader";
 import { wait } from "@/@disktro/utils";
 import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 import { UserModuleObject as ModuleObject } from "../module";
@@ -11,7 +10,6 @@ import CustomSuccess from "@/@disktro/CustomSuccess";
 import CustomAlert from "@/@disktro/CustomAlert";
 import Select from "react-select";
 import countryList from "react-select-country-list";
-import { ArtistModuleObject } from "../artist/module";
 
 // ✅ Ajoute cet import (adapte le chemin)
 import { AccessibilityButton } from "./accessibilityButton/AccessibilityButton";
@@ -49,40 +47,6 @@ const Music = ({ size = 24, className = "" }) => (
     <path d="M9 18V5l12-2v13" />
     <circle cx="6" cy="18" r="3" />
     <circle cx="18" cy="16" r="3" />
-  </svg>
-);
-
-const Mail = ({ size = 24, className = "" }) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-    <polyline points="22,6 12,13 2,6" />
-  </svg>
-);
-
-const Lock = ({ size = 24, className = "" }) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
   </svg>
 );
 
@@ -211,7 +175,6 @@ export function ArtistProfileSetup({
   const router = useRouter();
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   const [isDraggingPic, setIsDraggingPic] = useState(false);
-  const [isDraggingVideo, setIsDraggingVideo] = useState(false);
 
   const text = {
     spanish: {
@@ -373,15 +336,6 @@ export function ArtistProfileSetup({
   const content = text[language as keyof typeof text] || text.english;
 
   const handleVerifyEmail = () => setShowVerificationCode(true);
-
-  const handleVerifyCode = () => {
-    if (verificationCode === "") {
-      setEmailVerified(true);
-      setShowVerificationCode(false);
-    }
-  };
-
-  const handleEnableTwoFactor = () => setTwoFactorEnabled(true);
 
   const passwordsMatch =
     password && confirmPassword && password === confirmPassword;

@@ -37,40 +37,6 @@ const Lock = ({ size = 24, className = "" }) => (
   </svg>
 );
 
-const CreditCard = ({ size = 24, className = "" }) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
-    <line x1="1" y1="10" x2="23" y2="10" />
-  </svg>
-);
-
-const Mail = ({ size = 24, className = "" }) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-    <polyline points="22,6 12,13 2,6" />
-  </svg>
-);
-
 const Save = ({ size = 24, className = "" }) => (
   <svg
     width={size}
@@ -123,23 +89,6 @@ const EyeOff = ({ size = 24, className = "" }) => (
   </svg>
 );
 
-const Smartphone = ({ size = 24, className = "" }) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
-    <line x1="12" y1="18" x2="12.01" y2="18" />
-  </svg>
-);
-
 interface FanProfileProps {
   onBack: () => void;
   language: string;
@@ -166,52 +115,6 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
   const [paymentType, setPaymentType] = useState<
     "card" | "paypal" | "bizum" | "ideal" | "mobilemoney" | "orangemoney"
   >("card");
-
-  // Card payment states
-  const [cardNumber, setCardNumber] = useState("");
-  const [cardName, setCardName] = useState("");
-  const [expiryDate, setExpiryDate] = useState("");
-  const [cvv, setCvv] = useState("");
-
-  // PayPal states
-  const [paypalEmail, setPaypalEmail] = useState("");
-
-  // Bizum states
-  const [bizumPhone, setBizumPhone] = useState("");
-
-  // iDEAL states
-  const [idealBank, setIdealBank] = useState("");
-  const [idealAccountHolder, setIdealAccountHolder] = useState("");
-
-  // Mobile Money states
-  const [mobileMoneyPhone, setMobileMoneyPhone] = useState("");
-  const [mobileMoneyProvider, setMobileMoneyProvider] = useState("");
-
-  // Orange Money states
-  const [orangeMoneyPhone, setOrangeMoneyPhone] = useState("");
-
-  const [savedPaymentMethods, setSavedPaymentMethods] = useState<
-    Array<{
-      id: string;
-      type:
-        | "card"
-        | "paypal"
-        | "bizum"
-        | "ideal"
-        | "mobilemoney"
-        | "orangemoney";
-      displayInfo: string;
-      details?: string;
-    }>
-  >([
-    { id: "1", type: "card", displayInfo: "Visa •••• 4242", details: "12/25" },
-    {
-      id: "2",
-      type: "paypal",
-      displayInfo: "user@example.com",
-      details: "PayPal",
-    },
-  ]);
 
   const text = {
     spanish: {
@@ -389,8 +292,6 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
 
   const [isLoadingPassword, setIsLoadingPassword] = useState(false);
   const [successPassword, setSuccessPassword] = useState(false);
-  const [successPasswordMessage, setSuccessPasswordMessage] = useState("");
-  const [errorPasswordMessage, setErrorPasswordMessage] = useState("");
 
   // Account states
   const [name, setName] = useState(formData.name);
