@@ -5,8 +5,6 @@ import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { UserModuleObject as ModuleObject } from "../module";
 
-import CustomAlert from "@/@disktro/CustomAlert";
-import CustomSuccess from "@/@disktro/CustomSuccess";
 import { AccessibilityButton } from "./accessibilityButton/AccessibilityButton";
 
 // Icon components
@@ -78,23 +76,6 @@ const EyeOff = ({ size = 24, className = "" }) => (
   </svg>
 );
 
-const ArrowLeft = ({ size = 24, className = "" }) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <line x1="19" y1="12" x2="5" y2="12" />
-    <polyline points="12 19 5 12 12 5" />
-  </svg>
-);
-
 const Music = ({ size = 24, className = "" }) => (
   <svg
     width={size}
@@ -139,7 +120,6 @@ export function Login({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const text = {

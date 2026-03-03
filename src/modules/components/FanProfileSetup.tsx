@@ -30,40 +30,6 @@ const User = ({ size = 24, className = "" }) => (
   </svg>
 );
 
-const Mail = ({ size = 24, className = "" }) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-    <polyline points="22,6 12,13 2,6" />
-  </svg>
-);
-
-const Lock = ({ size = 24, className = "" }) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-  </svg>
-);
-
 const Shield = ({ size = 24, className = "" }) => (
   <svg
     width={size}
@@ -114,23 +80,6 @@ const EyeOff = ({ size = 24, className = "" }) => (
   </svg>
 );
 
-const CheckCircle = ({ size = 24, className = "" }) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-    <polyline points="22 4 12 14.01 9 11.01" />
-  </svg>
-);
-
 const ArrowLeft = ({ size = 24, className = "" }) => (
   <svg
     width={size}
@@ -176,26 +125,6 @@ export function FanProfileSetup({
   const options = React.useMemo(() => countryList().getData(), []);
 
   const [isDraggingPic, setIsDraggingPic] = useState(false);
-  const [isDraggingVideo, setIsDraggingVideo] = useState(false);
-
-  // Petits helpers
-  const preventDefaults = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-  };
-
-  const handleDropProfile = (e: React.DragEvent<HTMLDivElement>) => {
-    preventDefaults(e);
-    setIsDraggingPic(false);
-
-    const file = e.dataTransfer.files?.[0];
-    if (!file) return;
-    if (!file.type.startsWith("image/")) return;
-
-    // Utilise la même logique que handleProfilePicture
-    const fakeEvent = { target: { files: [file] } } as any;
-    handleImageChange(fakeEvent);
-  };
 
   const text = {
     spanish: {
@@ -364,17 +293,6 @@ export function FanProfileSetup({
   const router = useRouter();
   const handleVerifyEmail = () => {
     setShowVerificationCode(true);
-  };
-
-  const handleVerifyCode = () => {
-    if (verificationCode === "123456") {
-      setEmailVerified(true);
-      setShowVerificationCode(false);
-    }
-  };
-
-  const handleEnableTwoFactor = () => {
-    setTwoFactorEnabled(true);
   };
 
   const passwordsMatch =

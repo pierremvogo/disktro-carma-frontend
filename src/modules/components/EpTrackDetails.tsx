@@ -187,10 +187,6 @@ export default function EpTracksEditor({
     null
   );
 
-  const [epTrackMap, setEpTrackMap] = React.useState<Record<string, string>>(
-    {}
-  );
-
   // ========== Fetch moods ==========
   React.useEffect(() => {
     async function fetchMoods() {
