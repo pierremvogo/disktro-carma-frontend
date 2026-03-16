@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
+import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { Questionnaire } from "./Questionnaire";
 import { UserType } from "./UserType";
 import { ArtistDashboard } from "./ArtistDashboard";
@@ -30,22 +31,13 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
   const [isArtist, setIsArtist] = useState(false);
 
   const mediaScrollRef = useRef<HTMLDivElement | null>(null);
+  const router = useRouter();
 
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
 
   const [isDragging, setIsDragging] = useState(false);
-  // const dragData = useRef({ startX: 0, scrollLeft: 0 });
-
-  const router = useRouter();
-
-  const dragData = useRef({
-    startX: 0,
-    startY: 0,
-    scrollLeft: 0,
-    locked: false, // est-ce qu'on a décidé horizontal/vertical ?
-    isHorizontal: false, // true => on gère le drag horizontal
-  });
+  const dragData = useRef({ startX: 0, scrollLeft: 0 });
 
   // ✅ NEW: index actif + refs vidéos
   const [activeMediaIndex, setActiveMediaIndex] = useState(0);
@@ -92,58 +84,6 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
       setShowFanStreaming(false);
     }
   }, [initialView]);
-
-  const bbokMessage = {
-    english: {
-      title: "Welcome to Bbok",
-      p: [
-        "Bbok is a music streaming service and fan-subscription platform built for music lovers.",
-        "It allows artists to share exclusive content with their most dedicated fans and build a closer, more personal connection.",
-        "We are currently welcoming artists to contact us and help us test the platform’s features, shape its future, and grow together.",
-        "Accessibility is at the heart of Bbok.",
-        "We have made a strong commitment to inclusion by developing features such as Sign Language support, Braille compatibility, Deuteranopia-friendly design, and many more accessibility tools — because music is better when everybody is included.",
-      ],
-      tags: ["#artists4artists", "#musicwitheverybody"],
-      sign: ["Love,", "Team Bbok"],
-      psLabel: "PS:",
-      psText:
-        "You can check out my YouTube channel if you’d like to know more about me as an artist:",
-    },
-
-    spanish: {
-      title: "Bienvenido a Bbok",
-      p: [
-        "Bbok es un servicio de streaming musical y una plataforma de suscripción para fans, creada para amantes de la música.",
-        "Permite a los artistas compartir contenido exclusivo con sus fans más fieles y construir una conexión más cercana y personal.",
-        "Actualmente invitamos a artistas a contactarnos y ayudarnos a probar las funciones de la plataforma, dar forma a su futuro y crecer juntos.",
-        "La accesibilidad está en el corazón de Bbok.",
-        "Hemos asumido un fuerte compromiso con la inclusión desarrollando funciones como soporte de Lengua de Señas, compatibilidad con Braille, diseño adaptado para deuteranopía y muchas más herramientas de accesibilidad — porque la música es mejor cuando todos están incluidos.",
-      ],
-      tags: ["#artists4artists", "#musicwitheverybody"],
-      sign: ["Con cariño,", "Team Bbok"],
-      psLabel: "PD:",
-      psText:
-        "Puedes visitar mi canal de YouTube si quieres saber más sobre mí como artista:",
-    },
-
-    catalan: {
-      title: "Benvingut/da a Bbok",
-      p: [
-        "Bbok és un servei d’streaming musical i una plataforma de subscripció per a fans, creada per als amants de la música.",
-        "Permet als artistes compartir contingut exclusiu amb els seus fans més fidels i construir una connexió més propera i personal.",
-        "Actualment convidem artistes a contactar amb nosaltres i ajudar-nos a provar les funcionalitats de la plataforma, donar forma al seu futur i créixer plegats.",
-        "L’accessibilitat és al cor de Bbok.",
-        "Hem fet un compromís ferm amb la inclusió desenvolupant funcionalitats com suport per a Llengua de Signes, compatibilitat amb Braille, disseny adaptat per a la deuteranòpia i moltes més eines d’accessibilitat — perquè la música és millor quan tothom hi és inclòs.",
-      ],
-      tags: ["#artists4artists", "#musicwitheverybody"],
-      sign: ["Amb estima,", "Team Bbok"],
-      psLabel: "PS:",
-      psText:
-        "Pots visitar el meu canal de YouTube si vols saber més de mi com a artista:",
-    },
-  };
-
-  const ytLink = "https://youtube.com/@kabifepabbil";
 
   // Charger la langue depuis localStorage au montage
   useEffect(() => {
@@ -255,15 +195,15 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
     setActiveMediaIndex(index);
   };
 
-  // const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-  //   const el = mediaScrollRef.current;
-  //   if (!el) return;
-  //   setIsDragging(true);
-  //   dragData.current = {
-  //     startX: e.pageX - el.offsetLeft,
-  //     scrollLeft: el.scrollLeft,
-  //   };
-  // };
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    const el = mediaScrollRef.current;
+    if (!el) return;
+    setIsDragging(true);
+    dragData.current = {
+      startX: e.pageX - el.offsetLeft,
+      scrollLeft: el.scrollLeft,
+    };
+  };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!isDragging) return;
@@ -330,9 +270,9 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
   ]);
 
   const messages = {
-    spanish: "Bienvenido a música para todos",
-    english: "Welcome to music for everybody",
-    catalan: "Benvingut a música per a tothom",
+    spanish: "Bienvenido a Bbok",
+    english: "Welcome to Bbok",
+    catalan: "Benvingut a Bbok",
   };
 
   const loginText = {
@@ -359,10 +299,6 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
           setShowArtistChoice(false);
           setShowFanStreaming(true);
         }}
-        onBack={() => {
-          setShowArtistChoice(false);
-          setIsArtist(false);
-        }}
         language={language}
         onLogout={() => {
           setShowArtistChoice(false);
@@ -375,31 +311,28 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
   // 🧩 LOGIN FULL SCREEN
   if (showLogin) {
     return (
-      <FullScreenScroll>
-        <Login
-          onBack={() => {
-            setShowLogin(false);
-            setShowUserType(false);
-            setShowQuestionnaire(false);
-            setShowUserType(true);
-          }}
-          onLoginAsFan={() => {
-            setShowLogin(false);
-            setIsArtist(false);
-            setShowFanStreaming(true);
-          }}
-          onLoginAsArtist={() => {
-            setShowLogin(false);
-            setIsArtist(true);
-            setShowArtistChoice(true);
-          }}
-          language={language}
-          onSignUp={() => {
-            setShowLogin(false);
-            setShowUserType(true);
-          }}
-        />
-      </FullScreenScroll>
+      <Login
+        onBack={() => {
+          setShowLogin(false);
+          setShowUserType(false);
+          setShowQuestionnaire(false);
+        }}
+        onLoginAsFan={() => {
+          setShowLogin(false);
+          setIsArtist(false);
+          setShowFanStreaming(true);
+        }}
+        onLoginAsArtist={() => {
+          setShowLogin(false);
+          setIsArtist(true);
+          setShowArtistChoice(true);
+        }}
+        language={language}
+        onSignUp={() => {
+          setShowLogin(false);
+          setShowUserType(true);
+        }}
+      />
     );
   }
 
@@ -463,227 +396,270 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
     );
   }
 
-  function FullScreenScroll({ children }: { children: React.ReactNode }) {
-    return (
-      <div
-        className="
-          fixed inset-0 w-screen h-[100dvh]
-          overflow-y-auto overscroll-contain
-          touch-pan-y
-        "
-        style={{ WebkitOverflowScrolling: "touch" }}
-      >
-        {/* Important : un contenu qui peut dépasser */}
-        <div className="min-h-[100dvh]">{children}</div>
-      </div>
-    );
-  }
-
   // 🧩 EMBEDDED SCREEN
   return (
-    <div className="relative w-full h-[100dvh] overflow-hidden text-white">
-      {/* ✅ Background image (boost colors) */}
-      <div
-        className="absolute inset-0 bg-cover bg-center origin-center"
-        style={{
-          backgroundImage:
-            'url("/image/4ac3eed398bb68113a14d0fa5efe7a6def6f7651.png")',
-          filter: "brightness(1.2) saturate(1.25) contrast(1.08)",
-          transform: "scale(1.03)",
-        }}
-      />
-
-      {/* ✅ Gradient tint */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#5A0B4D]/30 via-[#4A1456]/25 to-[#2D0E3E]/30" />
-      {/* ✅ Lighter overlay than before */}
-      <div className="absolute inset-0 bg-black/25" />
-
-      {/* ✅ Bouton d’accessibilité */}
+    <div
+      className="
+        relative w-full
+        min-h-[100svh] md:min-h-screen
+        overflow-hidden
+        bg-gradient-to-br from-[#5A0B4D] via-[#4A1456] to-[#2D0E3E]
+        text-white
+        bg-cover bg-center
+      "
+      style={{
+        backgroundImage:
+          'url("/image/4ac3eed398bb68113a14d0fa5efe7a6def6f7651.png")',
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
+      {/* ✅ Bouton d’accessibilité : monté au plus haut niveau */}
       <AccessibilityButton language={language} />
 
-      {/* ✅ WRAPPER PRINCIPAL */}
-      <div className="relative z-10 flex flex-col w-full h-full min-h-0 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
-        {/* ✅ HEADER (STICKY, robuste sur Android) */}
-        <div
-          className="
-    sticky top-0 z-[60]
-    w-full
-     backdrop-blur-md
-    border-b border-white/10
-  "
-          style={{ WebkitBackdropFilter: "blur(12px)" }}
-        >
-          <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6">
-            <div className="pt-[calc(env(safe-area-inset-top)+0.75rem)] pb-3">
-              {/* ✅ 1 seul layout : mobile colonne centrée, desktop ligne (2 colonnes) */}
-              <div
-                className="
-          flex flex-col items-center justify-center gap-3
-          md:grid md:grid-cols-[auto_1fr_auto] md:items-center
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-black/50" />
+
+      {/* ✅ WRAPPER PRINCIPAL (safe-area + hauteur stable iOS) */}
+      <div
+        className="
+          relative z-10 flex flex-col w-full
+          min-h-[100svh] md:min-h-screen
+          pt-[env(safe-area-inset-top)]
+          pb-[env(safe-area-inset-bottom)]
+          overflow-hidden
         "
+      >
+        <div className="w-full md:w-auto md:justify-self-start flex justify-center md:justify-start">
+          <button
+            onClick={() => {
+              setShowUserType(false);
+              setShowQuestionnaire(false);
+              setShowLogin(false);
+              setShowArtistChoice(false);
+              setShowFanStreaming(false);
+              setShowArtistProfileSetup(false);
+              setShowFanProfileSetup(false);
+            }}
+            className="cursor-pointer"
+            aria-label="Home"
+          >
+            <img
+              src="/logo_vector.svg"
+              alt="Logo"
+              className="h-8 sm:h-9 md:h-10 w-auto"
+            />
+          </button>
+        </div>
+        {/* Language Options and Controls */}
+        <div className="flex flex-col items-center gap-3 w-full pt-4 px-3">
+          <nav
+            aria-label={
+              language === "spanish"
+                ? "Selección de idioma"
+                : language === "english"
+                ? "Language selection"
+                : "Selecció d'idioma"
+            }
+            className="w-full"
+          >
+            <div
+              className="flex flex-wrap justify-center gap-3 sm:gap-6"
+              role="group"
+            >
+              <button
+                onClick={() => changeLanguage("spanish")}
+                className={`text-white cursor-pointer drop-shadow hover:opacity-70 transition-opacity underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent rounded px-2 py-1 text-sm sm:text-base ${
+                  language === "spanish"
+                    ? "opacity-100 font-bold"
+                    : "opacity-70"
+                }`}
+                aria-label="Español"
+                aria-current={language === "spanish" ? "true" : "false"}
+                type="button"
               >
-                {/* ✅ Logo (gauche sur desktop, centré sur mobile) */}
-                <div className="w-full md:w-auto md:justify-self-start flex justify-center md:justify-start">
-                  <button
-                    onClick={() => {
-                      setShowUserType(false);
-                      setShowQuestionnaire(false);
-                      setShowLogin(false);
-                      setShowArtistChoice(false);
-                      setShowFanStreaming(false);
-                      setShowArtistProfileSetup(false);
-                      setShowFanProfileSetup(false);
-                    }}
-                    className="cursor-pointer"
-                    aria-label="Home"
-                  >
-                    <img
-                      src="/logo_vector.svg"
-                      alt="Logo"
-                      className="h-8 sm:h-9 md:h-10 w-auto"
-                    />
-                  </button>
-                </div>
-                {/* ✅ Bloc boutons (centré, même sur desktop) */}
-                <div className="w-full md:w-auto md:justify-self-center">
-                  <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
-                    {/* Home */}
-                    <button
-                      onClick={() => router.replace("/home/?view=home")}
-                      className="flex cursor-pointer items-center gap-2 px-3 sm:px-4 py-2 bg-white/15 backdrop-blur-md border border-white/25 rounded-lg text-white text-xs sm:text-sm drop-shadow hover:bg-white/25 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      type="button"
-                      aria-label="Home"
-                    >
-                      Home
-                    </button>
+                Spanish
+              </button>
 
-                    {/* Test Group */}
-                    <button
-                      onClick={() => router.replace("/home/?view=question")}
-                      className="flex cursor-pointer items-center gap-2 px-3 sm:px-4 py-2 bg-white/15 backdrop-blur-md border border-white/25 rounded-lg text-white text-xs sm:text-sm drop-shadow hover:bg-white/25 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      type="button"
-                    >
-                      Test Group
-                    </button>
+              <button
+                onClick={() => changeLanguage("english")}
+                className={`text-white cursor-pointer drop-shadow hover:opacity-70 transition-opacity underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent rounded px-2 py-1 text-sm sm:text-base ${
+                  language === "english"
+                    ? "opacity-100 font-bold"
+                    : "opacity-70"
+                }`}
+                aria-label="English"
+                aria-current={language === "english" ? "true" : "false"}
+                type="button"
+              >
+                English
+              </button>
 
-                    {/* Sign Up */}
-                    <button
-                      onClick={() => router.replace("/home/?view=signup")}
-                      className="flex cursor-pointer items-center gap-2 px-3 sm:px-4 py-2 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg text-white text-xs sm:text-sm drop-shadow hover:bg-white/30 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      type="button"
-                      aria-label={
-                        signUpText[language as keyof typeof signUpText]
-                      }
-                    >
-                      {signUpText[language as keyof typeof signUpText]}
-                    </button>
-
-                    {/* Login / Dashboard */}
-                    {!isLoggedIn ? (
-                      <button
-                        onClick={() => router.replace("/home/?view=login")}
-                        className="flex cursor-pointer items-center gap-2 px-3 sm:px-4 py-2 bg-white/15 backdrop-blur-md border border-white/25 rounded-lg text-white text-xs sm:text-sm drop-shadow hover:bg-white/25 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        type="button"
-                        aria-label={
-                          loginText[language as keyof typeof loginText]
-                        }
-                      >
-                        {loginText[language as keyof typeof loginText]}
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => {
-                          if (getUserRole() == "artist")
-                            router.push("/dashboard/artist/select");
-                          else setShowFanStreaming(true);
-                        }}
-                        className="flex cursor-pointer items-center gap-2 px-3 sm:px-4 py-2 bg-white/15 backdrop-blur-md border border-white/25 rounded-lg text-white text-xs sm:text-sm drop-shadow hover:bg-white/25 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        type="button"
-                        aria-label="Dashboard"
-                      >
-                        Dashboard
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                {/* ✅ Bloc langues (extrême droite sur desktop, centré sur mobile) */}
-                <div className="w-full lg:w-auto lg:justify-self-end">
-                  <nav
-                    aria-label={
-                      language === "spanish"
-                        ? "Selección de idioma"
-                        : language === "english"
-                        ? "Language selection"
-                        : "Selecció d'idioma"
-                    }
-                    className="w-full"
-                  >
-                    <div className="flex flex-wrap items-center justify-center lg:justify-end gap-3 text-xs sm:text-sm">
-                      <button
-                        onClick={() => changeLanguage("spanish")}
-                        className={`cursor-pointer text-white underline ${
-                          language === "spanish"
-                            ? "font-bold opacity-100"
-                            : "opacity-70"
-                        }`}
-                        type="button"
-                        aria-label="Español"
-                        aria-current={language === "spanish" ? "true" : "false"}
-                      >
-                        Spanish
-                      </button>
-
-                      <button
-                        onClick={() => changeLanguage("english")}
-                        className={`cursor-pointer text-white underline ${
-                          language === "english"
-                            ? "font-bold opacity-100"
-                            : "opacity-70"
-                        }`}
-                        type="button"
-                        aria-label="English"
-                        aria-current={language === "english" ? "true" : "false"}
-                      >
-                        English
-                      </button>
-
-                      <button
-                        onClick={() => changeLanguage("catalan")}
-                        className={`cursor-pointer text-white underline ${
-                          language === "catalan"
-                            ? "font-bold opacity-100"
-                            : "opacity-70"
-                        }`}
-                        type="button"
-                        aria-label="Català"
-                        aria-current={language === "catalan" ? "true" : "false"}
-                      >
-                        Catalan
-                      </button>
-                    </div>
-                  </nav>
-                </div>
-              </div>
+              <button
+                onClick={() => changeLanguage("catalan")}
+                className={`text-white cursor-pointer drop-shadow hover:opacity-70 transition-opacity underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent rounded px-2 py-1 text-sm sm:text-base ${
+                  language === "catalan"
+                    ? "opacity-100 font-bold"
+                    : "opacity-70"
+                }`}
+                aria-label="Català"
+                aria-current={language === "catalan" ? "true" : "false"}
+                type="button"
+              >
+                Catalan
+              </button>
             </div>
+          </nav>
+
+          <div className="flex flex-wrap items-center justify-center gap-3 mt-1">
+            <button
+              onClick={() => router.replace("/home/?view=home")}
+              className="flex cursor-pointer items-center gap-2 px-3 sm:px-4 py-2 bg-white/15 backdrop-blur-md border border-white/25 rounded-lg text-white text-xs sm:text-sm drop-shadow hover:bg-white/25 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
+              type="button"
+              aria-label="Home"
+            >
+              Home
+            </button>
+            <button
+              onClick={() => router.replace("/home/?view=question")}
+              className="
+                flex cursor-pointer items-center gap-2
+                px-3 sm:px-4 py-2
+                bg-white/20 backdrop-blur-md
+                border border-white/30
+                rounded-lg
+                text-white text-sm sm:text-base
+                drop-shadow
+                hover:bg-white/30 transition-all
+                focus:outline-none focus:ring-2 focus:ring-blue-500
+              "
+              type="button"
+            >
+              Test Group
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </button>
+
+            <button
+              onClick={() => router.replace("/home/?view=signup")}
+              className="
+                flex cursor-pointer items-center gap-2
+                px-3 sm:px-4 py-2
+                bg-white/30 backdrop-blur-md
+                border border-white/40
+                rounded-lg
+                text-white text-sm sm:text-base
+                drop-shadow
+                hover:bg-white/40 transition-all
+                focus:outline-none focus:ring-2 focus:ring-blue-500
+              "
+              aria-label={signUpText[language as keyof typeof signUpText]}
+              type="button"
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <line x1="19" y1="8" x2="19" y2="14" />
+                <line x1="22" y1="11" x2="16" y2="11" />
+              </svg>
+              {signUpText[language as keyof typeof signUpText]}
+            </button>
+
+            {!isLoggedIn ? (
+              <button
+                onClick={() => router.replace("/home/?view=login")}
+                className="
+                  flex cursor-pointer items-center gap-2
+                  px-3 sm:px-4 py-2
+                  bg-white/20 backdrop-blur-md
+                  border border-white/30
+                  rounded-lg
+                  text-white text-sm sm:text-base
+                  drop-shadow
+                  hover:bg-white/30 transition-all
+                  focus:outline-none focus:ring-2 focus:ring-blue-500
+                "
+                aria-label={loginText[language as keyof typeof loginText]}
+                type="button"
+              >
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                  <polyline points="10 17 15 12 10 7" />
+                  <line x1="15" y1="12" x2="3" y2="12" />
+                </svg>
+                {loginText[language as keyof typeof loginText]}
+              </button>
+            ) : (
+              <button
+                onClick={() => {
+                  if (getUserRole() == "artist")
+                    router.push("/dashboard/artist/select");
+                  else setShowFanStreaming(true);
+                }}
+                className="
+                  flex cursor-pointer items-center gap-2
+                  px-3 sm:px-4 py-2
+                  bg-white/20 backdrop-blur-md
+                  border border-white/30
+                  rounded-lg
+                  text-white text-sm sm:text-base
+                  drop-shadow
+                  hover:bg-white/30 transition-all
+                  focus:outline-none focus:ring-2 focus:ring-blue-500
+                "
+                aria-label="Dashboard"
+                type="button"
+              >
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M3 13h8V3H3v10zM13 21h8V11h-8v10zM13 3h8v6h-8V3zM3 17h8v4H3v-4z" />
+                </svg>
+                Dashboard
+              </button>
+            )}
           </div>
         </div>
 
-        {/* ✅ CONTENT SCROLL (interne) */}
-        <div
-          className="
-            flex-1 min-h-0 w-full
-            overflow-y-auto overscroll-contain
-            px-4 md:px-8 pb-6
-            touch-pan-y
-          "
-          style={{
-            WebkitOverflowScrolling: "touch",
-            overscrollBehaviorY: "contain",
-          }}
-        >
-          <div className="relative w-full max-w-7xl mx-auto flex flex-col items-center gap-8 md:gap-10 min-h-0">
-            <div className="relative w-full flex items-center justify-center min-h-0">
+        {/* ✅ Content (scroll stable) */}
+        <div className="flex-1 w-full overflow-y-auto overscroll-contain px-4 md:px-8 pb-4">
+          <div className="relative w-full max-w-7xl mx-auto flex flex-col items-center gap-8 md:gap-10">
+            <div className="relative w-full flex items-center justify-center">
               {/* Left Panel */}
               <div className="hidden lg:block absolute left-0 w-64 h-full rounded-3xl overflow-hidden shadow-2xl bg-cover bg-center origin-center" />
 
@@ -691,115 +667,178 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
               <div className="hidden lg:block absolute right-0 w-64 h-full rounded-3xl overflow-hidden shadow-2xl bg-cover bg-center origin-center" />
 
               {/* Middle Panel */}
-              <div className="relative z-10 w-full max-w-4xl mt-4 md:mt-2 lg:mt-2 min-h-0">
-                <div className="w-full h-full shadow-2xl overflow-visible border-white/20 flex flex-col min-h-0">
+              <div className="relative z-10 w-full max-w-4xl mt-4 md:mt-2 lg:mt-2">
+                <div className="w-full h-full bg-white/10 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden border border-white/20 flex flex-col">
                   {/* MAIN CONTENT */}
-                  <div className="flex-1 relative flex flex-col items-center justify-start p-4 sm:p-6 md:p-8 min-h-0">
+                  <div className="flex-1 relative bg-gradient-to-br from-purple-500/20 via-pink-500/20 to-blue-500/20 flex items-center justify-center p-4 sm:p-6 md:p-8">
                     {showUserType ? (
-                      <FullScreenScroll>
-                        <UserType
-                          onBack={() => {
-                            setShowUserType(false);
-                            setShowQuestionnaire(false);
-                          }}
-                          onSelectArtist={() => {
-                            setShowUserType(false);
-                            setShowArtistProfileSetup(true);
-                          }}
-                          onSelectFan={() => {
-                            setShowUserType(false);
-                            setShowFanProfileSetup(true);
-                          }}
-                          language={language}
-                          onGoToQuestionnaire={() => {
-                            setShowUserType(false);
-                            setShowQuestionnaire(true);
-                          }}
-                          onGoToWelcome={() => {
-                            setShowUserType(false);
-                          }}
-                        />
-                      </FullScreenScroll>
+                      <UserType
+                        onBack={() => {
+                          setShowUserType(false);
+                          setShowQuestionnaire(false);
+                        }}
+                        onSelectArtist={() => {
+                          setShowUserType(false);
+                          setShowArtistProfileSetup(true);
+                        }}
+                        onSelectFan={() => {
+                          setShowUserType(false);
+                          setShowFanProfileSetup(true);
+                        }}
+                        language={language}
+                        onGoToQuestionnaire={() => {
+                          setShowUserType(false);
+                          setShowQuestionnaire(true);
+                        }}
+                        onGoToWelcome={() => {
+                          setShowUserType(false);
+                        }}
+                      />
                     ) : showQuestionnaire ? (
-                      <FullScreenScroll>
-                        <Questionnaire
-                          onBack={() => {
-                            setShowQuestionnaire(false);
-                            setShowUserType(false);
-                          }}
-                          onSubmit={() => {
-                            setShowQuestionnaire(false);
-                            setShowLogin(true);
-                          }}
-                          language={language}
-                          onShowLogin={() => {
-                            setShowQuestionnaire(false);
-                            setShowLogin(true);
-                          }}
-                          onSkipToSignUp={() => {
-                            setShowQuestionnaire(false);
-                            setShowUserType(true);
-                          }}
-                        />
-                      </FullScreenScroll>
+                      <Questionnaire
+                        onBack={() => {
+                          setShowQuestionnaire(false);
+                          setShowUserType(false);
+                        }}
+                        onSubmit={() => {
+                          setShowQuestionnaire(false);
+                          setShowLogin(true);
+                        }}
+                        language={language}
+                        onShowLogin={() => {
+                          setShowQuestionnaire(false);
+                          setShowLogin(true);
+                        }}
+                        onSkipToSignUp={() => {
+                          setShowQuestionnaire(false);
+                          setShowUserType(true);
+                        }}
+                      />
                     ) : (
-                      <div className="text-center text-white space-y-6 px-2 sm:px-4 w-full">
-                        {/* ================= TEXT CONTENT ================= */}
-                        <div className="space-y-4 max-w-2xl mx-auto font-bold text-justify">
-                          {(() => {
-                            const t =
-                              bbokMessage[
-                                language as keyof typeof bbokMessage
-                              ] || bbokMessage.english;
-
-                            return (
-                              <>
-                                <h2 className="text-2xl sm:text-3xl md:text-4xl drop-shadow-lg text-center font-bold">
-                                  {t.title}
-                                </h2>
-
-                                <div className="space-y-3 text-sm sm:text-base leading-relaxed text-white/90 font-bold text-justify">
-                                  {t.p.map((paragraph, index) => (
-                                    <p key={index}>{paragraph}</p>
-                                  ))}
-                                </div>
-
-                                <div className="flex flex-wrap gap-2 pt-2 justify-start">
-                                  {t.tags.map((tag) => (
-                                    <span
-                                      key={tag}
-                                      className="text-xs sm:text-sm px-3 py-1 rounded-full bg-white/10 border border-white/20 font-bold"
-                                    >
-                                      {tag}
-                                    </span>
-                                  ))}
-                                </div>
-
-                                <div className="pt-4 font-bold text-justify">
-                                  <p className="text-white/90">{t.sign[0]}</p>
-                                  <p>{t.sign[1]}</p>
-                                </div>
-
-                                <div className="pt-3 text-sm sm:text-base text-white/90 font-bold text-justify">
-                                  <p>
-                                    <span>{t.psLabel}</span> {t.psText}
-                                  </p>
-                                  <a
-                                    href="https://youtube.com/@kabifepabbil"
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="underline hover:opacity-80 break-all font-bold"
-                                  >
-                                    https://youtube.com/@kabifepabbil
-                                  </a>
-                                </div>
-                              </>
-                            );
-                          })()}
+                      <div className="text-center text-white space-y-4 px-2 sm:px-4">
+                        <div className="space-y-2">
+                          <h2 className="text-2xl sm:text-3xl md:text-4xl drop-shadow-lg">
+                            {messages[language]}
+                          </h2>
                         </div>
 
-                        {/* ================= MEDIA CARD ================= */}
-                        {/*  */}
+                        {/* MEDIA CARD */}
+                        <div className="mt-6 sm:mt-8 bg-white/10 backdrop-blur-md rounded-xl p-4 sm:p-6 max-w-md mx-auto border border-white/20 relative">
+                          {/* Arrow Left */}
+                          {canScrollLeft && (
+                            <button
+                              type="button"
+                              onClick={() => scrollByAmount(-300)}
+                              className="flex items-center justify-center absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 text-white p-2 rounded-full backdrop-blur-md shadow-md hover:bg-black/60 transition"
+                              aria-label="Scroll left"
+                            >
+                              ←
+                            </button>
+                          )}
+
+                          {/* Arrow Right */}
+                          {canScrollRight && (
+                            <button
+                              type="button"
+                              onClick={() => scrollByAmount(300)}
+                              className="flex items-center justify-center absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 text-white p-2 rounded-full backdrop-blur-md shadow-md hover:bg-black/60 transition"
+                              aria-label="Scroll right"
+                            >
+                              →
+                            </button>
+                          )}
+
+                          {/* Scrollable Zone (Pointer events = mobile + desktop) */}
+                          <div
+                            ref={mediaScrollRef}
+                            onScroll={handleMediaScroll}
+                            onPointerDown={(e) => {
+                              const el = mediaScrollRef.current;
+                              if (!el) return;
+                              el.setPointerCapture(e.pointerId);
+                              setIsDragging(true);
+                              dragData.current = {
+                                startX: e.clientX,
+                                scrollLeft: el.scrollLeft,
+                              };
+                            }}
+                            onPointerMove={(e) => {
+                              if (!isDragging) return;
+                              const el = mediaScrollRef.current;
+                              if (!el) return;
+                              e.preventDefault();
+                              const walk =
+                                (e.clientX - dragData.current.startX) * 1.2;
+                              el.scrollLeft =
+                                dragData.current.scrollLeft - walk;
+                            }}
+                            onPointerUp={() => setIsDragging(false)}
+                            onPointerCancel={() => setIsDragging(false)}
+                            className={`
+                              flex gap-4
+                              overflow-x-auto
+                              snap-x snap-mandatory
+                              pb-2
+                              no-scrollbar
+                              touch-pan-x select-none
+                              ${isDragging ? "cursor-grabbing" : "cursor-grab"}
+                            `}
+                            style={{ scrollBehavior: "smooth" }}
+                          >
+                            {/* Videos */}
+                            {videos.map((url, index) => (
+                              <div
+                                key={index}
+                                className="min-w-full snap-center"
+                              >
+                                <div className="aspect-video bg-black rounded-lg mb-3 overflow-hidden">
+                                  <video
+                                    ref={(el) => {
+                                      videoRefs.current[index] = el;
+                                    }}
+                                    className="w-full h-full object-cover"
+                                    src={url}
+                                    controls
+                                    muted
+                                    playsInline
+                                    preload="metadata"
+                                    onEnded={() => {
+                                      const el = mediaScrollRef.current;
+                                      if (!el) return;
+                                      const next = Math.min(
+                                        index + 1,
+                                        videos.length - 1
+                                      );
+                                      el.scrollTo({
+                                        left: next * el.clientWidth,
+                                        behavior: "smooth",
+                                      });
+                                    }}
+                                  />
+                                </div>
+                                <p className="text-xs sm:text-sm opacity-80 drop-shadow text-center">
+                                  #{index + 1}
+                                </p>
+                              </div>
+                            ))}
+
+                            {/* Image Slide */}
+                            <div className="min-w-full snap-center">
+                              <div className="aspect-video bg-black/20 backdrop-blur-sm rounded-lg mb-3 flex items-center justify-center overflow-hidden">
+                                <ImageWithFallback
+                                  src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&q=80"
+                                  alt="Second visual"
+                                  className="w-full h-full object-cover rounded-lg opacity-80"
+                                />
+                              </div>
+                            </div>
+                          </div>
+
+                          <p className="text-[11px] sm:text-xs opacity-70 mt-2 text-center">
+                            Drag horizontally with your cursor or swipe on
+                            mobile to explore media.
+                          </p>
+                        </div>
                       </div>
                     )}
                   </div>

@@ -61,30 +61,29 @@ export function UserType({
   return (
     <div
       className="
-        relative w-full
-        min-h-[100svh] md:min-h-screen
-        flex flex-col items-center justify-start
+        relative w-full h-full min-h-0
+        flex flex-col items-center justify-center
+        overflow-hidden
         px-4 sm:px-6 md:px-8
-        py-15
-        pt-[calc(env(safe-area-inset-top)+7rem)]
-        pb-[calc(env(safe-area-inset-bottom)+2.5rem)]
+        pt-[max(56px,calc(env(safe-area-inset-top)+0.75rem))]
+        pb-[max(16px,calc(env(safe-area-inset-bottom)+0.75rem))]
       "
     >
-      {/* Back button (safe on notch + always visible) */}
+      {/* Back button */}
       <button
         onClick={() => router.replace("/home/?view=home")}
         type="button"
         className="
-          fixed z-50
-          left-4 sm:left-6
-          top-[calc(env(safe-area-inset-top)+1rem)]
+          absolute z-20
+          left-3 sm:left-4 md:left-5
+          top-[max(8px,env(safe-area-inset-top))]
           flex items-center gap-2
+          rounded-full
+          border border-white/20
+          bg-white/10 backdrop-blur-md
+          px-3 py-2
           text-white drop-shadow
           hover:opacity-70 transition-opacity
-          bg-white/10 backdrop-blur-md
-          border border-white/20
-          rounded-full
-          px-3 py-2
         "
       >
         <svg
@@ -96,74 +95,76 @@ export function UserType({
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
+          className="shrink-0"
         >
           <path d="M19 12H5M12 19l-7-7 7-7" />
         </svg>
-        <span className="text-sm sm:text-base">{text.back}</span>
+        <span className="text-xs sm:text-sm md:text-base">{text.back}</span>
       </button>
 
-      <div className="w-full max-w-2xl text-center">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl mt-12 text-white drop-shadow-lg mb-8 sm:mb-10 md:mb-12">
+      <div className="w-full max-w-2xl min-h-0 flex flex-col items-center justify-center text-center">
+        <h2
+          className="text-white drop-shadow-lg font-semibold leading-tight mb-4 sm:mb-5 md:mb-6"
+          style={{ fontSize: "clamp(1.4rem, 3vw, 2.4rem)" }}
+        >
           {text.title}
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+        <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 md:gap-5">
           <button
             onClick={() => handleSelection("artist")}
             type="button"
             className="
-              cursor-pointer
-              w-full
-              px-6 sm:px-8
-              py-8 sm:py-10 md:py-12
+              cursor-pointer w-full
               rounded-2xl
-              bg-white/20 backdrop-blur-md
               border-2 border-white/30
+              bg-white/20 backdrop-blur-md
               text-white drop-shadow
               hover:bg-white/30 hover:border-white/50
-              transition-all
-              active:scale-[0.99]
+              transition-all active:scale-[0.99]
+              px-5 sm:px-6
+              py-6 sm:py-7 md:py-8
             "
           >
-            <div className="text-xl sm:text-2xl">{text.artist}</div>
+            <div className="text-lg sm:text-xl md:text-2xl leading-tight">
+              {text.artist}
+            </div>
           </button>
 
           <button
             onClick={() => handleSelection("fan")}
             type="button"
             className="
-              cursor-pointer
-              w-full
-              px-6 sm:px-8
-              py-8 sm:py-10 md:py-12
+              cursor-pointer w-full
               rounded-2xl
-              bg-white/20 backdrop-blur-md
               border-2 border-white/30
+              bg-white/20 backdrop-blur-md
               text-white drop-shadow
               hover:bg-white/30 hover:border-white/50
-              transition-all
-              active:scale-[0.99]
+              transition-all active:scale-[0.99]
+              px-5 sm:px-6
+              py-6 sm:py-7 md:py-8
             "
           >
-            <div className="text-xl sm:text-2xl">{text.fan}</div>
+            <div className="text-lg sm:text-xl md:text-2xl leading-tight">
+              {text.fan}
+            </div>
           </button>
         </div>
 
-        <div className="mt-8">
+        <div className="mt-5 sm:mt-6 flex flex-col items-center gap-3">
           <button
             type="button"
             onClick={() => router.replace("/home/?view=question")}
-            className="cursor-pointer text-sm text-white/90 drop-shadow hover:opacity-70 transition-opacity"
+            className="cursor-pointer text-xs sm:text-sm text-white/90 drop-shadow hover:opacity-70 transition-opacity"
           >
             {text.questionnaireLink}
           </button>
-        </div>
 
-        <div className="mt-4">
           <button
             type="button"
             onClick={() => router.replace("/home/?view=home")}
-            className="cursor-pointer text-sm text-white/90 drop-shadow hover:opacity-70 transition-opacity"
+            className="cursor-pointer text-xs sm:text-sm text-white/90 drop-shadow hover:opacity-70 transition-opacity"
           >
             {text.welcomeLink}
           </button>

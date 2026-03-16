@@ -165,22 +165,22 @@ export function Questionnaire({
   };
 
   return (
-    <div className="relative w-full h-[100dvh] overflow-hidden">
-      {/* ✅ FIXED BACK BUTTON (ne scroll pas) */}
+    <div className="relative w-full h-full min-h-0 overflow-hidden">
+      {/* Back button */}
       <button
         onClick={onBack}
         type="button"
         className="
-          fixed z-50
-          left-4 sm:left-6
-          top-[calc(env(safe-area-inset-top)+1rem)]
+          absolute z-20
+          left-3 sm:left-4 md:left-5
+          top-[max(8px,env(safe-area-inset-top))]
           flex items-center gap-2
+          rounded-full
+          border border-white/20
+          bg-white/10 backdrop-blur-md
+          px-3 py-2
           text-white drop-shadow
           hover:opacity-70 transition-opacity
-          bg-white/10 backdrop-blur-md
-          border border-white/20
-          rounded-full
-          px-3 py-2
         "
       >
         <svg
@@ -192,38 +192,41 @@ export function Questionnaire({
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
+          className="shrink-0"
         >
           <path d="M19 12H5M12 19l-7-7 7-7" />
         </svg>
-        <span className="text-sm sm:text-base">{text.back}</span>
+        <span className="text-xs sm:text-sm md:text-base">{text.back}</span>
       </button>
 
-      {/* ✅ SCROLL AREA (SEUL CE CONTAINER SCROLLE) */}
+      {/* Content */}
       <div
         className="
           relative z-10
-          h-[100dvh]
-          overflow-y-auto overscroll-contain
-          touch-pan-y
-          px-4 sm:px-6
-          pt-[calc(env(safe-area-inset-top)+1rem+8.25rem)]
-          pb-[calc(env(safe-area-inset-bottom)+1rem)]
+          flex h-full min-h-0 w-full items-center justify-center
+          overflow-hidden
+          px-4 sm:px-5 md:px-6
+          pt-[max(56px,calc(env(safe-area-inset-top)+0.75rem))]
+          pb-[max(14px,calc(env(safe-area-inset-bottom)+0.75rem))]
         "
-        style={{ WebkitOverflowScrolling: "touch" }}
       >
-        <div className="max-w-lg mx-auto w-full pt-2 pb-8">
-          <h2 className="text-white drop-shadow-lg mb-1 text-xl sm:text-2xl">
+        <div className="mx-auto flex w-full max-w-lg min-h-0 flex-col justify-center">
+          <h2
+            className="mb-1 text-white drop-shadow-lg font-semibold leading-tight"
+            style={{ fontSize: "clamp(1.2rem, 2.5vw, 2rem)" }}
+          >
             {text.title}
           </h2>
-          <p className="text-white/90 drop-shadow mb-4 text-sm sm:text-base">
+
+          <p className="mb-4 text-sm sm:text-base text-white/90 drop-shadow">
             {text.subtitle}
           </p>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
             <div>
               <label
                 htmlFor="name"
-                className="block text-white drop-shadow mb-1"
+                className="mb-1 block text-sm sm:text-base text-white drop-shadow"
               >
                 {text.name}
               </label>
@@ -234,12 +237,19 @@ export function Questionnaire({
                 value={formData.name}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 rounded-lg bg-white/20 backdrop-blur-md border border-white/30 text-black placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50"
+                className="
+                  w-full rounded-lg border border-white/30
+                  bg-white/20 backdrop-blur-md
+                  px-4 py-2.5
+                  text-black
+                  placeholder-white/50
+                  focus:outline-none focus:ring-2 focus:ring-white/50
+                "
               />
             </div>
 
             <div>
-              <label className="block text-white drop-shadow mb-1">
+              <label className="mb-1 block text-sm sm:text-base text-white drop-shadow">
                 {text.ageRange}
               </label>
               <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
@@ -248,13 +258,13 @@ export function Questionnaire({
                     key={range}
                     type="button"
                     onClick={() => handleSelectAgeRange(range)}
-                    className={`px-2 py-2 cursor-pointer rounded-lg transition-all ${
+                    className={`rounded-lg px-2 py-2 cursor-pointer transition-all ${
                       formData.ageRange === range
-                        ? "bg-white/30 backdrop-blur-sm border-2 border-white/50"
-                        : "bg-white/10 backdrop-blur-sm border-2 border-white/20 hover:bg-white/20"
+                        ? "border-2 border-white/50 bg-white/30 backdrop-blur-sm"
+                        : "border-2 border-white/20 bg-white/10 backdrop-blur-sm hover:bg-white/20"
                     }`}
                   >
-                    <span className="text-white drop-shadow text-xs">
+                    <span className="text-[11px] sm:text-xs text-white drop-shadow">
                       {range}
                     </span>
                   </button>
@@ -263,7 +273,7 @@ export function Questionnaire({
             </div>
 
             <div>
-              <label className="block text-white drop-shadow mb-1">
+              <label className="mb-1 block text-sm sm:text-base text-white drop-shadow">
                 {text.language}
               </label>
               <div className="grid grid-cols-3 gap-2">
@@ -272,13 +282,13 @@ export function Questionnaire({
                     key={lang}
                     type="button"
                     onClick={() => handleSelectLanguage(lang)}
-                    className={`px-3 py-2 cursor-pointer rounded-lg transition-all ${
+                    className={`rounded-lg px-3 py-2 cursor-pointer transition-all ${
                       formData.language === lang
-                        ? "bg-white/30 backdrop-blur-sm border-2 border-white/50"
-                        : "bg-white/10 backdrop-blur-sm border-2 border-white/20 hover:bg-white/20"
+                        ? "border-2 border-white/50 bg-white/30 backdrop-blur-sm"
+                        : "border-2 border-white/20 bg-white/10 backdrop-blur-sm hover:bg-white/20"
                     }`}
                   >
-                    <span className="text-white drop-shadow capitalize">
+                    <span className="capitalize text-xs sm:text-sm text-white drop-shadow">
                       {lang}
                     </span>
                   </button>
@@ -289,7 +299,7 @@ export function Questionnaire({
             <div>
               <label
                 htmlFor="email"
-                className="block text-white drop-shadow mb-1"
+                className="mb-1 block text-sm sm:text-base text-white drop-shadow"
               >
                 {text.email}
               </label>
@@ -301,28 +311,37 @@ export function Questionnaire({
                 value={formData.email}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 rounded-lg bg-white/20 backdrop-blur-md border border-white/30 text-black placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50"
+                className="
+                  w-full rounded-lg border border-white/30
+                  bg-white/20 backdrop-blur-md
+                  px-4 py-2.5
+                  text-black
+                  placeholder-white/50
+                  focus:outline-none focus:ring-2 focus:ring-white/50
+                "
               />
 
               {errorMessage && (
-                <div className="mt-3 px-3 py-2 rounded-lg bg-red-500/70 text-white text-sm">
+                <div className="mt-3 rounded-lg bg-red-500/70 px-3 py-2 text-sm text-white">
                   {errorMessage}
                 </div>
               )}
 
               {successMessage && (
-                <div className="mt-3 px-3 py-2 rounded-lg bg-emerald-500/70 text-white text-sm">
+                <div className="mt-3 rounded-lg bg-emerald-500/70 px-3 py-2 text-sm text-white">
                   {successMessage}
                 </div>
               )}
 
-              <div className="mt-4 flex flex-col sm:flex-row gap-3 sm:justify-end">
+              <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:justify-end">
                 {!success ? (
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className={`disabled:cursor-not-allowed w-full sm:w-auto px-6 cursor-pointer py-2 bg-gradient-to-r from-purple-500/50 to-pink-500/50 backdrop-blur-md border-2 border-white/50 rounded-xl text-white drop-shadow-lg hover:from-purple-500/60 hover:to-pink-500/60 transition-all flex items-center justify-center gap-2 shadow-xl whitespace-nowrap ${
-                      isSubmitting ? "opacity-70 cursor-not-allowed" : ""
+                    className={`w-full sm:w-auto whitespace-nowrap rounded-xl border-2 border-white/50 bg-gradient-to-r from-purple-500/50 to-pink-500/50 px-5 py-2.5 text-white shadow-xl backdrop-blur-md transition-all flex items-center justify-center gap-2 drop-shadow-lg ${
+                      isSubmitting
+                        ? "cursor-not-allowed opacity-70"
+                        : "cursor-pointer hover:from-purple-500/60 hover:to-pink-500/60"
                     }`}
                   >
                     {isSubmitting ? (
@@ -330,8 +349,8 @@ export function Questionnaire({
                     ) : (
                       <>
                         <svg
-                          width="20"
-                          height="20"
+                          width="18"
+                          height="18"
                           viewBox="0 0 24 24"
                           fill="none"
                           stroke="currentColor"
@@ -341,7 +360,9 @@ export function Questionnaire({
                         >
                           <polyline points="20 6 9 17 4 12" />
                         </svg>
-                        <span className="font-medium">{text.submit}</span>
+                        <span className="text-sm sm:text-base font-medium">
+                          {text.submit}
+                        </span>
                       </>
                     )}
                   </button>
@@ -349,9 +370,20 @@ export function Questionnaire({
                   <button
                     type="button"
                     onClick={onSubmit}
-                    className="w-full sm:w-auto px-6 cursor-pointer py-2 bg-gradient-to-r from-purple-500/50 to-pink-500/50 backdrop-blur-md border-2 border-white/50 rounded-xl text-white drop-shadow-lg hover:from-purple-500/60 hover:to-pink-500/60 transition-all flex items-center justify-center gap-2 shadow-xl whitespace-nowrap"
+                    className="
+                      w-full sm:w-auto whitespace-nowrap
+                      rounded-xl border-2 border-white/50
+                      bg-gradient-to-r from-purple-500/50 to-pink-500/50
+                      px-5 py-2.5
+                      text-white shadow-xl backdrop-blur-md
+                      transition-all hover:from-purple-500/60 hover:to-pink-500/60
+                      flex items-center justify-center gap-2
+                      drop-shadow-lg cursor-pointer
+                    "
                   >
-                    <span className="font-medium">{text.continue}</span>
+                    <span className="text-sm sm:text-base font-medium">
+                      {text.continue}
+                    </span>
                   </button>
                 )}
               </div>
