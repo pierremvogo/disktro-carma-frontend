@@ -17,6 +17,7 @@ import { StripeModuleObject } from "./stripe/module";
 import { LygosModuleObject } from "./lygos/module";
 import { Search } from "lucide-react";
 import { ArtistProfileModal } from "./previewProfileArtist/ArtistProfileModal";
+import { speak } from "@/@disktro/lib/text-to-speech";
 
 // Icon components
 const Music = ({ size = 24, className = "" }) => (
@@ -2379,17 +2380,17 @@ pb-[env(safe-area-inset-bottom)]
               title={text.accessibility}
               type="button"
               className={`
-      relative
-      h-9 w-9 sm:h-10 sm:w-10
-      rounded-full
-      shadow-md
-      transition-all
-      hover:scale-105
-      focus:outline-none
-      focus:ring-4 focus:ring-white/30
-      select-none
-      ${animationClasses}
-    `}
+                          relative
+                          h-9 w-9 sm:h-10 sm:w-10
+                          rounded-full
+                          shadow-md
+                          transition-all
+                          hover:scale-105
+                          focus:outline-none
+                          focus:ring-4 focus:ring-white/30
+                          select-none
+                          ${animationClasses}
+                        `}
               style={{
                 background: "rgba(168, 85, 145, 0.4)",
                 backdropFilter: "blur(10px)",
@@ -2466,6 +2467,11 @@ pb-[env(safe-area-inset-bottom)]
             {/* PROFILE BUTTON */}
             <button
               onClick={() => setShowProfile(true)}
+              onMouseEnter={() => {
+                if (textToSpeech) {
+                  speak("Your Profile");
+                }
+              }}
               className="flex cursor-pointer items-center gap-2 px-3 py-2 text-white bg-white/10
           backdrop-blur-md border border-white/20 rounded-lg hover:bg-white/20 transition-all"
             >
@@ -2482,6 +2488,11 @@ pb-[env(safe-area-inset-bottom)]
             {/* LOGOUT BUTTON */}
             <button
               onClick={handleLogout}
+              onMouseEnter={() => {
+                if (textToSpeech) {
+                  speak("Logout");
+                }
+              }}
               className="px-3 py-2 bg-gradient-to-r cursor-pointer from-red-500/40 to-orange-500/40 
           backdrop-blur-md border border-white/30 rounded-lg text-white
           hover:from-red-500/60 hover:to-orange-500/60 transition-all flex items-center gap-2"
@@ -4185,7 +4196,7 @@ pb-[env(safe-area-inset-bottom)]
                         type="button"
                         onClick={() => setHighContrast(!highContrast)}
                         className={`w-14 h-8 rounded-full transition-all ${
-                          highContrast ? "bg-white/40" : "bg-white/20"
+                          highContrast ? "bg-green-500" : "bg-white/20"
                         }`}
                       >
                         <div
@@ -4247,7 +4258,7 @@ pb-[env(safe-area-inset-bottom)]
                         type="button"
                         onClick={() => setReduceMotion(!reduceMotion)}
                         className={`w-14 h-8 rounded-full transition-all ${
-                          reduceMotion ? "bg-white/40" : "bg-white/20"
+                          reduceMotion ? "bg-green-500" : "bg-white/20"
                         }`}
                       >
                         <div
@@ -4281,7 +4292,7 @@ pb-[env(safe-area-inset-bottom)]
                         type="button"
                         onClick={() => setDyslexiaFont(!dyslexiaFont)}
                         className={`w-14 h-8 rounded-full transition-all ${
-                          dyslexiaFont ? "bg-white/40" : "bg-white/20"
+                          dyslexiaFont ? "bg-green-500" : "bg-white/20"
                         }`}
                       >
                         <div
@@ -4344,7 +4355,7 @@ pb-[env(safe-area-inset-bottom)]
                         type="button"
                         onClick={() => setShowCaptions(!showCaptions)}
                         className={`w-14 h-8 rounded-full transition-all ${
-                          showCaptions ? "bg-white/40" : "bg-white/20"
+                          showCaptions ? "bg-green-500" : "bg-white/20"
                         }`}
                       >
                         <div
@@ -4379,7 +4390,7 @@ pb-[env(safe-area-inset-bottom)]
                           setVisualNotifications(!visualNotifications)
                         }
                         className={`w-14 h-8 rounded-full transition-all ${
-                          visualNotifications ? "bg-white/40" : "bg-white/20"
+                          visualNotifications ? "bg-green-500" : "bg-white/20"
                         }`}
                       >
                         <div
@@ -4415,7 +4426,7 @@ pb-[env(safe-area-inset-bottom)]
                         type="button"
                         onClick={() => setTextToSpeech(!textToSpeech)}
                         className={`w-14 h-8 rounded-full transition-all ${
-                          textToSpeech ? "bg-white/40" : "bg-white/20"
+                          textToSpeech ? "bg-green-500" : "bg-white/20"
                         }`}
                       >
                         <div
