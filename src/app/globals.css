@@ -18,6 +18,11 @@
     --foreground: #ededed;
   }
 }
+@layer base {
+  button:focus-visible {
+    @apply ring-2 ring-white ring-offset-2;
+  }
+}
 
 body {
   background: radial-gradient(circle at top left, #e0e7ff, #f0f4ff);
@@ -111,4 +116,8 @@ html.reading-guide body::before {
 .no-scrollbar {
   -ms-overflow-style: none; /* IE/Edge */
   scrollbar-width: none; /* Firefox */
+}
+button:focus-visible {
+  outline: 3px solid "#fffffff";
+  outline-offset: 3px;
 }

@@ -71,6 +71,10 @@ export function UserType({
     >
       {/* Back button */}
       <button
+        style={{
+          outline: "3px solid #ffffff",
+          outlineOffset: "3px",
+        }}
         onClick={() => router.replace("/home/?view=home")}
         type="button"
         className="
@@ -112,6 +116,10 @@ export function UserType({
 
         <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 md:gap-5">
           <button
+            style={{
+              outline: "3px solid #ffffff",
+              outlineOffset: "3px",
+            }}
             onClick={() => handleSelection("artist")}
             type="button"
             className="
@@ -132,6 +140,10 @@ export function UserType({
           </button>
 
           <button
+            style={{
+              outline: "3px solid #ffffff",
+              outlineOffset: "3px",
+            }}
             onClick={() => handleSelection("fan")}
             type="button"
             className="
@@ -154,6 +166,10 @@ export function UserType({
 
         <div className="mt-5 sm:mt-6 flex flex-col items-center gap-3">
           <button
+            style={{
+              outline: "3px solid #ffffff",
+              outlineOffset: "3px",
+            }}
             type="button"
             onClick={() => router.replace("/home/?view=question")}
             className="cursor-pointer text-xs sm:text-sm text-white/90 drop-shadow hover:opacity-70 transition-opacity"
@@ -162,6 +178,10 @@ export function UserType({
           </button>
 
           <button
+            style={{
+              outline: "3px solid #ffffff",
+              outlineOffset: "3px",
+            }}
             type="button"
             onClick={() => router.replace("/home/?view=home")}
             className="cursor-pointer text-xs sm:text-sm text-white/90 drop-shadow hover:opacity-70 transition-opacity"
