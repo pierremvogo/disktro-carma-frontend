@@ -2598,6 +2598,10 @@ export function ArtistDashboard({
             )}
 
             <button
+              style={{
+                outline: "3px solid #ffffff",
+                outlineOffset: "3px",
+              }}
               onClick={() => {
                 router.push("/subscription");
               }}

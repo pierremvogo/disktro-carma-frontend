@@ -2454,7 +2454,6 @@ pb-[env(safe-area-inset-bottom)]
 
             {isArtist && (
               <button
-                
                 onClick={() => router.push("/dashboard/artist/select")}
                 className={`flex cursor-pointer items-center gap-2 text-white drop-shadow hover:opacity-70 ${animationClasses} ${buttonSizeClasses}`}
                 aria-label={text.back}
