@@ -207,6 +207,10 @@ export function ArtistChoice({
       >
         {/* Back */}
         <button
+          style={{
+            outline: "3px solid #ffffff",
+            outlineOffset: "3px",
+          }}
           onClick={() => router.replace("/home/?view=home")}
           type="button"
           className="
@@ -237,6 +241,10 @@ export function ArtistChoice({
 
         {/* Logout */}
         <button
+          style={{
+            outline: "3px solid #ffffff",
+            outlineOffset: "3px",
+          }}
           onClick={() => handleLogout()}
           className="
             cursor-pointer
@@ -346,6 +354,10 @@ export function ArtistChoice({
 
                 {/* Button */}
                 <button
+                  style={{
+                    outline: "3px solid #ffffff",
+                    outlineOffset: "3px",
+                  }}
                   onClick={() => router.push("/dashboard/artist")}
                   type="button"
                   className="cursor-pointer w-full px-5 py-3 sm:px-6 sm:py-4 bg-gradient-to-r from-purple-500/50 to-pink-500/50 backdrop-blur-md border border-white/40 rounded-xl text-white text-base sm:text-lg hover:from-purple-500/60 hover:to-pink-500/60 hover:border-white/70 transition-all shadow-lg flex items-center justify-center gap-2 group-hover:scale-[1.02]"
@@ -410,6 +422,10 @@ export function ArtistChoice({
 
                 {/* Button */}
                 <button
+                  style={{
+                    outline: "3px solid #ffffff",
+                    outlineOffset: "3px",
+                  }}
                   onClick={() => router.push("/dashboard/fan-streaming")}
                   type="button"
                   className="cursor-pointer w-full px-5 py-3 sm:px-6 sm:py-4 bg-gradient-to-r from-blue-500/50 to-cyan-500/50 backdrop-blur-md border border-white/40 rounded-xl text-white text-base sm:text-lg hover:from-blue-500/60 hover:to-cyan-500/60 hover:border-white/70 transition-all shadow-lg flex items-center justify-center gap-2 group-hover:scale-[1.02]"

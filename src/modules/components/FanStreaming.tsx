@@ -1268,6 +1268,32 @@ export function FanStreaming({ language }: FanStreamingProps) {
     }
   }
 
+  const handleTabHover = (tab: string) => {
+    if (textToSpeech) {
+      switch (tab) {
+        case "discover":
+          speak("Discover section");
+          break;
+
+        case "artists":
+          speak("Artist section");
+          break;
+
+        case "mymusic":
+          speak("Music section");
+          break;
+
+        case "editorplaylists":
+          speak("Editor playlist");
+          break;
+
+        case "dashboard":
+          speak("Dashboard section");
+          break;
+      }
+    }
+  };
+
   async function fetchFeaturedTracks() {
     try {
       setFeaturedLoading(true);
@@ -2428,6 +2454,10 @@ pb-[env(safe-area-inset-bottom)]
 
             {isArtist && (
               <button
+                style={{
+                  outline: "3px solid #ffffff",
+                  outlineOffset: "3px",
+                }}
                 onClick={() => router.push("/dashboard/artist/select")}
                 className={`flex cursor-pointer items-center gap-2 text-white drop-shadow hover:opacity-70 ${animationClasses} ${buttonSizeClasses}`}
                 aria-label={text.back}
@@ -2463,9 +2493,13 @@ pb-[env(safe-area-inset-bottom)]
             </h1>
           </div>
 
-          <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="flex items-center gap-5 flex-shrink-0">
             {/* PROFILE BUTTON */}
             <button
+              style={{
+                outline: "3px solid #ffffff",
+                outlineOffset: "3px",
+              }}
               onClick={() => setShowProfile(true)}
               onMouseEnter={() => {
                 if (textToSpeech) {
@@ -2487,6 +2521,10 @@ pb-[env(safe-area-inset-bottom)]
 
             {/* LOGOUT BUTTON */}
             <button
+              style={{
+                outline: "3px solid #ffffff",
+                outlineOffset: "3px",
+              }}
               onClick={handleLogout}
               onMouseEnter={() => {
                 if (textToSpeech) {
@@ -2539,6 +2577,7 @@ pb-[env(safe-area-inset-bottom)]
                   <button
                     key={key}
                     onClick={() => setSelectedTab(key)}
+                    onMouseEnter={() => handleTabHover(key)}
                     type="button"
                     className={`
               flex-shrink-0
@@ -2639,122 +2678,260 @@ pb-[env(safe-area-inset-bottom)]
       >
         {/* Discover Tab */}
         {selectedTab === "discover" && (
-          <div className="space-y-8 max-w-6xl mx-auto">
-            {/* Browse by Mood Section */}
-            <div>
-              <h2 className="text-2xl text-white drop-shadow-lg mb-4">
-                {language === "spanish" && "Explorar por Estado de Ánimo"}
-                {language === "english" && "Browse by Mood"}
-                {language === "catalan" && "Explorar per Estat d'Ànim"}
-              </h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {[
-                  {
-                    name:
-                      language === "spanish"
-                        ? "Feliz"
-                        : language === "catalan"
-                        ? "Feliç"
-                        : "Happy",
-                    emoji: "😊",
-                    color: "from-yellow-400/40 to-orange-400/40",
-                  },
-                  {
-                    name:
-                      language === "spanish"
-                        ? "Relajado"
-                        : language === "catalan"
-                        ? "Relaxat"
-                        : "Relaxed",
-                    emoji: "😌",
-                    color: "from-blue-400/40 to-cyan-400/40",
-                  },
-                  {
-                    name:
-                      language === "spanish"
-                        ? "Energético"
-                        : language === "catalan"
-                        ? "Energètic"
-                        : "Energetic",
-                    emoji: "⚡",
-                    color: "from-red-400/40 to-pink-400/40",
-                  },
-                  {
-                    name:
-                      language === "spanish"
-                        ? "Triste"
-                        : language === "catalan"
-                        ? "Trist"
-                        : "Sad",
-                    emoji: "😢",
-                    color: "from-indigo-400/40 to-blue-400/40",
-                  },
-                  {
-                    name:
-                      language === "spanish"
-                        ? "Romántico"
-                        : language === "catalan"
-                        ? "Romàntic"
-                        : "Romantic",
-                    emoji: "💕",
-                    color: "from-pink-400/40 to-rose-400/40",
-                  },
-                  {
-                    name:
-                      language === "spanish"
-                        ? "Enfocado"
-                        : language === "catalan"
-                        ? "Concentrat"
-                        : "Focused",
-                    emoji: "🎯",
-                    color: "from-purple-400/40 to-violet-400/40",
-                  },
-                  {
-                    name:
-                      language === "spanish"
-                        ? "Motivado"
-                        : language === "catalan"
-                        ? "Motivat"
-                        : "Motivated",
-                    emoji: "💪",
-                    color: "from-green-400/40 to-emerald-400/40",
-                  },
-                  {
-                    name:
-                      language === "spanish"
-                        ? "Nostálgico"
-                        : language === "catalan"
-                        ? "Nostàlgic"
-                        : "Nostalgic",
-                    emoji: "🌅",
-                    color: "from-amber-400/40 to-yellow-400/40",
-                  },
-                ].map((mood) => (
-                  <button
-                    key={mood.name}
-                    onClick={() => openMoodDrawer(mood.name)}
-                    className={`
-        bg-gradient-to-br ${mood.color}
-        backdrop-blur-md rounded-2xl p-6
-        border border-white/20
-        hover:scale-105 transition-all
-        cursor-pointer
-        focus:outline-none focus:ring-2 focus:ring-white/40
-      `}
-                    aria-label={`Browse mood ${mood.name}`}
-                  >
-                    <div className="text-center">
-                      <div className="text-4xl mb-3">{mood.emoji}</div>
-                      <h3 className="text-white drop-shadow">{mood.name}</h3>
+          <div className="space-y-10 max-w-7xl mx-auto">
+            {/* Top Section */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
+              {/* Browse by Mood Section */}
+              <div className="bg-white/5 backdrop-blur-xl rounded-3xl p-5 border border-white/10 h-full flex flex-col">
+                <h2 className="text-3xl font-bold tracking-tight text-white drop-shadow-lg mb-4">
+                  {language === "spanish" && "Explorar por Estado de Ánimo"}
+                  {language === "english" && "Browse by Mood"}
+                  {language === "catalan" && "Explorar per Estat d'Ànim"}
+                </h2>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 flex-1">
+                  {[
+                    {
+                      name:
+                        language === "spanish"
+                          ? "Feliz"
+                          : language === "catalan"
+                          ? "Feliç"
+                          : "Happy",
+                      emoji: "😊",
+                      color: "from-yellow-400/40 to-orange-400/40",
+                    },
+                    {
+                      name:
+                        language === "spanish"
+                          ? "Relajado"
+                          : language === "catalan"
+                          ? "Relaxat"
+                          : "Relaxed",
+                      emoji: "😌",
+                      color: "from-blue-400/40 to-cyan-400/40",
+                    },
+                    {
+                      name:
+                        language === "spanish"
+                          ? "Energético"
+                          : language === "catalan"
+                          ? "Energètic"
+                          : "Energetic",
+                      emoji: "⚡",
+                      color: "from-red-400/40 to-pink-400/40",
+                    },
+                    {
+                      name:
+                        language === "spanish"
+                          ? "Triste"
+                          : language === "catalan"
+                          ? "Trist"
+                          : "Sad",
+                      emoji: "😢",
+                      color: "from-indigo-400/40 to-blue-400/40",
+                    },
+                    {
+                      name:
+                        language === "spanish"
+                          ? "Romántico"
+                          : language === "catalan"
+                          ? "Romàntic"
+                          : "Romantic",
+                      emoji: "💕",
+                      color: "from-pink-400/40 to-rose-400/40",
+                    },
+                    {
+                      name:
+                        language === "spanish"
+                          ? "Enfocado"
+                          : language === "catalan"
+                          ? "Concentrat"
+                          : "Focused",
+                      emoji: "🎯",
+                      color: "from-purple-400/40 to-violet-400/40",
+                    },
+                    {
+                      name:
+                        language === "spanish"
+                          ? "Motivado"
+                          : language === "catalan"
+                          ? "Motivat"
+                          : "Motivated",
+                      emoji: "💪",
+                      color: "from-green-400/40 to-emerald-400/40",
+                    },
+                    {
+                      name:
+                        language === "spanish"
+                          ? "Nostálgico"
+                          : language === "catalan"
+                          ? "Nostàlgic"
+                          : "Nostalgic",
+                      emoji: "🌅",
+                      color: "from-amber-400/40 to-yellow-400/40",
+                    },
+                    {
+                      name:
+                        language === "spanish"
+                          ? "Eufórico"
+                          : language === "catalan"
+                          ? "Eufòric"
+                          : "Hype",
+                      emoji: "🔥",
+                      color: "from-orange-500/40 to-red-500/40",
+                    },
+                    {
+                      name:
+                        language === "spanish"
+                          ? "Tranquilo"
+                          : language === "catalan"
+                          ? "Tranquil"
+                          : "Chill",
+                      emoji: "🌴",
+                      color: "from-cyan-400/40 to-sky-500/40",
+                    },
+                  ].map((mood) => (
+                    <button
+                      key={mood.name}
+                      onClick={() => openMoodDrawer(mood.name)}
+                      className={`
+                                  h-full
+                                  min-h-[140px]
+                                  bg-gradient-to-br ${mood.color}
+                                  backdrop-blur-xl
+                                  rounded-2xl
+                                  p-5
+                                  border border-white/10
+                                  hover:scale-[1.03]
+                                hover:border-white/20
+                                  transition-all duration-300
+                                  group
+                      `}
+                      aria-label={`Browse mood ${mood.name}`}
+                    >
+                      <div className="text-center">
+                        <div className="text-3xl mb-2">{mood.emoji}</div>
+                        <h3 className="text-white font-medium">{mood.name}</h3>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* New Releases */}
+              <div className="bg-white/5 backdrop-blur-xl rounded-3xl p-5 border border-white/10 h-full">
+                <h2 className="text-3xl font-bold tracking-tight text-white mb-5">
+                  {text.newReleases}
+                </h2>
+
+                <div className="space-y-3 max-h-[560px] overflow-y-auto">
+                  {newReleasesLoading ? (
+                    <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 text-white/70 text-sm">
+                      Loading...
                     </div>
-                  </button>
-                ))}
+                  ) : newReleasesError ? (
+                    <div className="bg-red-500/10 backdrop-blur-md rounded-xl p-4 border border-red-500/20 text-white/80 text-sm">
+                      {newReleasesError}
+                    </div>
+                  ) : (
+                    (filteredNewReleases ?? []).map((song: any) => (
+                      <div
+                        key={song.id}
+                        className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 hover:bg-white/15 transition-all"
+                      >
+                        <div className="flex items-center gap-4 sm:flex-row flex-col">
+                          <div className="w-16 h-16 bg-white/5 rounded-lg overflow-hidden flex-shrink-0">
+                            <img
+                              src={song.cover ?? "/placeholder.png"}
+                              alt={song.title}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+
+                          <div className="flex-1 min-w-0">
+                            <h4 className="text-white drop-shadow truncate">
+                              {song.title}
+                            </h4>
+                            <p className="text-white/60 text-sm truncate">
+                              {song.artist} • {song.album}
+                            </p>
+                          </div>
+
+                          <div className="flex items-center gap-4">
+                            <span className="text-white/60 text-sm">
+                              {song.duration}
+                            </span>
+
+                            {/* ✅ Nouveau handler : le Player choisit single/ep/album et charge la bonne queue */}
+                            <button
+                              onClick={() => handlePlayFeatured(song)}
+                              className="cursor-pointer p-3 bg-white/20 backdrop-blur-sm rounded-full hover:bg-white/30 transition-all"
+                              aria-label={
+                                isPlaying && currentSong?.id === song.id
+                                  ? text.pause
+                                  : text.play
+                              }
+                              title={
+                                isPlaying && currentSong?.id === song.id
+                                  ? text.pause
+                                  : text.play
+                              }
+                            >
+                              {isPlaying && currentSong?.id === song.id ? (
+                                <Pause size={18} className="text-white" />
+                              ) : (
+                                <Play size={18} className="text-white" />
+                              )}
+                            </button>
+
+                            <button
+                              onClick={() => toggleFavorite(song.id)}
+                              className="cursor-pointer p-3 hover:bg-white/10 rounded-full transition-all"
+                              title={text.addToFavorites}
+                            >
+                              <Heart
+                                size={18}
+                                className={`${
+                                  favoriteTrackIds.includes(String(song.id))
+                                    ? "text-red-400 fill-red-400"
+                                    : "text-white"
+                                }`}
+                              />
+                            </button>
+
+                            {/* ✅ Nouveau handler : ouvre modal + fetch playlists user + ajout track backend */}
+                            <button
+                              onClick={() => openAddToPlaylist(song)}
+                              className="cursor-pointer p-3 hover:bg-white/10 rounded-full transition-all"
+                              title={text.addToPlaylist}
+                              aria-label={text.addToPlaylist}
+                            >
+                              <svg
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
               </div>
             </div>
 
             {/* Featured Section */}
             <div>
-              <h2 className="text-2xl text-white drop-shadow-lg mb-4">
+              <h2 className="text-3xl font-bold tracking-tight text-white drop-shadow-lg mb-4">
                 {text.featured}
               </h2>
 
@@ -2767,13 +2944,13 @@ pb-[env(safe-area-inset-bottom)]
                   {featuredError}
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
                   {filteredFeatured.slice(0, 3).map((song: any) => (
                     <div
                       key={song.id}
-                      className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 hover:bg-white/15 transition-all"
+                      className="bg-white/10 backdrop-blur-md rounded-3xl p-7 border border-white/20 hover:bg-white/15 transition-all"
                     >
-                      <div className="aspect-square bg-white/5 rounded-xl mb-4 overflow-hidden">
+                      <div className="aspect-[4/3] bg-white/5 rounded-xl mb-4 overflow-hidden">
                         <img
                           src={song.cover ?? "/placeholder.png"}
                           alt={song.title}
@@ -2821,116 +2998,6 @@ pb-[env(safe-area-inset-bottom)]
                 </div>
               )}
             </div>
-
-            {/* New Releases */}
-            <div>
-              <h2 className="text-2xl text-white drop-shadow-lg mb-4">
-                {text.newReleases}
-              </h2>
-
-              <div className="space-y-3">
-                {newReleasesLoading ? (
-                  <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 text-white/70 text-sm">
-                    Loading...
-                  </div>
-                ) : newReleasesError ? (
-                  <div className="bg-red-500/10 backdrop-blur-md rounded-xl p-4 border border-red-500/20 text-white/80 text-sm">
-                    {newReleasesError}
-                  </div>
-                ) : (
-                  (filteredNewReleases ?? []).map((song: any) => (
-                    <div
-                      key={song.id}
-                      className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 hover:bg-white/15 transition-all"
-                    >
-                      <div className="flex items-center gap-4 sm:flex-row flex-col">
-                        <div className="w-16 h-16 bg-white/5 rounded-lg overflow-hidden flex-shrink-0">
-                          <img
-                            src={song.cover ?? "/placeholder.png"}
-                            alt={song.title}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-
-                        <div className="flex-1 min-w-0">
-                          <h4 className="text-white drop-shadow truncate">
-                            {song.title}
-                          </h4>
-                          <p className="text-white/60 text-sm truncate">
-                            {song.artist} • {song.album}
-                          </p>
-                        </div>
-
-                        <div className="flex items-center gap-4">
-                          <span className="text-white/60 text-sm">
-                            {song.duration}
-                          </span>
-
-                          {/* ✅ Nouveau handler : le Player choisit single/ep/album et charge la bonne queue */}
-                          <button
-                            onClick={() => handlePlayFeatured(song)}
-                            className="cursor-pointer p-3 bg-white/20 backdrop-blur-sm rounded-full hover:bg-white/30 transition-all"
-                            aria-label={
-                              isPlaying && currentSong?.id === song.id
-                                ? text.pause
-                                : text.play
-                            }
-                            title={
-                              isPlaying && currentSong?.id === song.id
-                                ? text.pause
-                                : text.play
-                            }
-                          >
-                            {isPlaying && currentSong?.id === song.id ? (
-                              <Pause size={18} className="text-white" />
-                            ) : (
-                              <Play size={18} className="text-white" />
-                            )}
-                          </button>
-
-                          <button
-                            onClick={() => toggleFavorite(song.id)}
-                            className="cursor-pointer p-3 hover:bg-white/10 rounded-full transition-all"
-                            title={text.addToFavorites}
-                          >
-                            <Heart
-                              size={18}
-                              className={`${
-                                favoriteTrackIds.includes(String(song.id))
-                                  ? "text-red-400 fill-red-400"
-                                  : "text-white"
-                              }`}
-                            />
-                          </button>
-
-                          {/* ✅ Nouveau handler : ouvre modal + fetch playlists user + ajout track backend */}
-                          <button
-                            onClick={() => openAddToPlaylist(song)}
-                            className="cursor-pointer p-3 hover:bg-white/10 rounded-full transition-all"
-                            title={text.addToPlaylist}
-                            aria-label={text.addToPlaylist}
-                          >
-                            <svg
-                              width="18"
-                              height="18"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            >
-                              <line x1="12" y1="5" x2="12" y2="19" />
-                              <line x1="5" y1="12" x2="19" y2="12" />
-                            </svg>
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
           </div>
         )}
 
@@ -2944,6 +3011,10 @@ pb-[env(safe-area-inset-bottom)]
               </h2>
 
               <button
+                style={{
+                  outline: "3px solid #ffffff",
+                  outlineOffset: "3px",
+                }}
                 onClick={() => setSortArtists(!sortArtists)}
                 className={`px-4 py-2 rounded-lg text-white text-sm transition-all ${
                   sortArtists ? "bg-white/20" : "bg-white/10 hover:bg-white/15"
@@ -3068,6 +3139,10 @@ pb-[env(safe-area-inset-bottom)]
                     </button> */}
 
                     <button
+                      style={{
+                        outline: "3px solid #ffffff",
+                        outlineOffset: "3px",
+                      }}
                       type="button"
                       onClick={() => openArtistProfile(artist)}
                       className="
@@ -3147,6 +3222,10 @@ pb-[env(safe-area-inset-bottom)]
                             {song.duration}
                           </span>
                           <button
+                            style={{
+                              outline: "3px solid #ffffff",
+                              outlineOffset: "3px",
+                            }}
                             onClick={() => handlePlaySong(song)}
                             className="p-2 bg-white/10 backdrop-blur-sm rounded-full hover:bg-white/20 transition-all"
                           >
@@ -3157,6 +3236,10 @@ pb-[env(safe-area-inset-bottom)]
                             )}
                           </button>
                           <button
+                            style={{
+                              outline: "3px solid #ffffff",
+                              outlineOffset: "3px",
+                            }}
                             onClick={() => toggleFavorite(String(song.id))}
                             className="p-2 hover:bg-white/10 rounded-full transition-all"
                           >
@@ -3224,6 +3307,10 @@ pb-[env(safe-area-inset-bottom)]
                   </button>
                 )}
                 <button
+                  style={{
+                    outline: "3px solid #ffffff",
+                    outlineOffset: "3px",
+                  }}
                   onClick={() => setShowCreatePlaylist(true)}
                   className="cursor-pointer px-4 py-2 bg-white/20 rounded-lg text-white hover:bg-white/30 transition-all text-sm flex items-center gap-2"
                 >
@@ -3324,6 +3411,10 @@ pb-[env(safe-area-inset-bottom)]
                     "Crea la teva primera playlist i comença a organitzar la teva música"}
                 </p>
                 <button
+                  style={{
+                    outline: "3px solid #ffffff",
+                    outlineOffset: "3px",
+                  }}
                   onClick={() => setShowCreatePlaylist(true)}
                   className="cursor-pointer px-6 py-3 bg-white/20 rounded-lg text-white hover:bg-white/30 transition-all inline-flex items-center gap-2"
                 >
@@ -3357,6 +3448,10 @@ pb-[env(safe-area-inset-bottom)]
               <button
                 type="button"
                 onClick={fetchEditorPlaylists}
+                style={{
+                  outline: "3px solid #ffffff",
+                  outlineOffset: "3px",
+                }}
                 disabled={editorPlaylistsLoading}
                 className="px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white/80 hover:bg-white/20 transition-all text-sm disabled:opacity-50 disabled:cursor-not-allowed"
               >
@@ -3514,6 +3609,10 @@ pb-[env(safe-area-inset-bottom)]
               </h2>
 
               <button
+                style={{
+                  outline: "3px solid #ffffff",
+                  outlineOffset: "3px",
+                }}
                 onClick={fetchMySubscriptionsDashboard}
                 disabled={subscriptionsLoading}
                 className="px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white/80 hover:bg-white/20 transition-all text-sm disabled:opacity-50 disabled:cursor-not-allowed"
@@ -3644,6 +3743,10 @@ pb-[env(safe-area-inset-bottom)]
                           </p>
 
                           <button
+                            style={{
+                              outline: "3px solid #ffffff",
+                              outlineOffset: "3px",
+                            }}
                             onClick={() =>
                               toggleSubscription(String(sub.artistId))
                             }
@@ -3673,6 +3776,10 @@ pb-[env(safe-area-inset-bottom)]
                     <Star size={64} className="text-white/30 mx-auto mb-4" />
                     <p className="text-white/60 mb-4">{text.noSubscriptions}</p>
                     <button
+                      style={{
+                        outline: "3px solid #ffffff",
+                        outlineOffset: "3px",
+                      }}
                       onClick={() => setSelectedTab("artists")}
                       className="px-6 py-3 bg-white/20 backdrop-blur-sm rounded-lg text-white hover:bg-white/30 transition-all"
                     >
@@ -3750,6 +3857,10 @@ pb-[env(safe-area-inset-bottom)]
                         </p>
 
                         <button
+                          style={{
+                            outline: "3px solid #ffffff",
+                            outlineOffset: "3px",
+                          }}
                           className={`w-full px-4 py-2 backdrop-blur-sm rounded-lg text-white transition-all ${
                             gift.claimed
                               ? "bg-white/10 cursor-not-allowed"
@@ -3807,6 +3918,10 @@ pb-[env(safe-area-inset-bottom)]
               </h3>
 
               <button
+                style={{
+                  outline: "3px solid #ffffff",
+                  outlineOffset: "3px",
+                }}
                 onClick={() => {
                   setShowCreatePlaylist(false);
                   setNewPlaylistName("");
@@ -3847,6 +3962,10 @@ pb-[env(safe-area-inset-bottom)]
 
             <div className="flex gap-4">
               <button
+                style={{
+                  outline: "3px solid #ffffff",
+                  outlineOffset: "3px",
+                }}
                 onClick={() => {
                   setShowCreatePlaylist(false);
                   setNewPlaylistName("");
@@ -3863,6 +3982,10 @@ pb-[env(safe-area-inset-bottom)]
               </button>
 
               <button
+                style={{
+                  outline: "3px solid #ffffff",
+                  outlineOffset: "3px",
+                }}
                 onClick={handleCreatePlaylist}
                 disabled={creatingPlaylist || !newPlaylistName.trim()}
                 className={`cursor-pointer flex-1 px-4 py-3 rounded-lg text-white transition-all ${
@@ -3893,6 +4016,10 @@ pb-[env(safe-area-inset-bottom)]
                 {text.addToPlaylist}
               </h3>
               <button
+                style={{
+                  outline: "3px solid #ffffff",
+                  outlineOffset: "3px",
+                }}
                 onClick={() => {
                   setShowAddToPlaylist(false);
                   setSelectedSongForPlaylist(null);
@@ -3963,6 +4090,10 @@ pb-[env(safe-area-inset-bottom)]
               ) : (
                 userPlaylists.map((playlist: any) => (
                   <button
+                    style={{
+                      outline: "3px solid #ffffff",
+                      outlineOffset: "3px",
+                    }}
                     key={playlist.id}
                     onClick={() => handleAddTrackToPlaylist(playlist.id)}
                     disabled={addingToPlaylist}
@@ -3992,6 +4123,10 @@ pb-[env(safe-area-inset-bottom)]
 
             <div className="flex gap-3">
               <button
+                style={{
+                  outline: "3px solid #ffffff",
+                  outlineOffset: "3px",
+                }}
                 onClick={async () => {
                   await fetchUserPlaylists();
                 }}
@@ -4006,6 +4141,10 @@ pb-[env(safe-area-inset-bottom)]
               </button>
 
               <button
+                style={{
+                  outline: "3px solid #ffffff",
+                  outlineOffset: "3px",
+                }}
                 onClick={() => {
                   setShowAddToPlaylist(false);
                   setSelectedSongForPlaylist(null);

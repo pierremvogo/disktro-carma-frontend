@@ -1109,7 +1109,6 @@ export function ArtistDashboard({
   const [errors, setErrors] = useState<PasswordErrors>(DefaultValue);
 
   const [miniVideoPreview, setMiniVideoPreview] = useState<string>("");
-  const [miniVideoUrl, setMiniVideoUrl] = useState<string>("");
 
   const [singles, setSingles] = useState<Single[]>([]);
   useEffect(() => {
@@ -2541,9 +2540,13 @@ export function ArtistDashboard({
       >
         {isArtist && (
           <button
+            style={{
+              outline: "3px solid #ffffff",
+              outlineOffset: "3px",
+            }}
             type="button"
             onClick={() => router.push("/dashboard/artist/select")}
-            className="cursor-pointer flex items-center gap-2 text-white drop-shadow hover:opacity-70 transition-opacity mb-6"
+            className="cursor-pointer rounded-2xl flex items-center gap-2 text-white drop-shadow hover:opacity-70 transition-opacity mb-6"
           >
             <svg
               width="20"
@@ -2568,6 +2571,10 @@ export function ArtistDashboard({
 
             {onGoToStreaming && (
               <button
+                style={{
+                  outline: "3px solid #ffffff",
+                  outlineOffset: "3px",
+                }}
                 type="button"
                 onClick={onGoToStreaming}
                 className="cursor-pointer flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500/40 to-cyan-500/40 backdrop-blur-md border-2 border-white/40 rounded-xl text-white hover:from-blue-500/50 hover:to-cyan-500/50 hover:border-white/60 transition-all shadow-lg"
@@ -2591,6 +2598,42 @@ export function ArtistDashboard({
             )}
 
             <button
+              onClick={() => {
+                router.push("/subscription");
+              }}
+              className="
+                  flex cursor-pointer items-center gap-2
+                  px-3 sm:px-1 py-2
+                  bg-white/20 backdrop-blur-md
+                  border border-white/30
+                  rounded-lg
+                  text-white text-sm sm:text-base
+                  drop-shadow
+                  hover:bg-white/30 transition-all
+                  focus:outline-none focus:ring-2 focus:ring-blue-500"
+              aria-label="Subscription"
+              type="button"
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M12 2L3 7v6c0 5 3.8 8.7 9 9 5.2-.3 9-4 9-9V7l-9-5z" />
+                <path d="M9 12l2 2 4-4" />
+              </svg>
+              Unlimited Access
+            </button>
+            <button
+              style={{
+                outline: "3px solid #ffffff",
+                outlineOffset: "3px",
+              }}
               onClick={handleLogout}
               type="button"
               className="px-4 py-2 bg-gradient-to-r cursor-pointer from-red-500/40 to-orange-500/40 
