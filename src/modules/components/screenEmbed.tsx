@@ -512,8 +512,12 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
             </div>
           </nav>
 
-          <div className="flex flex-wrap items-center justify-center gap-3 mt-1">
+          <div className="flex flex-wrap items-center justify-center gap-5 mt-1">
             <button
+              style={{
+                outline: "3px solid #ffffff",
+                outlineOffset: "3px",
+              }}
               onClick={() => router.replace("/home/?view=home")}
               className="flex cursor-pointer items-center gap-2 px-3 sm:px-4 py-2 bg-white/15 backdrop-blur-md border border-white/25 rounded-lg text-white text-xs sm:text-sm drop-shadow hover:bg-white/25 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
               type="button"
@@ -522,6 +526,10 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
               Home
             </button>
             <button
+              style={{
+                outline: "3px solid #ffffff",
+                outlineOffset: "3px",
+              }}
               onClick={() => router.replace("/home/?view=question")}
               className="
                 flex cursor-pointer items-center gap-2
@@ -552,6 +560,10 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
             </button>
 
             <button
+              style={{
+                outline: "3px solid #ffffff",
+                outlineOffset: "3px",
+              }}
               onClick={() => router.replace("/home/?view=signup")}
               className="
                 flex cursor-pointer items-center gap-2
@@ -587,6 +599,10 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
 
             {!isLoggedIn ? (
               <button
+                style={{
+                  outline: "3px solid #ffffff",
+                  outlineOffset: "3px",
+                }}
                 onClick={() => router.replace("/home/?view=login")}
                 className="
                   flex cursor-pointer items-center gap-2
@@ -620,6 +636,10 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
               </button>
             ) : (
               <button
+                style={{
+                  outline: "3px solid #ffffff",
+                  outlineOffset: "3px",
+                }}
                 onClick={() => {
                   if (getUserRole() == "artist")
                     router.push("/dashboard/artist/select");
@@ -655,6 +675,10 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
               </button>
             )}
             <button
+              style={{
+                outline: "3px solid #ffffff",
+                outlineOffset: "3px",
+              }}
               onClick={() => {
                 router.push("/subscription");
               }}
