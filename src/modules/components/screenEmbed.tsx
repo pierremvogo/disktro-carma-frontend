@@ -903,6 +903,70 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
               </div>
             </div>
           </div>
+          <div className="flex justify-start mt-20">
+            <button
+              onClick={() => router.push("/magazine")}
+              className="
+    relative
+    self-start
+    w-38 sm:w-46 md:w-54
+    h-[90px]
+    overflow-hidden
+    rounded-xl
+    transition-all
+    duration-300
+    hover:scale-[1.02]
+    hover:shadow-2xl
+    cursor-pointer
+    group
+  "
+              style={{
+                backgroundImage: "url('/image/bbok_club.jpeg')",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
+                border: "1.5px solid rgba(255,255,255,0.5)",
+                outline: "3px solid #ffffff",
+                outlineOffset: "3px",
+                boxShadow:
+                  "0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.25)",
+              }}
+            >
+              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all duration-300" />
+
+              <div
+                className="
+      absolute
+      top-0
+      left-0
+      w-full
+      h-1/3
+      bg-gradient-to-b
+      from-white/40
+      via-white/10
+      to-transparent
+      pointer-events-none
+    "
+              />
+
+              <div
+                className="
+      absolute
+      -top-full
+      -left-1/2
+      w-1/2
+      h-[300%
+      ] rotate-12
+      bg-white/10
+      blur-xl
+      group-hover:left-[120%]
+      transition-all
+      duration-1000
+      pointer-events-none
+    "
+              />
+            </button>
+          </div>
         </div>
       </div>
     </div>
