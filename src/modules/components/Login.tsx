@@ -25,6 +25,17 @@ const Mail = ({ size = 24, className = "" }) => (
   </svg>
 );
 
+
+
+
+
+
+
+
+
+
+
+
 const Lock = ({ size = 24, className = "" }) => (
   <svg
     width={size}
@@ -41,6 +52,11 @@ const Lock = ({ size = 24, className = "" }) => (
     <path d="M7 11V7a5 5 0 0 1 10 0v4" />
   </svg>
 );
+
+
+
+
+
 
 const Eye = ({ size = 24, className = "" }) => (
   <svg
