@@ -756,16 +756,238 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
 
         {/* CONTENU PRINCIPAL */}
         <main
-          className="flex-1 w-full overflow-y-auto overscroll-contain px-4 sm:px-6 lg:px-8 pb-6"
+          className="flex-1 w-full overflow-y-auto 
+          overscroll-contain px-4 sm:px-6 lg:px-8 pb-6"
           role="main"
         >
-          <div className="relative w-full max-w-7xl mx-auto flex flex-col items-center gap-6 md:gap-10">
+          
+          
+          <div className="relative w-full max-w-7xl mx-auto  
+          flex flex-col sm:flex-row items-center gap-6 md:gap-5">
             {/* Panneau central */}
-            <div className="relative z-10 w-full max-w-4xl mt-2 md:mt-4">
+
+             {/* Magazine Button */}
+            <div className="flex flex-row sm:flex-col  w-55 max-w-4xl mt-2 sm:mt-4">
+              <button
+                onClick={() => router.push("/magazine")}
+                className="
+                  m-2
+                  relative
+                  w-48 sm:w-48 md:w-56
+                  h-25 sm:h-[100px]
+                  overflow-hidden
+                  rounded-xl sm:rounded-2xl
+                  transition-all
+                  duration-300
+                  hover:scale-[1.02]
+                  hover:shadow-2xl
+                  cursor-pointer
+                  group
+                  focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-400 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent
+                "
+                style={{
+                  backgroundImage: "url('/image/bbok_btn1.jpg')",
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                  backgroundRepeat: "no-repeat",
+                  border: "1.5px solid rgba(255,255,255,0.5)",
+                  boxShadow:
+                    "0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.25)",
+                }}
+                tabIndex={0}
+                aria-label="Visit Bbok Club Magazine"
+              >
+                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all duration-300 rounded-xl sm:rounded-2xl" />
+
+                <div className="absolute top-0 left-0 w-full h-1/3 bg-gradient-to-b from-white/40 via-white/10 to-transparent pointer-events-none" />
+
+                <div className="absolute -top-full -left-1/2 w-1/2 h-[300%] rotate-12 bg-white/10 blur-xl group-hover:left-[120%] transition-all duration-1000 pointer-events-none" />
+
+                {/* Texte sur le bouton */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-white font-bold text-lg sm:text-xl drop-shadow-lg"></span>
+                </div>
+              </button>
+
+               <button
+                onClick={() => router.push("/magazine")}
+                className="
+                m-2
+                  relative
+                  w-48 sm:w-48 md:w-56
+                  h-25 sm:h-[100px]
+                  overflow-hidden
+                  rounded-xl sm:rounded-2xl
+                  transition-all
+                  duration-300
+                  hover:scale-[1.02]
+                  hover:shadow-2xl
+                  cursor-pointer
+                  group
+                  focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-400 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent
+                "
+                style={{
+                  backgroundImage: "url('/image/bbok_btn2.jpg')",
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                  backgroundRepeat: "no-repeat",
+                  border: "1.5px solid rgba(255,255,255,0.5)",
+                  boxShadow:
+                    "0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.25)",
+                }}
+                tabIndex={0}
+                aria-label="Visit Bbok Club Magazine"
+              >
+                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all duration-300 rounded-xl sm:rounded-2xl" />
+
+                <div className="absolute top-0 left-0 w-full h-1/3 bg-gradient-to-b from-white/40 via-white/10 to-transparent pointer-events-none" />
+
+                <div className="absolute -top-full -left-1/2 w-1/2 h-[300%] rotate-12 bg-white/10 blur-xl group-hover:left-[120%] transition-all duration-1000 pointer-events-none" />
+
+                {/* Texte sur le bouton */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-white font-bold text-lg sm:text-xl drop-shadow-lg"></span>
+                </div>
+              </button>
+
+
+              <button
+                onClick={() => router.push("/magazine")}
+                className="
+                invisible
+                m-2
+                  relative
+                  w-48 sm:w-48 md:w-56
+                  h-25 sm:h-[100px]
+                  overflow-hidden
+                  rounded-xl sm:rounded-2xl
+                  transition-all
+                  duration-300
+                  hover:scale-[1.02]
+                  hover:shadow-2xl
+                  cursor-pointer
+                  group
+                  focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-400 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent
+                "
+                style={{
+                  backgroundImage: "url('/image/bbok_btn2.jpg')",
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                  backgroundRepeat: "no-repeat",
+                  border: "1.5px solid rgba(255,255,255,0.5)",
+                  boxShadow:
+                    "0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.25)",
+                }}
+                tabIndex={0}
+                aria-label="Visit Bbok Club Magazine"
+              >
+                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all duration-300 rounded-xl sm:rounded-2xl" />
+
+                <div className="absolute top-0 left-0 w-full h-1/3 bg-gradient-to-b from-white/40 via-white/10 to-transparent pointer-events-none" />
+
+                <div className="absolute -top-full -left-1/2 w-1/2 h-[300%] rotate-12 bg-white/10 blur-xl group-hover:left-[120%] transition-all duration-1000 pointer-events-none" />
+
+                {/* Texte sur le bouton */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-white font-bold text-lg sm:text-xl drop-shadow-lg"></span>
+                </div>
+              </button>
+
+              <button
+                onClick={() => router.push("/magazine")}
+                className="
+                invisible
+                m-2
+                  relative
+                  w-48 sm:w-48 md:w-56
+                  h-25 sm:h-[100px]
+                  overflow-hidden
+                  rounded-xl sm:rounded-2xl
+                  transition-all
+                  duration-300
+                  hover:scale-[1.02]
+                  hover:shadow-2xl
+                  cursor-pointer
+                  group
+                  focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-400 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent
+                "
+                style={{
+                  backgroundImage: "url('/image/bbok_btn2.jpg')",
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                  backgroundRepeat: "no-repeat",
+                  border: "1.5px solid rgba(255,255,255,0.5)",
+                  boxShadow:
+                    "0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.25)",
+                }}
+                tabIndex={0}
+                aria-label="Visit Bbok Club Magazine"
+              >
+                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all duration-300 rounded-xl sm:rounded-2xl" />
+
+                <div className="absolute top-0 left-0 w-full h-1/3 bg-gradient-to-b from-white/40 via-white/10 to-transparent pointer-events-none" />
+
+                <div className="absolute -top-full -left-1/2 w-1/2 h-[300%] rotate-12 bg-white/10 blur-xl group-hover:left-[120%] transition-all duration-1000 pointer-events-none" />
+
+                {/* Texte sur le bouton */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-white font-bold text-lg sm:text-xl drop-shadow-lg"></span>
+                </div>
+              </button>
+
+              <button
+                onClick={() => router.push("/magazine")}
+                className="
+                invisible
+                m-2
+                  relative
+                  w-48 sm:w-48 md:w-56
+                  h-25 sm:h-[100px]
+                  overflow-hidden
+                  rounded-xl sm:rounded-2xl
+                  transition-all
+                  duration-300
+                  hover:scale-[1.02]
+                  hover:shadow-2xl
+                  cursor-pointer
+                  group
+                  focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-400 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent
+                "
+                style={{
+                  backgroundImage: "url('/image/bbok_btn2.jpg')",
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                  backgroundRepeat: "no-repeat",
+                  border: "1.5px solid rgba(255,255,255,0.5)",
+                  boxShadow:
+                    "0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.25)",
+                }}
+                tabIndex={0}
+                aria-label="Visit Bbok Club Magazine"
+              >
+                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all duration-300 rounded-xl sm:rounded-2xl" />
+
+                <div className="absolute top-0 left-0 w-full h-1/3 bg-gradient-to-b from-white/40 via-white/10 to-transparent pointer-events-none" />
+
+                <div className="absolute -top-full -left-1/2 w-1/2 h-[300%] rotate-12 bg-white/10 blur-xl group-hover:left-[120%] transition-all duration-1000 pointer-events-none" />
+
+                {/* Texte sur le bouton */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-white font-bold text-lg sm:text-xl drop-shadow-lg"></span>
+                </div>
+              </button>
+
+            </div>
+            
+            <div className="relative z-10 
+            w-full max-w-4xl mt-2 flex-row md:mt-4">
               <div className="w-full h-full bg-white/10 backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden border border-white/20 flex flex-col">
                 {/* MAIN CONTENT */}
+           
                 <div className="flex-1 relative bg-gradient-to-br from-purple-500/20 via-pink-500/20 to-blue-500/20 flex items-center justify-center p-4 sm:p-6 md:p-8">
+              
                   {showUserType ? (
+                  
                     <UserType
                       onBack={() => {
                         setShowUserType(false);
@@ -1028,10 +1250,9 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
                   )}
                 </div>
               </div>
-            </div>
 
-            {/* Magazine Button */}
-            <div className="flex justify-center sm:justify-start w-full max-w-4xl mt-6 sm:mt-10">
+              {/* Magazine Button */}
+            <div className="justify-center sm:justify-start w-full max-w-4xl mt-6 sm:mt-10">
               <button
                 onClick={() => router.push("/magazine")}
                 className="
@@ -1046,7 +1267,7 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
                   hover:shadow-2xl
                   cursor-pointer
                   group
-                  focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-400 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent
+                  focus focus-visible:ring-2 focus-visible:ring-blue-500
                 "
                 style={{
                   backgroundImage: "url('/image/bbok_club.jpeg')",
@@ -1072,6 +1293,9 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
                 </div>
               </button>
             </div>
+            </div>
+
+            
           </div>
         </main>
       </div>
