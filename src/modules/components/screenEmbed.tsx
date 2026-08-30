@@ -762,12 +762,12 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
         >
           
           
-          <div className="relative w-full max-w-7xl mx-auto  
+          <div className="relative w-full max-w-7xl mx-auto
           flex flex-col sm:flex-row items-center gap-6 md:gap-5">
             {/* Panneau central */}
 
-             {/* Magazine Button */}
-            <div className="flex flex-row sm:flex-col  w-55 max-w-4xl mt-2 sm:mt-4">
+             {/* Magazine Button 
+            <div className="flex sm:flex-col  w-55 max-w-4xl mt-2 sm:mt-4">
               <button
                 onClick={() => router.push("/magazine")}
                 className="
@@ -803,7 +803,7 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
 
                 <div className="absolute -top-full -left-1/2 w-1/2 h-[300%] rotate-12 bg-white/10 blur-xl group-hover:left-[120%] transition-all duration-1000 pointer-events-none" />
 
-                {/* Texte sur le bouton */}
+                
                 <div className="absolute inset-0 flex items-center justify-center">
                   <span className="text-white font-bold text-lg sm:text-xl drop-shadow-lg"></span>
                 </div>
@@ -844,7 +844,7 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
 
                 <div className="absolute -top-full -left-1/2 w-1/2 h-[300%] rotate-12 bg-white/10 blur-xl group-hover:left-[120%] transition-all duration-1000 pointer-events-none" />
 
-                {/* Texte sur le bouton */}
+                {/* Texte sur le bouton 
                 <div className="absolute inset-0 flex items-center justify-center">
                   <span className="text-white font-bold text-lg sm:text-xl drop-shadow-lg"></span>
                 </div>
@@ -887,7 +887,7 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
 
                 <div className="absolute -top-full -left-1/2 w-1/2 h-[300%] rotate-12 bg-white/10 blur-xl group-hover:left-[120%] transition-all duration-1000 pointer-events-none" />
 
-                {/* Texte sur le bouton */}
+                {/* Texte sur le bouton 
                 <div className="absolute inset-0 flex items-center justify-center">
                   <span className="text-white font-bold text-lg sm:text-xl drop-shadow-lg"></span>
                 </div>
@@ -929,7 +929,7 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
 
                 <div className="absolute -top-full -left-1/2 w-1/2 h-[300%] rotate-12 bg-white/10 blur-xl group-hover:left-[120%] transition-all duration-1000 pointer-events-none" />
 
-                {/* Texte sur le bouton */}
+                {/* Texte sur le bouton 
                 <div className="absolute inset-0 flex items-center justify-center">
                   <span className="text-white font-bold text-lg sm:text-xl drop-shadow-lg"></span>
                 </div>
@@ -971,16 +971,16 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
 
                 <div className="absolute -top-full -left-1/2 w-1/2 h-[300%] rotate-12 bg-white/10 blur-xl group-hover:left-[120%] transition-all duration-1000 pointer-events-none" />
 
-                {/* Texte sur le bouton */}
+                {/* Texte sur le bouton
                 <div className="absolute inset-0 flex items-center justify-center">
                   <span className="text-white font-bold text-lg sm:text-xl drop-shadow-lg"></span>
                 </div>
               </button>
 
-            </div>
+            </div>*/}
             
-            <div className="relative z-10 
-            w-full max-w-4xl mt-2 flex-row md:mt-4">
+            <div className="relative z-10
+            w-full max-w-7xl mt-2 flex-row md:mt-4">
               <div className="w-full h-full bg-white/10 backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden border border-white/20 flex flex-col">
                 {/* MAIN CONTENT */}
            
@@ -1252,13 +1252,13 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
               </div>
 
               {/* Magazine Button */}
-            <div className="justify-center sm:justify-start w-full max-w-4xl mt-6 sm:mt-10">
+            <div className="flex justify-center items-center sm:justify-start w-full max-w-4xl mt-6 sm:mt-10">
               <button
                 onClick={() => router.push("/magazine")}
                 className="
                   relative
-                  w-48 sm:w-48 md:w-56
-                  h-25 sm:h-[100px]
+                  w-38 sm:w-48 md:w-56
+                  h-15 sm:h-[100px]
                   overflow-hidden
                   rounded-xl sm:rounded-2xl
                   transition-all
