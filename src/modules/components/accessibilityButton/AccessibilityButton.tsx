@@ -7,8 +7,14 @@ import { Separator } from "./ui/separator";
 import { Switch } from "./ui/switch";
 import { Label } from "./ui/label";
 
+interface StickmanIconProps {
+  className?: string;
+  
+}
 // Stickman Accessibility Icon
-function StickmanIcon({ className }: { className?: string }) {
+function StickmanIcon({ className,
+}: StickmanIconProps) {
+
   return (
     <svg
       viewBox="0 0 24 24"
@@ -40,6 +46,32 @@ export function AccessibilityButton({ language }: { language: Language }) {
   const [voiceControl, setVoiceControl] = useState(false);
   const [focusMode, setFocusMode] = useState(false);
   const [readingGuide, setReadingGuide] = useState(false);
+  const [showAccessibility, setShowAccessibility] = useState(false);
+  const [fontSize, setFontSize] = useState<"small" | "medium" | "large" | "xl">(
+     "medium"
+   );
+    const [highContrast, setHighContrast] = useState(false);
+     const [colorBlindMode, setColorBlindMode] = useState<
+       "none" | "protanopia" | "deuteranopia" | "tritanopia"
+     >("none");
+     const [reduceMotion, setReduceMotion] = useState(false);
+     const [textToSpeech, setTextToSpeech] = useState(false);
+     const [showCaptions, setShowCaptions] = useState(false);
+     const [visualNotifications, setVisualNotifications] = useState(false);
+     const [largerTargets, setLargerTargets] = useState(false);
+     const [dyslexiaFont, setDyslexiaFont] = useState(false);
+ 
+   useEffect(() => {
+      if (!showAccessibility) return;
+  
+      const onKeyDown = (e: any) => {
+        if (e.key === "Escape") setShowAccessibility(false);
+      };
+  
+      window.addEventListener("keydown", onKeyDown);
+      return () => window.removeEventListener("keydown", onKeyDown);
+    }, [showAccessibility]);
+
 
   const text = {
     english: {
@@ -54,8 +86,150 @@ export function AccessibilityButton({ language }: { language: Language }) {
       focusModeDesc: "Reduce visual distractions",
       readingGuide: "Reading Guide",
       readingGuideDesc: "Guiding line for reading",
+       paymentSoon: "Subscription coming soon",
+      subscription: {
+        title: "Subscribe to a plan",
+        subtitle: "Choose a subscription to support {{artistName}}",
+
+        button: {
+          continue: "Continue",
+          redirecting: "Redirecting...",
+        },
+
+        message: {
+          redirecting: "Redirecting to the payment page...",
+          paymentFailed: "Payment failed. Please try again.",
+          success: "Payment completed successfully!",
+        },
+
+        payment: {
+          stripe: "Credit card (Stripe)",
+          lygos: "Mobile Money (Lygos)",
+        },
+
+        plans: {
+          monthly: {
+            label: "Monthly subscription",
+            features: [
+              "Access to exclusive releases",
+              "Early listening",
+              "Fan-only content",
+              "Standard support",
+            ],
+          },
+          quarterly: {
+            label: "Quarterly subscription",
+            features: [
+              "All monthly benefits",
+              "Exclusive premium content",
+              "Access to private live sessions",
+              "Limited downloads",
+              "Priority support",
+            ],
+          },
+          annual: {
+            label: "Annual subscription",
+            features: [
+              "All quarterly benefits",
+              "Unlimited access to premium content",
+              "Unlimited downloads",
+              "Virtual meet & greet with the artist",
+              "VIP Fan badge",
+              "VIP support",
+            ],
+          },
+        },
+      },
+      loading: "Loading...",
+      track: "Track",
+      refresh: "Refresh",
+      loadingTracks: "Loading tracks...",
+      loadingError: "Error loading",
+      retry: "Retry",
+      noTracksFound: "No track found",
+      tryAnother: "Try another",
+      close: "Close",
+      clear: "Clear",
+      errors: {
+        generic: "Something went wrong. Please try again later.",
+      },
+      noAlbumUploadedYet: "No album uploaded yet.",
+
+      title: "Bbok music with everybody",
+      discover: "Discover",
+      myMusic: "My Music",
+      artists: "Artists",
+      search: "Search music, artists...",
+      featured: "Featured",
+      newReleases: "New Releases",
+
+      subscribe: "Subscribe",
+      play: "Play",
+      pause: "Pause",
+      addToFavorites: "Add to favorites",
+      streams: "streams",
+      subscribers: "subscribers",
+      back: "Back",
+      nowPlaying: "Now playing",
+      duration: "Duration",
+      lyrics: "Lyrics",
+      textLyrics: "Text Lyrics",
+      signLanguage: "Sign Language",
+      editorPlaylists: "Editor's Playlists",
+      addToPlaylist: "Add to Playlist",
+      createPlaylist: "Create Playlist",
+      playlistName: "Playlist Name",
+      create: "Create",
+      cancel: "Cancel",
+      yourPlaylists: "Your Playlists",
+      sortAlphabetically: "Sort Alphabetically",
+      songs: "songs",
+      noSongs: "No songs in this playlist",
+      addedToPlaylist: "Added to playlist",
+      favorites: "Favorites",
+      addedToFavorites: "Added to favorites",
+      removedFromFavorites: "Removed from favorites",
+      accessibility: "Accessibility",
+      dashboard: "Dashboard",
+      mySubscriptions: "My Subscriptions",
+      exclusiveGifts: "Exclusive Gifts",
+      subscriptionStats: "Statistics",
+      totalSubscriptions: "Total Subscriptions",
+      totalGifts: "Total Gifts",
+      unsubscribe: "Unsubscribe",
+      subscribed: "Subscribed",
+      claimGift: "Claim Gift",
+      claimed: "Claimed",
+      noSubscriptions: "You're not subscribed to any artists yet",
+      noGifts: "No exclusive gifts available",
+      exploreArtists: "Explore Artists",
+      giftFrom: "Gift from",
+      subscribedOn: "Subscribed since",
+      visualAccessibility: "Visual Accessibility",
+      hearingAccessibility: "Hearing Accessibility",
+      motorAccessibility: "Motor Accessibility",
+      cognitiveAccessibility: "Cognitive Accessibility",
+      fontSize: "Font Size",
+      small: "Small",
+      medium: "Medium",
+      large: "Large",
+      extraLarge: "Extra Large",
+      highContrast: "High Contrast",
+      colorBlindMode: "Color Blind Mode",
+      none: "None",
+      protanopia: "Protanopia (Red-Green)",
+      deuteranopia: "Deuteranopia (Red-Green)",
+      tritanopia: "Tritanopia (Blue-Yellow)",
+      reduceMotion: "Reduce Motion",
+      textToSpeech: "Text to Speech",
+      captions: "Captions",
+      visualNotifications: "Visual Notifications",
+      largerTargets: "Larger Buttons",
+      dyslexiaFont: "Dyslexia Font",
+      simplifiedInterface: "Simplified Interface",
     },
     spanish: {
+      dyslexiaFont: "Fuente para Dislexia",
       aria: { open: "Opciones de accesibilidad", close: "Cerrar" },
       header: "Accesibilidad",
       keyboardNav: "Navegación por Teclado",
@@ -67,6 +241,145 @@ export function AccessibilityButton({ language }: { language: Language }) {
       focusModeDesc: "Reduce las distracciones visuales",
       readingGuide: "Guía de Lectura",
       readingGuideDesc: "Línea guía para leer",
+       subscription: {
+        title: "Suscribirse a un plan",
+        subtitle: "Elige una suscripción para apoyar a {{artistName}}",
+
+        button: {
+          continue: "Continuar",
+          redirecting: "Redirigiendo...",
+        },
+
+        message: {
+          redirecting: "Redirigiendo a la página de pago...",
+          paymentFailed: "El pago ha fallado. Inténtalo de nuevo.",
+          success: "¡Pago realizado con éxito!",
+        },
+
+        payment: {
+          stripe: "Tarjeta bancaria (Stripe)",
+          lygos: "Mobile Money (Lygos)",
+        },
+
+        plans: {
+          monthly: {
+            label: "Suscripción mensual",
+            features: [
+              "Acceso a lanzamientos exclusivos",
+              "Escucha anticipada",
+              "Contenido exclusivo para fans",
+              "Soporte estándar",
+            ],
+          },
+          quarterly: {
+            label: "Suscripción trimestral",
+            features: [
+              "Todos los beneficios mensuales",
+              "Contenido premium exclusivo",
+              "Acceso a conciertos en vivo privados",
+              "Descargas limitadas",
+              "Soporte prioritario",
+            ],
+          },
+          annual: {
+            label: "Suscripción anual",
+            features: [
+              "Todos los beneficios trimestrales",
+              "Acceso ilimitado a contenido premium",
+              "Descargas ilimitadas",
+              "Encuentros virtuales con el artista",
+              "Insignia de Fan VIP",
+              "Soporte VIP",
+            ],
+          },
+        },
+      },
+      title: "Música Para Todos",
+      discover: "Descubrir",
+      myMusic: "Mi Música",
+      artists: "Artistas",
+      search: "Buscar música, artistas...",
+      featured: "Destacados",
+      newReleases: "Nuevos Lanzamientos",
+
+      subscribe: "Suscribirse",
+      play: "Reproducir",
+      pause: "Pausar",
+      addToFavorites: "Añadir a favoritos",
+      streams: "reproducciones",
+      subscribers: "suscriptores",
+      back: "Volver",
+      nowPlaying: "Reproduciendo ahora",
+      duration: "Duración",
+      lyrics: "Letra",
+      textLyrics: "Letra en Texto",
+      signLanguage: "Lenguaje de Signos",
+      editorPlaylists: "Playlists de los Editores",
+      addToPlaylist: "Añadir a Playlist",
+      createPlaylist: "Crear Playlist",
+      playlistName: "Nombre de la Playlist",
+      create: "Crear",
+      cancel: "Cancelar",
+      yourPlaylists: "Tus Playlists",
+      sortAlphabetically: "Ordenar Alfabéticamente",
+      songs: "canciones",
+      noSongs: "No hay canciones en esta playlist",
+      addedToPlaylist: "Añadido a la playlist",
+      favorites: "Favoritos",
+      addedToFavorites: "Añadido a favoritos",
+      removedFromFavorites: "Eliminado de favoritos",
+      accessibility: "Accesibilidad",
+      dashboard: "Panel",
+      mySubscriptions: "Mis Suscripciones",
+      exclusiveGifts: "Regalos Exclusivos",
+      subscriptionStats: "Estadísticas",
+      totalSubscriptions: "Suscripciones Totales",
+      totalGifts: "Regalos Totales",
+      unsubscribe: "Cancelar Suscripción",
+      subscribed: "Suscrito",
+      claimGift: "Reclamar Regalo",
+      claimed: "Reclamado",
+      noSubscriptions: "Aún no estás suscrito a ningún artista",
+      noGifts: "No hay regalos exclusivos disponibles",
+      exploreArtists: "Explorar Artistas",
+      giftFrom: "Regalo de",
+      subscribedOn: "Suscrito desde",
+      visualAccessibility: "Accesibilidad Visual",
+      hearingAccessibility: "Accesibilidad Auditiva",
+      motorAccessibility: "Accesibilidad Motora",
+      cognitiveAccessibility: "Accesibilidad Cognitiva",
+      fontSize: "Tamaño de Fuente",
+      small: "Pequeño",
+      medium: "Mediano",
+      large: "Grande",
+      extraLarge: "Extra Grande",
+      highContrast: "Alto Contraste",
+      colorBlindMode: "Modo Daltónico",
+      none: "Ninguno",
+      protanopia: "Protanopia (Rojo-Verde)",
+      deuteranopia: "Deuteranopia (Rojo-Verde)",
+      tritanopia: "Tritanopia (Azul-Amarillo)",
+      reduceMotion: "Reducir Animaciones",
+      textToSpeech: "Texto a Voz",
+      captions: "Subtítulos",
+      visualNotifications: "Notificaciones Visuales",
+      largerTargets: "Botones Más Grandes",
+     
+      simplifiedInterface: "Interfaz Simplificada",
+      errors: {
+        generic: "Algo salió mal. Por favor, inténtalo de nuevo más tarde.",
+      },
+      loading: "Cargando...",
+      track: "Pista",
+      refresh: "Actualizar",
+      loadingTracks: "Cargando pistas...",
+      loadingError: "Error al cargar",
+      retry: "Reintentar",
+      noTracksFound: "No se encontró ninguna pista",
+      tryAnother: "Prueba otra",
+      close: "Cerrar",
+      clear: "Borrar",
+      paymentSoon: "Suscripción disponible próximamente",
     },
     catalan: {
       aria: { open: "Opcions d’accessibilitat", close: "Tancar" },
@@ -80,6 +393,146 @@ export function AccessibilityButton({ language }: { language: Language }) {
       focusModeDesc: "Redueix distraccions visuals",
       readingGuide: "Guia de Lectura",
       readingGuideDesc: "Línia guia per llegir",
+       paymentSoon: "Subscripció disponible aviat",
+      subscription: {
+        title: "Subscriure's a un pla",
+        subtitle: "Tria una subscripció per donar suport a {{artistName}}",
+
+        button: {
+          continue: "Continuar",
+          redirecting: "Redirigint...",
+        },
+
+        message: {
+          redirecting: "Redirigint a la pàgina de pagament...",
+          paymentFailed: "El pagament ha fallat. Torna-ho a provar.",
+          success: "Pagament realitzat amb èxit!",
+        },
+
+        payment: {
+          stripe: "Targeta bancària (Stripe)",
+          lygos: "Mobile Money (Lygos)",
+        },
+
+        plans: {
+          monthly: {
+            label: "Subscripció mensual",
+            features: [
+              "Accés a llançaments exclusius",
+              "Escolta anticipada",
+              "Contingut exclusiu per a fans",
+              "Suport estàndard",
+            ],
+          },
+          quarterly: {
+            label: "Subscripció trimestral",
+            features: [
+              "Tots els avantatges mensuals",
+              "Contingut premium exclusiu",
+              "Accés a directes privats",
+              "Descàrregues limitades",
+              "Suport prioritari",
+            ],
+          },
+          annual: {
+            label: "Subscripció anual",
+            features: [
+              "Tots els avantatges trimestrals",
+              "Accés il·limitat a contingut premium",
+              "Descàrregues il·limitades",
+              "Trobades virtuals amb l’artista",
+              "Insígnia de Fan VIP",
+              "Suport VIP",
+            ],
+          },
+        },
+      },
+      loading: "Carregant...",
+      track: "Pista",
+      refresh: "Actualitzar",
+      loadingTracks: "Carregant pistes...",
+      loadingError: "Error en carregar",
+      retry: "Torna-ho a provar",
+      noTracksFound: "Cap pista trobada",
+      tryAnother: "Prova una altra",
+      close: "Tancar",
+      clear: "Netejar",
+      errors: {
+        generic:
+          "Alguna cosa ha anat malament. Si us plau, torna-ho a provar més tard.",
+      },
+      title: "Música Per a Tothom",
+      discover: "Descobrir",
+      myMusic: "La Meva Música",
+      artists: "Artistes",
+      search: "Cercar música, artistes...",
+      featured: "Destacats",
+      newReleases: "Nous Llançaments",
+
+      subscribe: "Subscriure's",
+      play: "Reproduir",
+      pause: "Pausar",
+      addToFavorites: "Afegir a favorits",
+      streams: "reproduccions",
+      subscribers: "subscriptors",
+      back: "Tornar",
+      nowPlaying: "Reproduint ara",
+      duration: "Durada",
+      lyrics: "Lletra",
+      textLyrics: "Lletra en Text",
+      signLanguage: "Llengua de Signes",
+      editorPlaylists: "Playlists dels Editors",
+      addToPlaylist: "Afegir a Playlist",
+      createPlaylist: "Crear Playlist",
+      playlistName: "Nom de la Playlist",
+      create: "Crear",
+      cancel: "Cancel·lar",
+      yourPlaylists: "Les Teves Playlists",
+      sortAlphabetically: "Ordenar Alfabèticament",
+      songs: "cançons",
+      noSongs: "No hi ha cançons en aquesta playlist",
+      addedToPlaylist: "Afegit a la playlist",
+      favorites: "Favorits",
+      addedToFavorites: "Afegit a favorits",
+      removedFromFavorites: "Eliminat de favorits",
+      accessibility: "Accessibilitat",
+      dashboard: "Tauler",
+      mySubscriptions: "Les Meves Subscripcions",
+      exclusiveGifts: "Regals Exclusius",
+      subscriptionStats: "Estadístiques",
+      totalSubscriptions: "Subscripcions Totals",
+      totalGifts: "Regals Totals",
+      unsubscribe: "Cancel·lar Subscripció",
+      subscribed: "Subscrit",
+      claimGift: "Reclamar Regal",
+      claimed: "Reclamat",
+      noSubscriptions: "Encara no estàs subscrit a cap artista",
+      noGifts: "No hi ha regals exclusius disponibles",
+      exploreArtists: "Explorar Artistes",
+      giftFrom: "Regal de",
+      subscribedOn: "Subscrit des de",
+      visualAccessibility: "Accessibilitat Visual",
+      hearingAccessibility: "Accessibilitat Auditiva",
+      motorAccessibility: "Accessibilitat Motora",
+      cognitiveAccessibility: "Accessibilitat Cognitiva",
+      fontSize: "Mida de Font",
+      small: "Petit",
+      medium: "Mitjà",
+      large: "Gran",
+      extraLarge: "Extra Gran",
+      highContrast: "Alt Contrast",
+      colorBlindMode: "Mode Daltònic",
+      none: "Cap",
+      protanopia: "Protanòpia (Vermell-Verd)",
+      deuteranopia: "Deuteranòpia (Vermell-Verd)",
+      tritanopia: "Tritanòpia (Blau-Groc)",
+      reduceMotion: "Reduir Animacions",
+      textToSpeech: "Text a Veu",
+      captions: "Subtítols",
+      visualNotifications: "Notificacions Visuals",
+      largerTargets: "Botons Més Grans",
+      dyslexiaFont: "Font per Dislèxia",
+      simplifiedInterface: "Interfície Simplificada",
     },
   };
 
@@ -201,7 +654,7 @@ export function AccessibilityButton({ language }: { language: Language }) {
 
   return (
     <div
-      className="fixed z-50"
+      className=""
       style={{
         left: `${position.x}px`,
         top: `${position.y}px`,
@@ -212,7 +665,7 @@ export function AccessibilityButton({ language }: { language: Language }) {
       <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
           <button
-            className="relative h-16 w-16 rounded-full shadow-2xl transition-all hover:scale-105 focus:outline-none focus:ring-4 focus:ring-white/30"
+            className="relative h-14 w-14 rounded-full shadow-2xl transition-all hover:scale-105 focus:outline-none focus:ring-4 focus:ring-white/30"
             aria-label={content.aria.open}
             style={{
               background: "rgba(168, 85, 145, 0.4)",
@@ -229,7 +682,7 @@ export function AccessibilityButton({ language }: { language: Language }) {
                   "radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.15) 0%, transparent 60%)",
               }}
             />
-            <StickmanIcon className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-8 w-8 text-white" />
+            <StickmanIcon  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-8 w-8 text-white" />
           </button>
         </PopoverTrigger>
 
@@ -354,6 +807,9 @@ export function AccessibilityButton({ language }: { language: Language }) {
               </p>
             </div>
           </div>
+
+       
+      
         </PopoverContent>
       </Popover>
     </div>

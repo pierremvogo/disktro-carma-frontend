@@ -33,11 +33,12 @@ export function ArtistProfileModal({ isOpen, onClose, artist }: Props) {
           top-[calc(env(safe-area-inset-top)+0.75rem)]
           bottom-[calc(env(safe-area-inset-bottom)+0.75rem)]
           overflow-hidden
-          rounded-sm
+  
           border border-white/20
           bg-black/60
           backdrop-blur-xl
           shadow-2xl
+          rounded-md
         "
         onMouseDown={(e) => e.stopPropagation()}
       >
