@@ -191,9 +191,9 @@ export function ArtistChoice({
       <div className="fixed inset-0 -z-10 bg-black/60" />
 
       {/* ✅ Bouton d’accessibilité : monté au plus haut niveau */}
-      <div className="relative z-30">
+      {/* <div className="relative z-30">
         <AccessibilityButton language={language} />
-      </div>
+      </div> */}
 
       {/* ✅ TOP BAR (safe-area + fixed, ne scrolle pas) */}
       <div

@@ -504,7 +504,6 @@ export function ArtistProfileSidebar({
     if (!subscription) {
       fetchSubscription();
     }
-    console.log("ARTIST - PROFILE : ", artist);
   }, [subscription]);
 
   const genresList =
@@ -517,7 +516,7 @@ export function ArtistProfileSidebar({
     <>
       {/* Backdrop + Player */}
       <div
-        className="fixed inset-0 z-40 bg-transparent"
+        className="fixed inset-0 z-40 bg-transparent rounded-2xl"
         onClick={onClose}
         style={{
           backgroundImage:
@@ -529,17 +528,21 @@ export function ArtistProfileSidebar({
       {/* Sidebar */}
       <div
         className="
-                    fixed right-0 top-0 z-50
-                    h-[100svh] sm:h-screen
-                    w-[92vw] max-w-[480px]
-                    bg-gradient-to-b from-[#3d1952] to-[#4a1f5c]
+                      fixed inset-0 z-50
+                    left-1/2
+                    -translate-x-1/2
+                    top-0
+                    w-[480px]
+                    max-w-[90vw]
+                      h-[100svh] sm:h-screen
+                      bg-gradient-to-b from-[#3d1952] to-[#4a1f5c]
                     shadow-2xl
                     overflow-y-auto overscroll-contain
                     [padding-top:env(safe-area-inset-top)]
                     [padding-bottom:env(safe-area-inset-bottom)]
                   "
       >
-        <div className="p-6 sm:p-8">
+        <div className="px-6 sm:px-8">
           {/* Header */}
           <div className="flex items-center justify-between mb-6 sm:mb-8">
             <div className="min-w-0">

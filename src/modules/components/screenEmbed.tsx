@@ -420,7 +420,7 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
         backgroundPosition: "center",
       }}
     >
-      <AccessibilityButton language={language} />
+      {/* <AccessibilityButton language={language} /> */}
 
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/50" />
@@ -539,19 +539,19 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
                   >
                     🏠 Home
                   </button>
-                  <button
+                  {/* <button
                     onClick={() => {
                       router.replace("/home/?view=question");
                       setIsMenuOpen(false);
                     }}
                     className={`${getButtonClass(
                       "question"
-                    )} flex items-center gap-2 w-full text-left`}
+                    )} flex items-center gap-2 w-full text-left `}
                     role="menuitem"
                     tabIndex={0}
                   >
                     🧪 Test Group
-                  </button>
+                  </button> */}
                   <button
                     onClick={() => {
                       router.replace("/home/?view=signup");
@@ -614,6 +614,11 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
             role="navigation"
             aria-label="Main navigation"
           >
+
+             <div className="flex items-center gap-2">
+    
+            {/* Bouton Accessibilité */}
+             <AccessibilityButton language={language} /> 
             {/* Language Pills */}
             <div
               className="flex items-center gap-1 bg-white/10 backdrop-blur-md rounded-full p-1 border border-white/10"
@@ -638,6 +643,7 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
                 </button>
               ))}
             </div>
+            </div>
 
             {/* Navigation Buttons */}
             <div className="flex items-center gap-2">
@@ -652,7 +658,7 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
               >
                 Home
               </button>
-              <button
+              {/* <button
                 onClick={() => router.replace("/home/?view=question")}
                 className={`${
                   currentView === "question"
@@ -673,7 +679,7 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
                 >
                   <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
-              </button>
+              </button> */}
               <button
                 onClick={() => router.replace("/home/?view=signup")}
                 className={`${
@@ -762,7 +768,7 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
         >
           
           
-          <div className="relative w-full max-w-7xl mx-auto
+          <div className="relative w-full max-w-2xl mx-auto
           flex flex-col sm:flex-row items-center gap-6 md:gap-5">
             {/* Panneau central */}
 
@@ -979,8 +985,8 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
 
             </div>*/}
             
-            <div className="relative z-10
-            w-full max-w-7xl mt-2 flex-row md:mt-4">
+            <div className="relative z-10 
+            w-full max-w-2xl mt-2 flex-row md:mt-4">
               <div className="w-full h-full bg-white/10 backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden border border-white/20 flex flex-col">
                 {/* MAIN CONTENT */}
            
@@ -1252,7 +1258,7 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
               </div>
 
               {/* Magazine Button */}
-            <div className="flex justify-center items-center sm:justify-start w-full max-w-4xl mt-6 sm:mt-10">
+            <div className="flex justify-center items-center sm:justify-center w-full max-w-4xl mt-6 sm:mt-10">
               <button
                 onClick={() => router.push("/magazine")}
                 className="

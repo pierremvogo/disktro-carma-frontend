@@ -236,7 +236,7 @@ export function UserType({
             mt-2 sm:mt-4
           "
         >
-          <button
+          {/* <button
             type="button"
             onClick={() => router.replace("/home/?view=question")}
             className="
@@ -253,9 +253,9 @@ export function UserType({
             "
           >
             {text.questionnaireLink}
-          </button>
+          </button> */}
 
-          <button
+          {/* <button
             type="button"
             onClick={() => router.replace("/home/?view=home")}
             className="
@@ -272,7 +272,7 @@ export function UserType({
             "
           >
             {text.welcomeLink}
-          </button>
+          </button> */}
         </div>
       </div>
     </div>
