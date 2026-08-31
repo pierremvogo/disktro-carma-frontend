@@ -528,14 +528,14 @@ export function ArtistProfileSidebar({
       {/* Sidebar */}
       <div
         className="
-                      fixed inset-0 z-50
+                    fixed inset-0 z-50
                     left-1/2
                     -translate-x-1/2
                     top-0
                     w-[480px]
                     max-w-[90vw]
-                      h-[100svh] sm:h-screen
-                      bg-gradient-to-b from-[#3d1952] to-[#4a1f5c]
+                    h-[100svh] sm:h-screen
+                    bg-gradient-to-b from-[#3d1952] to-[#4a1f5c]
                     shadow-2xl
                     overflow-y-auto overscroll-contain
                     [padding-top:env(safe-area-inset-top)]

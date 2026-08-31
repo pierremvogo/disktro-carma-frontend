@@ -9,12 +9,9 @@ import { Label } from "./ui/label";
 
 interface StickmanIconProps {
   className?: string;
-  
 }
 // Stickman Accessibility Icon
-function StickmanIcon({ className,
-}: StickmanIconProps) {
-
+function StickmanIcon({ className }: StickmanIconProps) {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -48,30 +45,29 @@ export function AccessibilityButton({ language }: { language: Language }) {
   const [readingGuide, setReadingGuide] = useState(false);
   const [showAccessibility, setShowAccessibility] = useState(false);
   const [fontSize, setFontSize] = useState<"small" | "medium" | "large" | "xl">(
-     "medium"
-   );
-    const [highContrast, setHighContrast] = useState(false);
-     const [colorBlindMode, setColorBlindMode] = useState<
-       "none" | "protanopia" | "deuteranopia" | "tritanopia"
-     >("none");
-     const [reduceMotion, setReduceMotion] = useState(false);
-     const [textToSpeech, setTextToSpeech] = useState(false);
-     const [showCaptions, setShowCaptions] = useState(false);
-     const [visualNotifications, setVisualNotifications] = useState(false);
-     const [largerTargets, setLargerTargets] = useState(false);
-     const [dyslexiaFont, setDyslexiaFont] = useState(false);
- 
-   useEffect(() => {
-      if (!showAccessibility) return;
-  
-      const onKeyDown = (e: any) => {
-        if (e.key === "Escape") setShowAccessibility(false);
-      };
-  
-      window.addEventListener("keydown", onKeyDown);
-      return () => window.removeEventListener("keydown", onKeyDown);
-    }, [showAccessibility]);
+    "medium",
+  );
+  const [highContrast, setHighContrast] = useState(false);
+  const [colorBlindMode, setColorBlindMode] = useState<
+    "none" | "protanopia" | "deuteranopia" | "tritanopia"
+  >("none");
+  const [reduceMotion, setReduceMotion] = useState(false);
+  const [textToSpeech, setTextToSpeech] = useState(false);
+  const [showCaptions, setShowCaptions] = useState(false);
+  const [visualNotifications, setVisualNotifications] = useState(false);
+  const [largerTargets, setLargerTargets] = useState(false);
+  const [dyslexiaFont, setDyslexiaFont] = useState(false);
 
+  useEffect(() => {
+    if (!showAccessibility) return;
+
+    const onKeyDown = (e: any) => {
+      if (e.key === "Escape") setShowAccessibility(false);
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [showAccessibility]);
 
   const text = {
     english: {
@@ -86,7 +82,7 @@ export function AccessibilityButton({ language }: { language: Language }) {
       focusModeDesc: "Reduce visual distractions",
       readingGuide: "Reading Guide",
       readingGuideDesc: "Guiding line for reading",
-       paymentSoon: "Subscription coming soon",
+      paymentSoon: "Subscription coming soon",
       subscription: {
         title: "Subscribe to a plan",
         subtitle: "Choose a subscription to support {{artistName}}",
@@ -241,7 +237,7 @@ export function AccessibilityButton({ language }: { language: Language }) {
       focusModeDesc: "Reduce las distracciones visuales",
       readingGuide: "Guía de Lectura",
       readingGuideDesc: "Línea guía para leer",
-       subscription: {
+      subscription: {
         title: "Suscribirse a un plan",
         subtitle: "Elige una suscripción para apoyar a {{artistName}}",
 
@@ -364,7 +360,7 @@ export function AccessibilityButton({ language }: { language: Language }) {
       captions: "Subtítulos",
       visualNotifications: "Notificaciones Visuales",
       largerTargets: "Botones Más Grandes",
-     
+
       simplifiedInterface: "Interfaz Simplificada",
       errors: {
         generic: "Algo salió mal. Por favor, inténtalo de nuevo más tarde.",
@@ -393,7 +389,7 @@ export function AccessibilityButton({ language }: { language: Language }) {
       focusModeDesc: "Redueix distraccions visuals",
       readingGuide: "Guia de Lectura",
       readingGuideDesc: "Línia guia per llegir",
-       paymentSoon: "Subscripció disponible aviat",
+      paymentSoon: "Subscripció disponible aviat",
       subscription: {
         title: "Subscriure's a un pla",
         subtitle: "Tria una subscripció per donar suport a {{artistName}}",
@@ -544,7 +540,7 @@ export function AccessibilityButton({ language }: { language: Language }) {
 
   // ✅ Position: init bottom-right on client
   const [position, setPosition] = useState<{ x: number; y: number } | null>(
-    null
+    null,
   );
 
   // ✅ Dragging state
@@ -572,7 +568,7 @@ export function AccessibilityButton({ language }: { language: Language }) {
     const handleMouseMove = (e: MouseEvent) => {
       document.documentElement.style.setProperty(
         "--reading-guide-position",
-        `${e.clientY}px`
+        `${e.clientY}px`,
       );
     };
 
@@ -583,7 +579,7 @@ export function AccessibilityButton({ language }: { language: Language }) {
   // ✅ Only start dragging if user clicked the BUTTON (not the popover)
   const handleMouseDown = (e: React.MouseEvent) => {
     const clickedButton = (e.target as HTMLElement).closest(
-      `button[aria-label="${content.aria.open}"]`
+      `button[aria-label="${content.aria.open}"]`,
     );
     if (!clickedButton) return;
 
@@ -682,7 +678,7 @@ export function AccessibilityButton({ language }: { language: Language }) {
                   "radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.15) 0%, transparent 60%)",
               }}
             />
-            <StickmanIcon  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-8 w-8 text-white" />
+            <StickmanIcon className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-8 w-8 text-white" />
           </button>
         </PopoverTrigger>
 
@@ -807,9 +803,6 @@ export function AccessibilityButton({ language }: { language: Language }) {
               </p>
             </div>
           </div>
-
-       
-      
         </PopoverContent>
       </Popover>
     </div>
