@@ -76,8 +76,35 @@ html.larger-buttons [role="button"],
 html.larger-buttons input,
 html.larger-buttons select,
 html.larger-buttons textarea {
-  min-height: 52px;
+  min-height: 1px;
   font-size: 1.05rem;
+}
+
+html.smaller-buttons button,
+html.smaller-buttons [role="button"],
+html.smaller-buttons input,
+html.smaller-buttons select,
+html.smaller-buttons textarea {
+  min-height: 1px;
+  font-size: 0.5rem;
+}
+
+html.medium-buttons button,
+html.medium-buttons [role="button"],
+html.medium-buttons input,
+html.medium-buttons select,
+html.medium-buttons textarea {
+  min-height: 1px;
+  font-size: 0.8rem;
+}
+
+html.xl-buttons button,
+html.xl-buttons [role="button"],
+html.xl-buttons input,
+html.xl-buttons select,
+html.xl-buttons textarea {
+  min-height: 1px;
+  font-size: 1.25rem;
 }
 
 /* ============ Focus mode (réduit les distractions) ============ */

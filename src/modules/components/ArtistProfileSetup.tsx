@@ -363,12 +363,12 @@ export function ArtistProfileSetup({
   // --- ADD: handlers for react-select ---
   const tagOptions: Option[] = React.useMemo(
     () => tags.map((t) => ({ value: t.id, label: t.name })),
-    [tags]
+    [tags],
   );
 
   const selectedTagOptions: Option[] = React.useMemo(
     () => tagOptions.filter((o) => selectedTagIds.includes(o.value)),
-    [tagOptions, selectedTagIds]
+    [tagOptions, selectedTagIds],
   );
 
   const handleTagsChange = (selected: readonly Option[] | null) => {
@@ -506,9 +506,9 @@ export function ArtistProfileSetup({
       <div className="fixed inset-0 -z-10 bg-black/40" />
 
       {/* ================= ACCESSIBILITY BUTTON ================= */}
-      <div className="relative z-20">
+      {/* <div className="relative z-20">
         <AccessibilityButton language={language} />
-      </div>
+      </div> */}
 
       {/* ================= SCROLL CONTAINER ================= */}
       <div
