@@ -25,17 +25,6 @@ const Mail = ({ size = 24, className = "" }) => (
   </svg>
 );
 
-
-
-
-
-
-
-
-
-
-
-
 const Lock = ({ size = 24, className = "" }) => (
   <svg
     width={size}
@@ -52,11 +41,6 @@ const Lock = ({ size = 24, className = "" }) => (
     <path d="M7 11V7a5 5 0 0 1 10 0v4" />
   </svg>
 );
-
-
-
-
-
 
 const Eye = ({ size = 24, className = "" }) => (
   <svg
@@ -229,11 +213,11 @@ export function Login({
       const res1 = await ModuleObject.service.getUser(res.user.id);
       localStorage.setItem(
         ModuleObject.localState.USER_DATA,
-        JSON.stringify(res1.data)
+        JSON.stringify(res1.data),
       );
       localStorage.setItem(
         ModuleObject.localState.USER_ROLE,
-        JSON.stringify(res1.data.type)
+        JSON.stringify(res1.data.type),
       );
       setSuccessMessage(res.message);
       setIsLoading(false);
@@ -268,7 +252,7 @@ export function Login({
       }}
     >
       {/* ✅ Bouton d’accessibilité : monté au plus haut niveau */}
-      <AccessibilityButton language={language} />
+      {/* <AccessibilityButton language={language} /> */}
 
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/50" />

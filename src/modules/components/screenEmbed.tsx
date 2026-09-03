@@ -16,6 +16,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 type Language = "english" | "spanish" | "catalan";
 const LANGUAGE_STORAGE_KEY = "disktro_language";
+type size_type = "small" | "medium" | "large" | "xl";
 
 export function ScreenEmbed({ initialView }: { initialView?: string }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -32,9 +33,7 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const [showAccessibility, setShowAccessibility] = useState(false);
-  const [fontSize, setFontSize] = useState<"small" | "medium" | "large" | "xl">(
-    "medium",
-  );
+  const [fontSize, setFontSize] = useState<size_type>("medium");
   const [highContrast, setHighContrast] = useState(false);
   const [colorBlindMode, setColorBlindMode] = useState<
     "none" | "protanopia" | "deuteranopia" | "tritanopia"
@@ -60,6 +59,7 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
   const dragData = useRef({ startX: 0, scrollLeft: 0 });
 
   const [activeMediaIndex, setActiveMediaIndex] = useState(0);
+  const [largerButtons, setLargerButtons] = useState(false);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const ACCESS_TOKEN_KEY = UserModule.localState.ACCESS_TOKEN;
   const USER_ID_KEY = UserModule.localState.USER_ID;
@@ -118,6 +118,38 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
     } else if (e.key === "ArrowRight") {
       e.preventDefault();
       scrollByAmount(300);
+    }
+  };
+
+  const toggleLargerButtons = (size: size_type) => {
+    setFontSize(size);
+    switch (size) {
+      case "small":
+        document.documentElement.classList.remove("medium-buttons");
+        document.documentElement.classList.remove("xl-buttons");
+        document.documentElement.classList.remove("larger-buttons");
+        document.documentElement.classList.add("smaller-buttons");
+        break;
+      case "medium":
+        document.documentElement.classList.add("medium-buttons");
+        document.documentElement.classList.remove("xl-buttons");
+        document.documentElement.classList.remove("larger-buttons");
+        document.documentElement.classList.remove("smaller-buttons");
+        break;
+      case "large":
+        document.documentElement.classList.remove("medium-buttons");
+        document.documentElement.classList.remove("xl-buttons");
+        document.documentElement.classList.add("larger-buttons");
+        document.documentElement.classList.remove("smaller-buttons");
+        break;
+      case "xl":
+        document.documentElement.classList.remove("medium-buttons");
+        document.documentElement.classList.add("xl-buttons");
+        document.documentElement.classList.remove("larger-buttons");
+        document.documentElement.classList.remove("smaller-buttons");
+        break;
+      default:
+        document.documentElement.classList.remove("medium-buttons");
     }
   };
 
@@ -567,7 +599,7 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
 
   const containerClasses = `fixed inset-0 w-screen h-screen bg-gradient-to-br from-[#5A0B4D] via-[#4A1456] to-[#2D0E3E] overflow-hidden relative w-full
 min-h-[100svh] md:min-h-screen
-overflow-hidden
+overflow-y-scroll
 pt-[env(safe-area-inset-top)]
 pb-[env(safe-area-inset-bottom)]
  ${
@@ -1421,7 +1453,7 @@ pb-[env(safe-area-inset-bottom)]
                               <button
                                 key={size}
                                 type="button"
-                                onClick={() => setFontSize(size)}
+                                onClick={() => toggleLargerButtons(size)}
                                 className={`px-3 py-1.5 rounded-lg transition-all text-xs ${
                                   fontSize === size
                                     ? "bg-white/30 text-white"
@@ -1703,7 +1735,7 @@ pb-[env(safe-area-inset-bottom)]
         >
           <div
             className="relative w-full max-w-2xl mx-auto
-          flex flex-col sm:flex-row items-center gap-6 md:gap-5"
+            flex flex-col sm:flex-row items-center gap-6 md:gap-5"
           >
             {/* Panneau central */}
 
@@ -2190,13 +2222,11 @@ pb-[env(safe-area-inset-bottom)]
                     </div>
                   )}
                 </div>
-              </div>
-
-              {/* Magazine Button */}
-              <div className="flex justify-center items-center sm:justify-center w-full max-w-4xl mt-6 sm:mt-10">
-                <button
-                  onClick={() => router.push("/magazine")}
-                  className="
+                {/* Magazine Button */}
+                <div className="flex m-5 justify-center items-center sm:justify-center w-full max-w-4xl mt-6 sm:mt-10">
+                  <button
+                    onClick={() => router.push("/magazine")}
+                    className="
                   relative
                   w-38 sm:w-48 md:w-56
                   h-15 sm:h-[100px]
@@ -2210,29 +2240,30 @@ pb-[env(safe-area-inset-bottom)]
                   group
                   focus focus-visible:ring-2 focus-visible:ring-blue-500
                 "
-                  style={{
-                    backgroundImage: "url('/image/bbok_club.jpeg')",
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
-                    backgroundRepeat: "no-repeat",
-                    border: "1.5px solid rgba(255,255,255,0.5)",
-                    boxShadow:
-                      "0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.25)",
-                  }}
-                  tabIndex={0}
-                  aria-label="Visit Bbok Club Magazine"
-                >
-                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all duration-300 rounded-xl sm:rounded-2xl" />
+                    style={{
+                      backgroundImage: "url('/image/bbok_club.jpeg')",
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                      backgroundRepeat: "no-repeat",
+                      border: "1.5px solid rgba(255,255,255,0.5)",
+                      boxShadow:
+                        "0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.25)",
+                    }}
+                    tabIndex={0}
+                    aria-label="Visit Bbok Club Magazine"
+                  >
+                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all duration-300 rounded-xl sm:rounded-2xl" />
 
-                  <div className="absolute top-0 left-0 w-full h-1/3 bg-gradient-to-b from-white/40 via-white/10 to-transparent pointer-events-none" />
+                    <div className="absolute top-0 left-0 w-full h-1/3 bg-gradient-to-b from-white/40 via-white/10 to-transparent pointer-events-none" />
 
-                  <div className="absolute -top-full -left-1/2 w-1/2 h-[300%] rotate-12 bg-white/10 blur-xl group-hover:left-[120%] transition-all duration-1000 pointer-events-none" />
+                    <div className="absolute -top-full -left-1/2 w-1/2 h-[300%] rotate-12 bg-white/10 blur-xl group-hover:left-[120%] transition-all duration-1000 pointer-events-none" />
 
-                  {/* Texte sur le bouton */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-white font-bold text-lg sm:text-xl drop-shadow-lg"></span>
-                  </div>
-                </button>
+                    {/* Texte sur le bouton */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-white font-bold text-lg sm:text-xl drop-shadow-lg"></span>
+                    </div>
+                  </button>
+                </div>
               </div>
             </div>
           </div>

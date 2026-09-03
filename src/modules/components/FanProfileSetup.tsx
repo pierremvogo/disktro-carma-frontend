@@ -422,9 +422,9 @@ export function FanProfileSetup({
       <div className="fixed inset-0 -z-10 bg-black/50" />
 
       {/* ================= ACCESSIBILITY BUTTON ================= */}
-      <div className="relative z-20">
+      {/* <div className="relative z-20">
         <AccessibilityButton language={language} />
-      </div>
+      </div> */}
 
       {/* ================= SCROLL CONTAINER ================= */}
       <div
