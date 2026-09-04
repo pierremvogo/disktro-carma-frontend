@@ -1734,299 +1734,136 @@ pb-[env(safe-area-inset-bottom)]
           role="main"
         >
           <div
-            className=" relative w-full max-w-6xl mx-auto
-    flex flex-col md:flex-row
-    items-center justify-center
-    gap-4 md:gap-8 lg:gap-12
-    px-2 sm:px-4"
+            className=" relative
+    w-full
+    max-w-6xl
+    mx-auto
+    flex
+    flex-col
+    md:flex-row
+    items-center
+    justify-center
+    gap-3
+    md:gap-8
+    lg:gap-12
+    px-2
+    sm:px-4"
           >
             {/* PERSONNAGE BBOK */}
+            {/* PERSONNAGE + BOUTON */}
             <div
               className="
     relative
-    hidden md:flex
-    w-[280px] lg:w-[340px] xl:w-[390px]
-    h-[520px] lg:h-[620px] xl:h-[680px]
+    flex
+    flex-col
+    items-center
+    justify-end
     flex-shrink-0
-    items-end justify-center
-    pointer-events-none
+
+    /* MOBILE */
+    order-2
+    w-full
+    mt-2
+
+    /* DESKTOP */
+    md:order-1
+    md:w-[280px]
+    lg:w-[340px]
+    xl:w-[390px]
+    md:mt-0
   "
             >
-              <img
-                src="/image/bbok_character.jpg"
-                alt="BBOK character"
+              {/* PERSONNAGE */}
+              <div
                 className="
-      absolute
-      bottom-0
-      left-1/2
-      -translate-x-1/2
-      w-full
-      h-full
-      object-contain
-      object-bottom
-      drop-shadow-[0_20px_35px_rgba(0,0,0,0.45)]
+      relative
+      flex
+      items-end
+      justify-center
+
+      /* MOBILE : petit sticker */
+      w-[170px]
+      h-[210px]
+
+      /* DESKTOP */
+      md:w-full
+      md:h-[520px]
+      lg:h-[620px]
+      xl:h-[680px]
     "
-              />
+              >
+                <img
+                  src="/image/bbok_character.png"
+                  alt="BBOK character"
+                  className="
+        absolute
+        bottom-0
+        left-1/2
+        -translate-x-1/2
+
+        w-full
+        h-full
+        object-contain
+        object-bottom
+
+        drop-shadow-[0_12px_20px_rgba(0,0,0,0.5)]
+      "
+                />
+              </div>
+
               {/* BOUTON MULTIPLAYER */}
               <button
                 type="button"
                 onClick={() => {
-                  // Action du bouton ici
                   // router.push("/multiplayer");
                 }}
                 className="
-                 w-38 sm:w-48 md:w-56
-                  h-15 sm:h-[80px]
       relative
-     
-      mt-3
       overflow-hidden
-      rounded-2xl
+      rounded-xl
       transition-all
       duration-300
       hover:scale-[1.02]
       hover:shadow-2xl
       cursor-pointer
+
+      /* MOBILE */
+      w-[210px]
+      mt-1
+
+      /* DESKTOP */
+      md:w-[230px]
+      lg:w-[260px]
+      xl:w-[280px]
+      md:mt-3
+
       focus:outline-none
       focus-visible:ring-2
       focus-visible:ring-purple-400
-      focus-visible:ring-offset-2
-      focus-visible:ring-offset-transparent
-      focus focus-visible:ring-2 focus-visible:ring-blue-500
     "
                 aria-label="Multiplayer online PC game - Coming 2027"
               >
                 <img
                   src="/image/button_play.png"
                   alt="Multiplayer online PC game - Coming 2027"
-                  className="
-        block
-        w-full
-        h-auto
-        object-contain
-      "
+                  className="block w-full h-auto object-contain"
                 />
               </button>
             </div>
 
-            {/* Panneau central */}
-
-            {/* Magazine Button 
-            <div className="flex sm:flex-col  w-55 max-w-4xl mt-2 sm:mt-4">
-              <button
-                onClick={() => router.push("/magazine")}
-                className="
-                  m-2
-                  relative
-                  w-48 sm:w-48 md:w-56
-                  h-25 sm:h-[100px]
-                  overflow-hidden
-                  rounded-xl sm:rounded-2xl
-                  transition-all
-                  duration-300
-                  hover:scale-[1.02]
-                  hover:shadow-2xl
-                  cursor-pointer
-                  group
-                  focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-400 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent
-                "
-                style={{
-                  backgroundImage: "url('/image/bbok_btn1.jpg')",
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  backgroundRepeat: "no-repeat",
-                  border: "1.5px solid rgba(255,255,255,0.5)",
-                  boxShadow:
-                    "0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.25)",
-                }}
-                tabIndex={0}
-                aria-label="Visit Bbok Club Magazine"
-              >
-                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all duration-300 rounded-xl sm:rounded-2xl" />
-
-                <div className="absolute top-0 left-0 w-full h-1/3 bg-gradient-to-b from-white/40 via-white/10 to-transparent pointer-events-none" />
-
-                <div className="absolute -top-full -left-1/2 w-1/2 h-[300%] rotate-12 bg-white/10 blur-xl group-hover:left-[120%] transition-all duration-1000 pointer-events-none" />
-
-                
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-white font-bold text-lg sm:text-xl drop-shadow-lg"></span>
-                </div>
-              </button>
-
-               <button
-                onClick={() => router.push("/magazine")}
-                className="
-                m-2
-                  relative
-                  w-48 sm:w-48 md:w-56
-                  h-25 sm:h-[100px]
-                  overflow-hidden
-                  rounded-xl sm:rounded-2xl
-                  transition-all
-                  duration-300
-                  hover:scale-[1.02]
-                  hover:shadow-2xl
-                  cursor-pointer
-                  group
-                  focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-400 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent
-                "
-                style={{
-                  backgroundImage: "url('/image/bbok_btn2.jpg')",
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  backgroundRepeat: "no-repeat",
-                  border: "1.5px solid rgba(255,255,255,0.5)",
-                  boxShadow:
-                    "0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.25)",
-                }}
-                tabIndex={0}
-                aria-label="Visit Bbok Club Magazine"
-              >
-                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all duration-300 rounded-xl sm:rounded-2xl" />
-
-                <div className="absolute top-0 left-0 w-full h-1/3 bg-gradient-to-b from-white/40 via-white/10 to-transparent pointer-events-none" />
-
-                <div className="absolute -top-full -left-1/2 w-1/2 h-[300%] rotate-12 bg-white/10 blur-xl group-hover:left-[120%] transition-all duration-1000 pointer-events-none" />
-
-                {/* Texte sur le bouton 
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-white font-bold text-lg sm:text-xl drop-shadow-lg"></span>
-                </div>
-              </button>
-
-
-              <button
-                onClick={() => router.push("/magazine")}
-                className="
-                invisible
-                m-2
-                  relative
-                  w-48 sm:w-48 md:w-56
-                  h-25 sm:h-[100px]
-                  overflow-hidden
-                  rounded-xl sm:rounded-2xl
-                  transition-all
-                  duration-300
-                  hover:scale-[1.02]
-                  hover:shadow-2xl
-                  cursor-pointer
-                  group
-                  focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-400 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent
-                "
-                style={{
-                  backgroundImage: "url('/image/bbok_btn2.jpg')",
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  backgroundRepeat: "no-repeat",
-                  border: "1.5px solid rgba(255,255,255,0.5)",
-                  boxShadow:
-                    "0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.25)",
-                }}
-                tabIndex={0}
-                aria-label="Visit Bbok Club Magazine"
-              >
-                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all duration-300 rounded-xl sm:rounded-2xl" />
-
-                <div className="absolute top-0 left-0 w-full h-1/3 bg-gradient-to-b from-white/40 via-white/10 to-transparent pointer-events-none" />
-
-                <div className="absolute -top-full -left-1/2 w-1/2 h-[300%] rotate-12 bg-white/10 blur-xl group-hover:left-[120%] transition-all duration-1000 pointer-events-none" />
-
-                {/* Texte sur le bouton 
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-white font-bold text-lg sm:text-xl drop-shadow-lg"></span>
-                </div>
-              </button>
-
-              <button
-                onClick={() => router.push("/magazine")}
-                className="
-                invisible
-                m-2
-                  relative
-                  w-48 sm:w-48 md:w-56
-                  h-25 sm:h-[100px]
-                  overflow-hidden
-                  rounded-xl sm:rounded-2xl
-                  transition-all
-                  duration-300
-                  hover:scale-[1.02]
-                  hover:shadow-2xl
-                  cursor-pointer
-                  group
-                  focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-400 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent
-                "
-                style={{
-                  backgroundImage: "url('/image/bbok_btn2.jpg')",
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  backgroundRepeat: "no-repeat",
-                  border: "1.5px solid rgba(255,255,255,0.5)",
-                  boxShadow:
-                    "0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.25)",
-                }}
-                tabIndex={0}
-                aria-label="Visit Bbok Club Magazine"
-              >
-                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all duration-300 rounded-xl sm:rounded-2xl" />
-
-                <div className="absolute top-0 left-0 w-full h-1/3 bg-gradient-to-b from-white/40 via-white/10 to-transparent pointer-events-none" />
-
-                <div className="absolute -top-full -left-1/2 w-1/2 h-[300%] rotate-12 bg-white/10 blur-xl group-hover:left-[120%] transition-all duration-1000 pointer-events-none" />
-
-                {/* Texte sur le bouton 
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-white font-bold text-lg sm:text-xl drop-shadow-lg"></span>
-                </div>
-              </button>
-
-              <button
-                onClick={() => router.push("/magazine")}
-                className="
-                invisible
-                m-2
-                  relative
-                  w-48 sm:w-48 md:w-56
-                  h-25 sm:h-[100px]
-                  overflow-hidden
-                  rounded-xl sm:rounded-2xl
-                  transition-all
-                  duration-300
-                  hover:scale-[1.02]
-                  hover:shadow-2xl
-                  cursor-pointer
-                  group
-                  focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-400 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent
-                "
-                style={{
-                  backgroundImage: "url('/image/bbok_btn2.jpg')",
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  backgroundRepeat: "no-repeat",
-                  border: "1.5px solid rgba(255,255,255,0.5)",
-                  boxShadow:
-                    "0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.25)",
-                }}
-                tabIndex={0}
-                aria-label="Visit Bbok Club Magazine"
-              >
-                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all duration-300 rounded-xl sm:rounded-2xl" />
-
-                <div className="absolute top-0 left-0 w-full h-1/3 bg-gradient-to-b from-white/40 via-white/10 to-transparent pointer-events-none" />
-
-                <div className="absolute -top-full -left-1/2 w-1/2 h-[300%] rotate-12 bg-white/10 blur-xl group-hover:left-[120%] transition-all duration-1000 pointer-events-none" />
-
-                {/* Texte sur le bouton
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-white font-bold text-lg sm:text-xl drop-shadow-lg"></span>
-                </div>
-              </button>
-
-            </div>*/}
-
             <div
-              className="relative z-10 
-            w-full max-w-2xl mt-2 flex-row md:mt-4"
+              className="relative
+                          z-10
+                          w-full
+                          max-w-2xl
+                          mt-2
+
+                          /* MOBILE */
+                          order-1
+
+                          /* DESKTOP */
+                          md:order-2
+                          md:mt-4"
             >
               <div className="w-full h-full bg-white/10 backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden border border-white/20 flex flex-col">
                 {/* MAIN CONTENT */}
