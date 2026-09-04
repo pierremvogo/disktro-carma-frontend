@@ -1734,9 +1734,81 @@ pb-[env(safe-area-inset-bottom)]
           role="main"
         >
           <div
-            className="relative w-full max-w-2xl mx-auto
-            flex flex-col sm:flex-row items-center gap-6 md:gap-5"
+            className=" relative w-full max-w-6xl mx-auto
+    flex flex-col md:flex-row
+    items-center justify-center
+    gap-4 md:gap-8 lg:gap-12
+    px-2 sm:px-4"
           >
+            {/* PERSONNAGE BBOK */}
+            <div
+              className="
+    relative
+    hidden md:flex
+    w-[280px] lg:w-[340px] xl:w-[390px]
+    h-[520px] lg:h-[620px] xl:h-[680px]
+    flex-shrink-0
+    items-end justify-center
+    pointer-events-none
+  "
+            >
+              <img
+                src="/image/bbok_character.jpg"
+                alt="BBOK character"
+                className="
+      absolute
+      bottom-0
+      left-1/2
+      -translate-x-1/2
+      w-full
+      h-full
+      object-contain
+      object-bottom
+      drop-shadow-[0_20px_35px_rgba(0,0,0,0.45)]
+    "
+              />
+              {/* BOUTON MULTIPLAYER */}
+              <button
+                type="button"
+                onClick={() => {
+                  // Action du bouton ici
+                  // router.push("/multiplayer");
+                }}
+                className="
+                 w-38 sm:w-48 md:w-56
+                  h-15 sm:h-[80px]
+      relative
+     
+      mt-3
+      overflow-hidden
+      rounded-2xl
+      transition-all
+      duration-300
+      hover:scale-[1.02]
+      hover:shadow-2xl
+      cursor-pointer
+      focus:outline-none
+      focus-visible:ring-2
+      focus-visible:ring-purple-400
+      focus-visible:ring-offset-2
+      focus-visible:ring-offset-transparent
+      focus focus-visible:ring-2 focus-visible:ring-blue-500
+    "
+                aria-label="Multiplayer online PC game - Coming 2027"
+              >
+                <img
+                  src="/image/button_play.png"
+                  alt="Multiplayer online PC game - Coming 2027"
+                  className="
+        block
+        w-full
+        h-auto
+        object-contain
+      "
+                />
+              </button>
+            </div>
+
             {/* Panneau central */}
 
             {/* Magazine Button 
