@@ -597,7 +597,7 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
 
   const text = content[language as keyof typeof content];
 
-  const containerClasses = `fixed inset-0 w-screen h-screen bg-gradient-to-br from-[#5A0B4D] via-[#4A1456] to-[#2D0E3E] overflow-hidden relative w-full
+  const containerClasses = `fixed inset-0 w-screen h-screen bg-gradient-to-br from-[#5A0B4D] via-[#4A1456] to-[#2D0E3E] overflow-x-hidden relative w-full
 min-h-[100svh] md:min-h-screen
 overflow-y-scroll
 pt-[env(safe-area-inset-top)]
@@ -948,10 +948,8 @@ pb-[env(safe-area-inset-bottom)]
                 : "none",
       }}
     >
-      {/* <AccessibilityButton language={language} /> */}
-
       {/* Overlay */}
-      <div className="absolute inset-0 bg-black/50" />
+      <div className="fixed inset-0 bg-black/50 pointer-events-none" />
 
       {/* WRAPPER PRINCIPAL */}
       <div
@@ -960,7 +958,6 @@ pb-[env(safe-area-inset-bottom)]
           min-h-[100svh] md:min-h-screen
           pt-[max(env(safe-area-inset-top),1rem)]
           pb-[max(env(safe-area-inset-bottom),1rem)]
-          overflow-hidden
         "
       >
         {/* Keyboard Navigation Hints */}
@@ -1730,84 +1727,84 @@ pb-[env(safe-area-inset-bottom)]
         {/* CONTENU PRINCIPAL */}
         <main
           className="flex-1 w-full overflow-y-auto 
-          overscroll-contain px-4 sm:px-6 lg:px-8 pb-6"
+          overscroll-auto px-4 sm:px-6 lg:px-8 pb-6"
           role="main"
         >
           <div
             className=" relative
-    w-full
-    max-w-6xl
-    mx-auto
-    flex
-    flex-col
-    md:flex-row
-    items-center
-    justify-center
-    gap-3
-    md:gap-8
-    lg:gap-12
-    px-2
-    sm:px-4"
+                        w-full
+                        max-w-6xl
+                        mx-auto
+                        flex
+                        flex-col
+                        md:flex-row
+                        items-center
+                        justify-center
+                        gap-3
+                        md:gap-8
+                        lg:gap-12
+                        px-2
+                        sm:px-4"
           >
             {/* PERSONNAGE BBOK */}
             {/* PERSONNAGE + BOUTON */}
             <div
               className="
-    relative
-    flex
-    flex-col
-    items-center
-    justify-end
-    flex-shrink-0
+                        relative
+                        flex
+                        flex-col
+                        items-center
+                        justify-end
+                        flex-shrink-0
 
-    /* MOBILE */
-    order-2
-    w-full
-    mt-2
+                        /* MOBILE */
+                        order-2
+                        w-full
+                        mt-2
 
-    /* DESKTOP */
-    md:order-1
-    md:w-[280px]
-    lg:w-[340px]
-    xl:w-[390px]
-    md:mt-0
-  "
+                        /* DESKTOP */
+                        md:order-1
+                        md:w-[280px]
+                        lg:w-[340px]
+                        xl:w-[390px]
+                        md:mt-0
+                      "
             >
               {/* PERSONNAGE */}
               <div
                 className="
-      relative
-      flex
-      items-end
-      justify-center
+                  relative
+                  flex
+                  items-end
+                  justify-center
 
-      /* MOBILE : petit sticker */
-      w-[170px]
-      h-[210px]
+                  /* MOBILE : petit sticker */
+                  w-[160px]
+                  h-[160px]
 
-      /* DESKTOP */
-      md:w-full
-      md:h-[520px]
-      lg:h-[620px]
-      xl:h-[680px]
-    "
+                  /* DESKTOP */
+                  md:w-full
+                  md:h-[520px]
+                  lg:h-[620px]
+                  xl:h-[680px]
+                "
               >
                 <img
                   src="/image/bbok_character.png"
                   alt="BBOK character"
                   className="
-        absolute
-        bottom-0
-        left-1/2
-        -translate-x-1/2
+                  absolute
+                  bottom-0
+                  left-1/2
+                  -translate-x-1/2
 
-        w-full
-        h-full
-        object-contain
-        object-bottom
+                  w-full
+                  h-full
+                  object-contain
+                  object-bottom
 
-        drop-shadow-[0_12px_20px_rgba(0,0,0,0.5)]
-      "
+                  drop-shadow-[0_12px_20px_rgba(0,0,0,0.5)]
+                "
                 />
               </div>
 
@@ -1818,35 +1815,38 @@ pb-[env(safe-area-inset-bottom)]
                   // router.push("/multiplayer");
                 }}
                 className="
-      relative
-      overflow-hidden
-      rounded-xl
-      transition-all
-      duration-300
-      hover:scale-[1.02]
-      hover:shadow-2xl
-      cursor-pointer
+                  overflow-hidden
+                  rounded-xl
+                  transition-all
+                  duration-300
+                  hover:scale-[1.02]
+                  hover:shadow-2xl
+                  cursor-pointer
 
-      /* MOBILE */
-      w-[210px]
-      mt-1
+                  /* MOBILE */
+                  absolute
+                  left-[calc(50%+20px)]
+                  top-[60px]
+                  w-[125px]
+                  z-20
 
-      /* DESKTOP */
-      md:w-[230px]
-      lg:w-[260px]
-      xl:w-[280px]
-      md:mt-3
+                  /* DESKTOP */
+                  md:static
+                  md:w-[240px]
+                  lg:w-[270px]
+                  xl:w-[290px]
+                  md:mt-[-25px]
 
-      focus:outline-none
-      focus-visible:ring-2
-      focus-visible:ring-purple-400
-    "
+                  focus:outline-none
+                  focus-visible:ring-2
+                  focus-visible:ring-purple-400
+                "
                 aria-label="Multiplayer online PC game - Coming 2027"
               >
                 <img
                   src="/image/button_play.png"
                   alt="Multiplayer online PC game - Coming 2027"
-                  className="block w-full h-auto object-contain"
+                  className="block w-full h-7 md:h-auto object-contain"
                 />
               </button>
             </div>
