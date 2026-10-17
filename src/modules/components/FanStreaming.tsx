@@ -15,12 +15,26 @@ import { SubscriptionModal } from "./subscriptionModal";
 import { PlanModuleObject } from "../plan/module";
 import { StripeModuleObject } from "./stripe/module";
 import { LygosModuleObject } from "./lygos/module";
-import { Search } from "lucide-react";
+import {
+  Search,
+  Shuffle,
+  Repeat,
+  Maximize,
+  MoreVertical,
+  ArrowRight,
+  Plus,
+} from "lucide-react";
 import { ArtistProfileModal } from "./previewProfileArtist/ArtistProfileModal";
 import { speak } from "@/@disktro/lib/text-to-speech";
 
-// Icon components
-const Music = ({ size = 24, className = "" }) => (
+// ====================== Icon components ======================
+type IconProps = { size?: number; className?: string };
+
+const Svg = ({
+  size = 24,
+  className = "",
+  children,
+}: IconProps & { children: React.ReactNode }) => (
   <svg
     width={size}
     height={size}
@@ -32,163 +46,79 @@ const Music = ({ size = 24, className = "" }) => (
     strokeLinejoin="round"
     className={className}
   >
+    {children}
+  </svg>
+);
+
+const Music = (p: IconProps) => (
+  <Svg {...p}>
     <path d="M9 18V5l12-2v13" />
     <circle cx="6" cy="18" r="3" />
     <circle cx="18" cy="16" r="3" />
-  </svg>
+  </Svg>
 );
 
-const Play = ({ size = 24, className = "" }) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
+const Play = (p: IconProps) => (
+  <Svg {...p}>
     <polygon points="5 3 19 12 5 21 5 3" />
-  </svg>
+  </Svg>
 );
 
-const Pause = ({ size = 24, className = "" }) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
+const Pause = (p: IconProps) => (
+  <Svg {...p}>
     <rect x="6" y="4" width="4" height="16" />
     <rect x="14" y="4" width="4" height="16" />
-  </svg>
+  </Svg>
 );
 
-const Heart = ({ size = 24, className = "" }) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
+const Heart = (p: IconProps) => (
+  <Svg {...p}>
     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-  </svg>
+  </Svg>
 );
 
-const User = ({ size = 24, className = "" }) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
+const User = (p: IconProps) => (
+  <Svg {...p}>
     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
     <circle cx="12" cy="7" r="4" />
-  </svg>
+  </Svg>
 );
 
-const Star = ({ size = 24, className = "" }) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
+const Star = (p: IconProps) => (
+  <Svg {...p}>
     <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-  </svg>
+  </Svg>
 );
 
-const SkipBack = ({ size = 24, className = "" }) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
+const SkipBack = (p: IconProps) => (
+  <Svg {...p}>
     <polygon points="19 20 9 12 19 4 19 20" />
     <line x1="5" y1="19" x2="5" y2="5" />
-  </svg>
+  </Svg>
 );
 
-const SkipForward = ({ size = 24, className = "" }) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
+const SkipForward = (p: IconProps) => (
+  <Svg {...p}>
     <polygon points="5 4 15 12 5 20 5 4" />
     <line x1="19" y1="5" x2="19" y2="19" />
-  </svg>
+  </Svg>
 );
 
-const Volume2 = ({ size = 24, className = "" }) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
+const Volume2 = (p: IconProps) => (
+  <Svg {...p}>
     <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
     <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" />
-  </svg>
+  </Svg>
 );
 
-const FileText = ({ size = 24, className = "" }) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
+const FileText = (p: IconProps) => (
+  <Svg {...p}>
     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
     <polyline points="14 2 14 8 20 8" />
     <line x1="16" y1="13" x2="8" y2="13" />
     <line x1="16" y1="17" x2="8" y2="17" />
     <polyline points="10 9 9 9 8 9" />
-  </svg>
+  </Svg>
 );
 
 interface FanStreamingProps {
@@ -333,6 +263,14 @@ export function FanStreaming({ language }: FanStreamingProps) {
   const [newReleases, setNewReleases] = useState<any[]>([]);
   const [newReleasesLoading, setNewReleasesLoading] = useState(false);
   const [newReleasesError, setNewReleasesError] = useState<string | null>(null);
+
+  // ====================== UI-only states (nouvelle interface) ======================
+  const [isShuffle, setIsShuffle] = useState(false);
+  const [isRepeat, setIsRepeat] = useState(false);
+  const isShuffleRef = useRef(false);
+  const [showAllNewReleases, setShowAllNewReleases] = useState(false);
+  const [showAllFeatured, setShowAllFeatured] = useState(false);
+  const videoContainerRef = useRef<HTMLDivElement | null>(null);
 
   // ====================== SEARCH HANDLER (COMPLET) ======================
 
@@ -1449,7 +1387,15 @@ export function FanStreaming({ language }: FanStreamingProps) {
 
   const handleNextFromQueue1 = () => {
     setQueueIndex((prevIndex) => {
-      const nextIndex = prevIndex + 1;
+      let nextIndex = prevIndex + 1;
+
+      // Mode aléatoire (désactivé par défaut → comportement d'origine inchangé)
+      if (isShuffleRef.current && queue.length > 1) {
+        do {
+          nextIndex = Math.floor(Math.random() * queue.length);
+        } while (nextIndex === prevIndex);
+      }
+
       if (nextIndex < queue.length) {
         setCurrentSong(queue[nextIndex]);
         return nextIndex;
@@ -1607,6 +1553,8 @@ export function FanStreaming({ language }: FanStreamingProps) {
       search: "Buscar música, artistas...",
       featured: "Destacados",
       newReleases: "Nuevos Lanzamientos",
+      seeAll: "Ver todo",
+      nothingPlaying: "Selecciona una canción para empezar",
 
       subscribe: "Suscribirse",
       play: "Reproducir",
@@ -1769,6 +1717,8 @@ export function FanStreaming({ language }: FanStreamingProps) {
       search: "Search music, artists...",
       featured: "Featured",
       newReleases: "New Releases",
+      seeAll: "See all",
+      nothingPlaying: "Select a track to start playing",
 
       subscribe: "Subscribe",
       play: "Play",
@@ -1915,6 +1865,8 @@ export function FanStreaming({ language }: FanStreamingProps) {
       search: "Cercar música, artistes...",
       featured: "Destacats",
       newReleases: "Nous Llançaments",
+      seeAll: "Veure tot",
+      nothingPlaying: "Selecciona una cançó per començar",
 
       subscribe: "Subscriure's",
       play: "Reproduir",
@@ -2014,6 +1966,16 @@ export function FanStreaming({ language }: FanStreamingProps) {
     if (!audioRef.current) return;
     audioRef.current.volume = isMuted ? 0 : volume;
   }, [volume, isMuted]);
+
+  // UI: shuffle / repeat (défaut désactivés → comportement d'origine)
+  useEffect(() => {
+    isShuffleRef.current = isShuffle;
+  }, [isShuffle]);
+
+  useEffect(() => {
+    if (!audioRef.current) return;
+    audioRef.current.loop = isRepeat;
+  }, [isRepeat]);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -2263,6 +2225,176 @@ export function FanStreaming({ language }: FanStreamingProps) {
     }
   }
 
+  // ====================== Données d'affichage (nouvelle interface) ======================
+  const moods = [
+    {
+      name:
+        language === "spanish"
+          ? "Feliz"
+          : language === "catalan"
+          ? "Feliç"
+          : "Happy",
+      emoji: "😊",
+      color: "from-yellow-400/40 to-orange-400/40",
+    },
+    {
+      name:
+        language === "spanish"
+          ? "Relajado"
+          : language === "catalan"
+          ? "Relaxat"
+          : "Relaxed",
+      emoji: "😌",
+      color: "from-blue-400/40 to-cyan-400/40",
+    },
+    {
+      name:
+        language === "spanish"
+          ? "Energético"
+          : language === "catalan"
+          ? "Energètic"
+          : "Energetic",
+      emoji: "⚡",
+      color: "from-red-400/40 to-pink-400/40",
+    },
+    {
+      name:
+        language === "spanish"
+          ? "Triste"
+          : language === "catalan"
+          ? "Trist"
+          : "Sad",
+      emoji: "😢",
+      color: "from-indigo-400/40 to-blue-400/40",
+    },
+    {
+      name:
+        language === "spanish"
+          ? "Romántico"
+          : language === "catalan"
+          ? "Romàntic"
+          : "Romantic",
+      emoji: "💕",
+      color: "from-pink-400/40 to-rose-400/40",
+    },
+    {
+      name:
+        language === "spanish"
+          ? "Enfocado"
+          : language === "catalan"
+          ? "Concentrat"
+          : "Focused",
+      emoji: "🎯",
+      color: "from-purple-400/40 to-violet-400/40",
+    },
+    {
+      name:
+        language === "spanish"
+          ? "Motivado"
+          : language === "catalan"
+          ? "Motivat"
+          : "Motivated",
+      emoji: "💪",
+      color: "from-green-400/40 to-emerald-400/40",
+    },
+    {
+      name:
+        language === "spanish"
+          ? "Nostálgico"
+          : language === "catalan"
+          ? "Nostàlgic"
+          : "Nostalgic",
+      emoji: "🌅",
+      color: "from-amber-400/40 to-yellow-400/40",
+    },
+    {
+      name:
+        language === "spanish"
+          ? "Eufórico"
+          : language === "catalan"
+          ? "Eufòric"
+          : "Hype",
+      emoji: "🔥",
+      color: "from-orange-500/40 to-red-500/40",
+    },
+    {
+      name:
+        language === "spanish"
+          ? "Tranquilo"
+          : language === "catalan"
+          ? "Tranquil"
+          : "Chill",
+      emoji: "🌴",
+      color: "from-cyan-400/40 to-sky-500/40",
+    },
+  ];
+
+  const tabItems: [string, string][] = [
+    ["discover", text.discover],
+    ["artists", text.artists],
+    ["mymusic", text.myMusic],
+    ["editorplaylists", text.editorPlaylists],
+    ["dashboard", text.dashboard],
+  ];
+
+  const handleFullscreen = () => {
+    const el = videoContainerRef.current;
+    if (!el) return;
+    if (document.fullscreenElement) {
+      document.exitFullscreen?.();
+    } else {
+      el.requestFullscreen?.();
+    }
+  };
+
+  const currentCover =
+    currentSong?.coverUrl ?? currentSong?.cover ?? "/placeholder.png";
+  const currentArtistName =
+    currentSong?.artistName ?? currentSong?.artist ?? currentSong?.userId ?? "";
+
+  // Le mini-player fixe n'apparaît que hors de l'onglet Discover
+  // (dans Discover, le lecteur est intégré à la page)
+  const showMiniPlayer = Boolean(currentSong) && selectedTab !== "discover";
+
+  const renderTabs = (wrapperClass: string) => (
+    <div className={wrapperClass}>
+      {tabItems.map(([key, label]) => (
+        <button
+          key={key}
+          onClick={() => setSelectedTab(key)}
+          onMouseEnter={() => handleTabHover(key)}
+          type="button"
+          className={`flex-shrink-0 text-xs sm:text-sm text-white drop-shadow cursor-pointer pb-1 border-b-2 transition-colors ${
+            selectedTab === key
+              ? "border-white opacity-100"
+              : "border-transparent opacity-60 hover:opacity-80"
+          }`}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  );
+
+  const renderSearchInput = () => (
+    <div className="relative">
+      {!searchQuery && (
+        <Search
+          size={14}
+          className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none z-10"
+        />
+      )}
+      <input
+        ref={searchInputRef}
+        type="text"
+        value={searchQuery}
+        onChange={handleSearchChange}
+        placeholder={text.search}
+        className="w-full py-1.5 pr-3 pl-8 bg-white border border-white/20 rounded-lg text-black text-xs placeholder:text-black/50 placeholder:text-center focus:outline-none focus:ring-2 focus:ring-white/40"
+      />
+    </div>
+  );
+
   // Apply accessibility styles
   const containerClasses = `fixed inset-0 w-screen h-screen bg-gradient-to-br from-[#5A0B4D] via-[#4A1456] to-[#2D0E3E] overflow-hidden relative w-full
 min-h-[100svh] md:min-h-screen
@@ -2283,6 +2415,11 @@ pb-[env(safe-area-inset-bottom)]
     ? "min-h-[48px] min-w-[48px] px-6 py-3"
     : "";
   const animationClasses = reduceMotion ? "" : "transition-all";
+
+  const cardClasses =
+    "bg-white/5 backdrop-blur-xl rounded-2xl p-4 border border-white/10";
+  const seeAllBtnClasses =
+    "cursor-pointer inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20 border border-white/20 text-white text-[11px] transition-all";
 
   // Show profile page if requested
   if (showProfile) {
@@ -2396,22 +2533,22 @@ pb-[env(safe-area-inset-bottom)]
         </div>
       )}
 
-      {/* Header */}
+      {/* ====================== HEADER (une seule ligne sur desktop) ====================== */}
       <div
         className={`fixed left-0 right-0 z-20 bg-black/20 backdrop-blur-md border-b border-white/10 ${
           focusMode ? "opacity-80" : ""
         }`}
         style={{ top: "env(safe-area-inset-top)" }}
       >
-        {/* LIGNE 1 : Back + Title + Profile/Logout */}
-        <div className="flex items-center justify-between gap-2 px-4 sm:px-6 py-1.5">
-          <div className="flex items-center gap-2 min-w-0">
+        <div className="flex items-center justify-between gap-3 px-4 sm:px-6 py-2">
+          {/* Gauche : accessibilité + retour + titre */}
+          <div className="flex items-center gap-2 min-w-0 md:w-[280px] flex-shrink-0">
             <button
               onClick={() => setShowAccessibility(true)}
               aria-label={text.accessibility}
               title={text.accessibility}
               type="button"
-              className="relative h-8 w-8 sm:h-9 sm:w-9 rounded-full shadow-md transition-all hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/30 select-none"
+              className="relative h-8 w-8 sm:h-9 sm:w-9 flex-shrink-0 rounded-full shadow-md transition-all hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/30 select-none"
               style={{
                 background: "rgba(168, 85, 145, 0.4)",
                 backdropFilter: "blur(10px)",
@@ -2463,7 +2600,6 @@ pb-[env(safe-area-inset-bottom)]
                 >
                   <path d="M19 12H5M12 19l-7-7 7-7" />
                 </svg>
-                <span className="hidden sm:inline text-sm"></span>
               </button>
             )}
 
@@ -2472,7 +2608,17 @@ pb-[env(safe-area-inset-bottom)]
             </h1>
           </div>
 
-          <div className="flex items-center gap-3 flex-shrink-0">
+          {/* Centre : onglets (desktop) */}
+          {renderTabs(
+            "hidden md:flex flex-1 flex-nowrap items-center justify-center gap-6 min-w-0"
+          )}
+
+          {/* Droite : recherche (desktop) + profil + déconnexion */}
+          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 md:ml-auto">
+            <div className="hidden md:block w-[260px]">
+              {renderSearchInput()}
+            </div>
+
             <button
               style={{
                 outline: "2px solid #ffffff",
@@ -2533,356 +2679,466 @@ pb-[env(safe-area-inset-bottom)]
           </div>
         </div>
 
-        {/* LIGNE 2 : Tabs + Search */}
-        <div className="w-full border-t border-white/10">
-          <div className="flex items-center gap-3 px-4 sm:px-6 py-1.5 min-w-0">
-            <div className="flex-1 overflow-x-auto no-scrollbar min-w-0">
-              <div className="flex flex-nowrap items-center justify-start sm:justify-center gap-3 sm:gap-6 min-w-max">
-                {[
-                  ["discover", text.discover],
-                  ["artists", text.artists],
-                  ["mymusic", text.myMusic],
-                  ["editorplaylists", text.editorPlaylists],
-                  ["dashboard", text.dashboard],
-                ].map(([key, label]) => (
-                  <button
-                    key={key}
-                    onClick={() => setSelectedTab(key)}
-                    onMouseEnter={() => handleTabHover(key)}
-                    type="button"
-                    className={`flex-shrink-0 text-xs sm:text-sm text-white drop-shadow cursor-pointer pb-1 border-b-2 transition-colors ${
-                      selectedTab === key
-                        ? "border-white opacity-100"
-                        : "border-transparent opacity-60 hover:opacity-80"
-                    }`}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="hidden md:block max-w-[280px] w-full flex-shrink-0">
-              <div className="relative">
-                {!searchQuery && (
-                  <Search
-                    size={14}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none z-10"
-                  />
-                )}
-                <input
-                  ref={searchInputRef}
-                  type="text"
-                  value={searchQuery}
-                  onChange={handleSearchChange}
-                  placeholder={text.search}
-                  className="w-full py-1.5 pr-3 pl-8 bg-white/10 backdrop-blur-md border border-white/20 rounded-lg text-black text-xs placeholder:text-black/50 placeholder:text-center focus:outline-none focus:ring-2 focus:ring-white/40"
-                />
-              </div>
-            </div>
+        {/* Mobile / tablette : onglets + recherche sous le header */}
+        <div className="md:hidden border-t border-white/10">
+          <div className="overflow-x-auto no-scrollbar px-4 sm:px-6 py-1.5">
+            {renderTabs(
+              "flex flex-nowrap items-center justify-start gap-3 sm:gap-6 min-w-max"
+            )}
           </div>
-
-          <div className="md:hidden px-4 sm:px-6 pb-1.5">
-            <div className="relative">
-              {!searchQuery && (
-                <Search
-                  size={14}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none z-10"
-                />
-              )}
-              <input
-                ref={searchInputRef}
-                type="text"
-                value={searchQuery}
-                onChange={handleSearchChange}
-                placeholder={text.search}
-                className="w-full py-1.5 pr-3 pl-8 bg-white/10 backdrop-blur-md border border-white/20 rounded-lg text-black text-xs placeholder:text-black/50 placeholder:text-center focus:outline-none focus:ring-2 focus:ring-white/40"
-              />
-            </div>
-          </div>
+          <div className="px-4 sm:px-6 pb-1.5">{renderSearchInput()}</div>
         </div>
       </div>
 
-      {/* Main Content */}
+      {/* ====================== MAIN CONTENT ====================== */}
       <div
-        className={`absolute inset-x-0 top-0 bottom-0 overflow-y-auto overscroll-contain px-4 sm:px-6 pt-[calc(env(safe-area-inset-top)+100px)] sm:pt-[calc(env(safe-area-inset-top)+105px)] ${
-          currentSong
+        className={`absolute inset-x-0 top-0 bottom-0 overflow-y-auto overscroll-contain px-4 sm:px-6 pt-[calc(env(safe-area-inset-top)+150px)] md:pt-[calc(env(safe-area-inset-top)+72px)] ${
+          showMiniPlayer
             ? "pb-[calc(env(safe-area-inset-bottom)+140px)]"
             : "pb-[calc(env(safe-area-inset-bottom)+40px)]"
         }`}
       >
-        {/* Discover Tab */}
+        {/* ====================== Discover Tab ====================== */}
         {selectedTab === "discover" && (
-          <div className="space-y-8 max-w-6xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
-              <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-4 border border-white/10 h-full flex flex-col">
-                <h2 className="text-xl font-bold tracking-tight text-white drop-shadow-lg mb-3">
+          <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
+            {/* ---------- 1) Lecteur intégré ---------- */}
+            <section className={`${cardClasses} flex flex-col`}>
+              <div
+                ref={videoContainerRef}
+                className="relative aspect-video rounded-xl overflow-hidden bg-black/40"
+              >
+                {currentSong ? (
+                  <img
+                    src={currentCover}
+                    alt={currentSong.title}
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-purple-500/20 to-pink-500/20 text-white/60">
+                    <Music size={40} className="text-white/40" />
+                    <p className="text-xs">{text.nothingPlaying}</p>
+                  </div>
+                )}
+
+                {/* Bouton central */}
+                {currentSong && (
+                  <button
+                    type="button"
+                    onClick={() => handlePlaySong(currentSong, queue)}
+                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center w-14 h-14 rounded-full bg-black/50 backdrop-blur-sm border border-white/20 hover:bg-black/70 transition-all cursor-pointer"
+                    aria-label={isPlaying ? text.pause : text.play}
+                    title={isPlaying ? text.pause : text.play}
+                  >
+                    {isPlaying ? (
+                      <Pause size={24} className="text-white" />
+                    ) : (
+                      <Play size={24} className="text-white" />
+                    )}
+                  </button>
+                )}
+
+                {/* Barre de contrôle du « lecteur vidéo » */}
+                <div className="absolute inset-x-0 bottom-0 flex items-center gap-2 px-3 py-2 bg-gradient-to-t from-black/80 to-transparent text-white text-[10px]">
+                  <button
+                    type="button"
+                    disabled={!currentSong}
+                    onClick={() =>
+                      currentSong && handlePlaySong(currentSong, queue)
+                    }
+                    className="cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    aria-label={isPlaying ? text.pause : text.play}
+                  >
+                    {isPlaying ? <Pause size={14} /> : <Play size={14} />}
+                  </button>
+                  <span className="tabular-nums whitespace-nowrap">
+                    {formatTime(currentTime)} / {formatTime(duration)}
+                  </span>
+                  <input
+                    type="range"
+                    min={0}
+                    max={duration ?? 0}
+                    step={0.1}
+                    value={currentTime}
+                    onChange={handleSeek}
+                    disabled={!currentSong}
+                    className="flex-1 accent-white h-1"
+                    aria-label="Progress"
+                  />
+                  <button
+                    type="button"
+                    onClick={toggleMute}
+                    className="cursor-pointer"
+                    aria-label="Volume"
+                    title={isMuted ? "Unmute" : "Mute"}
+                  >
+                    <Volume2 size={14} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleFullscreen}
+                    className="cursor-pointer"
+                    aria-label="Fullscreen"
+                    title="Fullscreen"
+                  >
+                    <Maximize size={14} />
+                  </button>
+                  <button
+                    type="button"
+                    disabled={!currentSong}
+                    onClick={() => currentSong && openAddToPlaylist(currentSong)}
+                    className="cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    aria-label={text.addToPlaylist}
+                    title={text.addToPlaylist}
+                  >
+                    <MoreVertical size={14} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Ligne titre + contrôles */}
+              <div className="mt-3 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2 min-w-0 flex-1">
+                  <div className="w-11 h-11 bg-white/5 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center">
+                    {currentSong ? (
+                      <img
+                        src={currentCover}
+                        alt={currentSong.title}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <Music size={18} className="text-white/40" />
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-white text-xs truncate">
+                      {currentSong?.title ?? "—"}
+                    </p>
+                    <p className="text-white/60 text-[11px] truncate">
+                      {currentArtistName}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    disabled={!currentSong}
+                    onClick={() =>
+                      currentSong && toggleFavorite(currentSong.id)
+                    }
+                    className="cursor-pointer p-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                    aria-label={text.addToFavorites}
+                    title={text.addToFavorites}
+                  >
+                    <Heart
+                      size={14}
+                      className={
+                        currentSong &&
+                        favoriteTrackIds.includes(String(currentSong.id))
+                          ? "text-red-400 fill-red-400"
+                          : "text-white"
+                      }
+                    />
+                  </button>
+                  <button
+                    type="button"
+                    disabled={!currentSong}
+                    onClick={() => {
+                      setLyricsViewMode("text");
+                      setShowLyrics(true);
+                    }}
+                    className="cursor-pointer p-1 text-white/80 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                    aria-label={text.lyrics}
+                    title={text.lyrics}
+                  >
+                    <MoreVertical size={14} />
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-3 flex-shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setIsShuffle((s) => !s)}
+                    className={`cursor-pointer ${
+                      isShuffle ? "text-white" : "text-white/60"
+                    } hover:text-white`}
+                    aria-label="Shuffle"
+                    aria-pressed={isShuffle}
+                    title="Shuffle"
+                  >
+                    <Shuffle size={largerTargets ? 20 : 16} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handlePrevFromQueue1}
+                    disabled={!currentSong}
+                    className="text-white/80 hover:text-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    aria-label="Previous"
+                  >
+                    <SkipBack size={largerTargets ? 24 : 18} />
+                  </button>
+                  <button
+                    type="button"
+                    disabled={!currentSong}
+                    onClick={() =>
+                      currentSong && handlePlaySong(currentSong, queue)
+                    }
+                    className="cursor-pointer flex items-center justify-center p-2 bg-white/10 border-2 border-white/80 rounded-full hover:bg-white/20 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    aria-label={isPlaying ? text.pause : text.play}
+                    title={isPlaying ? text.pause : text.play}
+                  >
+                    {isPlaying ? (
+                      <Pause
+                        size={largerTargets ? 22 : 16}
+                        className="text-white"
+                      />
+                    ) : (
+                      <Play
+                        size={largerTargets ? 22 : 16}
+                        className="text-white"
+                      />
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleNextFromQueue1}
+                    disabled={!currentSong}
+                    className="text-white/80 hover:text-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    aria-label="Next"
+                  >
+                    <SkipForward size={largerTargets ? 24 : 18} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsRepeat((r) => !r)}
+                    className={`cursor-pointer ${
+                      isRepeat ? "text-white" : "text-white/60"
+                    } hover:text-white`}
+                    aria-label="Repeat"
+                    aria-pressed={isRepeat}
+                    title="Repeat"
+                  >
+                    <Repeat size={largerTargets ? 20 : 16} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Progression + volume */}
+              <div className="mt-2 flex items-center gap-2">
+                <span className="text-white/60 text-[10px] w-8 text-right tabular-nums">
+                  {formatTime(currentTime)}
+                </span>
+                <input
+                  type="range"
+                  min={0}
+                  max={duration ?? 0}
+                  step={0.1}
+                  value={currentTime}
+                  onChange={handleSeek}
+                  disabled={!currentSong}
+                  className="flex-1 accent-white h-1"
+                  aria-label="Progress"
+                />
+                <span className="text-white/60 text-[10px] w-8 tabular-nums">
+                  {formatTime(duration)}
+                </span>
+                <button
+                  type="button"
+                  onClick={toggleMute}
+                  className="text-white/80 hover:text-white cursor-pointer ml-1"
+                  aria-label="Volume"
+                  title={isMuted ? "Unmute" : "Mute"}
+                >
+                  <Volume2 size={14} />
+                </button>
+                <input
+                  type="range"
+                  min={0}
+                  max={1}
+                  step={0.01}
+                  value={isMuted ? 0 : volume}
+                  onChange={(e) => {
+                    setIsMuted(false);
+                    setVolume(Number(e.target.value));
+                  }}
+                  className="w-20 accent-white h-1"
+                  aria-label="Volume slider"
+                />
+              </div>
+            </section>
+
+            {/* ---------- 2) Browse by Mood ---------- */}
+            <section className={`${cardClasses} h-full flex flex-col`}>
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-base font-bold tracking-tight text-white drop-shadow-lg">
                   {language === "spanish" && "Explorar por Estado de Ánimo"}
                   {language === "english" && "Browse by Mood"}
                   {language === "catalan" && "Explorar per Estat d'Ànim"}
                 </h2>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 flex-1">
-                  {[
-                    {
-                      name:
-                        language === "spanish"
-                          ? "Feliz"
-                          : language === "catalan"
-                          ? "Feliç"
-                          : "Happy",
-                      emoji: "😊",
-                      color: "from-yellow-400/40 to-orange-400/40",
-                    },
-                    {
-                      name:
-                        language === "spanish"
-                          ? "Relajado"
-                          : language === "catalan"
-                          ? "Relaxat"
-                          : "Relaxed",
-                      emoji: "😌",
-                      color: "from-blue-400/40 to-cyan-400/40",
-                    },
-                    {
-                      name:
-                        language === "spanish"
-                          ? "Energético"
-                          : language === "catalan"
-                          ? "Energètic"
-                          : "Energetic",
-                      emoji: "⚡",
-                      color: "from-red-400/40 to-pink-400/40",
-                    },
-                    {
-                      name:
-                        language === "spanish"
-                          ? "Triste"
-                          : language === "catalan"
-                          ? "Trist"
-                          : "Sad",
-                      emoji: "😢",
-                      color: "from-indigo-400/40 to-blue-400/40",
-                    },
-                    {
-                      name:
-                        language === "spanish"
-                          ? "Romántico"
-                          : language === "catalan"
-                          ? "Romàntic"
-                          : "Romantic",
-                      emoji: "💕",
-                      color: "from-pink-400/40 to-rose-400/40",
-                    },
-                    {
-                      name:
-                        language === "spanish"
-                          ? "Enfocado"
-                          : language === "catalan"
-                          ? "Concentrat"
-                          : "Focused",
-                      emoji: "🎯",
-                      color: "from-purple-400/40 to-violet-400/40",
-                    },
-                    {
-                      name:
-                        language === "spanish"
-                          ? "Motivado"
-                          : language === "catalan"
-                          ? "Motivat"
-                          : "Motivated",
-                      emoji: "💪",
-                      color: "from-green-400/40 to-emerald-400/40",
-                    },
-                    {
-                      name:
-                        language === "spanish"
-                          ? "Nostálgico"
-                          : language === "catalan"
-                          ? "Nostàlgic"
-                          : "Nostalgic",
-                      emoji: "🌅",
-                      color: "from-amber-400/40 to-yellow-400/40",
-                    },
-                    {
-                      name:
-                        language === "spanish"
-                          ? "Eufórico"
-                          : language === "catalan"
-                          ? "Eufòric"
-                          : "Hype",
-                      emoji: "🔥",
-                      color: "from-orange-500/40 to-red-500/40",
-                    },
-                    {
-                      name:
-                        language === "spanish"
-                          ? "Tranquilo"
-                          : language === "catalan"
-                          ? "Tranquil"
-                          : "Chill",
-                      emoji: "🌴",
-                      color: "from-cyan-400/40 to-sky-500/40",
-                    },
-                  ].map((mood) => (
-                    <button
-                      key={mood.name}
-                      onClick={() => openMoodDrawer(mood.name)}
-                      className={`h-full min-h-[100px] bg-gradient-to-br ${mood.color} backdrop-blur-xl rounded-xl p-3 border border-white/10 hover:scale-[1.02] hover:border-white/20 transition-all duration-300 group`}
-                      aria-label={`Browse mood ${mood.name}`}
-                    >
-                      <div className="text-center">
-                        <div className="text-2xl mb-1.5">{mood.emoji}</div>
-                        <h3 className="text-white font-medium text-xs">
-                          {mood.name}
-                        </h3>
-                      </div>
-                    </button>
-                  ))}
-                </div>
+                <button type="button" className={seeAllBtnClasses}>
+                  {text.seeAll}
+                  <ArrowRight size={12} />
+                </button>
               </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 auto-rows-fr gap-3 flex-1">
+                {moods.map((mood) => (
+                  <button
+                    key={mood.name}
+                    onClick={() => openMoodDrawer(mood.name)}
+                    className={`h-full min-h-[84px] bg-gradient-to-br ${mood.color} backdrop-blur-xl rounded-xl p-3 border border-white/10 hover:scale-[1.02] hover:border-white/20 transition-all duration-300 flex items-center justify-center cursor-pointer`}
+                    aria-label={`Browse mood ${mood.name}`}
+                  >
+                    <div className="text-center">
+                      <div className="text-2xl mb-1.5">{mood.emoji}</div>
+                      <h3 className="text-white font-medium text-[11px]">
+                        {mood.name}
+                      </h3>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </section>
 
-              <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-4 border border-white/10 h-full">
-                <h2 className="text-xl font-bold tracking-tight text-white mb-4">
+            {/* ---------- 3) New Releases ---------- */}
+            <section className={`${cardClasses} h-full`}>
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-base font-bold tracking-tight text-white">
                   {text.newReleases}
                 </h2>
-                <div className="space-y-2 max-h-[400px] overflow-y-auto">
-                  {newReleasesLoading ? (
-                    <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20 text-white/70 text-xs">
-                      Loading...
-                    </div>
-                  ) : newReleasesError ? (
-                    <div className="bg-red-500/10 backdrop-blur-md rounded-xl p-3 border border-red-500/20 text-white/80 text-xs">
-                      {newReleasesError}
-                    </div>
-                  ) : (
-                    (filteredNewReleases ?? []).map((song: any) => (
-                      <div
-                        key={song.id}
-                        className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20 hover:bg-white/15 transition-all"
-                      >
-                        <div className="flex items-center gap-3 sm:flex-row flex-col">
-                          <div className="w-12 h-12 bg-white/5 rounded-lg overflow-hidden flex-shrink-0">
-                            <img
-                              src={song.cover ?? "/placeholder.png"}
-                              alt={song.title}
-                              className="w-full h-full object-cover"
+                <button
+                  type="button"
+                  onClick={() => setShowAllNewReleases((v) => !v)}
+                  className={seeAllBtnClasses}
+                >
+                  {text.seeAll}
+                  <ArrowRight size={12} />
+                </button>
+              </div>
+              <div className="space-y-2 max-h-[300px] overflow-y-auto">
+                {newReleasesLoading ? (
+                  <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20 text-white/70 text-xs">
+                    {text.loading}
+                  </div>
+                ) : newReleasesError ? (
+                  <div className="bg-red-500/10 backdrop-blur-md rounded-xl p-3 border border-red-500/20 text-white/80 text-xs">
+                    {newReleasesError}
+                  </div>
+                ) : (
+                  (showAllNewReleases
+                    ? filteredNewReleases ?? []
+                    : (filteredNewReleases ?? []).slice(0, 5)
+                  ).map((song: any) => (
+                    <div
+                      key={song.id}
+                      className="bg-white/10 backdrop-blur-md rounded-lg px-2.5 py-2 border border-white/15 hover:bg-white/15 transition-all"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 bg-white/5 rounded overflow-hidden flex-shrink-0">
+                          <img
+                            src={song.cover ?? "/placeholder.png"}
+                            alt={song.title}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-white drop-shadow truncate text-xs">
+                            {song.title}
+                          </h4>
+                          <p className="text-white/60 text-[11px] truncate">
+                            {song.artist} • {song.album}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-1.5 flex-shrink-0">
+                          <button
+                            onClick={() => handlePlayFeatured(song)}
+                            className="cursor-pointer p-1.5 bg-white/20 backdrop-blur-sm rounded-full hover:bg-white/30 transition-all"
+                            aria-label={
+                              isPlaying && currentSong?.id === song.id
+                                ? text.pause
+                                : text.play
+                            }
+                            title={
+                              isPlaying && currentSong?.id === song.id
+                                ? text.pause
+                                : text.play
+                            }
+                          >
+                            {isPlaying && currentSong?.id === song.id ? (
+                              <Pause size={12} className="text-white" />
+                            ) : (
+                              <Play size={12} className="text-white" />
+                            )}
+                          </button>
+                          <button
+                            onClick={() => toggleFavorite(song.id)}
+                            className="cursor-pointer p-1.5 hover:bg-white/10 rounded-full transition-all"
+                            title={text.addToFavorites}
+                            aria-label={text.addToFavorites}
+                          >
+                            <Heart
+                              size={13}
+                              className={`${
+                                favoriteTrackIds.includes(String(song.id))
+                                  ? "text-red-400 fill-red-400"
+                                  : "text-white"
+                              }`}
                             />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h4 className="text-white drop-shadow truncate text-sm">
-                              {song.title}
-                            </h4>
-                            <p className="text-white/60 text-xs truncate">
-                              {song.artist} • {song.album}
-                            </p>
-                          </div>
-                          <div className="flex items-center gap-3">
-                            <span className="text-white/60 text-xs">
-                              {song.duration}
-                            </span>
-                            <button
-                              onClick={() => handlePlayFeatured(song)}
-                              className="cursor-pointer p-2 bg-white/20 backdrop-blur-sm rounded-full hover:bg-white/30 transition-all"
-                              aria-label={
-                                isPlaying && currentSong?.id === song.id
-                                  ? text.pause
-                                  : text.play
-                              }
-                              title={
-                                isPlaying && currentSong?.id === song.id
-                                  ? text.pause
-                                  : text.play
-                              }
-                            >
-                              {isPlaying && currentSong?.id === song.id ? (
-                                <Pause size={14} className="text-white" />
-                              ) : (
-                                <Play size={14} className="text-white" />
-                              )}
-                            </button>
-                            <button
-                              onClick={() => toggleFavorite(song.id)}
-                              className="cursor-pointer p-2 hover:bg-white/10 rounded-full transition-all"
-                              title={text.addToFavorites}
-                            >
-                              <Heart
-                                size={14}
-                                className={`${
-                                  favoriteTrackIds.includes(String(song.id))
-                                    ? "text-red-400 fill-red-400"
-                                    : "text-white"
-                                }`}
-                              />
-                            </button>
-                            <button
-                              onClick={() => openAddToPlaylist(song)}
-                              className="cursor-pointer p-2 hover:bg-white/10 rounded-full transition-all"
-                              title={text.addToPlaylist}
-                              aria-label={text.addToPlaylist}
-                            >
-                              <svg
-                                width="14"
-                                height="14"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              >
-                                <line x1="12" y1="5" x2="12" y2="19" />
-                                <line x1="5" y1="12" x2="19" y2="12" />
-                              </svg>
-                            </button>
-                          </div>
+                          </button>
+                          <button
+                            onClick={() => openAddToPlaylist(song)}
+                            className="cursor-pointer p-1.5 hover:bg-white/10 rounded-full transition-all text-white"
+                            title={text.addToPlaylist}
+                            aria-label={text.addToPlaylist}
+                          >
+                            <Plus size={14} />
+                          </button>
                         </div>
                       </div>
-                    ))
-                  )}
-                </div>
+                    </div>
+                  ))
+                )}
               </div>
-            </div>
+            </section>
 
-            <div>
-              <h2 className="text-xl font-bold tracking-tight text-white drop-shadow-lg mb-3">
-                {text.featured}
-              </h2>
+            {/* ---------- 4) Featured ---------- */}
+            <section className={`${cardClasses} h-full`}>
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-base font-bold tracking-tight text-white drop-shadow-lg">
+                  {text.featured}
+                </h2>
+                <button
+                  type="button"
+                  onClick={() => setShowAllFeatured((v) => !v)}
+                  className={seeAllBtnClasses}
+                >
+                  {text.seeAll}
+                  <ArrowRight size={12} />
+                </button>
+              </div>
               {featuredLoading ? (
                 <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 text-white/70 text-center text-sm">
-                  Loading...
+                  {text.loading}
                 </div>
               ) : featuredError ? (
                 <div className="bg-red-500/10 backdrop-blur-md rounded-xl p-4 border border-red-500/20 text-white/80 text-center text-sm">
                   {featuredError}
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-                  {filteredFeatured.slice(0, 3).map((song: any) => (
+                <div className="grid grid-cols-3 gap-3">
+                  {(showAllFeatured
+                    ? filteredFeatured
+                    : filteredFeatured.slice(0, 3)
+                  ).map((song: any) => (
                     <div
                       key={song.id}
-                      className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20 hover:bg-white/15 transition-all"
+                      className="bg-white/10 backdrop-blur-md rounded-xl p-2 border border-white/20 hover:bg-white/15 transition-all"
                     >
-                      <div className="aspect-[4/3] bg-white/5 rounded-xl mb-3 overflow-hidden">
+                      <div className="relative aspect-square bg-white/5 rounded-lg mb-2 overflow-hidden">
                         <img
                           src={song.cover ?? "/placeholder.png"}
                           alt={song.title}
                           className="w-full h-full object-cover"
                         />
-                      </div>
-                      <h3 className="text-white drop-shadow mb-1 text-sm">
-                        {song.title}
-                      </h3>
-                      <p className="text-white/60 text-xs mb-2">
-                        {song.artist}
-                        {song.album ? ` • ${song.album}` : ""}
-                      </p>
-                      <div className="flex items-center justify-between">
-                        <span className="text-white/50 text-[11px]">
-                          {song.streams} {text.streams}
-                        </span>
                         <button
                           onClick={() => handlePlayFeatured(song)}
-                          className="cursor-pointer p-1.5 bg-white/20 backdrop-blur-sm rounded-full hover:bg-white/30 transition-all"
+                          className="cursor-pointer absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center w-9 h-9 rounded-full bg-black/50 backdrop-blur-sm border border-white/20 hover:bg-black/70 transition-all"
                           aria-label={
                             isPlaying && currentSong?.id === song.id
                               ? text.pause
@@ -2895,17 +3151,43 @@ pb-[env(safe-area-inset-bottom)]
                           }
                         >
                           {isPlaying && currentSong?.id === song.id ? (
-                            <Pause size={16} className="text-white" />
+                            <Pause size={14} className="text-white" />
                           ) : (
-                            <Play size={16} className="text-white" />
+                            <Play size={14} className="text-white" />
                           )}
+                        </button>
+                      </div>
+                      <div className="flex items-start justify-between gap-1">
+                        <div className="min-w-0">
+                          <h3 className="text-white drop-shadow text-[11px] truncate">
+                            {song.title}
+                          </h3>
+                          <p className="text-white/60 text-[10px] truncate">
+                            {song.artist}
+                            {song.album ? ` • ${song.album}` : ""}
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => toggleFavorite(song.id)}
+                          className="cursor-pointer p-0.5 flex-shrink-0"
+                          title={text.addToFavorites}
+                          aria-label={text.addToFavorites}
+                        >
+                          <Heart
+                            size={12}
+                            className={`${
+                              favoriteTrackIds.includes(String(song.id))
+                                ? "text-red-400 fill-red-400"
+                                : "text-white"
+                            }`}
+                          />
                         </button>
                       </div>
                     </div>
                   ))}
                 </div>
               )}
-            </div>
+            </section>
           </div>
         )}
 
@@ -4346,9 +4628,9 @@ pb-[env(safe-area-inset-bottom)]
       {showLyrics && currentSong && (
         <div
           className={`fixed inset-x-0 z-[85] px-3 sm:px-4 md:px-6 ${
-            currentSong
+            showMiniPlayer
               ? "bottom-[140px] sm:bottom-24"
-              : "bottom-20 sm:bottom-24"
+              : "bottom-6 sm:bottom-8"
           }`}
         >
           <div className="mx-auto w-full max-w-xs sm:max-w-md bg-black/70 backdrop-blur-xl rounded-xl border border-white/20 overflow-hidden shadow-2xl">
@@ -4425,7 +4707,7 @@ pb-[env(safe-area-inset-bottom)]
                         <p key={idx}>
                           {paragraph
                             .split("\n")
-                            .map((line: string, lineIdx: number, arr) => (
+                            .map((line: string, lineIdx: number, arr: any[]) => (
                               <React.Fragment key={lineIdx}>
                                 {line}
                                 {lineIdx < arr.length - 1 && <br />}
@@ -4510,22 +4792,19 @@ pb-[env(safe-area-inset-bottom)]
         </div>
       )}
 
-      {/* Player */}
-      {currentSong && (
+      {/* ====================== Mini-player fixe (onglets autres que Discover) ====================== */}
+      {showMiniPlayer && (
         <div
           className="fixed left-0 right-0 z-20 bg-black/40 backdrop-blur-xl border-t border-white/10"
           style={{ bottom: "env(safe-area-inset-bottom)" }}
         >
           <div className="px-3 sm:px-4 py-2">
-            <div className="hidden md:grid grid-cols-[1fr_auto_1fr] items-center gap-3">
-              <div className="flex items-center gap-2.5 min-w-0">
+            <div className="flex flex-col md:grid md:grid-cols-[1fr_auto_1fr] items-center gap-2 md:gap-3">
+              {/* Infos titre */}
+              <div className="flex items-center gap-2.5 min-w-0 w-full">
                 <div className="w-10 h-10 bg-white/5 rounded-lg overflow-hidden flex-shrink-0">
                   <img
-                    src={
-                      currentSong.coverUrl ??
-                      currentSong.cover ??
-                      "/placeholder.png"
-                    }
+                    src={currentCover}
                     alt={currentSong.title}
                     className="w-full h-full object-cover"
                   />
@@ -4534,15 +4813,14 @@ pb-[env(safe-area-inset-bottom)]
                   <h4 className="text-white text-xs sm:text-sm truncate">
                     {currentSong.title}
                   </h4>
-                  <p className="text-white text-[11px] sm:text-xs truncate">
-                    {currentSong.artistName ??
-                      currentSong.artist ??
-                      currentSong.userId ??
-                      ""}
+                  <p className="text-white/70 text-[11px] sm:text-xs truncate">
+                    {currentArtistName}
                   </p>
                 </div>
               </div>
-              <div className="flex flex-col items-center justify-center min-w-[250px]">
+
+              {/* Contrôles + progression */}
+              <div className="flex flex-col items-center justify-center w-full md:min-w-[250px]">
                 <div className="flex items-center gap-3">
                   <button
                     onClick={handlePrevFromQueue1}
@@ -4597,8 +4875,10 @@ pb-[env(safe-area-inset-bottom)]
                   </span>
                 </div>
               </div>
-              <div className="flex items-center justify-end gap-2.5">
-                <span className="text-white/60 text-[11px]">
+
+              {/* Actions */}
+              <div className="flex items-center justify-end gap-2.5 w-full">
+                <span className="hidden md:inline text-white/60 text-[11px]">
                   {currentSong.duration ?? ""}
                 </span>
                 <button
@@ -4648,138 +4928,6 @@ pb-[env(safe-area-inset-bottom)]
                     }
                   />
                 </button>
-              </div>
-            </div>
-            <div className="md:hidden">
-              <div className="flex flex-col items-center justify-center">
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={handlePrevFromQueue1}
-                    className="text-white/80 hover:text-white cursor-pointer"
-                    aria-label="Previous"
-                  >
-                    <SkipBack size={largerTargets ? 24 : 18} />
-                  </button>
-                  <button
-                    onClick={() =>
-                      currentSong && handlePlaySong(currentSong, queue)
-                    }
-                    className="cursor-pointer flex items-center justify-center p-2.5 bg-white/20 rounded-full hover:bg-white/30 transition"
-                    aria-label={isPlaying ? text.pause : text.play}
-                    title={isPlaying ? text.pause : text.play}
-                  >
-                    {isPlaying ? (
-                      <Pause
-                        size={largerTargets ? 26 : 20}
-                        className="text-white"
-                      />
-                    ) : (
-                      <Play
-                        size={largerTargets ? 26 : 20}
-                        className="text-white"
-                      />
-                    )}
-                  </button>
-                  <button
-                    onClick={handleNextFromQueue1}
-                    className="text-white/80 hover:text-white cursor-pointer"
-                    aria-label="Next"
-                  >
-                    <SkipForward size={largerTargets ? 24 : 18} />
-                  </button>
-                </div>
-                <div className="mt-1.5 flex items-center gap-2 w-full">
-                  <span className="text-white/60 text-[10px] w-8 text-right tabular-nums">
-                    {formatTime(currentTime)}
-                  </span>
-                  <input
-                    type="range"
-                    min={0}
-                    max={duration ?? 0}
-                    step={0.1}
-                    value={currentTime}
-                    onChange={handleSeek}
-                    className="w-full accent-white h-1"
-                  />
-                  <span className="text-white/60 text-[10px] w-8 tabular-nums">
-                    {formatTime(duration)}
-                  </span>
-                </div>
-              </div>
-              <div className="mt-2 flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2 min-w-0">
-                  <div className="w-8 h-8 bg-white/5 rounded-md overflow-hidden flex-shrink-0">
-                    <img
-                      src={
-                        currentSong.coverUrl ??
-                        currentSong.cover ??
-                        "/placeholder.png"
-                      }
-                      alt={currentSong.title}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-white text-[11px] truncate">
-                      {currentSong.title}
-                    </p>
-                    <p className="text-white/60 text-[10px] truncate">
-                      {currentSong.artistName ??
-                        currentSong.artist ??
-                        currentSong.userId ??
-                        ""}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-1.5 flex-shrink-0">
-                  <button
-                    onClick={() => {
-                      setLyricsViewMode("text");
-                      setShowLyrics(true);
-                    }}
-                    className="text-white/80 hover:text-white"
-                    aria-label={text.lyrics}
-                    title={text.lyrics}
-                  >
-                    <FileText size={16} />
-                  </button>
-                  <button
-                    onClick={toggleMute}
-                    className="text-white/80 hover:text-white"
-                    aria-label="Volume"
-                    title={isMuted ? "Unmute" : "Mute"}
-                  >
-                    <Volume2 size={16} />
-                  </button>
-                  <input
-                    type="range"
-                    min={0}
-                    max={1}
-                    step={0.01}
-                    value={isMuted ? 0 : volume}
-                    onChange={(e) => {
-                      setIsMuted(false);
-                      setVolume(Number(e.target.value));
-                    }}
-                    className="w-16 accent-white h-1"
-                    aria-label="Volume slider"
-                  />
-                  <button
-                    onClick={() => toggleFavorite(currentSong.id)}
-                    className="text-white/80 hover:text-white"
-                    aria-label={text.addToFavorites}
-                    title={text.addToFavorites}
-                  >
-                    <Heart
-                      size={16}
-                      className={
-                        favoriteTrackIds.includes(String(currentSong.id))
-                          ? "text-red-400 fill-red-400"
-                          : "text-white"
-                      }
-                    />
-                  </button>
-                </div>
               </div>
             </div>
           </div>
@@ -5029,3073 +5177,3 @@ pb-[env(safe-area-inset-bottom)]
     </div>
   );
 }
-
-//   return (
-//     <div
-//       className={containerClasses}
-//       style={{
-//         filter:
-//           colorBlindMode === "protanopia"
-//             ? "url(#protanopia)"
-//             : colorBlindMode === "deuteranopia"
-//             ? "url(#deuteranopia)"
-//             : colorBlindMode === "tritanopia"
-//             ? "url(#tritanopia)"
-//             : "none",
-//       }}
-//     >
-//       {searchStats && (
-//         <div className="max-w-6xl mx-auto mb-3 text-white/70 text-xs">
-//           “{searchQuery.trim()}” •{" "}
-//           {Object.values(searchStats).reduce((a, b) => a + b, 0)} results
-//         </div>
-//       )}
-//       {/* SVG Filters for Color Blind Modes */}
-//       <svg className="hidden">
-//         <defs>
-//           <filter id="protanopia">
-//             <feColorMatrix
-//               type="matrix"
-//               values="0.567, 0.433, 0, 0, 0, 0.558, 0.442, 0, 0, 0, 0, 0.242, 0.758, 0, 0, 0, 0, 0, 1, 0"
-//             />
-//           </filter>
-//           <filter id="deuteranopia">
-//             <feColorMatrix
-//               type="matrix"
-//               values="0.625, 0.375, 0, 0, 0, 0.7, 0.3, 0, 0, 0, 0, 0.3, 0.7, 0, 0, 0, 0, 0, 1, 0"
-//             />
-//           </filter>
-//           <filter id="tritanopia">
-//             <feColorMatrix
-//               type="matrix"
-//               values="0.95, 0.05, 0, 0, 0, 0, 0.433, 0.567, 0, 0, 0, 0.475, 0.525, 0, 0, 0, 0, 0, 1, 0"
-//             />
-//           </filter>
-//         </defs>
-//       </svg>
-
-//       {/* Accessibility Floating Button */}
-
-//       {/* Reading Guide */}
-//       {readingGuide && (
-//         <div
-//           className="fixed left-0 right-0 h-12 bg-white/10 backdrop-blur-sm border-y-2 border-white/30 pointer-events-none z-50"
-//           style={{ top: "50%", transform: "translateY(-50%)" }}
-//         />
-//       )}
-
-//       {/* Visual Notifications */}
-//       {notification && visualNotifications && (
-//         <div
-//           className="fixed right-6 z-50 bg-white/20 backdrop-blur-xl border-2 border-white/40 rounded-xl p-4 shadow-2xl animate-bounce"
-//           style={{ top: "calc(env(safe-area-inset-top) + 80px)" }}
-//         >
-//           <div className="flex items-center gap-3">
-//             <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse" />
-//             <span className="text-white drop-shadow">{notification}</span>
-//           </div>
-//         </div>
-//       )}
-
-//       {/* Keyboard Navigation Hints */}
-//       {keyboardNav && !showAccessibility && (
-//         <div
-//           className="fixed right-6 z-40 bg-black/80 backdrop-blur-md border border-white/30 rounded-xl p-4 text-xs text-white/80"
-//           style={{ bottom: "calc(env(safe-area-inset-bottom) + 24px)" }}
-//         >
-//           <div className="space-y-1">
-//             <div>
-//               <kbd className="bg-white/20 px-2 py-1 rounded">ESC</kbd>{" "}
-//               {language === "spanish"
-//                 ? "Volver"
-//                 : language === "english"
-//                 ? "Back"
-//                 : "Tornar"}
-//             </div>
-//             <div>
-//               <kbd className="bg-white/20 px-2 py-1 rounded">SPACE</kbd>{" "}
-//               {language === "spanish"
-//                 ? "Play/Pausa"
-//                 : language === "english"
-//                 ? "Play/Pause"
-//                 : "Play/Pausa"}
-//             </div>
-//             <div>
-//               <kbd className="bg-white/20 px-2 py-1 rounded">Ctrl+A</kbd>{" "}
-//               {text.accessibility}
-//             </div>
-//           </div>
-//         </div>
-//       )}
-
-//       {/* Header */}
-//       <div
-//         className={`fixed left-0 right-0 z-20 bg-black/20 backdrop-blur-md border-b border-white/10 ${
-//           focusMode ? "opacity-80" : ""
-//         }`}
-//         style={{ top: "env(safe-area-inset-top)" }}
-//       >
-//         {/* ✅ LIGNE 1 : Back + Title + Profile/Logout */}
-//         <div className="flex items-center justify-between gap-3 px-4 sm:px-6 py-2">
-//           <div className="flex items-center gap-3 min-w-0">
-//             {/* ✅ Accessibility button (same design as your new one) */}
-//             <button
-//               onClick={() => setShowAccessibility(true)}
-//               aria-label={text.accessibility}
-//               title={text.accessibility}
-//               type="button"
-//               className={`
-//                           relative
-//                           h-9 w-9 sm:h-10 sm:w-10
-//                           rounded-full
-//                           shadow-md
-//                           transition-all
-//                           hover:scale-105
-//                           focus:outline-none
-//                           focus:ring-4 focus:ring-white/30
-//                           select-none
-//                           ${animationClasses}
-//                         `}
-//               style={{
-//                 background: "rgba(168, 85, 145, 0.4)",
-//                 backdropFilter: "blur(10px)",
-//                 border: "2px solid rgba(255, 255, 255, 0.2)",
-//               }}
-//             >
-//               {/* highlight radial */}
-//               <div
-//                 className="absolute inset-0 rounded-full pointer-events-none"
-//                 style={{
-//                   background:
-//                     "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15) 0%, transparent 60%)",
-//                 }}
-//               />
-
-//               {/* stickman icon */}
-//               <svg
-//                 viewBox="0 0 24 24"
-//                 fill="none"
-//                 stroke="currentColor"
-//                 strokeWidth="2.5"
-//                 strokeLinecap="round"
-//                 strokeLinejoin="round"
-//                 className="absolute top-1/2 left-1/2 h-5 w-5 sm:h-6 sm:w-6 -translate-x-1/2 -translate-y-1/2 text-white"
-//                 aria-hidden="true"
-//               >
-//                 <circle cx="12" cy="5" r="2.5" />
-//                 <line x1="12" y1="7.5" x2="12" y2="14" />
-//                 <line x1="12" y1="9.5" x2="8" y2="12" />
-//                 <line x1="12" y1="9.5" x2="16" y2="12" />
-//                 <line x1="12" y1="14" x2="9" y2="19" />
-//                 <line x1="12" y1="14" x2="15" y2="19" />
-//               </svg>
-//             </button>
-
-//             {isArtist && (
-//               <button
-//                 onClick={() => router.push("/dashboard/artist/select")}
-//                 className={`flex cursor-pointer items-center gap-2 text-white drop-shadow hover:opacity-70 ${animationClasses} ${buttonSizeClasses}`}
-//                 aria-label={text.back}
-//                 type="button"
-//               >
-//                 <svg
-//                   width="18"
-//                   height="18"
-//                   viewBox="0 0 24 24"
-//                   fill="none"
-//                   stroke="currentColor"
-//                   strokeWidth="2"
-//                   strokeLinecap="round"
-//                   strokeLinejoin="round"
-//                 >
-//                   <path d="M19 12H5M12 19l-7-7 7-7" />
-//                 </svg>
-//                 <span className="hidden sm:inline"></span>
-//               </button>
-//             )}
-
-//             <h1
-//               className="
-//       text-lg sm:text-xl
-//       font-semibold
-//       bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400
-//       bg-clip-text text-transparent
-//       drop-shadow
-//       truncate
-//     "
-//             >
-//               {text.title}
-//             </h1>
-//           </div>
-
-//           <div className="flex items-center gap-5 flex-shrink-0">
-//             {/* PROFILE BUTTON */}
-//             <button
-//               style={{
-//                 outline: "3px solid #ffffff",
-//                 outlineOffset: "3px",
-//               }}
-//               onClick={() => setShowProfile(true)}
-//               onMouseEnter={() => {
-//                 if (textToSpeech) {
-//                   speak("Your Profile");
-//                 }
-//               }}
-//               className="flex cursor-pointer items-center gap-2 px-3 py-2 text-white bg-white/10
-//           backdrop-blur-md border border-white/20 rounded-lg hover:bg-white/20 transition-all"
-//             >
-//               <User size={18} />
-//               <span className="hidden sm:inline">
-//                 {language === "spanish"
-//                   ? "Perfil"
-//                   : language === "english"
-//                   ? "Profile"
-//                   : "Perfil"}
-//               </span>
-//             </button>
-
-//             {/* LOGOUT BUTTON */}
-//             <button
-//               style={{
-//                 outline: "3px solid #ffffff",
-//                 outlineOffset: "3px",
-//               }}
-//               onClick={handleLogout}
-//               onMouseEnter={() => {
-//                 if (textToSpeech) {
-//                   speak("Logout");
-//                 }
-//               }}
-//               className="px-3 py-2 bg-gradient-to-r cursor-pointer from-red-500/40 to-orange-500/40
-//           backdrop-blur-md border border-white/30 rounded-lg text-white
-//           hover:from-red-500/60 hover:to-orange-500/60 transition-all flex items-center gap-2"
-//             >
-//               <svg
-//                 width="16"
-//                 height="16"
-//                 viewBox="0 0 24 24"
-//                 fill="none"
-//                 stroke="currentColor"
-//                 strokeWidth="2"
-//                 strokeLinecap="round"
-//                 strokeLinejoin="round"
-//                 className="text-white"
-//               >
-//                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-//                 <polyline points="16 17 21 12 16 7" />
-//                 <line x1="21" y1="12" x2="9" y2="12" />
-//               </svg>
-
-//               <span className="hidden sm:inline">
-//                 {language === "spanish" && "Cerrar sesión"}
-//                 {language === "english" && "Logout"}
-//                 {language === "catalan" && "Tancar sessió"}
-//               </span>
-//             </button>
-//           </div>
-//         </div>
-
-//         {/* ✅ LIGNE 2 : Tabs + Search */}
-//         <div className="w-full border-t border-white/10">
-//           {/* Row 1: Tabs + Search (Desktop only) */}
-//           <div className="flex items-center gap-4 px-4 sm:px-6 py-2 min-w-0">
-//             {/* Tabs (always scrollable) */}
-//             <div className="flex-1 overflow-x-auto no-scrollbar min-w-0">
-//               <div className="flex flex-nowrap items-center justify-start sm:justify-center gap-4 sm:gap-8 min-w-max">
-//                 {[
-//                   ["discover", text.discover],
-//                   ["artists", text.artists],
-//                   ["mymusic", text.myMusic],
-//                   ["editorplaylists", text.editorPlaylists],
-//                   ["dashboard", text.dashboard],
-//                 ].map(([key, label]) => (
-//                   <button
-//                     key={key}
-//                     onClick={() => setSelectedTab(key)}
-//                     onMouseEnter={() => handleTabHover(key)}
-//                     type="button"
-//                     className={`
-//               flex-shrink-0
-//               text-sm sm:text-base
-//               text-white drop-shadow
-//               cursor-pointer
-//               pb-1 border-b-2 transition-colors
-//               ${
-//                 selectedTab === key
-//                   ? "border-white opacity-100"
-//                   : "border-transparent opacity-60 hover:opacity-80"
-//               }
-//             `}
-//                   >
-//                     {label}
-//                   </button>
-//                 ))}
-//               </div>
-//             </div>
-
-//             {/* ✅ Desktop only (lg+) */}
-//             <div className="hidden md:block max-w-[420px] w-full flex-shrink-0">
-//               <div className="relative">
-//                 {!searchQuery && (
-//                   <Search
-//                     size={16}
-//                     className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 pointer-events-none z-10"
-//                   />
-//                 )}
-//                 <input
-//                   ref={searchInputRef}
-//                   type="text"
-//                   value={searchQuery}
-//                   onChange={handleSearchChange}
-//                   placeholder={text.search}
-//                   className="
-//             w-full py-2 pr-3 pl-9
-//             bg-white/10 backdrop-blur-md
-//             border border-white/20
-//             rounded-lg
-//             text-black text-sm
-//             placeholder:text-black/50
-//             placeholder:text-center
-//             focus:outline-none
-//             focus:ring-2 focus:ring-white/40
-//           "
-//                 />
-//               </div>
-//             </div>
-//           </div>
-
-//           {/* ✅ Mobile + iPad only (< lg) */}
-//           <div className="md:hidden px-4 sm:px-6 pb-2">
-//             <div className="relative">
-//               {!searchQuery && (
-//                 <Search
-//                   size={16}
-//                   className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 pointer-events-none z-10"
-//                 />
-//               )}
-//               <input
-//                 ref={searchInputRef}
-//                 type="text"
-//                 value={searchQuery}
-//                 onChange={handleSearchChange}
-//                 placeholder={text.search}
-//                 className="
-//           w-full py-2 pr-3 pl-9
-//           bg-white/10 backdrop-blur-md
-//           border border-white/20
-//           rounded-lg
-//           text-black text-sm
-//           placeholder:text-black/50
-//           placeholder:text-center
-//           focus:outline-none
-//           focus:ring-2 focus:ring-white/40
-//         "
-//               />
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-
-//       {/* Main Content */}
-//       <div
-//         className={`
-//     absolute inset-x-0 top-0 bottom-0
-//     overflow-y-auto overscroll-contain
-//     px-4 sm:px-6
-//     pt-[calc(env(safe-area-inset-top)+144px)]
-//     sm:pt-[calc(env(safe-area-inset-top)+150px)]
-//     ${
-//       currentSong
-//         ? "pb-[calc(env(safe-area-inset-bottom)+150px)]"
-//         : "pb-[calc(env(safe-area-inset-bottom)+50px)]"
-//     }
-//   `}
-//       >
-//         {/* Discover Tab */}
-//         {selectedTab === "discover" && (
-//           <div className="space-y-10 max-w-7xl mx-auto">
-//             {/* Top Section */}
-//             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
-//               {/* Browse by Mood Section */}
-//               <div className="bg-white/5 backdrop-blur-xl rounded-3xl p-5 border border-white/10 h-full flex flex-col">
-//                 <h2 className="text-3xl font-bold tracking-tight text-white drop-shadow-lg mb-4">
-//                   {language === "spanish" && "Explorar por Estado de Ánimo"}
-//                   {language === "english" && "Browse by Mood"}
-//                   {language === "catalan" && "Explorar per Estat d'Ànim"}
-//                 </h2>
-//                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 flex-1">
-//                   {[
-//                     {
-//                       name:
-//                         language === "spanish"
-//                           ? "Feliz"
-//                           : language === "catalan"
-//                           ? "Feliç"
-//                           : "Happy",
-//                       emoji: "😊",
-//                       color: "from-yellow-400/40 to-orange-400/40",
-//                     },
-//                     {
-//                       name:
-//                         language === "spanish"
-//                           ? "Relajado"
-//                           : language === "catalan"
-//                           ? "Relaxat"
-//                           : "Relaxed",
-//                       emoji: "😌",
-//                       color: "from-blue-400/40 to-cyan-400/40",
-//                     },
-//                     {
-//                       name:
-//                         language === "spanish"
-//                           ? "Energético"
-//                           : language === "catalan"
-//                           ? "Energètic"
-//                           : "Energetic",
-//                       emoji: "⚡",
-//                       color: "from-red-400/40 to-pink-400/40",
-//                     },
-//                     {
-//                       name:
-//                         language === "spanish"
-//                           ? "Triste"
-//                           : language === "catalan"
-//                           ? "Trist"
-//                           : "Sad",
-//                       emoji: "😢",
-//                       color: "from-indigo-400/40 to-blue-400/40",
-//                     },
-//                     {
-//                       name:
-//                         language === "spanish"
-//                           ? "Romántico"
-//                           : language === "catalan"
-//                           ? "Romàntic"
-//                           : "Romantic",
-//                       emoji: "💕",
-//                       color: "from-pink-400/40 to-rose-400/40",
-//                     },
-//                     {
-//                       name:
-//                         language === "spanish"
-//                           ? "Enfocado"
-//                           : language === "catalan"
-//                           ? "Concentrat"
-//                           : "Focused",
-//                       emoji: "🎯",
-//                       color: "from-purple-400/40 to-violet-400/40",
-//                     },
-//                     {
-//                       name:
-//                         language === "spanish"
-//                           ? "Motivado"
-//                           : language === "catalan"
-//                           ? "Motivat"
-//                           : "Motivated",
-//                       emoji: "💪",
-//                       color: "from-green-400/40 to-emerald-400/40",
-//                     },
-//                     {
-//                       name:
-//                         language === "spanish"
-//                           ? "Nostálgico"
-//                           : language === "catalan"
-//                           ? "Nostàlgic"
-//                           : "Nostalgic",
-//                       emoji: "🌅",
-//                       color: "from-amber-400/40 to-yellow-400/40",
-//                     },
-//                     {
-//                       name:
-//                         language === "spanish"
-//                           ? "Eufórico"
-//                           : language === "catalan"
-//                           ? "Eufòric"
-//                           : "Hype",
-//                       emoji: "🔥",
-//                       color: "from-orange-500/40 to-red-500/40",
-//                     },
-//                     {
-//                       name:
-//                         language === "spanish"
-//                           ? "Tranquilo"
-//                           : language === "catalan"
-//                           ? "Tranquil"
-//                           : "Chill",
-//                       emoji: "🌴",
-//                       color: "from-cyan-400/40 to-sky-500/40",
-//                     },
-//                   ].map((mood) => (
-//                     <button
-//                       key={mood.name}
-//                       onClick={() => openMoodDrawer(mood.name)}
-//                       className={`
-//                                   h-full
-//                                   min-h-[140px]
-//                                   bg-gradient-to-br ${mood.color}
-//                                   backdrop-blur-xl
-//                                   rounded-2xl
-//                                   p-5
-//                                   border border-white/10
-//                                   hover:scale-[1.03]
-//                                 hover:border-white/20
-//                                   transition-all duration-300
-//                                   group
-//                       `}
-//                       aria-label={`Browse mood ${mood.name}`}
-//                     >
-//                       <div className="text-center">
-//                         <div className="text-3xl mb-2">{mood.emoji}</div>
-//                         <h3 className="text-white font-medium">{mood.name}</h3>
-//                       </div>
-//                     </button>
-//                   ))}
-//                 </div>
-//               </div>
-
-//               {/* New Releases */}
-//               <div className="bg-white/5 backdrop-blur-xl rounded-3xl p-5 border border-white/10 h-full">
-//                 <h2 className="text-3xl font-bold tracking-tight text-white mb-5">
-//                   {text.newReleases}
-//                 </h2>
-
-//                 <div className="space-y-3 max-h-[560px] overflow-y-auto">
-//                   {newReleasesLoading ? (
-//                     <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 text-white/70 text-sm">
-//                       Loading...
-//                     </div>
-//                   ) : newReleasesError ? (
-//                     <div className="bg-red-500/10 backdrop-blur-md rounded-xl p-4 border border-red-500/20 text-white/80 text-sm">
-//                       {newReleasesError}
-//                     </div>
-//                   ) : (
-//                     (filteredNewReleases ?? []).map((song: any) => (
-//                       <div
-//                         key={song.id}
-//                         className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 hover:bg-white/15 transition-all"
-//                       >
-//                         <div className="flex items-center gap-4 sm:flex-row flex-col">
-//                           <div className="w-16 h-16 bg-white/5 rounded-lg overflow-hidden flex-shrink-0">
-//                             <img
-//                               src={song.cover ?? "/placeholder.png"}
-//                               alt={song.title}
-//                               className="w-full h-full object-cover"
-//                             />
-//                           </div>
-
-//                           <div className="flex-1 min-w-0">
-//                             <h4 className="text-white drop-shadow truncate">
-//                               {song.title}
-//                             </h4>
-//                             <p className="text-white/60 text-sm truncate">
-//                               {song.artist} • {song.album}
-//                             </p>
-//                           </div>
-
-//                           <div className="flex items-center gap-4">
-//                             <span className="text-white/60 text-sm">
-//                               {song.duration}
-//                             </span>
-
-//                             {/* ✅ Nouveau handler : le Player choisit single/ep/album et charge la bonne queue */}
-//                             <button
-//                               onClick={() => handlePlayFeatured(song)}
-//                               className="cursor-pointer p-3 bg-white/20 backdrop-blur-sm rounded-full hover:bg-white/30 transition-all"
-//                               aria-label={
-//                                 isPlaying && currentSong?.id === song.id
-//                                   ? text.pause
-//                                   : text.play
-//                               }
-//                               title={
-//                                 isPlaying && currentSong?.id === song.id
-//                                   ? text.pause
-//                                   : text.play
-//                               }
-//                             >
-//                               {isPlaying && currentSong?.id === song.id ? (
-//                                 <Pause size={18} className="text-white" />
-//                               ) : (
-//                                 <Play size={18} className="text-white" />
-//                               )}
-//                             </button>
-
-//                             <button
-//                               onClick={() => toggleFavorite(song.id)}
-//                               className="cursor-pointer p-3 hover:bg-white/10 rounded-full transition-all"
-//                               title={text.addToFavorites}
-//                             >
-//                               <Heart
-//                                 size={18}
-//                                 className={`${
-//                                   favoriteTrackIds.includes(String(song.id))
-//                                     ? "text-red-400 fill-red-400"
-//                                     : "text-white"
-//                                 }`}
-//                               />
-//                             </button>
-
-//                             {/* ✅ Nouveau handler : ouvre modal + fetch playlists user + ajout track backend */}
-//                             <button
-//                               onClick={() => openAddToPlaylist(song)}
-//                               className="cursor-pointer p-3 hover:bg-white/10 rounded-full transition-all"
-//                               title={text.addToPlaylist}
-//                               aria-label={text.addToPlaylist}
-//                             >
-//                               <svg
-//                                 width="18"
-//                                 height="18"
-//                                 viewBox="0 0 24 24"
-//                                 fill="none"
-//                                 stroke="currentColor"
-//                                 strokeWidth="2"
-//                                 strokeLinecap="round"
-//                                 strokeLinejoin="round"
-//                               >
-//                                 <line x1="12" y1="5" x2="12" y2="19" />
-//                                 <line x1="5" y1="12" x2="19" y2="12" />
-//                               </svg>
-//                             </button>
-//                           </div>
-//                         </div>
-//                       </div>
-//                     ))
-//                   )}
-//                 </div>
-//               </div>
-//             </div>
-
-//             {/* Featured Section */}
-//             <div>
-//               <h2 className="text-3xl font-bold tracking-tight text-white drop-shadow-lg mb-4">
-//                 {text.featured}
-//               </h2>
-
-//               {featuredLoading ? (
-//                 <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 text-white/70 text-center">
-//                   Loading...
-//                 </div>
-//               ) : featuredError ? (
-//                 <div className="bg-red-500/10 backdrop-blur-md rounded-2xl p-6 border border-red-500/20 text-white/80 text-center">
-//                   {featuredError}
-//                 </div>
-//               ) : (
-//                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-//                   {filteredFeatured.slice(0, 3).map((song: any) => (
-//                     <div
-//                       key={song.id}
-//                       className="bg-white/10 backdrop-blur-md rounded-3xl p-7 border border-white/20 hover:bg-white/15 transition-all"
-//                     >
-//                       <div className="aspect-[4/3] bg-white/5 rounded-xl mb-4 overflow-hidden">
-//                         <img
-//                           src={song.cover ?? "/placeholder.png"}
-//                           alt={song.title}
-//                           className="w-full h-full object-cover"
-//                         />
-//                       </div>
-
-//                       <h3 className="text-white drop-shadow mb-1">
-//                         {song.title}
-//                       </h3>
-
-//                       <p className="text-white/60 text-sm mb-2">
-//                         {song.artist}
-//                         {song.album ? ` • ${song.album}` : ""}
-//                       </p>
-
-//                       <div className="flex items-center justify-between">
-//                         <span className="text-white/50 text-xs">
-//                           {song.streams} {text.streams}
-//                         </span>
-
-//                         <button
-//                           onClick={() => handlePlayFeatured(song)}
-//                           className="cursor-pointer p-2 bg-white/20 backdrop-blur-sm rounded-full hover:bg-white/30 transition-all"
-//                           aria-label={
-//                             isPlaying && currentSong?.id === song.id
-//                               ? text.pause
-//                               : text.play
-//                           }
-//                           title={
-//                             isPlaying && currentSong?.id === song.id
-//                               ? text.pause
-//                               : text.play
-//                           }
-//                         >
-//                           {isPlaying && currentSong?.id === song.id ? (
-//                             <Pause size={20} className="text-white" />
-//                           ) : (
-//                             <Play size={20} className="text-white" />
-//                           )}
-//                         </button>
-//                       </div>
-//                     </div>
-//                   ))}
-//                 </div>
-//               )}
-//             </div>
-//           </div>
-//         )}
-
-//         {/* Artists Tab */}
-//         {selectedTab === "artists" && (
-//           <div className="space-y-6 max-w-6xl mx-auto">
-//             {/* Header with sort option */}
-//             <div className="flex items-center justify-between">
-//               <h2 className="text-2xl text-white drop-shadow-lg">
-//                 {text.artists}
-//               </h2>
-
-//               <button
-//                 style={{
-//                   outline: "3px solid #ffffff",
-//                   outlineOffset: "3px",
-//                 }}
-//                 onClick={() => setSortArtists(!sortArtists)}
-//                 className={`px-4 py-2 rounded-lg text-white text-sm transition-all ${
-//                   sortArtists ? "bg-white/20" : "bg-white/10 hover:bg-white/15"
-//                 }`}
-//               >
-//                 <svg
-//                   width="16"
-//                   height="16"
-//                   viewBox="0 0 24 24"
-//                   fill="none"
-//                   stroke="currentColor"
-//                   strokeWidth="2"
-//                   className="inline mr-2"
-//                 >
-//                   <line x1="3" y1="6" x2="21" y2="6" />
-//                   <line x1="3" y1="12" x2="21" y2="12" />
-//                   <line x1="3" y1="18" x2="15" y2="18" />
-//                 </svg>
-//                 {text.sortAlphabetically}
-//               </button>
-//             </div>
-
-//             {/* Loading / Error / Grid */}
-//             {artistsLoading ? (
-//               <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20 text-white/70 text-center">
-//                 Loading artists...
-//               </div>
-//             ) : artistsError ? (
-//               <div className="bg-red-500/10 backdrop-blur-md rounded-xl p-6 border border-red-500/20 text-white/80 text-center">
-//                 {artistsError}
-//               </div>
-//             ) : (
-//               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-//                 {(sortArtists
-//                   ? [...filteredArtists].sort((a: any, b: any) =>
-//                       String(a.name ?? "").localeCompare(String(b.name ?? ""))
-//                     )
-//                   : filteredArtists
-//                 ).map((artist: any) => (
-//                   <div
-//                     key={artist.id}
-//                     className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 hover:bg-white/15 transition-all text-center"
-//                   >
-//                     <div className="w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden bg-white/5">
-//                       <img
-//                         src={artist.avatar ?? "/avatar-placeholder.png"}
-//                         alt={artist.name}
-//                         className="w-full h-full object-cover"
-//                       />
-//                     </div>
-
-//                     <h3 className="text-white drop-shadow mb-1">
-//                       {artist.name}
-//                     </h3>
-
-//                     {(() => {
-//                       const raw = artist.genres;
-
-//                       // genres peut être: array ["pop","rap"] ou string "pop, rap"
-//                       const list = Array.isArray(raw)
-//                         ? raw
-//                         : String(raw ?? "")
-//                             .split(",")
-//                             .map((s) => s.trim())
-//                             .filter(Boolean);
-
-//                       if (list.length === 0) {
-//                         return <p className="text-white/60 text-sm mb-1">—</p>;
-//                       }
-
-//                       const shown = list.slice(0, 3);
-//                       const hasMore = list.length > 3;
-
-//                       return (
-//                         <p className="text-white/60 text-sm mb-1">
-//                           {shown.join(", ")}
-//                           {hasMore ? "..." : ""}
-//                         </p>
-//                       );
-//                     })()}
-
-//                     <p className="text-white/50 text-xs mb-4">
-//                       {artist.subscribers ?? 0} {text.subscribers}
-//                     </p>
-
-//                     {/* <button
-//                       disabled={!artist.hasActivePlan}
-//                       onClick={() => {
-//                         if (!artist.hasActivePlan) return;
-
-//                         subscribedArtists.includes(String(artist.id))
-//                           ? toggleSubscription(String(artist.id)) // unsubscribe
-//                           : startSubscription(artist); // open payment options
-//                       }}
-//                       className={`cursor-pointer disabled:cursor-not-allowed w-full px-4 py-2 backdrop-blur-sm rounded-lg text-white transition-all flex items-center justify-center gap-2
-//                                   ${
-//                                     artist.hasActivePlan
-//                                       ? subscribedArtists.includes(
-//                                           String(artist.id)
-//                                         )
-//                                         ? "bg-white/30 border border-white/40"
-//                                         : "bg-white/20 hover:bg-white/30"
-//                                       : "bg-white/10 text-white/60 cursor-not-allowed"
-//                                   }
-//                                 `}
-//                     >
-//                       <Star
-//                         size={16}
-//                         className={
-//                           artist.hasActivePlan &&
-//                           subscribedArtists.includes(String(artist.id))
-//                             ? "fill-white"
-//                             : ""
-//                         }
-//                       />
-
-//                       {artist.hasActivePlan
-//                         ? subscribedArtists.includes(artist.id)
-//                           ? text.subscribed
-//                           : text.subscribe
-//                         : text.paymentSoon}
-//                     </button> */}
-
-//                     <button
-//                       style={{
-//                         outline: "3px solid #ffffff",
-//                         outlineOffset: "3px",
-//                       }}
-//                       type="button"
-//                       onClick={() => openArtistProfile(artist)}
-//                       className="
-//                                   w-full px-4 py-2
-//                                   rounded-lg
-//                                   bg-white/15 hover:bg-white/25
-//                                   border border-white/20
-//                                   text-white
-//                                   transition-all
-//                                   cursor-pointer
-//                                   flex items-center justify-center gap-2
-//                                 "
-//                       aria-label={`View profile of ${artist.name}`}
-//                     >
-//                       <User size={16} className="text-white/90" />
-
-//                       {language === "spanish"
-//                         ? "Ver perfil"
-//                         : language === "catalan"
-//                         ? "Veure perfil"
-//                         : "View profile"}
-//                     </button>
-//                   </div>
-//                 ))}
-//               </div>
-//             )}
-//           </div>
-//         )}
-
-//         {/* My Music Tab */}
-//         {selectedTab === "mymusic" && (
-//           <div className="max-w-6xl mx-auto space-y-8">
-//             {/* Favorites Playlist - Always visible */}
-//             <div>
-//               <h2 className="text-2xl text-white drop-shadow-lg mb-4">
-//                 {text.favorites}
-//               </h2>
-//               <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 hover:bg-white/15 transition-all">
-//                 <div className="flex items-center gap-6 mb-6">
-//                   <div className="w-32 h-32 bg-gradient-to-br from-red-500/40 to-pink-500/40 rounded-xl flex items-center justify-center flex-shrink-0">
-//                     <Heart size={64} className="text-white" />
-//                   </div>
-//                   <div>
-//                     <h3 className="text-2xl text-white drop-shadow mb-2">
-//                       {text.favorites}
-//                     </h3>
-//                     <p className="text-white/60">
-//                       {favoriteTrackIds.length} {text.songs}
-//                     </p>
-//                   </div>
-//                 </div>
-
-//                 {favoriteTrackIds.length > 0 ? (
-//                   <div className="space-y-2">
-//                     {filteredFavoriteTracks.map((song) => (
-//                       <div
-//                         key={song.id}
-//                         className="bg-white/5 rounded-lg p-3 flex items-center gap-4 hover:bg-white/10 transition-all"
-//                       >
-//                         <div className="w-12 h-12 bg-white/5 rounded overflow-hidden flex-shrink-0">
-//                           <img
-//                             src={song.cover}
-//                             alt={song.title}
-//                             className="w-full h-full object-cover"
-//                           />
-//                         </div>
-//                         <div className="flex-1 min-w-0">
-//                           <h4 className="text-white drop-shadow text-sm truncate">
-//                             {song.title}
-//                           </h4>
-//                           <p className="text-white/60 text-xs truncate">
-//                             {song.artist}
-//                           </p>
-//                         </div>
-//                         <div className="flex items-center gap-2">
-//                           <span className="text-white/60 text-sm">
-//                             {song.duration}
-//                           </span>
-//                           <button
-//                             style={{
-//                               outline: "3px solid #ffffff",
-//                               outlineOffset: "3px",
-//                             }}
-//                             onClick={() => handlePlaySong(song)}
-//                             className="p-2 bg-white/10 backdrop-blur-sm rounded-full hover:bg-white/20 transition-all"
-//                           >
-//                             {isPlaying && currentSong?.id === song.id ? (
-//                               <Pause size={16} className="text-white" />
-//                             ) : (
-//                               <Play size={16} className="text-white" />
-//                             )}
-//                           </button>
-//                           <button
-//                             style={{
-//                               outline: "3px solid #ffffff",
-//                               outlineOffset: "3px",
-//                             }}
-//                             onClick={() => toggleFavorite(String(song.id))}
-//                             className="p-2 hover:bg-white/10 rounded-full transition-all"
-//                           >
-//                             <Heart
-//                               size={16}
-//                               className="text-red-400 fill-red-400"
-//                             />
-//                           </button>
-//                         </div>
-//                       </div>
-//                     ))}
-//                   </div>
-//                 ) : (
-//                   <div className="text-center py-8">
-//                     <Heart size={48} className="text-white/30 mx-auto mb-3" />
-//                     <p className="text-white/50">
-//                       {language === "spanish" &&
-//                         "Aún no tienes canciones favoritas"}
-//                       {language === "english" && "No favorite songs yet"}
-//                       {language === "catalan" &&
-//                         "Encara no tens cançons favorites"}
-//                     </p>
-//                     <p className="text-white/40 text-sm mt-2">
-//                       {language === "spanish" &&
-//                         "Presiona el corazón en cualquier canción para añadirla a favoritos"}
-//                       {language === "english" &&
-//                         "Press the heart on any song to add it to favorites"}
-//                       {language === "catalan" &&
-//                         "Prem el cor a qualsevol cançó per afegir-la a favorits"}
-//                     </p>
-//                   </div>
-//                 )}
-//               </div>
-//             </div>
-
-//             {/* Header with sort and create options */}
-//             <div className="flex items-center justify-between">
-//               <h2 className="text-2xl text-white drop-shadow-lg">
-//                 {text.yourPlaylists}
-//               </h2>
-//               <div className="flex items-center gap-4">
-//                 {userPlaylists.length > 0 && (
-//                   <button
-//                     onClick={() => setSortPlaylists(!sortPlaylists)}
-//                     className={`cursor-pointer px-4 py-2 rounded-lg text-white text-sm transition-all ${
-//                       sortPlaylists
-//                         ? "bg-white/20"
-//                         : "bg-white/10 hover:bg-white/15"
-//                     }`}
-//                   >
-//                     <svg
-//                       width="16"
-//                       height="16"
-//                       viewBox="0 0 24 24"
-//                       fill="none"
-//                       stroke="currentColor"
-//                       strokeWidth="2"
-//                       className="inline mr-2"
-//                     >
-//                       <line x1="3" y1="6" x2="21" y2="6" />
-//                       <line x1="3" y1="12" x2="21" y2="12" />
-//                       <line x1="3" y1="18" x2="15" y2="18" />
-//                     </svg>
-//                     {text.sortAlphabetically}
-//                   </button>
-//                 )}
-//                 <button
-//                   style={{
-//                     outline: "3px solid #ffffff",
-//                     outlineOffset: "3px",
-//                   }}
-//                   onClick={() => setShowCreatePlaylist(true)}
-//                   className="cursor-pointer px-4 py-2 bg-white/20 rounded-lg text-white hover:bg-white/30 transition-all text-sm flex items-center gap-2"
-//                 >
-//                   <svg
-//                     width="16"
-//                     height="16"
-//                     viewBox="0 0 24 24"
-//                     fill="none"
-//                     stroke="currentColor"
-//                     strokeWidth="2"
-//                   >
-//                     <line x1="12" y1="5" x2="12" y2="19" />
-//                     <line x1="5" y1="12" x2="19" y2="12" />
-//                   </svg>
-//                   {text.createPlaylist}
-//                 </button>
-//               </div>
-//             </div>
-
-//             {/* Playlists Grid */}
-//             {userPlaylists.length > 0 ? (
-//               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-//                 {(sortPlaylists
-//                   ? [...filteredUserPlaylists].sort((a, b) =>
-//                       a.nom.localeCompare(b.nom)
-//                     )
-//                   : filteredUserPlaylists
-//                 ).map((playlist) => (
-//                   <div
-//                     key={playlist.id}
-//                     onClick={() => handlePlayPlaylist(playlist, 0)}
-//                     className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 hover:bg-white/15 transition-all cursor-pointer"
-//                   >
-//                     <div className="aspect-square bg-gradient-to-br from-purple-500/30 to-pink-500/30 rounded-xl mb-4 flex items-center justify-center">
-//                       <Music size={64} className="text-white/60" />
-//                     </div>
-//                     <h3 className="text-white drop-shadow mb-2">
-//                       {playlist.nom}
-//                     </h3>
-//                     <p className="text-white/60 text-sm">
-//                       {playlist.tracks?.length ?? 0} {text.songs}
-//                     </p>
-
-//                     {/* Show songs in playlist */}
-//                     {(playlist.tracks?.length ?? 0) > 0 && (
-//                       <div className="mt-4 space-y-2">
-//                         {playlist.tracks.slice(0, 3).map((track: any) => (
-//                           <div
-//                             key={track.id}
-//                             className="flex items-center gap-2"
-//                           >
-//                             <div className="w-8 h-8 bg-white/5 rounded overflow-hidden flex-shrink-0">
-//                               <img
-//                                 src={track.coverUrl ?? "/placeholder.png"}
-//                                 alt={track.title}
-//                                 className="w-full h-full object-cover"
-//                               />
-//                             </div>
-
-//                             <div className="flex-1 min-w-0">
-//                               <p className="text-white/80 text-xs truncate">
-//                                 {track.title}
-//                               </p>
-//                             </div>
-//                           </div>
-//                         ))}
-
-//                         {(playlist.tracks?.length ?? 0) > 3 && (
-//                           <p className="text-white/50 text-xs">
-//                             +{(playlist.tracks?.length ?? 0) - 3} más
-//                           </p>
-//                         )}
-//                       </div>
-//                     )}
-
-//                     {playlist.tracks?.length === 0 && (
-//                       <p className="text-white/50 text-sm mt-4 italic">
-//                         {text.noSongs}
-//                       </p>
-//                     )}
-//                   </div>
-//                 ))}
-//               </div>
-//             ) : (
-//               <div className="bg-white/10 backdrop-blur-md rounded-2xl p-12 border border-white/20 text-center">
-//                 <Music size={64} className="text-white/40 mx-auto mb-4" />
-//                 <h3 className="text-xl text-white drop-shadow mb-2">
-//                   {language === "spanish" && "No tienes playlists aún"}
-//                   {language === "english" && "You don't have any playlists yet"}
-//                   {language === "catalan" && "Encara no tens playlists"}
-//                 </h3>
-//                 <p className="text-white/60 mb-6">
-//                   {language === "spanish" &&
-//                     "Crea tu primera playlist y empieza a organizar tu música"}
-//                   {language === "english" &&
-//                     "Create your first playlist and start organizing your music"}
-//                   {language === "catalan" &&
-//                     "Crea la teva primera playlist i comença a organitzar la teva música"}
-//                 </p>
-//                 <button
-//                   style={{
-//                     outline: "3px solid #ffffff",
-//                     outlineOffset: "3px",
-//                   }}
-//                   onClick={() => setShowCreatePlaylist(true)}
-//                   className="cursor-pointer px-6 py-3 bg-white/20 rounded-lg text-white hover:bg-white/30 transition-all inline-flex items-center gap-2"
-//                 >
-//                   <svg
-//                     width="20"
-//                     height="20"
-//                     viewBox="0 0 24 24"
-//                     fill="none"
-//                     stroke="currentColor"
-//                     strokeWidth="2"
-//                   >
-//                     <line x1="12" y1="5" x2="12" y2="19" />
-//                     <line x1="5" y1="12" x2="19" y2="12" />
-//                   </svg>
-//                   {text.createPlaylist}
-//                 </button>
-//               </div>
-//             )}
-//           </div>
-//         )}
-
-//         {/* Editor's Playlists Tab */}
-//         {selectedTab === "editorplaylists" && (
-//           <div className="max-w-6xl mx-auto space-y-6">
-//             {/* Header */}
-//             <div className="flex items-center justify-between gap-3">
-//               <h2 className="text-2xl text-white drop-shadow-lg">
-//                 {text.editorPlaylists}
-//               </h2>
-
-//               <button
-//                 type="button"
-//                 onClick={fetchEditorPlaylists}
-//                 style={{
-//                   outline: "3px solid #ffffff",
-//                   outlineOffset: "3px",
-//                 }}
-//                 disabled={editorPlaylistsLoading}
-//                 className="px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white/80 hover:bg-white/20 transition-all text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-//               >
-//                 {editorPlaylistsLoading
-//                   ? "loading…"
-//                   : language === "english"
-//                   ? "Refresh"
-//                   : language === "spanish"
-//                   ? "Actualizar"
-//                   : "Actualitzar"}
-//               </button>
-//             </div>
-
-//             {/* LOADING */}
-//             {editorPlaylistsLoading && (
-//               <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20 text-white/70 text-center">
-//                 {language === "english"
-//                   ? "Loading editor playlists…"
-//                   : language === "spanish"
-//                   ? "Cargando playlists editoriales…"
-//                   : "Carregant playlists editorials…"}
-//               </div>
-//             )}
-
-//             {/* ERROR */}
-//             {!editorPlaylistsLoading && editorPlaylistsError && (
-//               <div className="bg-red-500/10 backdrop-blur-md rounded-xl p-6 border border-red-500/20 text-white/80 text-center">
-//                 {editorPlaylistsError}
-//               </div>
-//             )}
-
-//             {/* EMPTY STATE */}
-//             {!editorPlaylistsLoading &&
-//               !editorPlaylistsError &&
-//               (editorPlaylists?.length ?? 0) === 0 && (
-//                 <div className="bg-white/10 backdrop-blur-md rounded-xl p-10 border border-white/20 text-center">
-//                   <p className="text-white/80 text-lg font-semibold mb-2">
-//                     {language === "english"
-//                       ? "No editor playlists yet"
-//                       : language === "spanish"
-//                       ? "Aún no hay playlists editoriales"
-//                       : "Encara no hi ha playlists editorials"}
-//                   </p>
-
-//                   <p className="text-white/60 text-sm max-w-md mx-auto">
-//                     {language === "english"
-//                       ? "Our editorial team is working on curated playlists. Check back soon!"
-//                       : language === "spanish"
-//                       ? "Nuestro equipo editorial está preparando playlists seleccionadas. ¡Vuelve pronto!"
-//                       : "El nostre equip editorial està preparant playlists seleccionades. Torna aviat!"}
-//                   </p>
-//                 </div>
-//               )}
-
-//             {/* LIST */}
-//             {!editorPlaylistsLoading &&
-//               !editorPlaylistsError &&
-//               (editorPlaylists?.length ?? 0) > 0 && (
-//                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-//                   {filteredEditorPlaylists.map((playlist: any) => (
-//                     <div
-//                       key={playlist.id}
-//                       className="bg-white/10 backdrop-blur-md rounded-2xl overflow-hidden border border-white/20 hover:bg-white/15 transition-all"
-//                     >
-//                       <div className="aspect-video bg-white/5 overflow-hidden">
-//                         <img
-//                           src={playlist.cover ?? "/placeholder.png"}
-//                           alt={playlist.name}
-//                           className="w-full h-full object-cover"
-//                         />
-//                       </div>
-
-//                       <div className="p-6">
-//                         <h3 className="text-white drop-shadow mb-2">
-//                           {playlist.name}
-//                         </h3>
-
-//                         <p className="text-white/60 text-sm mb-4">
-//                           {playlist.description}
-//                         </p>
-
-//                         <p className="text-white/50 text-xs mb-4">
-//                           {playlist.songCount} {text.songs}
-//                         </p>
-
-//                         {/* Preview songs */}
-//                         <div className="space-y-2 mb-4">
-//                           {(playlist.songs ?? [])
-//                             .slice(0, 5)
-//                             .map((song: any) => (
-//                               <div
-//                                 key={song.id}
-//                                 className="flex items-center gap-3"
-//                               >
-//                                 <div className="w-10 h-10 bg-white/5 rounded overflow-hidden flex-shrink-0">
-//                                   <img
-//                                     src={song.cover ?? "/placeholder.png"}
-//                                     alt={song.title}
-//                                     className="w-full h-full object-cover"
-//                                   />
-//                                 </div>
-
-//                                 <div className="flex-1 min-w-0">
-//                                   <p className="text-white/90 text-sm truncate">
-//                                     {song.title}
-//                                   </p>
-//                                   <p className="text-white/50 text-xs truncate">
-//                                     {song.artist}
-//                                   </p>
-//                                 </div>
-
-//                                 <button
-//                                   onClick={() =>
-//                                     handlePlaySong(song, playlist.songs)
-//                                   }
-//                                   className="p-2 hover:bg-white/10 rounded-full transition-all"
-//                                   aria-label={
-//                                     isPlaying && currentSong?.id === song.id
-//                                       ? text.pause
-//                                       : text.play
-//                                   }
-//                                 >
-//                                   {isPlaying && currentSong?.id === song.id ? (
-//                                     <Pause size={16} className="text-white" />
-//                                   ) : (
-//                                     <Play size={16} className="text-white" />
-//                                   )}
-//                                 </button>
-//                               </div>
-//                             ))}
-//                         </div>
-
-//                         <button
-//                           onClick={() => handlePlayEditorPlaylist(playlist)}
-//                           className="w-full px-4 py-2 bg-white/20 backdrop-blur-sm rounded-lg text-white hover:bg-white/30 transition-all flex items-center justify-center gap-2"
-//                         >
-//                           <Play size={16} />
-//                           {text.play}
-//                         </button>
-//                       </div>
-//                     </div>
-//                   ))}
-//                 </div>
-//               )}
-//           </div>
-//         )}
-
-//         {/* Dashboard Tab */}
-//         {selectedTab === "dashboard" && (
-//           <div className="max-w-6xl mx-auto space-y-8">
-//             {/* Header actions */}
-//             <div className="flex items-center justify-between gap-3">
-//               <h2 className="text-2xl text-white drop-shadow-lg">
-//                 {text.dashboard}
-//               </h2>
-
-//               <button
-//                 style={{
-//                   outline: "3px solid #ffffff",
-//                   outlineOffset: "3px",
-//                 }}
-//                 onClick={fetchMySubscriptionsDashboard}
-//                 disabled={subscriptionsLoading}
-//                 className="px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white/80 hover:bg-white/20 transition-all text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-//               >
-//                 {subscriptionsLoading
-//                   ? "loading…"
-//                   : language === "english"
-//                   ? "Refresh"
-//                   : language === "spanish"
-//                   ? "Actualizar"
-//                   : "Actualitzar"}
-//               </button>
-//             </div>
-
-//             {/* Loading/Error */}
-//             {subscriptionsLoading && (
-//               <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20 text-white/70">
-//                 {language === "english"
-//                   ? "Loading subscriptions…"
-//                   : language === "spanish"
-//                   ? "Cargando suscripciones…"
-//                   : "Carregant subscripcions…"}
-//               </div>
-//             )}
-
-//             {!subscriptionsLoading && subscriptionsError && (
-//               <div className="bg-red-500/10 backdrop-blur-md rounded-xl p-6 border border-red-500/20 text-white/80">
-//                 {subscriptionsError}
-//               </div>
-//             )}
-
-//             {/* Stats Cards */}
-//             {!subscriptionsLoading && !subscriptionsError && (
-//               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-//                 <div className="bg-gradient-to-br from-purple-500/40 to-pink-500/40 backdrop-blur-md rounded-2xl p-6 border border-white/20">
-//                   <div className="flex items-center gap-4">
-//                     <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
-//                       <Star size={32} className="text-white" />
-//                     </div>
-//                     <div>
-//                       <p className="text-white/60 text-sm">
-//                         {text.totalSubscriptions}
-//                       </p>
-//                       <p className="text-3xl text-white drop-shadow">
-//                         {
-//                           mySubscriptions.filter(
-//                             (s: any) => s.status === "active"
-//                           ).length
-//                         }
-//                       </p>
-//                     </div>
-//                   </div>
-//                 </div>
-
-//                 <div className="bg-gradient-to-br from-blue-500/40 to-cyan-500/40 backdrop-blur-md rounded-2xl p-6 border border-white/20">
-//                   <div className="flex items-center gap-4">
-//                     <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
-//                       <svg
-//                         width="32"
-//                         height="32"
-//                         viewBox="0 0 24 24"
-//                         fill="none"
-//                         stroke="currentColor"
-//                         strokeWidth="2"
-//                         className="text-white"
-//                       >
-//                         <path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6" />
-//                         <polyline points="7 3 12 8 17 3" />
-//                         <polyline points="12 8 12 21" />
-//                       </svg>
-//                     </div>
-//                     <div>
-//                       <p className="text-white/60 text-sm">{text.totalGifts}</p>
-//                       <p className="text-3xl text-white drop-shadow">
-//                         {getGiftsForSubscribedArtistsFromSubs().length}
-//                       </p>
-//                     </div>
-//                   </div>
-//                 </div>
-//               </div>
-//             )}
-
-//             {/* My Subscriptions */}
-//             <div>
-//               <h2 className="text-2xl text-white drop-shadow-lg mb-4">
-//                 {text.mySubscriptions}
-//               </h2>
-
-//               {!subscriptionsLoading &&
-//               !subscriptionsError &&
-//               mySubscriptions.length > 0 ? (
-//                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-//                   {mySubscriptions
-//                     .filter((s: any) => s.status === "active")
-//                     .map((sub: any) => {
-//                       const artist = artists.find(
-//                         (a: any) => String(a.id) === String(sub.artistId)
-//                       );
-
-//                       return (
-//                         <div
-//                           key={sub.id}
-//                           className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 hover:bg-white/15 transition-all"
-//                         >
-//                           <div className="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden bg-white/5">
-//                             <img
-//                               src={artist?.avatar ?? "/avatar-placeholder.png"}
-//                               alt={artist?.name ?? "Artist"}
-//                               className="w-full h-full object-cover"
-//                             />
-//                           </div>
-
-//                           <h3 className="text-white drop-shadow mb-2 text-center">
-//                             {artist?.name ?? "Artist"}
-//                           </h3>
-
-//                           <p className="text-white/60 text-sm mb-1 text-center">
-//                             {artist?.genres ?? "—"}
-//                           </p>
-
-//                           <p className="text-white/50 text-xs mb-4 text-center">
-//                             {text.subscribedOn}:{" "}
-//                             {sub.startDate
-//                               ? new Date(sub.startDate).toLocaleDateString()
-//                               : new Date(
-//                                   sub.createdAt ?? Date.now()
-//                                 ).toLocaleDateString()}
-//                           </p>
-
-//                           <button
-//                             style={{
-//                               outline: "3px solid #ffffff",
-//                               outlineOffset: "3px",
-//                             }}
-//                             onClick={() =>
-//                               toggleSubscription(String(sub.artistId))
-//                             }
-//                             className="w-full px-4 py-2 bg-red-500/30 backdrop-blur-sm rounded-lg text-white hover:bg-red-500/40 transition-all flex items-center justify-center gap-2 border border-red-500/40"
-//                           >
-//                             <svg
-//                               width="16"
-//                               height="16"
-//                               viewBox="0 0 24 24"
-//                               fill="none"
-//                               stroke="currentColor"
-//                               strokeWidth="2"
-//                             >
-//                               <line x1="18" y1="6" x2="6" y2="18" />
-//                               <line x1="6" y1="6" x2="18" y2="18" />
-//                             </svg>
-//                             {text.unsubscribe}
-//                           </button>
-//                         </div>
-//                       );
-//                     })}
-//                 </div>
-//               ) : (
-//                 !subscriptionsLoading &&
-//                 !subscriptionsError && (
-//                   <div className="bg-white/10 backdrop-blur-md rounded-2xl p-12 border border-white/20 text-center">
-//                     <Star size={64} className="text-white/30 mx-auto mb-4" />
-//                     <p className="text-white/60 mb-4">{text.noSubscriptions}</p>
-//                     <button
-//                       style={{
-//                         outline: "3px solid #ffffff",
-//                         outlineOffset: "3px",
-//                       }}
-//                       onClick={() => setSelectedTab("artists")}
-//                       className="px-6 py-3 bg-white/20 backdrop-blur-sm rounded-lg text-white hover:bg-white/30 transition-all"
-//                     >
-//                       {text.exploreArtists}
-//                     </button>
-//                   </div>
-//                 )
-//               )}
-//             </div>
-
-//             {/* Exclusive Gifts */}
-//             <div>
-//               <h2 className="text-2xl text-white drop-shadow-lg mb-4">
-//                 {text.exclusiveGifts}
-//               </h2>
-
-//               {!subscriptionsLoading &&
-//               !subscriptionsError &&
-//               getGiftsForSubscribedArtistsFromSubs().length > 0 ? (
-//                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-//                   {getGiftsForSubscribedArtistsFromSubs().map((gift: any) => (
-//                     <div
-//                       key={gift.id}
-//                       className="bg-white/10 backdrop-blur-md rounded-2xl overflow-hidden border border-white/20 hover:bg-white/15 transition-all"
-//                     >
-//                       <div className="aspect-square bg-white/5 overflow-hidden">
-//                         <img
-//                           src={gift.cover}
-//                           alt={gift.title}
-//                           className="w-full h-full object-cover"
-//                         />
-//                       </div>
-//                       <div className="p-6">
-//                         <div className="flex items-start justify-between mb-2">
-//                           <div className="flex-1">
-//                             <p className="text-white/50 text-xs mb-1">
-//                               {text.giftFrom} {gift.artistName}
-//                             </p>
-//                             <h3 className="text-white drop-shadow mb-2">
-//                               {gift.title}
-//                             </h3>
-//                           </div>
-//                           <div className="w-8 h-8 bg-gradient-to-br from-yellow-500/40 to-orange-500/40 rounded-lg flex items-center justify-center flex-shrink-0">
-//                             {gift.type === "album" && (
-//                               <Music size={16} className="text-white" />
-//                             )}
-//                             {gift.type === "track" && (
-//                               <Play size={16} className="text-white" />
-//                             )}
-//                             {gift.type === "video" && (
-//                               <svg
-//                                 width="16"
-//                                 height="16"
-//                                 viewBox="0 0 24 24"
-//                                 fill="none"
-//                                 stroke="currentColor"
-//                                 strokeWidth="2"
-//                               >
-//                                 <polygon points="23 7 16 12 23 17 23 7" />
-//                                 <rect
-//                                   x="1"
-//                                   y="5"
-//                                   width="15"
-//                                   height="14"
-//                                   rx="2"
-//                                   ry="2"
-//                                 />
-//                               </svg>
-//                             )}
-//                           </div>
-//                         </div>
-
-//                         <p className="text-white/60 text-sm mb-4">
-//                           {gift.description}
-//                         </p>
-
-//                         <button
-//                           style={{
-//                             outline: "3px solid #ffffff",
-//                             outlineOffset: "3px",
-//                           }}
-//                           className={`w-full px-4 py-2 backdrop-blur-sm rounded-lg text-white transition-all ${
-//                             gift.claimed
-//                               ? "bg-white/10 cursor-not-allowed"
-//                               : "bg-gradient-to-r from-purple-500/40 to-pink-500/40 hover:from-purple-500/50 hover:to-pink-500/50 border border-white/20"
-//                           }`}
-//                           disabled={gift.claimed}
-//                         >
-//                           {gift.claimed ? text.claimed : text.claimGift}
-//                         </button>
-//                       </div>
-//                     </div>
-//                   ))}
-//                 </div>
-//               ) : (
-//                 !subscriptionsLoading &&
-//                 !subscriptionsError && (
-//                   <div className="bg-white/10 backdrop-blur-md rounded-2xl p-12 border border-white/20 text-center">
-//                     <svg
-//                       width="64"
-//                       height="64"
-//                       viewBox="0 0 24 24"
-//                       fill="none"
-//                       stroke="currentColor"
-//                       strokeWidth="2"
-//                       className="text-white/30 mx-auto mb-4"
-//                     >
-//                       <path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6" />
-//                       <polyline points="7 3 12 8 17 3" />
-//                       <polyline points="12 8 12 21" />
-//                     </svg>
-//                     <p className="text-white/60 mb-4">{text.noGifts}</p>
-//                     <p className="text-white/50 text-sm">
-//                       {language === "spanish" &&
-//                         "Suscríbete a tus artistas favoritos para recibir regalos exclusivos"}
-//                       {language === "english" &&
-//                         "Subscribe to your favorite artists to receive exclusive gifts"}
-//                       {language === "catalan" &&
-//                         "Subscriu-te als teus artistes favorits per rebre regals exclusius"}
-//                     </p>
-//                   </div>
-//                 )
-//               )}
-//             </div>
-//           </div>
-//         )}
-//       </div>
-
-//       {/* Create Playlist Modal */}
-//       {showCreatePlaylist && (
-//         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[90] p-4">
-//           <div className="bg-black/80 backdrop-blur-xl rounded-2xl border border-white/20 p-8 max-w-md w-full mx-4">
-//             <div className="flex items-center justify-between mb-6">
-//               <h3 className="text-xl text-white drop-shadow">
-//                 {text.createPlaylist}
-//               </h3>
-
-//               <button
-//                 style={{
-//                   outline: "3px solid #ffffff",
-//                   outlineOffset: "3px",
-//                 }}
-//                 onClick={() => {
-//                   setShowCreatePlaylist(false);
-//                   setNewPlaylistName("");
-//                   setCreatePlaylistError(null);
-//                 }}
-//                 className="cursor-pointer p-2 rounded-lg hover:bg-white/10 text-white/80"
-//                 aria-label="Close"
-//               >
-//                 <svg
-//                   width="18"
-//                   height="18"
-//                   viewBox="0 0 24 24"
-//                   fill="none"
-//                   stroke="currentColor"
-//                   strokeWidth="2"
-//                 >
-//                   <line x1="18" y1="6" x2="6" y2="18" />
-//                   <line x1="6" y1="6" x2="18" y2="18" />
-//                 </svg>
-//               </button>
-//             </div>
-
-//             {/* Error */}
-//             {createPlaylistError && (
-//               <div className="mb-4 text-sm text-red-200 bg-red-500/10 border border-red-500/20 rounded-lg p-3">
-//                 {createPlaylistError}
-//               </div>
-//             )}
-
-//             <input
-//               type="text"
-//               value={newPlaylistName}
-//               onChange={(e) => setNewPlaylistName(e.target.value)}
-//               placeholder={text.playlistName}
-//               className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-black placeholder:text-white/50 focus:outline-none focus:border-white/40 transition-all mb-6"
-//               disabled={creatingPlaylist}
-//             />
-
-//             <div className="flex gap-4">
-//               <button
-//                 style={{
-//                   outline: "3px solid #ffffff",
-//                   outlineOffset: "3px",
-//                 }}
-//                 onClick={() => {
-//                   setShowCreatePlaylist(false);
-//                   setNewPlaylistName("");
-//                   setCreatePlaylistError(null);
-//                 }}
-//                 disabled={creatingPlaylist}
-//                 className={`cursor-pointer flex-1 px-4 py-3 rounded-lg text-white transition-all ${
-//                   creatingPlaylist
-//                     ? "bg-white/10 opacity-60 cursor-not-allowed"
-//                     : "bg-white/10 hover:bg-white/20"
-//                 }`}
-//               >
-//                 {text.cancel}
-//               </button>
-
-//               <button
-//                 style={{
-//                   outline: "3px solid #ffffff",
-//                   outlineOffset: "3px",
-//                 }}
-//                 onClick={handleCreatePlaylist}
-//                 disabled={creatingPlaylist || !newPlaylistName.trim()}
-//                 className={`cursor-pointer flex-1 px-4 py-3 rounded-lg text-white transition-all ${
-//                   creatingPlaylist || !newPlaylistName.trim()
-//                     ? "bg-white/10 opacity-60 cursor-not-allowed"
-//                     : "bg-white/20 hover:bg-white/30"
-//                 }`}
-//               >
-//                 {creatingPlaylist
-//                   ? language === "english"
-//                     ? "Creating..."
-//                     : language === "spanish"
-//                     ? "Creando..."
-//                     : "Creant..."
-//                   : text.create}
-//               </button>
-//             </div>
-//           </div>
-//         </div>
-//       )}
-
-//       {/* Add to Playlist Modal */}
-//       {showAddToPlaylist && selectedSongForPlaylist && (
-//         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[90] p-4">
-//           <div className="bg-black/80 backdrop-blur-xl rounded-2xl border border-white/20 p-8 max-w-md w-full mx-4 max-h-[80vh] overflow-y-auto">
-//             <div className="flex items-center justify-between mb-6">
-//               <h3 className="text-xl text-white drop-shadow">
-//                 {text.addToPlaylist}
-//               </h3>
-//               <button
-//                 style={{
-//                   outline: "3px solid #ffffff",
-//                   outlineOffset: "3px",
-//                 }}
-//                 onClick={() => {
-//                   setShowAddToPlaylist(false);
-//                   setSelectedSongForPlaylist(null);
-//                   setAddToPlaylistError(null);
-//                 }}
-//                 className="cursor-pointer p-2 rounded-lg hover:bg-white/10 text-white/80"
-//                 aria-label="Close"
-//               >
-//                 <svg
-//                   width="18"
-//                   height="18"
-//                   viewBox="0 0 24 24"
-//                   fill="none"
-//                   stroke="currentColor"
-//                   strokeWidth="2"
-//                 >
-//                   <line x1="18" y1="6" x2="6" y2="18" />
-//                   <line x1="6" y1="6" x2="18" y2="18" />
-//                 </svg>
-//               </button>
-//             </div>
-
-//             {/* Song preview */}
-//             <div className="flex items-center gap-3 mb-6 p-3 bg-white/10 rounded-lg">
-//               <div className="w-12 h-12 bg-white/5 rounded overflow-hidden flex-shrink-0">
-//                 <img
-//                   src={selectedSongForPlaylist.cover ?? "/placeholder.png"}
-//                   alt={selectedSongForPlaylist.title}
-//                   className="w-full h-full object-cover"
-//                 />
-//               </div>
-//               <div className="flex-1 min-w-0">
-//                 <p className="text-white text-sm truncate">
-//                   {selectedSongForPlaylist.title}
-//                 </p>
-//                 <p className="text-white/60 text-xs truncate">
-//                   {selectedSongForPlaylist.artist ??
-//                     selectedSongForPlaylist.artistName ??
-//                     selectedSongForPlaylist.userId ??
-//                     ""}
-//                 </p>
-//               </div>
-//             </div>
-
-//             {/* Error */}
-//             {addToPlaylistError && (
-//               <div className="mb-4 text-sm text-red-200 bg-red-500/10 border border-red-500/20 rounded-lg p-3">
-//                 {addToPlaylistError}
-//               </div>
-//             )}
-
-//             {/* Playlists list (backend) */}
-//             <div className="space-y-2 mb-6">
-//               {playlistsLoading ? (
-//                 <div className="text-white/70 text-sm bg-white/10 border border-white/15 rounded-lg p-3">
-//                   Loading playlists...
-//                 </div>
-//               ) : playlistsError ? (
-//                 <div className="text-white/70 text-sm bg-white/10 border border-white/15 rounded-lg p-3">
-//                   {playlistsError}
-//                 </div>
-//               ) : userPlaylists.length === 0 ? (
-//                 <div className="text-white/60 text-sm bg-white/10 border border-white/15 rounded-lg p-3 text-center">
-//                   {language === "spanish" && "No tienes playlists aún"}
-//                   {language === "english" && "You don't have any playlists yet"}
-//                   {language === "catalan" && "Encara no tens playlists"}
-//                 </div>
-//               ) : (
-//                 userPlaylists.map((playlist: any) => (
-//                   <button
-//                     style={{
-//                       outline: "3px solid #ffffff",
-//                       outlineOffset: "3px",
-//                     }}
-//                     key={playlist.id}
-//                     onClick={() => handleAddTrackToPlaylist(playlist.id)}
-//                     disabled={addingToPlaylist}
-//                     className={`cursor-pointer w-full p-3 rounded-lg text-left transition-all ${
-//                       addingToPlaylist
-//                         ? "bg-white/10 text-white/60 cursor-not-allowed"
-//                         : "bg-white/10 hover:bg-white/20 text-white"
-//                     }`}
-//                   >
-//                     <div className="flex items-center justify-between">
-//                       <span className="truncate">
-//                         {playlist.nom ?? playlist.name}
-//                       </span>
-//                       {addingToPlaylist && (
-//                         <span className="text-xs text-white/50">...</span>
-//                       )}
-//                     </div>
-
-//                     <span className="text-xs text-white/50">
-//                       {playlist.tracks?.length ?? playlist.songs?.length ?? 0}{" "}
-//                       {text.songs}
-//                     </span>
-//                   </button>
-//                 ))
-//               )}
-//             </div>
-
-//             <div className="flex gap-3">
-//               <button
-//                 style={{
-//                   outline: "3px solid #ffffff",
-//                   outlineOffset: "3px",
-//                 }}
-//                 onClick={async () => {
-//                   await fetchUserPlaylists();
-//                 }}
-//                 disabled={playlistsLoading}
-//                 className={`cursor-pointer flex-1 px-4 py-3 rounded-lg text-white transition-all ${
-//                   playlistsLoading
-//                     ? "bg-white/10 cursor-not-allowed"
-//                     : "bg-white/20 hover:bg-white/30"
-//                 }`}
-//               >
-//                 Refresh
-//               </button>
-
-//               <button
-//                 style={{
-//                   outline: "3px solid #ffffff",
-//                   outlineOffset: "3px",
-//                 }}
-//                 onClick={() => {
-//                   setShowAddToPlaylist(false);
-//                   setSelectedSongForPlaylist(null);
-//                   setAddToPlaylistError(null);
-//                 }}
-//                 className="cursor-pointer flex-1 px-4 py-3 bg-white/20 rounded-lg text-white hover:bg-white/30 transition-all"
-//               >
-//                 {text.cancel}
-//               </button>
-//             </div>
-//           </div>
-//         </div>
-//       )}
-//       <SubscriptionModal
-//         text={text}
-//         showSubscriptionModal={showSubscriptionModal}
-//         selectedArtistForSubscription={selectedArtistForSubscription}
-//         handleConfirmSubscriptionStripe={handleConfirmSubscriptionStripe}
-//         handleConfirmSubscriptionLygos={handleConfirmSubscriptionLygos}
-//         artistPlans={artistPlans}
-//         plansLoading={plansLoading}
-//         plansError={plansError}
-//         selectedPlanId={selectedPlanId}
-//         setSelectedPlanId={setSelectedPlanId}
-//         onClose={() => {
-//           setShowSubscriptionModal(false);
-//           setSelectedArtistForSubscription(null);
-//           setCardNumber("");
-//           setCardHolder("");
-//           setCardExpiry("");
-//           setCardCvc("");
-//           setPaypalEmail("");
-//         }}
-//       />
-//       {/* Accessibility Panel */}
-//       {/* Accessibility Panel */}
-//       {showAccessibility && (
-//         <div
-//           className="fixed inset-0 z-50"
-//           role="dialog"
-//           aria-modal="true"
-//           aria-labelledby="accessibility-title"
-//           onMouseDown={() => setShowAccessibility(false)} // clic backdrop ferme
-//         >
-//           {/* Backdrop */}
-//           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-
-//           {/* Panel */}
-//           <div
-//             className="
-//         absolute inset-x-0
-//         mx-auto
-//         w-[min(980px,calc(100%-1.5rem))]
-//         sm:w-[min(980px,calc(100%-2rem))]
-//         top-[calc(env(safe-area-inset-top)+0.75rem)]
-//         bottom-[calc(env(safe-area-inset-bottom)+0.75rem)]
-//         bg-black/80 backdrop-blur-xl
-//         rounded-2xl
-//         border border-white/30
-//         shadow-2xl
-//         overflow-hidden
-//         flex flex-col
-//       "
-//             onMouseDown={(e) => e.stopPropagation()} // empêche fermeture si clic dedans
-//           >
-//             {/* Sticky Header */}
-//             <div className="sticky top-0 z-10 bg-black/90 backdrop-blur-xl border-b border-white/20">
-//               <div className="flex items-center justify-between gap-3 p-4 sm:p-6">
-//                 <h2
-//                   id="accessibility-title"
-//                   className="text-lg sm:text-2xl text-white drop-shadow-lg flex items-center gap-3"
-//                 >
-//                   <svg
-//                     width="26"
-//                     height="26"
-//                     viewBox="0 0 24 24"
-//                     fill="none"
-//                     stroke="currentColor"
-//                     strokeWidth="2"
-//                     strokeLinecap="round"
-//                     strokeLinejoin="round"
-//                     className="text-white"
-//                   >
-//                     <circle cx="12" cy="12" r="10" />
-//                     <path d="M12 16v-4" />
-//                     <path d="M12 8h.01" />
-//                   </svg>
-//                   {text.accessibility}
-//                 </h2>
-
-//                 <button
-//                   type="button"
-//                   onClick={() => setShowAccessibility(false)}
-//                   className="rounded-lg p-2 hover:bg-white/10 text-white/70 hover:text-white transition-colors"
-//                   aria-label="Close accessibility panel"
-//                 >
-//                   <svg
-//                     width="22"
-//                     height="22"
-//                     viewBox="0 0 24 24"
-//                     fill="none"
-//                     stroke="currentColor"
-//                     strokeWidth="2"
-//                   >
-//                     <line x1="18" y1="6" x2="6" y2="18" />
-//                     <line x1="6" y1="6" x2="18" y2="18" />
-//                   </svg>
-//                 </button>
-//               </div>
-
-//               {/* Petit hint sur mobile */}
-//               <div className="px-4 sm:px-6 pb-3 text-white/50 text-xs">
-//                 {language === "english"
-//                   ? "Tip: Tap outside to close."
-//                   : language === "spanish"
-//                   ? "Consejo: toca fuera para cerrar."
-//                   : "Consell: toca fora per tancar."}
-//               </div>
-//             </div>
-
-//             {/* Scrollable Content */}
-//             <div className="flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6">
-//               {/* ✅ Layout responsive : 1 colonne mobile, 2 colonnes iPad/desktop */}
-//               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-//                 {/* ===================== LEFT COLUMN ===================== */}
-//                 <div className="space-y-6">
-//                   {/* Visual Accessibility (ton bloc inchangé) */}
-//                   <div className="space-y-4">
-//                     <h3 className="text-base sm:text-xl text-white drop-shadow flex items-center gap-2">
-//                       <svg
-//                         width="22"
-//                         height="22"
-//                         viewBox="0 0 24 24"
-//                         fill="none"
-//                         stroke="currentColor"
-//                         strokeWidth="2"
-//                       >
-//                         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-//                         <circle cx="12" cy="12" r="3" />
-//                       </svg>
-//                       {text.visualAccessibility}
-//                     </h3>
-
-//                     {/* Font Size */}
-//                     <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20">
-//                       <label className="text-white/90 mb-3 block text-sm sm:text-base">
-//                         {text.fontSize}
-//                       </label>
-//                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-//                         {(["small", "medium", "large", "xl"] as const).map(
-//                           (size) => (
-//                             <button
-//                               key={size}
-//                               type="button"
-//                               onClick={() => setFontSize(size)}
-//                               className={`px-4 py-2 rounded-lg transition-all text-sm sm:text-base ${
-//                                 fontSize === size
-//                                   ? "bg-white/30 text-white"
-//                                   : "bg-white/10 text-white/70 hover:bg-white/20"
-//                               }`}
-//                             >
-//                               {text[size === "xl" ? "extraLarge" : size]}
-//                             </button>
-//                           )
-//                         )}
-//                       </div>
-//                     </div>
-
-//                     {/* High Contrast */}
-//                     <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 flex items-center justify-between">
-//                       <div className="flex items-center gap-3">
-//                         <svg
-//                           width="20"
-//                           height="20"
-//                           viewBox="0 0 24 24"
-//                           fill="none"
-//                           stroke="currentColor"
-//                           strokeWidth="2"
-//                         >
-//                           <circle cx="12" cy="12" r="10" />
-//                           <path d="M12 2v20" />
-//                         </svg>
-//                         <span className="text-white/90 text-sm sm:text-base">
-//                           {text.highContrast}
-//                         </span>
-//                       </div>
-//                       <button
-//                         type="button"
-//                         onClick={() => setHighContrast(!highContrast)}
-//                         className={`w-14 h-8 rounded-full transition-all ${
-//                           highContrast ? "bg-green-500" : "bg-white/20"
-//                         }`}
-//                       >
-//                         <div
-//                           className={`w-6 h-6 bg-white rounded-full transition-transform ${
-//                             highContrast ? "translate-x-7" : "translate-x-1"
-//                           }`}
-//                         />
-//                       </button>
-//                     </div>
-
-//                     {/* Color Blind Mode */}
-//                     <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20">
-//                       <label className="text-white/90 mb-3 block text-sm sm:text-base">
-//                         {text.colorBlindMode}
-//                       </label>
-//                       <div className="grid grid-cols-2 gap-2">
-//                         {(
-//                           [
-//                             "none",
-//                             "protanopia",
-//                             "deuteranopia",
-//                             "tritanopia",
-//                           ] as const
-//                         ).map((mode) => (
-//                           <button
-//                             key={mode}
-//                             type="button"
-//                             onClick={() => setColorBlindMode(mode)}
-//                             className={`px-4 py-2 rounded-lg transition-all text-sm ${
-//                               colorBlindMode === mode
-//                                 ? "bg-white/30 text-white"
-//                                 : "bg-white/10 text-white/70 hover:bg-white/20"
-//                             }`}
-//                           >
-//                             {text[mode]}
-//                           </button>
-//                         ))}
-//                       </div>
-//                     </div>
-
-//                     {/* Reduce Motion */}
-//                     <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 flex items-center justify-between">
-//                       <div className="flex items-center gap-3">
-//                         <svg
-//                           width="20"
-//                           height="20"
-//                           viewBox="0 0 24 24"
-//                           fill="none"
-//                           stroke="currentColor"
-//                           strokeWidth="2"
-//                         >
-//                           <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-//                         </svg>
-//                         <span className="text-white/90 text-sm sm:text-base">
-//                           {text.reduceMotion}
-//                         </span>
-//                       </div>
-//                       <button
-//                         type="button"
-//                         onClick={() => setReduceMotion(!reduceMotion)}
-//                         className={`w-14 h-8 rounded-full transition-all ${
-//                           reduceMotion ? "bg-green-500" : "bg-white/20"
-//                         }`}
-//                       >
-//                         <div
-//                           className={`w-6 h-6 bg-white rounded-full transition-transform ${
-//                             reduceMotion ? "translate-x-7" : "translate-x-1"
-//                           }`}
-//                         />
-//                       </button>
-//                     </div>
-
-//                     {/* Dyslexia Font */}
-//                     <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 flex items-center justify-between">
-//                       <div className="flex items-center gap-3">
-//                         <svg
-//                           width="20"
-//                           height="20"
-//                           viewBox="0 0 24 24"
-//                           fill="none"
-//                           stroke="currentColor"
-//                           strokeWidth="2"
-//                         >
-//                           <path d="M4 7V4h16v3" />
-//                           <path d="M9 20h6" />
-//                           <path d="M12 4v16" />
-//                         </svg>
-//                         <span className="text-white/90 text-sm sm:text-base">
-//                           {text.dyslexiaFont}
-//                         </span>
-//                       </div>
-//                       <button
-//                         type="button"
-//                         onClick={() => setDyslexiaFont(!dyslexiaFont)}
-//                         className={`w-14 h-8 rounded-full transition-all ${
-//                           dyslexiaFont ? "bg-green-500" : "bg-white/20"
-//                         }`}
-//                       >
-//                         <div
-//                           className={`w-6 h-6 bg-white rounded-full transition-transform ${
-//                             dyslexiaFont ? "translate-x-7" : "translate-x-1"
-//                           }`}
-//                         />
-//                       </button>
-//                     </div>
-//                   </div>
-//                 </div>
-
-//                 {/* ===================== RIGHT COLUMN ===================== */}
-//                 <div className="space-y-6">
-//                   {/* Hearing Accessibility (ton bloc inchangé, juste responsive titres) */}
-//                   <div className="space-y-4">
-//                     <h3 className="text-base sm:text-xl text-white drop-shadow flex items-center gap-2">
-//                       <svg
-//                         width="22"
-//                         height="22"
-//                         viewBox="0 0 24 24"
-//                         fill="none"
-//                         stroke="currentColor"
-//                         strokeWidth="2"
-//                       >
-//                         <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
-//                         <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-//                         <line x1="12" y1="19" x2="12" y2="22" />
-//                       </svg>
-//                       {text.hearingAccessibility}
-//                     </h3>
-
-//                     {/* Captions */}
-//                     <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 flex items-center justify-between">
-//                       <div className="flex items-center gap-3">
-//                         <svg
-//                           width="20"
-//                           height="20"
-//                           viewBox="0 0 24 24"
-//                           fill="none"
-//                           stroke="currentColor"
-//                           strokeWidth="2"
-//                         >
-//                           <rect x="2" y="4" width="20" height="16" rx="2" />
-//                           <path d="M8 10h.01" />
-//                           <path d="M12 10h.01" />
-//                           <path d="M16 10h.01" />
-//                           <path d="M8 14h8" />
-//                         </svg>
-//                         <div>
-//                           <span className="text-white/90 block text-sm sm:text-base">
-//                             {text.captions}
-//                           </span>
-//                           <span className="text-white/50 text-xs">
-//                             {text.signLanguage}
-//                           </span>
-//                         </div>
-//                       </div>
-//                       <button
-//                         type="button"
-//                         onClick={() => setShowCaptions(!showCaptions)}
-//                         className={`w-14 h-8 rounded-full transition-all ${
-//                           showCaptions ? "bg-green-500" : "bg-white/20"
-//                         }`}
-//                       >
-//                         <div
-//                           className={`w-6 h-6 bg-white rounded-full transition-transform ${
-//                             showCaptions ? "translate-x-7" : "translate-x-1"
-//                           }`}
-//                         />
-//                       </button>
-//                     </div>
-
-//                     {/* Visual Notifications */}
-//                     <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 flex items-center justify-between">
-//                       <div className="flex items-center gap-3">
-//                         <svg
-//                           width="20"
-//                           height="20"
-//                           viewBox="0 0 24 24"
-//                           fill="none"
-//                           stroke="currentColor"
-//                           strokeWidth="2"
-//                         >
-//                           <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-//                           <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-//                         </svg>
-//                         <span className="text-white/90 text-sm sm:text-base">
-//                           {text.visualNotifications}
-//                         </span>
-//                       </div>
-//                       <button
-//                         type="button"
-//                         onClick={() =>
-//                           setVisualNotifications(!visualNotifications)
-//                         }
-//                         className={`w-14 h-8 rounded-full transition-all ${
-//                           visualNotifications ? "bg-green-500" : "bg-white/20"
-//                         }`}
-//                       >
-//                         <div
-//                           className={`w-6 h-6 bg-white rounded-full transition-transform ${
-//                             visualNotifications
-//                               ? "translate-x-7"
-//                               : "translate-x-1"
-//                           }`}
-//                         />
-//                       </button>
-//                     </div>
-
-//                     {/* Text to Speech */}
-//                     <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 flex items-center justify-between">
-//                       <div className="flex items-center gap-3">
-//                         <svg
-//                           width="20"
-//                           height="20"
-//                           viewBox="0 0 24 24"
-//                           fill="none"
-//                           stroke="currentColor"
-//                           strokeWidth="2"
-//                         >
-//                           <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-//                           <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
-//                           <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
-//                         </svg>
-//                         <span className="text-white/90 text-sm sm:text-base">
-//                           {text.textToSpeech}
-//                         </span>
-//                       </div>
-//                       <button
-//                         type="button"
-//                         onClick={() => setTextToSpeech(!textToSpeech)}
-//                         className={`w-14 h-8 rounded-full transition-all ${
-//                           textToSpeech ? "bg-green-500" : "bg-white/20"
-//                         }`}
-//                       >
-//                         <div
-//                           className={`w-6 h-6 bg-white rounded-full transition-transform ${
-//                             textToSpeech ? "translate-x-7" : "translate-x-1"
-//                           }`}
-//                         />
-//                       </button>
-//                     </div>
-//                   </div>
-
-//                   {/* Motor + Cognitive = restent en colonne droite (tu peux garder exactement tes blocs) */}
-//                   {/* ⚠️ Ici tu colles tes sections Motor Accessibility + Cognitive Accessibility inchangées */}
-//                 </div>
-//               </div>
-//             </div>
-
-//             {/* Optional footer sticky (si tu veux des actions plus tard) */}
-//             <div className="border-t border-white/10 bg-black/70 px-4 sm:px-6 py-3 text-xs text-white/50">
-//               {language === "english"
-//                 ? "Changes are applied instantly."
-//                 : language === "spanish"
-//                 ? "Los cambios se aplican al instante."
-//                 : "Els canvis s'apliquen a l'instant."}
-//             </div>
-//           </div>
-//         </div>
-//       )}
-
-//       {/* Lyrics Panel */}
-//       {showLyrics && currentSong && (
-//         <div
-//           className={`fixed inset-x-0 z-[85] px-3 sm:px-4 md:px-6 ${
-//             // sur mobile on monte plus haut pour ne pas masquer le player
-//             currentSong
-//               ? "bottom-[160px] sm:bottom-28"
-//               : "bottom-24 sm:bottom-28"
-//           }`}
-//         >
-//           <div className="mx-auto w-full max-w-md sm:max-w-lg bg-black/70 backdrop-blur-xl rounded-2xl border border-white/20 overflow-hidden shadow-2xl">
-//             {/* Header */}
-//             <div className="p-3 sm:p-4 border-b border-white/10 flex items-center justify-between gap-2">
-//               <h3 className="text-white drop-shadow text-xs sm:text-sm line-clamp-2">
-//                 {text.lyrics} - {currentSong.title}
-//               </h3>
-//               <button
-//                 onClick={() => setShowLyrics(false)}
-//                 className="text-white/60 hover:text-white transition-colors flex-shrink-0 cursor-pointer"
-//                 aria-label="Close lyrics"
-//               >
-//                 <svg
-//                   width="18"
-//                   height="18"
-//                   viewBox="0 0 24 24"
-//                   fill="none"
-//                   stroke="currentColor"
-//                   strokeWidth="2"
-//                   strokeLinecap="round"
-//                   strokeLinejoin="round"
-//                 >
-//                   <line x1="18" y1="6" x2="6" y2="18" />
-//                   <line x1="6" y1="6" x2="18" y2="18" />
-//                 </svg>
-//               </button>
-//             </div>
-
-//             {/* Toggle between Text and Sign Language */}
-//             {currentSong.signLanguageVideoUrl && (
-//               <div className="flex p-2 border-b border-white/10 gap-2">
-//                 <button
-//                   onClick={() => setLyricsViewMode("text")}
-//                   className={`cursor-pointer flex-1 py-1.5 sm:py-2 px-2 sm:px-3 rounded-lg text-xs sm:text-sm transition-all ${
-//                     lyricsViewMode === "text"
-//                       ? "bg-white/20 text-white"
-//                       : "text-white/60 hover:bg-white/10"
-//                   }`}
-//                 >
-//                   <FileText size={14} className="inline mr-1 sm:mr-2" />
-//                   {text.textLyrics}
-//                 </button>
-
-//                 <button
-//                   onClick={() => setLyricsViewMode("sign")}
-//                   className={`cursor-pointer flex-1 py-1.5 sm:py-2 px-2 sm:px-3 rounded-lg text-xs sm:text-sm transition-all ${
-//                     lyricsViewMode === "sign"
-//                       ? "bg-white/20 text-white"
-//                       : "text-white/60 hover:bg-white/10"
-//                   }`}
-//                 >
-//                   <svg
-//                     width="14"
-//                     height="14"
-//                     viewBox="0 0 24 24"
-//                     fill="none"
-//                     stroke="currentColor"
-//                     strokeWidth="2"
-//                     className="inline mr-1 sm:mr-2"
-//                   >
-//                     <path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0" />
-//                     <path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2" />
-//                     <path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8" />
-//                     <path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15" />
-//                   </svg>
-//                   {text.signLanguage}
-//                 </button>
-//               </div>
-//             )}
-
-//             {/* Content Area */}
-//             <div className="p-4 sm:p-6 overflow-y-auto max-h-[45vh] sm:max-h-[60vh]">
-//               {lyricsViewMode === "text" ? (
-//                 // Text Lyrics
-//                 <div className="text-white/80 text-xs sm:text-sm leading-relaxed space-y-3 sm:space-y-4">
-//                   {currentSong.lyrics ? (
-//                     currentSong.lyrics
-//                       .split("\n\n")
-//                       .map((paragraph: string, idx: number) => (
-//                         <p key={idx}>
-//                           {paragraph
-//                             .split("\n")
-//                             .map((line: string, lineIdx: number, arr) => (
-//                               <React.Fragment key={lineIdx}>
-//                                 {line}
-//                                 {lineIdx < arr.length - 1 && <br />}
-//                               </React.Fragment>
-//                             ))}
-//                         </p>
-//                       ))
-//                   ) : (
-//                     <p className="text-white/50 italic text-center">
-//                       {language === "spanish" &&
-//                         "No hay letras disponibles para esta canción"}
-//                       {language === "english" &&
-//                         "No lyrics available for this song"}
-//                       {language === "catalan" &&
-//                         "No hi ha lletres disponibles per aquesta cançó"}
-//                     </p>
-//                   )}
-
-//                   {/* Braille file link (optionnel) */}
-//                   {currentSong.brailleFileUrl && (
-//                     <a
-//                       href={currentSong.brailleFileUrl}
-//                       target="_blank"
-//                       rel="noreferrer"
-//                       className="inline-flex items-center gap-2 mt-2 text-white/80 text-xs px-3 py-2 rounded-lg bg-white/10 hover:bg-white/15 border border-white/10 transition-all"
-//                     >
-//                       <svg
-//                         width="14"
-//                         height="14"
-//                         viewBox="0 0 24 24"
-//                         fill="none"
-//                         stroke="currentColor"
-//                         strokeWidth="2"
-//                       >
-//                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-//                         <polyline points="14 2 14 8 20 8" />
-//                       </svg>
-//                       {language === "spanish" && "Abrir archivo Braille"}
-//                       {language === "english" && "Open Braille file"}
-//                       {language === "catalan" && "Obrir fitxer Braille"}
-//                     </a>
-//                   )}
-
-//                   <p className="text-white/40 text-[10px] sm:text-xs italic mt-4 sm:mt-6">
-//                     {language === "spanish" &&
-//                       "Las letras se proporcionan solo con fines educativos"}
-//                     {language === "english" &&
-//                       "Lyrics provided for educational purposes only"}
-//                     {language === "catalan" &&
-//                       "Les lletres es proporcionen només amb finalitats educatives"}
-//                   </p>
-//                 </div>
-//               ) : (
-//                 // Sign Language Video
-//                 <div>
-//                   {currentSong.signLanguageVideoUrl ? (
-//                     <div className="relative aspect-video rounded-lg overflow-hidden bg-black border border-white/20">
-//                       <video
-//                         src={currentSong.signLanguageVideoUrl}
-//                         controls
-//                         className="w-full h-full object-contain"
-//                       />
-//                     </div>
-//                   ) : (
-//                     <p className="text-white/50 italic text-xs sm:text-sm text-center py-6 sm:py-8">
-//                       {language === "spanish" &&
-//                         "No hay video en lenguaje de signos disponible"}
-//                       {language === "english" &&
-//                         "No sign language video available"}
-//                       {language === "catalan" &&
-//                         "No hi ha vídeo en llengua de signes disponible"}
-//                     </p>
-//                   )}
-
-//                   <p className="text-white/40 text-[10px] sm:text-xs italic mt-3 sm:mt-4">
-//                     {language === "spanish" &&
-//                       "Video en lenguaje de signos proporcionado por el artista"}
-//                     {language === "english" &&
-//                       "Sign language video provided by the artist"}
-//                     {language === "catalan" &&
-//                       "Vídeo en llengua de signes proporcionat per l'artista"}
-//                   </p>
-//                 </div>
-//               )}
-//             </div>
-//           </div>
-//         </div>
-//       )}
-
-//       {/*Player */}
-//       {currentSong && (
-//         <div
-//           className="fixed left-0 right-0 z-20 bg-black/40 backdrop-blur-xl border-t border-white/10"
-//           style={{ bottom: "env(safe-area-inset-bottom)" }}
-//         >
-//           <div className="px-3 sm:px-4 py-3">
-//             {/* ===== DESKTOP: 3 columns (left / center / right) ===== */}
-//             <div className="hidden md:grid grid-cols-[1fr_auto_1fr] items-center gap-3">
-//               {/* LEFT : Song info */}
-//               <div className="flex items-center gap-3 min-w-0">
-//                 <div className="w-11 h-11 bg-white/5 rounded-lg overflow-hidden flex-shrink-0">
-//                   <img
-//                     src={
-//                       currentSong.coverUrl ??
-//                       currentSong.cover ??
-//                       "/placeholder.png"
-//                     }
-//                     alt={currentSong.title}
-//                     className="w-full h-full object-cover"
-//                   />
-//                 </div>
-
-//                 <div className="min-w-0">
-//                   <h4 className="text-white text-sm sm:text-base truncate">
-//                     {currentSong.title}
-//                   </h4>
-//                   <p className="text-white text-xs sm:text-sm truncate">
-//                     {currentSong.artistName ??
-//                       currentSong.artist ??
-//                       currentSong.userId ??
-//                       ""}
-//                   </p>
-//                 </div>
-//               </div>
-
-//               {/* CENTER : Controls + Progress (always centered) */}
-//               <div className="flex flex-col items-center justify-center min-w-[300px]">
-//                 <div className="flex items-center gap-4">
-//                   <button
-//                     onClick={handlePrevFromQueue1}
-//                     className={`text-white/80 hover:text-white cursor-pointer ${animationClasses}`}
-//                     aria-label="Previous"
-//                   >
-//                     <SkipBack size={largerTargets ? 28 : 20} />
-//                   </button>
-
-//                   <button
-//                     onClick={() =>
-//                       currentSong && handlePlaySong(currentSong, queue)
-//                     }
-//                     className="cursor-pointer flex items-center justify-center p-3 bg-white/20 rounded-full hover:bg-white/30 transition"
-//                     aria-label={isPlaying ? text.pause : text.play}
-//                     title={isPlaying ? text.pause : text.play}
-//                   >
-//                     {isPlaying ? (
-//                       <Pause
-//                         size={largerTargets ? 30 : 22}
-//                         className="text-white"
-//                       />
-//                     ) : (
-//                       <Play
-//                         size={largerTargets ? 30 : 22}
-//                         className="text-white"
-//                       />
-//                     )}
-//                   </button>
-
-//                   <button
-//                     onClick={handleNextFromQueue1}
-//                     className={`text-white/80 hover:text-white cursor-pointer ${animationClasses}`}
-//                     aria-label="Next"
-//                   >
-//                     <SkipForward size={largerTargets ? 28 : 20} />
-//                   </button>
-//                 </div>
-
-//                 <div className="mt-2 flex items-center gap-2 w-full">
-//                   <span className="text-white/60 text-[11px] w-10 text-right tabular-nums">
-//                     {formatTime(currentTime)}
-//                   </span>
-//                   <input
-//                     type="range"
-//                     min={0}
-//                     max={duration ?? 0}
-//                     step={0.1}
-//                     value={currentTime}
-//                     onChange={handleSeek}
-//                     className="w-full accent-white"
-//                   />
-//                   <span className="text-white/60 text-[11px] w-10 tabular-nums">
-//                     {formatTime(duration)}
-//                   </span>
-//                 </div>
-//               </div>
-
-//               {/* RIGHT : Actions */}
-//               <div className="flex items-center justify-end gap-3">
-//                 <span className="text-white/60 text-xs">
-//                   {currentSong.duration ?? ""}
-//                 </span>
-
-//                 <button
-//                   onClick={() => {
-//                     setLyricsViewMode("text");
-//                     setShowLyrics(true);
-//                   }}
-//                   className="text-white/80 hover:text-white cursor-pointer"
-//                   aria-label={text.lyrics}
-//                   title={text.lyrics}
-//                 >
-//                   <FileText size={18} />
-//                 </button>
-
-//                 <button
-//                   onClick={toggleMute}
-//                   className="text-white/80 hover:text-white cursor-pointer"
-//                   aria-label="Volume"
-//                   title={isMuted ? "Unmute" : "Mute"}
-//                 >
-//                   <Volume2 size={18} />
-//                 </button>
-
-//                 <input
-//                   type="range"
-//                   min={0}
-//                   max={1}
-//                   step={0.01}
-//                   value={isMuted ? 0 : volume}
-//                   onChange={(e) => {
-//                     setIsMuted(false);
-//                     setVolume(Number(e.target.value));
-//                   }}
-//                   className="w-20 accent-white"
-//                   aria-label="Volume slider"
-//                 />
-
-//                 <button
-//                   onClick={() => toggleFavorite(currentSong.id)}
-//                   className="text-white/80 hover:text-white cursor-pointer"
-//                   aria-label={text.addToFavorites}
-//                   title={text.addToFavorites}
-//                 >
-//                   <Heart
-//                     size={18}
-//                     className={
-//                       favoriteTrackIds.includes(String(currentSong.id))
-//                         ? "text-red-400 fill-red-400"
-//                         : "text-white"
-//                     }
-//                   />
-//                 </button>
-//               </div>
-//             </div>
-
-//             {/* ===== MOBILE: center always centered + options row below ===== */}
-//             <div className="md:hidden">
-//               {/* Center (always centered) */}
-//               <div className="flex flex-col items-center justify-center">
-//                 <div className="flex items-center gap-4">
-//                   <button
-//                     onClick={handlePrevFromQueue1}
-//                     className={`text-white/80 hover:text-white cursor-pointer ${animationClasses}`}
-//                     aria-label="Previous"
-//                   >
-//                     <SkipBack size={largerTargets ? 28 : 20} />
-//                   </button>
-
-//                   <button
-//                     onClick={() =>
-//                       currentSong && handlePlaySong(currentSong, queue)
-//                     }
-//                     className="cursor-pointer flex items-center justify-center p-3 bg-white/20 rounded-full hover:bg-white/30 transition"
-//                     aria-label={isPlaying ? text.pause : text.play}
-//                     title={isPlaying ? text.pause : text.play}
-//                   >
-//                     {isPlaying ? (
-//                       <Pause
-//                         size={largerTargets ? 30 : 22}
-//                         className="text-white"
-//                       />
-//                     ) : (
-//                       <Play
-//                         size={largerTargets ? 30 : 22}
-//                         className="text-white"
-//                       />
-//                     )}
-//                   </button>
-
-//                   <button
-//                     onClick={handleNextFromQueue1}
-//                     className={`text-white/80 hover:text-white cursor-pointer ${animationClasses}`}
-//                     aria-label="Next"
-//                   >
-//                     <SkipForward size={largerTargets ? 28 : 20} />
-//                   </button>
-//                 </div>
-
-//                 <div className="mt-2 flex items-center gap-2 w-full">
-//                   <span className="text-white/60 text-[11px] w-10 text-right tabular-nums">
-//                     {formatTime(currentTime)}
-//                   </span>
-//                   <input
-//                     type="range"
-//                     min={0}
-//                     max={duration ?? 0}
-//                     step={0.1}
-//                     value={currentTime}
-//                     onChange={handleSeek}
-//                     className="w-full accent-white"
-//                   />
-//                   <span className="text-white/60 text-[11px] w-10 tabular-nums">
-//                     {formatTime(duration)}
-//                   </span>
-//                 </div>
-//               </div>
-
-//               {/* Song info + Actions row (visible on mobile) */}
-//               <div className="mt-3 flex items-center justify-between gap-3">
-//                 {/* Left info */}
-//                 <div className="flex items-center gap-2 min-w-0">
-//                   <div className="w-9 h-9 bg-white/5 rounded-md overflow-hidden flex-shrink-0">
-//                     <img
-//                       src={
-//                         currentSong.coverUrl ??
-//                         currentSong.cover ??
-//                         "/placeholder.png"
-//                       }
-//                       alt={currentSong.title}
-//                       className="w-full h-full object-cover"
-//                     />
-//                   </div>
-//                   <div className="min-w-0">
-//                     <p className="text-white text-xs truncate">
-//                       {currentSong.title}
-//                     </p>
-//                     <p className="text-white/60 text-[11px] truncate">
-//                       {currentSong.artistName ??
-//                         currentSong.artist ??
-//                         currentSong.userId ??
-//                         ""}
-//                     </p>
-//                   </div>
-//                 </div>
-
-//                 {/* Right actions */}
-//                 <div className="flex items-center gap-2 flex-shrink-0">
-//                   <button
-//                     onClick={() => {
-//                       setLyricsViewMode("text");
-//                       setShowLyrics(true);
-//                     }}
-//                     className="text-white/80 hover:text-white"
-//                     aria-label={text.lyrics}
-//                     title={text.lyrics}
-//                   >
-//                     <FileText size={18} />
-//                   </button>
-
-//                   <button
-//                     onClick={toggleMute}
-//                     className="text-white/80 hover:text-white"
-//                     aria-label="Volume"
-//                     title={isMuted ? "Unmute" : "Mute"}
-//                   >
-//                     <Volume2 size={18} />
-//                   </button>
-
-//                   <input
-//                     type="range"
-//                     min={0}
-//                     max={1}
-//                     step={0.01}
-//                     value={isMuted ? 0 : volume}
-//                     onChange={(e) => {
-//                       setIsMuted(false);
-//                       setVolume(Number(e.target.value));
-//                     }}
-//                     className="w-20 accent-white"
-//                     aria-label="Volume slider"
-//                   />
-
-//                   <button
-//                     onClick={() => toggleFavorite(currentSong.id)}
-//                     className="text-white/80 hover:text-white"
-//                     aria-label={text.addToFavorites}
-//                     title={text.addToFavorites}
-//                   >
-//                     <Heart
-//                       size={18}
-//                       className={
-//                         favoriteTrackIds.includes(String(currentSong.id))
-//                           ? "text-red-400 fill-red-400"
-//                           : "text-white"
-//                       }
-//                     />
-//                   </button>
-//                 </div>
-//               </div>
-//             </div>
-//           </div>
-//         </div>
-//       )}
-
-//       {/* ===================== DRAWER (Genre/Mood Results) ===================== */}
-//       {drawerOpen && (
-//         <div className="fixed inset-0 z-[40]">
-//           {/* Backdrop */}
-//           <button
-//             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-//             onClick={closeDrawer}
-//             aria-label="Close drawer"
-//           />
-
-//           {/* Drawer */}
-//           <aside
-//             className="
-//                         absolute right-0 top-0 h-full w-full sm:w-[560px]
-//                         bg-black/85 backdrop-blur-xl
-//                         border-l border-white/20
-//                         shadow-2xl
-//                         flex flex-col
-//                       "
-//             role="dialog"
-//             aria-modal="true"
-//             aria-label="Tracks drawer"
-//           >
-//             {/* Header */}
-//             <div className="sticky top-0 z-10 bg-black/70 backdrop-blur-xl border-b border-white/15">
-//               <div className="p-4 flex items-center justify-between gap-3">
-//                 <div className="min-w-0">
-//                   <p className="text-white/60 text-xs">
-//                     {drawerType === "genre" ? "Genre" : "Mood"}
-//                   </p>
-//                   <h3 className="text-white text-lg font-semibold truncate">
-//                     {drawerTitle}
-//                   </h3>
-//                 </div>
-
-//                 <button
-//                   onClick={closeDrawer}
-//                   className="p-2 rounded-lg hover:bg-white/10 text-white/80 cursor-pointer"
-//                   aria-label="Close"
-//                 >
-//                   <svg
-//                     width="20"
-//                     height="20"
-//                     viewBox="0 0 24 24"
-//                     fill="none"
-//                     stroke="currentColor"
-//                     strokeWidth="2"
-//                   >
-//                     <line x1="18" y1="6" x2="6" y2="18" />
-//                     <line x1="6" y1="6" x2="18" y2="18" />
-//                   </svg>
-//                 </button>
-//               </div>
-
-//               {/* Mini toolbar */}
-//               <div className="px-4 pb-4 flex items-center justify-between gap-3">
-//                 <div className="text-white/50 text-xs">
-//                   {loadingTracks
-//                     ? `${text.loading}`
-//                     : `${savedTracks.length} ${text.track}(s)`}
-//                 </div>
-
-//                 <button
-//                   onClick={() => {
-//                     // refresh selon le type du drawer
-//                     if (drawerType === "genre" && selectedGenreName) {
-//                       handleSelectGenre(selectedGenreName);
-//                     }
-//                     if (drawerType === "mood" && selectedMoodName) {
-//                       handleSelectMood(selectedMoodName);
-//                     }
-//                   }}
-//                   disabled={loadingTracks}
-//                   className={`px-3 py-2 rounded-lg cursor-pointer text-xs text-white transition-all border border-white/15
-//               ${
-//                 loadingTracks
-//                   ? "opacity-50 cursor-not-allowed"
-//                   : "bg-white/10 hover:bg-white/15"
-//               }
-//             `}
-//                 >
-//                   {text.refresh}
-//                 </button>
-//               </div>
-//             </div>
-
-//             {/* Body */}
-//             <div className="flex-1 overflow-y-auto overscroll-contain p-4 space-y-3">
-//               {/* Loading state */}
-//               {loadingTracks && (
-//                 <div className="bg-white/10 border border-white/15 rounded-xl p-4">
-//                   <div className="flex items-center gap-3">
-//                     <div className="w-3 h-3 rounded-full bg-white/60 animate-pulse" />
-//                     <p className="text-white/70 text-sm">
-//                       {text.loadingTracks}
-//                     </p>
-//                   </div>
-
-//                   <div className="mt-4 space-y-3">
-//                     {[...Array(5)].map((_, idx) => (
-//                       <div
-//                         key={idx}
-//                         className="h-16 rounded-lg bg-white/5 animate-pulse"
-//                       />
-//                     ))}
-//                   </div>
-//                 </div>
-//               )}
-
-//               {/* Error state */}
-//               {!loadingTracks && tracksError && (
-//                 <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4">
-//                   <p className="text-white/90 text-sm font-semibold">
-//                     {text.loadingError}
-//                   </p>
-//                   <p className="text-white/70 text-sm mt-1">{tracksError}</p>
-
-//                   <button
-//                     onClick={() => {
-//                       if (drawerType === "genre" && selectedGenreName) {
-//                         handleSelectGenre(selectedGenreName);
-//                       }
-//                       if (drawerType === "mood" && selectedMoodName) {
-//                         handleSelectMood(selectedMoodName);
-//                       }
-//                     }}
-//                     className="cursor-pointer mt-4 px-4 py-2 rounded-lg bg-white/15 hover:bg-white/25 text-white text-sm transition-all"
-//                   >
-//                     {text.retry}
-//                   </button>
-//                 </div>
-//               )}
-
-//               {/* Empty state */}
-//               {!loadingTracks && !tracksError && savedTracks.length === 0 && (
-//                 <div className="bg-white/10 border border-white/15 rounded-xl p-8 text-center">
-//                   <p className="text-white/80 font-semibold">
-//                     {text.noTracksFound}
-//                   </p>
-//                   <p className="text-white/60 text-sm mt-2">
-//                     {text.tryAnother}{" "}
-//                     {drawerType === "genre" ? "genre" : "mood"}.
-//                   </p>
-//                 </div>
-//               )}
-
-//               {/* Tracks list */}
-//               {!loadingTracks &&
-//                 !tracksError &&
-//                 filteredDrawerTracks.map((song: any) => {
-//                   const isCurrent = currentSong?.id === song.id;
-//                   const playing = isPlaying && isCurrent;
-
-//                   return (
-//                     <div
-//                       key={song.id}
-//                       className="bg-white/10 hover:bg-white/15 border border-white/15 rounded-xl p-3 flex items-start gap-3 transition-all"
-//                     >
-//                       {/* Cover placeholder */}
-//                       <div className="w-12 h-12 bg-white/5 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center text-white/40 mt-1">
-//                         <svg
-//                           width="20"
-//                           height="20"
-//                           viewBox="0 0 24 24"
-//                           fill="none"
-//                           stroke="currentColor"
-//                           strokeWidth="2"
-//                         >
-//                           <path d="M9 18V5l12-2v13" />
-//                           <circle cx="6" cy="18" r="3" />
-//                           <circle cx="18" cy="16" r="3" />
-//                         </svg>
-//                       </div>
-
-//                       <div className="flex-1 min-w-0">
-//                         <p className="text-white truncate">{song.title}</p>
-
-//                         <p className="text-white/60 text-xs truncate">
-//                           {song.artistName ??
-//                             song.artist ??
-//                             song.userId ??
-//                             song.artistId ??
-//                             ""}
-//                         </p>
-
-//                         {/* Accessibility + links */}
-//                         <div className="mt-2 flex flex-wrap gap-2">
-//                           <button
-//                             onClick={() => setShowLyrics(!showLyrics)}
-//                             className={`
-//                                         text-white/80 hover:text-white cursor-pointer
-//                                         ${animationClasses} ${buttonSizeClasses}
-//                                         ${showLyrics ? "text-white" : ""}
-//                                       `}
-//                             title={text.lyrics}
-//                             aria-label={text.lyrics}
-//                           >
-//                             <FileText size={largerTargets ? 28 : 22} />
-//                           </button>
-//                         </div>
-//                       </div>
-
-//                       {/* Controls */}
-//                       <div className="flex items-center gap-2 pt-1">
-//                         <button
-//                           onClick={() => handlePlaySong(song)}
-//                           className="cursor-pointer p-3 bg-white/15 hover:bg-white/25 rounded-full transition-all"
-//                           aria-label={playing ? "Pause" : "Play"}
-//                           title={playing ? "Pause" : "Play"}
-//                         >
-//                           {playing ? (
-//                             <svg
-//                               width="18"
-//                               height="18"
-//                               viewBox="0 0 24 24"
-//                               fill="none"
-//                               stroke="currentColor"
-//                               strokeWidth="2"
-//                               className="text-white"
-//                             >
-//                               <rect x="6" y="4" width="4" height="16" />
-//                               <rect x="14" y="4" width="4" height="16" />
-//                             </svg>
-//                           ) : (
-//                             <svg
-//                               width="18"
-//                               height="18"
-//                               viewBox="0 0 24 24"
-//                               fill="none"
-//                               stroke="currentColor"
-//                               strokeWidth="2"
-//                               className="text-white"
-//                             >
-//                               <polygon points="5 3 19 12 5 21 5 3" />
-//                             </svg>
-//                           )}
-//                         </button>
-//                       </div>
-//                       <audio
-//                         id={`fan-audio-${song.id}`}
-//                         src={song.audioUrl}
-//                         preload="none"
-//                       />
-//                     </div>
-//                   );
-//                 })}
-//             </div>
-
-//             {/* Footer */}
-//             <div className="p-4 border-t border-white/15 bg-black/70 backdrop-blur-xl flex items-center justify-between gap-3">
-//               <button
-//                 onClick={closeDrawer}
-//                 className="px-4 py-2 cursor-pointer rounded-lg bg-white/10 hover:bg-white/15 text-white transition-all"
-//               >
-//                 {text.close}
-//               </button>
-
-//               <button
-//                 onClick={() => {
-//                   setSavedTracks([]);
-//                   setTracksError(null);
-//                   setSelectedGenreName(null);
-//                   setSelectedMoodName(null);
-//                   closeDrawer();
-//                 }}
-//                 className="cursor-pointer px-4 py-2 rounded-lg bg-white/20 hover:bg-white/30 text-white transition-all"
-//               >
-//                 {text.clear}
-//               </button>
-//             </div>
-//           </aside>
-//         </div>
-//       )}
-
-//       <ArtistProfileModal
-//         isOpen={isProfileOpen}
-//         onClose={closeArtistProfile}
-//         artist={selectedArtist}
-//       />
-
-//       <audio ref={audioRef} preload="none" />
-//     </div>
-//   );
-// }
