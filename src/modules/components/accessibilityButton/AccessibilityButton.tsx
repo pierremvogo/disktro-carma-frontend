@@ -43,7 +43,6 @@ export function AccessibilityButton({ language }: { language: Language }) {
   const [voiceControl, setVoiceControl] = useState(false);
   const [focusMode, setFocusMode] = useState(false);
   const [readingGuide, setReadingGuide] = useState(false);
-  const [showAccessibility, setShowAccessibility] = useState(false);
   const [fontSize, setFontSize] = useState<"small" | "medium" | "large" | "xl">(
     "medium",
   );
@@ -58,16 +57,19 @@ export function AccessibilityButton({ language }: { language: Language }) {
   const [largerTargets, setLargerTargets] = useState(false);
   const [dyslexiaFont, setDyslexiaFont] = useState(false);
 
+  // Remove the document-level classes when the button unmounts, otherwise a
+  // setting stays applied on pages that have no control to turn it off.
   useEffect(() => {
-    if (!showAccessibility) return;
-
-    const onKeyDown = (e: any) => {
-      if (e.key === "Escape") setShowAccessibility(false);
+    return () => {
+      document.documentElement.classList.remove(
+        "keyboard-nav",
+        "larger-buttons",
+        "voice-control",
+        "focus-mode",
+        "reading-guide",
+      );
     };
-
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [showAccessibility]);
+  }, []);
 
   const text = {
     english: {
@@ -576,8 +578,12 @@ export function AccessibilityButton({ language }: { language: Language }) {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, [readingGuide]);
 
+  // A drag must not also toggle the popover when the mouse is released.
+  const didDragRef = React.useRef(false);
+
   // ✅ Only start dragging if user clicked the BUTTON (not the popover)
   const handleMouseDown = (e: React.MouseEvent) => {
+    didDragRef.current = false;
     const clickedButton = (e.target as HTMLElement).closest(
       `button[aria-label="${content.aria.open}"]`,
     );
@@ -598,6 +604,7 @@ export function AccessibilityButton({ language }: { language: Language }) {
     if (!isDragging) return;
 
     const handleMouseMove = (e: MouseEvent) => {
+      didDragRef.current = true;
       const x = e.clientX - dragOffset.x;
       const y = e.clientY - dragOffset.y;
 
@@ -650,23 +657,38 @@ export function AccessibilityButton({ language }: { language: Language }) {
 
   return (
     <div
-      className=""
       style={{
+        // `position` was missing, so left/top were ignored and the button
+        // rendered in the page flow instead of floating bottom-right.
+        position: "fixed",
+        zIndex: 60,
         left: `${position.x}px`,
         top: `${position.y}px`,
         cursor: isDragging ? "grabbing" : "grab",
       }}
       onMouseDown={handleMouseDown}
     >
-      <Popover open={isOpen} onOpenChange={setIsOpen}>
+      <Popover
+        open={isOpen}
+        onOpenChange={(open) => {
+          if (open && didDragRef.current) {
+            didDragRef.current = false;
+            return;
+          }
+          setIsOpen(open);
+        }}
+      >
         <PopoverTrigger asChild>
           <button
+            type="button"
             className="relative h-14 w-14 rounded-full shadow-2xl transition-all hover:scale-105 focus:outline-none focus:ring-4 focus:ring-white/30"
             aria-label={content.aria.open}
             style={{
-              background: "rgba(168, 85, 145, 0.4)",
+              // 0.4 alpha left the white icon with too little contrast on
+              // light pages.
+              background: "rgba(140, 50, 118, 0.92)",
               backdropFilter: "blur(10px)",
-              border: "2px solid rgba(255, 255, 255, 0.2)",
+              border: "2px solid rgba(255, 255, 255, 0.6)",
               cursor: isDragging ? "grabbing" : "grab",
               userSelect: "none",
             }}

@@ -14,6 +14,7 @@ interface AccessibilityContextType {
   highContrastMode: boolean;
   setHighContrastMode: (enabled: boolean) => void;
   reducedMotion: boolean;
+  setReducedMotion: (enabled: boolean) => void;
 }
 
 const AccessibilityContext = createContext<
@@ -57,17 +58,38 @@ export function AccessibilityProvider({
     return () => mediaQuery.removeEventListener("change", handleChange);
   }, []);
 
+  // Apply high contrast mode to the document. Previously this state was
+  // tracked but never used anywhere, so toggling "High Contrast" in the
+  // settings panel had no visible effect.
+  useEffect(() => {
+    if (!highContrastMode) return;
+    document.documentElement.classList.add("high-contrast");
+    return () => document.documentElement.classList.remove("high-contrast");
+  }, [highContrastMode]);
+
+  // Apply reduced motion to the document when the user has explicitly
+  // enabled it (in addition to the OS-level "prefers-reduced-motion" media
+  // query, which is handled separately in globals.css).
+  useEffect(() => {
+    if (!reducedMotion) return;
+    document.documentElement.classList.add("reduce-motion");
+    return () => document.documentElement.classList.remove("reduce-motion");
+  }, [reducedMotion]);
+
   const announceMessage = (
     message: string,
     priority: "polite" | "assertive" = "polite"
   ) => {
-    const id = Date.now().toString();
+    // Date.now() alone collides when two messages are announced in the same
+    // millisecond (duplicate React keys, and both were removed together).
+    const id = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
     setAnnouncements((prev) => [...prev, { id, message, priority }]);
 
-    // Remove announcement after it's been read
+    // Remove the announcement once screen readers have had time to pick it
+    // up (1s was too short for longer messages).
     setTimeout(() => {
       setAnnouncements((prev) => prev.filter((a) => a.id !== id));
-    }, 1000);
+    }, 4000);
   };
 
   return (
@@ -79,6 +101,7 @@ export function AccessibilityProvider({
         highContrastMode,
         setHighContrastMode,
         reducedMotion,
+        setReducedMotion,
       }}
     >
       {/* Screen reader announcements */}
@@ -130,16 +153,20 @@ export function FocusTrap({
     if (!active || !containerRef.current) return;
 
     const container = containerRef.current;
-    const focusableElements = container.querySelectorAll(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-    );
-    const firstElement = focusableElements[0] as HTMLElement;
-    const lastElement = focusableElements[
-      focusableElements.length - 1
-    ] as HTMLElement;
+    // Remember what had focus so it can be given back when the trap closes.
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    const selector =
+      'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+    const getFocusable = () =>
+      Array.from(container.querySelectorAll<HTMLElement>(selector));
+    const firstElement = getFocusable()[0];
 
     const handleTabKey = (e: KeyboardEvent) => {
       if (e.key !== "Tab") return;
+      // Re-query on every Tab: the content can change while the trap is open.
+      const items = getFocusable();
+      const firstElement = items[0];
+      const lastElement = items[items.length - 1];
 
       if (e.shiftKey) {
         if (document.activeElement === firstElement) {
@@ -159,6 +186,7 @@ export function FocusTrap({
 
     return () => {
       container.removeEventListener("keydown", handleTabKey);
+      previouslyFocused?.focus?.();
     };
   }, [active]);
 

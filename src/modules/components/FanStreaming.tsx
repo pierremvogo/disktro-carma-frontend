@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { ArtistProfileModal } from "./previewProfileArtist/ArtistProfileModal";
 import { speak } from "@/@disktro/lib/text-to-speech";
+import { ColorBlindFilters } from "./ColorBlindFilters";
 
 // ====================== Icon components ======================
 type IconProps = { size?: number; className?: string };
@@ -1324,6 +1325,20 @@ export function FanStreaming({ language }: FanStreamingProps) {
     }
   }, []);
 
+  // Accessibility: apply the settings that work through document-level CSS
+  // classes (see globals.css). A class is only added while its setting is on
+  // and removed on cleanup, so several components can share them safely.
+  React.useEffect(() => {
+    const root = document.documentElement;
+    const active: string[] = [];
+    if (reduceMotion) active.push("reduce-motion");
+    if (largerTargets) active.push("larger-targets");
+    if (keyboardNav) active.push("keyboard-nav");
+    if (focusMode) active.push("focus-mode");
+    active.forEach((c) => root.classList.add(c));
+    return () => active.forEach((c) => root.classList.remove(c));
+  }, [reduceMotion, largerTargets, keyboardNav, focusMode]);
+
   // Keyboard navigation
   React.useEffect(() => {
     if (!keyboardNav) return;
@@ -2390,6 +2405,7 @@ export function FanStreaming({ language }: FanStreamingProps) {
           key={key}
           onClick={() => setSelectedTab(key)}
           onMouseEnter={() => handleTabHover(key)}
+          onFocus={() => handleTabHover(key)}
           type="button"
           className={`flex-shrink-0 text-xs sm:text-sm text-white drop-shadow cursor-pointer pb-1 border-b-2 transition-colors ${
             selectedTab === key
@@ -2477,28 +2493,7 @@ pb-[env(safe-area-inset-bottom)]
       )}
 
       {/* SVG Filters for Color Blind Modes */}
-      <svg className="hidden">
-        <defs>
-          <filter id="protanopia">
-            <feColorMatrix
-              type="matrix"
-              values="0.567, 0.433, 0, 0, 0, 0.558, 0.442, 0, 0, 0, 0, 0.242, 0.758, 0, 0, 0, 0, 0, 1, 0"
-            />
-          </filter>
-          <filter id="deuteranopia">
-            <feColorMatrix
-              type="matrix"
-              values="0.625, 0.375, 0, 0, 0, 0.7, 0.3, 0, 0, 0, 0, 0.3, 0.7, 0, 0, 0, 0, 0, 1, 0"
-            />
-          </filter>
-          <filter id="tritanopia">
-            <feColorMatrix
-              type="matrix"
-              values="0.95, 0.05, 0, 0, 0, 0, 0.433, 0.567, 0, 0, 0, 0.475, 0.525, 0, 0, 0, 0, 0, 1, 0"
-            />
-          </filter>
-        </defs>
-      </svg>
+      <ColorBlindFilters />
 
       {/* Reading Guide */}
       {readingGuide && (
@@ -2648,12 +2643,13 @@ pb-[env(safe-area-inset-bottom)]
             </div>
 
             <button
-              style={{
-                outline: "2px solid #ffffff",
-                outlineOffset: "2px",
-              }}
               onClick={() => setShowProfile(true)}
               onMouseEnter={() => {
+                if (textToSpeech) {
+                  speak("Your Profile");
+                }
+              }}
+              onFocus={() => {
                 if (textToSpeech) {
                   speak("Your Profile");
                 }
@@ -2671,12 +2667,13 @@ pb-[env(safe-area-inset-bottom)]
             </button>
 
             <button
-              style={{
-                outline: "2px solid #ffffff",
-                outlineOffset: "2px",
-              }}
               onClick={handleLogout}
               onMouseEnter={() => {
+                if (textToSpeech) {
+                  speak("Logout");
+                }
+              }}
+              onFocus={() => {
                 if (textToSpeech) {
                   speak("Logout");
                 }
@@ -3246,10 +3243,6 @@ pb-[env(safe-area-inset-bottom)]
                 {text.artists}
               </h2>
               <button
-                style={{
-                  outline: "2px solid #ffffff",
-                  outlineOffset: "2px",
-                }}
                 onClick={() => setSortArtists(!sortArtists)}
                 className={`px-3 py-1.5 rounded-lg text-white text-xs transition-all ${
                   sortArtists ? "bg-white/20" : "bg-white/10 hover:bg-white/15"
@@ -3326,10 +3319,6 @@ pb-[env(safe-area-inset-bottom)]
                       {artist.subscribers ?? 0} {text.subscribers}
                     </p>
                     <button
-                      style={{
-                        outline: "2px solid #ffffff",
-                        outlineOffset: "2px",
-                      }}
                       type="button"
                       onClick={() => openArtistProfile(artist)}
                       className="w-full px-3 py-1.5 rounded-lg bg-white/15 hover:bg-white/25 border border-white/20 text-white transition-all cursor-pointer flex items-center justify-center gap-1.5 text-xs"
@@ -3397,10 +3386,6 @@ pb-[env(safe-area-inset-bottom)]
                             {song.duration}
                           </span>
                           <button
-                            style={{
-                              outline: "2px solid #ffffff",
-                              outlineOffset: "2px",
-                            }}
                             onClick={() => handlePlaySong(song)}
                             className="p-1.5 bg-white/10 backdrop-blur-sm rounded-full hover:bg-white/20 transition-all"
                           >
@@ -3411,10 +3396,6 @@ pb-[env(safe-area-inset-bottom)]
                             )}
                           </button>
                           <button
-                            style={{
-                              outline: "2px solid #ffffff",
-                              outlineOffset: "2px",
-                            }}
                             onClick={() => toggleFavorite(String(song.id))}
                             className="p-1.5 hover:bg-white/10 rounded-full transition-all"
                           >
@@ -3481,10 +3462,6 @@ pb-[env(safe-area-inset-bottom)]
                   </button>
                 )}
                 <button
-                  style={{
-                    outline: "2px solid #ffffff",
-                    outlineOffset: "2px",
-                  }}
                   onClick={() => setShowCreatePlaylist(true)}
                   className="cursor-pointer px-3 py-1.5 bg-white/20 rounded-lg text-white hover:bg-white/30 transition-all text-xs flex items-center gap-1.5"
                 >
@@ -3579,10 +3556,6 @@ pb-[env(safe-area-inset-bottom)]
                     "Crea la teva primera playlist i comença a organitzar la teva música"}
                 </p>
                 <button
-                  style={{
-                    outline: "2px solid #ffffff",
-                    outlineOffset: "2px",
-                  }}
                   onClick={() => setShowCreatePlaylist(true)}
                   className="cursor-pointer px-4 py-2 bg-white/20 rounded-lg text-white hover:bg-white/30 transition-all inline-flex items-center gap-1.5 text-sm"
                 >
@@ -3614,10 +3587,6 @@ pb-[env(safe-area-inset-bottom)]
               <button
                 type="button"
                 onClick={fetchEditorPlaylists}
-                style={{
-                  outline: "2px solid #ffffff",
-                  outlineOffset: "2px",
-                }}
                 disabled={editorPlaylistsLoading}
                 className="px-3 py-1.5 bg-white/10 border border-white/20 rounded-lg text-white/80 hover:bg-white/20 transition-all text-xs disabled:opacity-50 disabled:cursor-not-allowed"
               >
@@ -3760,10 +3729,6 @@ pb-[env(safe-area-inset-bottom)]
                 {text.dashboard}
               </h2>
               <button
-                style={{
-                  outline: "2px solid #ffffff",
-                  outlineOffset: "2px",
-                }}
                 onClick={fetchMySubscriptionsDashboard}
                 disabled={subscriptionsLoading}
                 className="px-3 py-1.5 bg-white/10 border border-white/20 rounded-lg text-white/80 hover:bg-white/20 transition-all text-xs disabled:opacity-50 disabled:cursor-not-allowed"
@@ -3884,10 +3849,6 @@ pb-[env(safe-area-inset-bottom)]
                                 ).toLocaleDateString()}
                           </p>
                           <button
-                            style={{
-                              outline: "2px solid #ffffff",
-                              outlineOffset: "2px",
-                            }}
                             onClick={() =>
                               toggleSubscription(String(sub.artistId))
                             }
@@ -3919,10 +3880,6 @@ pb-[env(safe-area-inset-bottom)]
                       {text.noSubscriptions}
                     </p>
                     <button
-                      style={{
-                        outline: "2px solid #ffffff",
-                        outlineOffset: "2px",
-                      }}
                       onClick={() => setSelectedTab("artists")}
                       className="px-4 py-2 bg-white/20 backdrop-blur-sm rounded-lg text-white hover:bg-white/30 transition-all text-sm"
                     >
@@ -3996,10 +3953,6 @@ pb-[env(safe-area-inset-bottom)]
                           {gift.description}
                         </p>
                         <button
-                          style={{
-                            outline: "2px solid #ffffff",
-                            outlineOffset: "2px",
-                          }}
                           className={`w-full px-3 py-1.5 backdrop-blur-sm rounded-lg text-white transition-all text-xs ${
                             gift.claimed
                               ? "bg-white/10 cursor-not-allowed"
@@ -4056,10 +4009,6 @@ pb-[env(safe-area-inset-bottom)]
                 {text.createPlaylist}
               </h3>
               <button
-                style={{
-                  outline: "2px solid #ffffff",
-                  outlineOffset: "2px",
-                }}
                 onClick={() => {
                   setShowCreatePlaylist(false);
                   setNewPlaylistName("");
@@ -4096,10 +4045,6 @@ pb-[env(safe-area-inset-bottom)]
             />
             <div className="flex gap-3">
               <button
-                style={{
-                  outline: "2px solid #ffffff",
-                  outlineOffset: "2px",
-                }}
                 onClick={() => {
                   setShowCreatePlaylist(false);
                   setNewPlaylistName("");
@@ -4115,10 +4060,6 @@ pb-[env(safe-area-inset-bottom)]
                 {text.cancel}
               </button>
               <button
-                style={{
-                  outline: "2px solid #ffffff",
-                  outlineOffset: "2px",
-                }}
                 onClick={handleCreatePlaylist}
                 disabled={creatingPlaylist || !newPlaylistName.trim()}
                 className={`cursor-pointer flex-1 px-3 py-2 rounded-lg text-white transition-all text-sm ${
@@ -4149,10 +4090,6 @@ pb-[env(safe-area-inset-bottom)]
                 {text.addToPlaylist}
               </h3>
               <button
-                style={{
-                  outline: "2px solid #ffffff",
-                  outlineOffset: "2px",
-                }}
                 onClick={() => {
                   setShowAddToPlaylist(false);
                   setSelectedSongForPlaylist(null);
@@ -4217,10 +4154,6 @@ pb-[env(safe-area-inset-bottom)]
               ) : (
                 userPlaylists.map((playlist: any) => (
                   <button
-                    style={{
-                      outline: "2px solid #ffffff",
-                      outlineOffset: "2px",
-                    }}
                     key={playlist.id}
                     onClick={() => handleAddTrackToPlaylist(playlist.id)}
                     disabled={addingToPlaylist}
@@ -4248,10 +4181,6 @@ pb-[env(safe-area-inset-bottom)]
             </div>
             <div className="flex gap-2">
               <button
-                style={{
-                  outline: "2px solid #ffffff",
-                  outlineOffset: "2px",
-                }}
                 onClick={async () => {
                   await fetchUserPlaylists();
                 }}
@@ -4265,10 +4194,6 @@ pb-[env(safe-area-inset-bottom)]
                 Refresh
               </button>
               <button
-                style={{
-                  outline: "2px solid #ffffff",
-                  outlineOffset: "2px",
-                }}
                 onClick={() => {
                   setShowAddToPlaylist(false);
                   setSelectedSongForPlaylist(null);
@@ -4398,6 +4323,7 @@ pb-[env(safe-area-inset-bottom)]
                               key={size}
                               type="button"
                               onClick={() => setFontSize(size)}
+                              aria-pressed={fontSize === size}
                               className={`px-3 py-1.5 rounded-lg transition-all text-xs ${
                                 fontSize === size
                                   ? "bg-white/30 text-white"
@@ -4429,6 +4355,9 @@ pb-[env(safe-area-inset-bottom)]
                       </div>
                       <button
                         type="button"
+                        role="switch"
+                        aria-checked={highContrast}
+                        aria-label={text.highContrast}
                         onClick={() => setHighContrast(!highContrast)}
                         className={`w-12 h-7 rounded-full transition-all ${
                           highContrast ? "bg-green-500" : "bg-white/20"
@@ -4458,6 +4387,7 @@ pb-[env(safe-area-inset-bottom)]
                             key={mode}
                             type="button"
                             onClick={() => setColorBlindMode(mode)}
+                            aria-pressed={colorBlindMode === mode}
                             className={`px-3 py-1.5 rounded-lg transition-all text-xs ${
                               colorBlindMode === mode
                                 ? "bg-white/30 text-white"
@@ -4487,6 +4417,9 @@ pb-[env(safe-area-inset-bottom)]
                       </div>
                       <button
                         type="button"
+                        role="switch"
+                        aria-checked={reduceMotion}
+                        aria-label={text.reduceMotion}
                         onClick={() => setReduceMotion(!reduceMotion)}
                         className={`w-12 h-7 rounded-full transition-all ${
                           reduceMotion ? "bg-green-500" : "bg-white/20"
@@ -4519,6 +4452,9 @@ pb-[env(safe-area-inset-bottom)]
                       </div>
                       <button
                         type="button"
+                        role="switch"
+                        aria-checked={dyslexiaFont}
+                        aria-label={text.dyslexiaFont}
                         onClick={() => setDyslexiaFont(!dyslexiaFont)}
                         className={`w-12 h-7 rounded-full transition-all ${
                           dyslexiaFont ? "bg-green-500" : "bg-white/20"
@@ -4577,6 +4513,9 @@ pb-[env(safe-area-inset-bottom)]
                       </div>
                       <button
                         type="button"
+                        role="switch"
+                        aria-checked={showCaptions}
+                        aria-label={text.captions}
                         onClick={() => setShowCaptions(!showCaptions)}
                         className={`w-12 h-7 rounded-full transition-all ${
                           showCaptions ? "bg-green-500" : "bg-white/20"
@@ -4608,6 +4547,9 @@ pb-[env(safe-area-inset-bottom)]
                       </div>
                       <button
                         type="button"
+                        role="switch"
+                        aria-checked={visualNotifications}
+                        aria-label={text.visualNotifications}
                         onClick={() =>
                           setVisualNotifications(!visualNotifications)
                         }
@@ -4644,6 +4586,9 @@ pb-[env(safe-area-inset-bottom)]
                       </div>
                       <button
                         type="button"
+                        role="switch"
+                        aria-checked={textToSpeech}
+                        aria-label={text.textToSpeech}
                         onClick={() => setTextToSpeech(!textToSpeech)}
                         className={`w-12 h-7 rounded-full transition-all ${
                           textToSpeech ? "bg-green-500" : "bg-white/20"
@@ -4652,6 +4597,100 @@ pb-[env(safe-area-inset-bottom)]
                         <div
                           className={`w-5 h-5 bg-white rounded-full transition-transform ${
                             textToSpeech ? "translate-x-6" : "translate-x-1"
+                          }`}
+                        />
+                      </button>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <h3 className="text-sm sm:text-base text-white drop-shadow">
+                      {text.motorAccessibility}
+                    </h3>
+                    <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20 flex items-center justify-between">
+                      <span className="text-white/90 text-xs sm:text-sm">
+                        {text.largerTargets}
+                      </span>
+                      <button
+                        type="button"
+                        role="switch"
+                        aria-checked={largerTargets}
+                        aria-label={text.largerTargets}
+                        onClick={() => setLargerTargets(!largerTargets)}
+                        className={`w-12 h-7 rounded-full transition-all ${
+                          largerTargets ? "bg-green-500" : "bg-white/20"
+                        }`}
+                      >
+                        <div
+                          className={`w-5 h-5 bg-white rounded-full transition-transform ${
+                            largerTargets ? "translate-x-6" : "translate-x-1"
+                          }`}
+                        />
+                      </button>
+                    </div>
+                    <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20 flex items-center justify-between">
+                      <span className="text-white/90 text-xs sm:text-sm">
+                        {text.keyboardNav}
+                      </span>
+                      <button
+                        type="button"
+                        role="switch"
+                        aria-checked={keyboardNav}
+                        aria-label={text.keyboardNav}
+                        onClick={() => setKeyboardNav(!keyboardNav)}
+                        className={`w-12 h-7 rounded-full transition-all ${
+                          keyboardNav ? "bg-green-500" : "bg-white/20"
+                        }`}
+                      >
+                        <div
+                          className={`w-5 h-5 bg-white rounded-full transition-transform ${
+                            keyboardNav ? "translate-x-6" : "translate-x-1"
+                          }`}
+                        />
+                      </button>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <h3 className="text-sm sm:text-base text-white drop-shadow">
+                      {text.cognitiveAccessibility}
+                    </h3>
+                    <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20 flex items-center justify-between">
+                      <span className="text-white/90 text-xs sm:text-sm">
+                        {text.focusMode}
+                      </span>
+                      <button
+                        type="button"
+                        role="switch"
+                        aria-checked={focusMode}
+                        aria-label={text.focusMode}
+                        onClick={() => setFocusMode(!focusMode)}
+                        className={`w-12 h-7 rounded-full transition-all ${
+                          focusMode ? "bg-green-500" : "bg-white/20"
+                        }`}
+                      >
+                        <div
+                          className={`w-5 h-5 bg-white rounded-full transition-transform ${
+                            focusMode ? "translate-x-6" : "translate-x-1"
+                          }`}
+                        />
+                      </button>
+                    </div>
+                    <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20 flex items-center justify-between">
+                      <span className="text-white/90 text-xs sm:text-sm">
+                        {text.readingGuide}
+                      </span>
+                      <button
+                        type="button"
+                        role="switch"
+                        aria-checked={readingGuide}
+                        aria-label={text.readingGuide}
+                        onClick={() => setReadingGuide(!readingGuide)}
+                        className={`w-12 h-7 rounded-full transition-all ${
+                          readingGuide ? "bg-green-500" : "bg-white/20"
+                        }`}
+                      >
+                        <div
+                          className={`w-5 h-5 bg-white rounded-full transition-transform ${
+                            readingGuide ? "translate-x-6" : "translate-x-1"
                           }`}
                         />
                       </button>
