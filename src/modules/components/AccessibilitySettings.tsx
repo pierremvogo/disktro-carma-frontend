@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { FocusTrap } from "./AccessibilityProvider";
 
 interface AccessibilitySettingsProps {
@@ -123,13 +123,25 @@ export function AccessibilitySettings({
 
   const content = text[language as keyof typeof text] || text.english;
 
+  // This dialog had no way to close it with the keyboard other than
+  // tabbing to the close button — Escape did nothing, unlike every other
+  // modal in the app (e.g. KeyboardShortcutsHelp).
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
+  }, [onClose]);
+
   const ToggleSwitch = ({ checked, onChange, label, description }: any) => (
     <div className="flex items-start justify-between p-4 bg-white/5 rounded-lg hover:bg-white/10 transition-all">
       <div className="flex-1 pr-4">
-        <label className="text-white drop-shadow cursor-pointer">{label}</label>
+        <span className="text-white drop-shadow">{label}</span>
         <p className="text-white/60 text-sm mt-1">{description}</p>
       </div>
       <button
+        type="button"
         role="switch"
         aria-checked={checked}
         aria-label={label}
@@ -149,7 +161,7 @@ export function AccessibilitySettings({
 
   return (
     <div
-      className="mt-60 bg-black/100 fixed inset-0  backdrop-blur-sm flex items-center justify-center z-50"
+      className="bg-black/80 fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50 p-4"
       onClick={onClose}
       role="dialog"
       aria-modal="true"

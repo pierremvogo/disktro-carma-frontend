@@ -10,6 +10,7 @@ import { ArtistProfileSetup } from "./ArtistProfileSetup";
 import { Login } from "./Login";
 import { ArtistChoice } from "./ArtistChoice";
 import { AccessibilityButton } from "./accessibilityButton/AccessibilityButton";
+import { ColorBlindFilters } from "./ColorBlindFilters";
 import { UserModuleObject as UserModule } from "../module";
 import { getUserRole } from "@/@disktro/utils";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -109,6 +110,34 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [showAccessibility]);
+
+  // Accessibility: apply the settings that work through document-level CSS
+  // classes (see globals.css). A class is only added while its setting is on
+  // and removed on cleanup, so several components can share them safely.
+  useEffect(() => {
+    const root = document.documentElement;
+    const active: string[] = [];
+    if (reduceMotion) active.push("reduce-motion");
+    if (largerTargets) active.push("larger-targets");
+    if (keyboardNav) active.push("keyboard-nav");
+    if (focusMode) active.push("focus-mode");
+    active.forEach((c) => root.classList.add(c));
+    return () => active.forEach((c) => root.classList.remove(c));
+  }, [reduceMotion, largerTargets, keyboardNav, focusMode]);
+
+  // Accessibility: reading guide line that follows the pointer.
+  useEffect(() => {
+    if (!readingGuide) return;
+    const root = document.documentElement;
+    root.classList.add("reading-guide");
+    const onMove = (e: MouseEvent) =>
+      root.style.setProperty("--reading-guide-position", `${e.clientY}px`);
+    window.addEventListener("mousemove", onMove);
+    return () => {
+      window.removeEventListener("mousemove", onMove);
+      root.classList.remove("reading-guide");
+    };
+  }, [readingGuide]);
 
   // Gestion de la navigation au clavier pour le scroll horizontal
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -948,6 +977,7 @@ pb-[env(safe-area-inset-bottom)]
                 : "none",
       }}
     >
+      <ColorBlindFilters />
       {/* Overlay */}
       <div className="fixed inset-0 bg-black/50 pointer-events-none" />
 
@@ -1451,6 +1481,7 @@ pb-[env(safe-area-inset-bottom)]
                                 key={size}
                                 type="button"
                                 onClick={() => toggleLargerButtons(size)}
+                                aria-pressed={fontSize === size}
                                 className={`px-3 py-1.5 rounded-lg transition-all text-xs ${
                                   fontSize === size
                                     ? "bg-white/30 text-white"
@@ -1482,6 +1513,9 @@ pb-[env(safe-area-inset-bottom)]
                         </div>
                         <button
                           type="button"
+                          role="switch"
+                          aria-checked={highContrast}
+                          aria-label={text.highContrast}
                           onClick={() => setHighContrast(!highContrast)}
                           className={`w-12 h-7 rounded-full transition-all ${
                             highContrast ? "bg-green-500" : "bg-white/20"
@@ -1511,6 +1545,7 @@ pb-[env(safe-area-inset-bottom)]
                               key={mode}
                               type="button"
                               onClick={() => setColorBlindMode(mode)}
+                              aria-pressed={colorBlindMode === mode}
                               className={`px-3 py-1.5 rounded-lg transition-all text-xs ${
                                 colorBlindMode === mode
                                   ? "bg-white/30 text-white"
@@ -1540,6 +1575,9 @@ pb-[env(safe-area-inset-bottom)]
                         </div>
                         <button
                           type="button"
+                          role="switch"
+                          aria-checked={reduceMotion}
+                          aria-label={text.reduceMotion}
                           onClick={() => setReduceMotion(!reduceMotion)}
                           className={`w-12 h-7 rounded-full transition-all ${
                             reduceMotion ? "bg-green-500" : "bg-white/20"
@@ -1572,6 +1610,9 @@ pb-[env(safe-area-inset-bottom)]
                         </div>
                         <button
                           type="button"
+                          role="switch"
+                          aria-checked={dyslexiaFont}
+                          aria-label={text.dyslexiaFont}
                           onClick={() => setDyslexiaFont(!dyslexiaFont)}
                           className={`w-12 h-7 rounded-full transition-all ${
                             dyslexiaFont ? "bg-green-500" : "bg-white/20"
@@ -1630,6 +1671,9 @@ pb-[env(safe-area-inset-bottom)]
                         </div>
                         <button
                           type="button"
+                          role="switch"
+                          aria-checked={showCaptions}
+                          aria-label={text.captions}
                           onClick={() => setShowCaptions(!showCaptions)}
                           className={`w-12 h-7 rounded-full transition-all ${
                             showCaptions ? "bg-green-500" : "bg-white/20"
@@ -1661,6 +1705,9 @@ pb-[env(safe-area-inset-bottom)]
                         </div>
                         <button
                           type="button"
+                          role="switch"
+                          aria-checked={visualNotifications}
+                          aria-label={text.visualNotifications}
                           onClick={() =>
                             setVisualNotifications(!visualNotifications)
                           }
@@ -1697,6 +1744,9 @@ pb-[env(safe-area-inset-bottom)]
                         </div>
                         <button
                           type="button"
+                          role="switch"
+                          aria-checked={textToSpeech}
+                          aria-label={text.textToSpeech}
                           onClick={() => setTextToSpeech(!textToSpeech)}
                           className={`w-12 h-7 rounded-full transition-all ${
                             textToSpeech ? "bg-green-500" : "bg-white/20"
@@ -1705,6 +1755,100 @@ pb-[env(safe-area-inset-bottom)]
                           <div
                             className={`w-5 h-5 bg-white rounded-full transition-transform ${
                               textToSpeech ? "translate-x-6" : "translate-x-1"
+                            }`}
+                          />
+                        </button>
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      <h3 className="text-sm sm:text-base text-white drop-shadow">
+                        {text.motorAccessibility}
+                      </h3>
+                      <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20 flex items-center justify-between">
+                        <span className="text-white/90 text-xs sm:text-sm">
+                          {text.largerTargets}
+                        </span>
+                        <button
+                          type="button"
+                          role="switch"
+                          aria-checked={largerTargets}
+                          aria-label={text.largerTargets}
+                          onClick={() => setLargerTargets(!largerTargets)}
+                          className={`w-12 h-7 rounded-full transition-all ${
+                            largerTargets ? "bg-green-500" : "bg-white/20"
+                          }`}
+                        >
+                          <div
+                            className={`w-5 h-5 bg-white rounded-full transition-transform ${
+                              largerTargets ? "translate-x-6" : "translate-x-1"
+                            }`}
+                          />
+                        </button>
+                      </div>
+                      <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20 flex items-center justify-between">
+                        <span className="text-white/90 text-xs sm:text-sm">
+                          {text.keyboardNav}
+                        </span>
+                        <button
+                          type="button"
+                          role="switch"
+                          aria-checked={keyboardNav}
+                          aria-label={text.keyboardNav}
+                          onClick={() => setKeyboardNav(!keyboardNav)}
+                          className={`w-12 h-7 rounded-full transition-all ${
+                            keyboardNav ? "bg-green-500" : "bg-white/20"
+                          }`}
+                        >
+                          <div
+                            className={`w-5 h-5 bg-white rounded-full transition-transform ${
+                              keyboardNav ? "translate-x-6" : "translate-x-1"
+                            }`}
+                          />
+                        </button>
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      <h3 className="text-sm sm:text-base text-white drop-shadow">
+                        {text.cognitiveAccessibility}
+                      </h3>
+                      <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20 flex items-center justify-between">
+                        <span className="text-white/90 text-xs sm:text-sm">
+                          {text.focusMode}
+                        </span>
+                        <button
+                          type="button"
+                          role="switch"
+                          aria-checked={focusMode}
+                          aria-label={text.focusMode}
+                          onClick={() => setFocusMode(!focusMode)}
+                          className={`w-12 h-7 rounded-full transition-all ${
+                            focusMode ? "bg-green-500" : "bg-white/20"
+                          }`}
+                        >
+                          <div
+                            className={`w-5 h-5 bg-white rounded-full transition-transform ${
+                              focusMode ? "translate-x-6" : "translate-x-1"
+                            }`}
+                          />
+                        </button>
+                      </div>
+                      <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20 flex items-center justify-between">
+                        <span className="text-white/90 text-xs sm:text-sm">
+                          {text.readingGuide}
+                        </span>
+                        <button
+                          type="button"
+                          role="switch"
+                          aria-checked={readingGuide}
+                          aria-label={text.readingGuide}
+                          onClick={() => setReadingGuide(!readingGuide)}
+                          className={`w-12 h-7 rounded-full transition-all ${
+                            readingGuide ? "bg-green-500" : "bg-white/20"
+                          }`}
+                        >
+                          <div
+                            className={`w-5 h-5 bg-white rounded-full transition-transform ${
+                              readingGuide ? "translate-x-6" : "translate-x-1"
                             }`}
                           />
                         </button>

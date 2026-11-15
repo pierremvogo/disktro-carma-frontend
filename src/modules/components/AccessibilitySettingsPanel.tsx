@@ -36,6 +36,7 @@ export function AccessibilitySettingsPanel({
     enableKeyboardShortcuts,
     setEnableKeyboardShortcuts,
     reducedMotion,
+    setReducedMotion,
   } = useAccessibility();
 
   const defaultSettings: AccessibilitySettingsState = {
@@ -77,8 +78,9 @@ export function AccessibilitySettingsPanel({
         if (typeof parsed.keyboardNav === "boolean") {
           setEnableKeyboardShortcuts(parsed.keyboardNav);
         }
-        // reducedMotion est plutôt géré via prefers-reduced-motion + contexte,
-        // mais tu peux le rendre contrôlable si tu ajoutes un setter dans le provider.
+        if (typeof parsed.reducedMotion === "boolean") {
+          setReducedMotion(parsed.reducedMotion);
+        }
       } else {
         // Pas de localStorage → on initialise avec les valeurs du provider
         setSettings(defaultSettings);
@@ -134,10 +136,9 @@ export function AccessibilitySettingsPanel({
       setEnableKeyboardShortcuts(Boolean(value));
     }
 
-    // Si un jour tu ajoutes setReducedMotion dans le provider :
-    // if (setting === "reducedMotion") {
-    //   setReducedMotion(Boolean(value));
-    // }
+    if (setting === "reducedMotion") {
+      setReducedMotion(Boolean(value));
+    }
   };
 
   return (

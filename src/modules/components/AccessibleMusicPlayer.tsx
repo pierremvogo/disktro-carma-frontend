@@ -85,6 +85,11 @@ interface AccessibleMusicPlayerProps {
   language?: string;
   largerTargets?: boolean;
   reducedMotion?: boolean;
+  /** Playback progress, 0–100. */
+  progress?: number;
+  /** When provided, the volume button is shown and toggles mute. */
+  onToggleMute?: () => void;
+  isMuted?: boolean;
 }
 
 export function AccessibleMusicPlayer({
@@ -97,6 +102,9 @@ export function AccessibleMusicPlayer({
   language = "english",
   largerTargets = false,
   reducedMotion = false,
+  progress = 0,
+  onToggleMute,
+  isMuted = false,
 }: AccessibleMusicPlayerProps) {
   const playerRef = useRef<HTMLDivElement>(null);
   const previousSongRef = useRef<string>("");
@@ -158,11 +166,15 @@ export function AccessibleMusicPlayer({
       announcer.textContent = announcement;
       document.body.appendChild(announcer);
 
-      setTimeout(() => {
-        document.body.removeChild(announcer);
-      }, 1000);
+      const timer = setTimeout(() => announcer.remove(), 4000);
+      return () => {
+        clearTimeout(timer);
+        announcer.remove();
+      };
     }
-  }, [currentSong, content, language]);
+    // `content` is rebuilt on every render, so it must not be a dependency.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentSong, language]);
 
   if (!currentSong) return null;
 
@@ -177,13 +189,9 @@ export function AccessibleMusicPlayer({
       aria-label={content.nowPlaying}
     >
       <div className="flex items-center justify-between p-6 gap-6">
-        {/* Song Info - Live region for screen reader updates */}
-        <div
-          className="flex items-center gap-4 flex-1 min-w-0"
-          role="status"
-          aria-live="polite"
-          aria-atomic="true"
-        >
+        {/* Song Info (the song change is announced once by the effect above;
+            a second live region here made screen readers read it twice) */}
+        <div className="flex items-center gap-4 flex-1 min-w-0">
           <div className="w-16 h-16 bg-white/5 rounded-lg overflow-hidden flex-shrink-0">
             <img
               src={currentSong.cover}
@@ -220,9 +228,10 @@ export function AccessibleMusicPlayer({
 
           <button
             onClick={onPlayPause}
-            className={`p-4 bg-white/20 backdrop-blur-sm rounded-full hover:bg-white/30 focus:bg-white/30 ${animationClasses} ${buttonSizeClasses}`}
+            className={`bg-white/20 backdrop-blur-sm rounded-full hover:bg-white/30 focus:bg-white/30 ${animationClasses} ${
+              largerTargets ? "p-5" : "p-4"
+            }`}
             aria-label={isPlaying ? content.pause : content.play}
-            aria-pressed={isPlaying}
             title={isPlaying ? content.pause : content.play}
           >
             {isPlaying ? (
@@ -274,13 +283,20 @@ export function AccessibleMusicPlayer({
             </button>
           )}
 
-          <button
-            className={`text-white/80 hover:text-white focus:text-white ${animationClasses} ${buttonSizeClasses}`}
-            aria-label={content.volume}
-            title={content.volume}
-          >
-            <Volume2 size={largerTargets ? 32 : 24} />
-          </button>
+          {onToggleMute && (
+            <button
+              type="button"
+              onClick={onToggleMute}
+              className={`text-white/80 hover:text-white focus:text-white ${animationClasses} ${buttonSizeClasses} ${
+                isMuted ? "opacity-50" : ""
+              }`}
+              aria-label={content.volume}
+              aria-pressed={!isMuted}
+              title={content.volume}
+            >
+              <Volume2 size={largerTargets ? 32 : 24} />
+            </button>
+          )}
         </div>
       </div>
 
@@ -297,9 +313,12 @@ export function AccessibleMusicPlayer({
         }
         aria-valuemin={0}
         aria-valuemax={100}
-        aria-valuenow={0}
+        aria-valuenow={Math.round(progress)}
       >
-        <div className="h-full bg-white/40 w-0"></div>
+        <div
+          className="h-full bg-white/40"
+          style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
+        ></div>
       </div>
     </div>
   );

@@ -71,13 +71,20 @@ html.keyboard-nav :focus-visible {
 }
 
 /* ============ Larger buttons ============ */
+/* min-height was stuck at 1px for every size (copy/paste bug), so the
+   "Larger Buttons" / font-size options never actually changed touch-target
+   size — only the text size changed. Real minimum sizes restored below,
+   following the WCAG 2.5.5 / 2.5.8 guidance of a ~44px minimum target. */
 html.larger-buttons button,
 html.larger-buttons [role="button"],
 html.larger-buttons input,
 html.larger-buttons select,
 html.larger-buttons textarea {
-  min-height: 1px;
+  min-height: 48px;
+  min-width: 48px;
   font-size: 1.05rem;
+  padding-top: 0.625rem;
+  padding-bottom: 0.625rem;
 }
 
 html.smaller-buttons button,
@@ -85,8 +92,9 @@ html.smaller-buttons [role="button"],
 html.smaller-buttons input,
 html.smaller-buttons select,
 html.smaller-buttons textarea {
-  min-height: 1px;
-  font-size: 0.5rem;
+  min-height: 32px;
+  min-width: 32px;
+  font-size: 0.8rem;
 }
 
 html.medium-buttons button,
@@ -94,8 +102,9 @@ html.medium-buttons [role="button"],
 html.medium-buttons input,
 html.medium-buttons select,
 html.medium-buttons textarea {
-  min-height: 1px;
-  font-size: 0.8rem;
+  min-height: 40px;
+  min-width: 40px;
+  font-size: 0.9rem;
 }
 
 html.xl-buttons button,
@@ -103,8 +112,11 @@ html.xl-buttons [role="button"],
 html.xl-buttons input,
 html.xl-buttons select,
 html.xl-buttons textarea {
-  min-height: 1px;
+  min-height: 56px;
+  min-width: 56px;
   font-size: 1.25rem;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
 }
 
 /* ============ Focus mode (réduit les distractions) ============ */
@@ -144,7 +156,56 @@ html.reading-guide body::before {
   -ms-overflow-style: none; /* IE/Edge */
   scrollbar-width: none; /* Firefox */
 }
+/* "#fffffff" was an invalid color (quoted, 7 hex digits) so this whole
+   declaration was silently dropped by the browser, leaving keyboard users
+   with no visible focus outline on plain buttons. */
 button:focus-visible {
-  outline: 3px solid "#fffffff";
+  outline: 3px solid #ffffff;
   outline-offset: 3px;
+}
+
+/* ============ Larger touch targets ============ */
+html.larger-targets button,
+html.larger-targets [role="button"],
+html.larger-targets [role="switch"],
+html.larger-targets a,
+html.larger-targets select,
+html.larger-targets input:not([type="range"]) {
+  min-height: 48px;
+  min-width: 48px;
+}
+
+/* ============ High contrast mode ============ */
+/* Toggled from the Accessibility Settings panel, but previously had no
+   effect anywhere — the setting updated state only. */
+html.high-contrast {
+  filter: contrast(1.5);
+}
+html.high-contrast img,
+html.high-contrast video {
+  filter: contrast(1.2);
+}
+
+/* ============ Reduced motion ============ */
+/* Mirrors the OS-level "prefers-reduced-motion" detection already wired up
+   in AccessibilityProvider, but (like high-contrast above) nothing used to
+   apply it. */
+@media (prefers-reduced-motion: reduce) {
+  html:not(.force-motion) *,
+  html:not(.force-motion) *::before,
+  html:not(.force-motion) *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+html.reduce-motion *,
+html.reduce-motion *::before,
+html.reduce-motion *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
 }
