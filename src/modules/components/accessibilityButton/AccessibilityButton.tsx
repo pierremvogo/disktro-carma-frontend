@@ -1,832 +1,591 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { X, Circle } from "lucide-react";
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
-import { Separator } from "./ui/separator";
-import { Switch } from "./ui/switch";
-import { Label } from "./ui/label";
+import React, { useId, useRef } from "react";
+import { Accessibility } from "lucide-react";
+import { useAccessibilityPreferences } from "../AccessibilityPreferences";
 
-interface StickmanIconProps {
-  className?: string;
-}
-// Stickman Accessibility Icon
-function StickmanIcon({ className }: StickmanIconProps) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-      aria-hidden="true"
-    >
-      <circle cx="12" cy="5" r="2.5" />
-      <line x1="12" y1="7.5" x2="12" y2="14" />
-      <line x1="12" y1="9.5" x2="8" y2="12" />
-      <line x1="12" y1="9.5" x2="16" y2="12" />
-      <line x1="12" y1="14" x2="9" y2="19" />
-      <line x1="12" y1="14" x2="15" y2="19" />
-    </svg>
-  );
-}
+const translations = {
+  spanish: {
+    accessibility: "Accesibilidad",
+    close: "Cerrar",
+    visualAccessibility: "Accesibilidad Visual",
+    hearingAccessibility: "Accesibilidad Auditiva",
+    motorAccessibility: "Accesibilidad Motora",
+    cognitiveAccessibility: "Accesibilidad Cognitiva",
+    fontSize: "Tamaño de Fuente",
+    small: "Pequeño",
+    medium: "Mediano",
+    large: "Grande",
+    extraLarge: "Extra Grande",
+    highContrast: "Alto Contraste",
+    colorBlindMode: "Modo Daltónico",
+    none: "Ninguno",
+    protanopia: "Protanopia",
+    deuteranopia: "Deuteranopia",
+    tritanopia: "Tritanopia",
+    reduceMotion: "Reducir Animaciones",
+    textToSpeech: "Texto a Voz",
+    captions: "Mostrar la letra automáticamente",
+    visualNotifications: "Notificaciones Visuales",
+    largerTargets: "Botones Más Grandes",
+    keyboardNav: "Navegación por Teclado",
+    dyslexiaFont: "Fuente para Dislexia",
+    focusMode: "Modo Enfoque",
+    readingGuide: "Guía de Lectura",
+  },
+  english: {
+    accessibility: "Accessibility",
+    close: "Close",
+    visualAccessibility: "Visual Accessibility",
+    hearingAccessibility: "Hearing Accessibility",
+    motorAccessibility: "Motor Accessibility",
+    cognitiveAccessibility: "Cognitive Accessibility",
+    fontSize: "Font Size",
+    small: "Small",
+    medium: "Medium",
+    large: "Large",
+    extraLarge: "Extra Large",
+    highContrast: "High Contrast",
+    colorBlindMode: "Color Blind Mode",
+    none: "None",
+    protanopia: "Protanopia",
+    deuteranopia: "Deuteranopia",
+    tritanopia: "Tritanopia",
+    reduceMotion: "Reduce Motion",
+    textToSpeech: "Text to Speech",
+    captions: "Show lyrics automatically",
+    visualNotifications: "Visual Notifications",
+    largerTargets: "Larger Buttons",
+    keyboardNav: "Keyboard Navigation",
+    dyslexiaFont: "Dyslexia Font",
+    focusMode: "Focus Mode",
+    readingGuide: "Reading Guide",
+  },
+  catalan: {
+    accessibility: "Accessibilitat",
+    close: "Tanca",
+    visualAccessibility: "Accessibilitat Visual",
+    hearingAccessibility: "Accessibilitat Auditiva",
+    motorAccessibility: "Accessibilitat Motora",
+    cognitiveAccessibility: "Accessibilitat Cognitiva",
+    fontSize: "Mida de Font",
+    small: "Petit",
+    medium: "Mitjà",
+    large: "Gran",
+    extraLarge: "Extra Gran",
+    highContrast: "Alt Contrast",
+    colorBlindMode: "Mode Daltònic",
+    none: "Cap",
+    protanopia: "Protanòpia",
+    deuteranopia: "Deuteranòpia",
+    tritanopia: "Tritanòpia",
+    reduceMotion: "Reduir Animacions",
+    textToSpeech: "Text a Veu",
+    captions: "Mostra la lletra automàticament",
+    visualNotifications: "Notificacions Visuals",
+    largerTargets: "Botons Més Grans",
+    keyboardNav: "Navegació per Teclat",
+    dyslexiaFont: "Font per Dislèxia",
+    focusMode: "Mode Focus",
+    readingGuide: "Guia de Lectura",
+  },
+};
 
-type Language = string;
-
-export function AccessibilityButton({ language }: { language: Language }) {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const [keyboardNav, setKeyboardNav] = useState(false);
-  const [largerButtons, setLargerButtons] = useState(false);
-  const [voiceControl, setVoiceControl] = useState(false);
-  const [focusMode, setFocusMode] = useState(false);
-  const [readingGuide, setReadingGuide] = useState(false);
-  const [fontSize, setFontSize] = useState<"small" | "medium" | "large" | "xl">(
-    "medium",
-  );
-  const [highContrast, setHighContrast] = useState(false);
-  const [colorBlindMode, setColorBlindMode] = useState<
-    "none" | "protanopia" | "deuteranopia" | "tritanopia"
-  >("none");
-  const [reduceMotion, setReduceMotion] = useState(false);
-  const [textToSpeech, setTextToSpeech] = useState(false);
-  const [showCaptions, setShowCaptions] = useState(false);
-  const [visualNotifications, setVisualNotifications] = useState(false);
-  const [largerTargets, setLargerTargets] = useState(false);
-  const [dyslexiaFont, setDyslexiaFont] = useState(false);
-
-  // Remove the document-level classes when the button unmounts, otherwise a
-  // setting stays applied on pages that have no control to turn it off.
-  useEffect(() => {
-    return () => {
-      document.documentElement.classList.remove(
-        "keyboard-nav",
-        "larger-buttons",
-        "voice-control",
-        "focus-mode",
-        "reading-guide",
-      );
-    };
-  }, []);
-
-  const text = {
-    english: {
-      aria: { open: "Accessibility options", close: "Close" },
-      header: "Accessibility",
-      keyboardNav: "Keyboard Navigation",
-      largerButtons: "Larger Buttons",
-      voiceControl: "Voice Control",
-      voiceControlDesc: "Control the app with voice commands",
-      cognitiveTitle: "Cognitive Accessibility",
-      focusMode: "Focus Mode",
-      focusModeDesc: "Reduce visual distractions",
-      readingGuide: "Reading Guide",
-      readingGuideDesc: "Guiding line for reading",
-      paymentSoon: "Subscription coming soon",
-      subscription: {
-        title: "Subscribe to a plan",
-        subtitle: "Choose a subscription to support {{artistName}}",
-
-        button: {
-          continue: "Continue",
-          redirecting: "Redirecting...",
-        },
-
-        message: {
-          redirecting: "Redirecting to the payment page...",
-          paymentFailed: "Payment failed. Please try again.",
-          success: "Payment completed successfully!",
-        },
-
-        payment: {
-          stripe: "Credit card (Stripe)",
-          lygos: "Mobile Money (Lygos)",
-        },
-
-        plans: {
-          monthly: {
-            label: "Monthly subscription",
-            features: [
-              "Access to exclusive releases",
-              "Early listening",
-              "Fan-only content",
-              "Standard support",
-            ],
-          },
-          quarterly: {
-            label: "Quarterly subscription",
-            features: [
-              "All monthly benefits",
-              "Exclusive premium content",
-              "Access to private live sessions",
-              "Limited downloads",
-              "Priority support",
-            ],
-          },
-          annual: {
-            label: "Annual subscription",
-            features: [
-              "All quarterly benefits",
-              "Unlimited access to premium content",
-              "Unlimited downloads",
-              "Virtual meet & greet with the artist",
-              "VIP Fan badge",
-              "VIP support",
-            ],
-          },
-        },
-      },
-      loading: "Loading...",
-      track: "Track",
-      refresh: "Refresh",
-      loadingTracks: "Loading tracks...",
-      loadingError: "Error loading",
-      retry: "Retry",
-      noTracksFound: "No track found",
-      tryAnother: "Try another",
-      close: "Close",
-      clear: "Clear",
-      errors: {
-        generic: "Something went wrong. Please try again later.",
-      },
-      noAlbumUploadedYet: "No album uploaded yet.",
-
-      title: "Bbok music with everybody",
-      discover: "Discover",
-      myMusic: "My Music",
-      artists: "Artists",
-      search: "Search music, artists...",
-      featured: "Featured",
-      newReleases: "New Releases",
-
-      subscribe: "Subscribe",
-      play: "Play",
-      pause: "Pause",
-      addToFavorites: "Add to favorites",
-      streams: "streams",
-      subscribers: "subscribers",
-      back: "Back",
-      nowPlaying: "Now playing",
-      duration: "Duration",
-      lyrics: "Lyrics",
-      textLyrics: "Text Lyrics",
-      signLanguage: "Sign Language",
-      editorPlaylists: "Editor's Playlists",
-      addToPlaylist: "Add to Playlist",
-      createPlaylist: "Create Playlist",
-      playlistName: "Playlist Name",
-      create: "Create",
-      cancel: "Cancel",
-      yourPlaylists: "Your Playlists",
-      sortAlphabetically: "Sort Alphabetically",
-      songs: "songs",
-      noSongs: "No songs in this playlist",
-      addedToPlaylist: "Added to playlist",
-      favorites: "Favorites",
-      addedToFavorites: "Added to favorites",
-      removedFromFavorites: "Removed from favorites",
-      accessibility: "Accessibility",
-      dashboard: "Dashboard",
-      mySubscriptions: "My Subscriptions",
-      exclusiveGifts: "Exclusive Gifts",
-      subscriptionStats: "Statistics",
-      totalSubscriptions: "Total Subscriptions",
-      totalGifts: "Total Gifts",
-      unsubscribe: "Unsubscribe",
-      subscribed: "Subscribed",
-      claimGift: "Claim Gift",
-      claimed: "Claimed",
-      noSubscriptions: "You're not subscribed to any artists yet",
-      noGifts: "No exclusive gifts available",
-      exploreArtists: "Explore Artists",
-      giftFrom: "Gift from",
-      subscribedOn: "Subscribed since",
-      visualAccessibility: "Visual Accessibility",
-      hearingAccessibility: "Hearing Accessibility",
-      motorAccessibility: "Motor Accessibility",
-      cognitiveAccessibility: "Cognitive Accessibility",
-      fontSize: "Font Size",
-      small: "Small",
-      medium: "Medium",
-      large: "Large",
-      extraLarge: "Extra Large",
-      highContrast: "High Contrast",
-      colorBlindMode: "Color Blind Mode",
-      none: "None",
-      protanopia: "Protanopia (Red-Green)",
-      deuteranopia: "Deuteranopia (Red-Green)",
-      tritanopia: "Tritanopia (Blue-Yellow)",
-      reduceMotion: "Reduce Motion",
-      textToSpeech: "Text to Speech",
-      captions: "Captions",
-      visualNotifications: "Visual Notifications",
-      largerTargets: "Larger Buttons",
-      dyslexiaFont: "Dyslexia Font",
-      simplifiedInterface: "Simplified Interface",
-    },
-    spanish: {
-      dyslexiaFont: "Fuente para Dislexia",
-      aria: { open: "Opciones de accesibilidad", close: "Cerrar" },
-      header: "Accesibilidad",
-      keyboardNav: "Navegación por Teclado",
-      largerButtons: "Botones Más Grandes",
-      voiceControl: "Control por Voz",
-      voiceControlDesc: "Controla la aplicación con comandos de voz",
-      cognitiveTitle: "Accesibilidad Cognitiva",
-      focusMode: "Modo Enfoque",
-      focusModeDesc: "Reduce las distracciones visuales",
-      readingGuide: "Guía de Lectura",
-      readingGuideDesc: "Línea guía para leer",
-      subscription: {
-        title: "Suscribirse a un plan",
-        subtitle: "Elige una suscripción para apoyar a {{artistName}}",
-
-        button: {
-          continue: "Continuar",
-          redirecting: "Redirigiendo...",
-        },
-
-        message: {
-          redirecting: "Redirigiendo a la página de pago...",
-          paymentFailed: "El pago ha fallado. Inténtalo de nuevo.",
-          success: "¡Pago realizado con éxito!",
-        },
-
-        payment: {
-          stripe: "Tarjeta bancaria (Stripe)",
-          lygos: "Mobile Money (Lygos)",
-        },
-
-        plans: {
-          monthly: {
-            label: "Suscripción mensual",
-            features: [
-              "Acceso a lanzamientos exclusivos",
-              "Escucha anticipada",
-              "Contenido exclusivo para fans",
-              "Soporte estándar",
-            ],
-          },
-          quarterly: {
-            label: "Suscripción trimestral",
-            features: [
-              "Todos los beneficios mensuales",
-              "Contenido premium exclusivo",
-              "Acceso a conciertos en vivo privados",
-              "Descargas limitadas",
-              "Soporte prioritario",
-            ],
-          },
-          annual: {
-            label: "Suscripción anual",
-            features: [
-              "Todos los beneficios trimestrales",
-              "Acceso ilimitado a contenido premium",
-              "Descargas ilimitadas",
-              "Encuentros virtuales con el artista",
-              "Insignia de Fan VIP",
-              "Soporte VIP",
-            ],
-          },
-        },
-      },
-      title: "Música Para Todos",
-      discover: "Descubrir",
-      myMusic: "Mi Música",
-      artists: "Artistas",
-      search: "Buscar música, artistas...",
-      featured: "Destacados",
-      newReleases: "Nuevos Lanzamientos",
-
-      subscribe: "Suscribirse",
-      play: "Reproducir",
-      pause: "Pausar",
-      addToFavorites: "Añadir a favoritos",
-      streams: "reproducciones",
-      subscribers: "suscriptores",
-      back: "Volver",
-      nowPlaying: "Reproduciendo ahora",
-      duration: "Duración",
-      lyrics: "Letra",
-      textLyrics: "Letra en Texto",
-      signLanguage: "Lenguaje de Signos",
-      editorPlaylists: "Playlists de los Editores",
-      addToPlaylist: "Añadir a Playlist",
-      createPlaylist: "Crear Playlist",
-      playlistName: "Nombre de la Playlist",
-      create: "Crear",
-      cancel: "Cancelar",
-      yourPlaylists: "Tus Playlists",
-      sortAlphabetically: "Ordenar Alfabéticamente",
-      songs: "canciones",
-      noSongs: "No hay canciones en esta playlist",
-      addedToPlaylist: "Añadido a la playlist",
-      favorites: "Favoritos",
-      addedToFavorites: "Añadido a favoritos",
-      removedFromFavorites: "Eliminado de favoritos",
-      accessibility: "Accesibilidad",
-      dashboard: "Panel",
-      mySubscriptions: "Mis Suscripciones",
-      exclusiveGifts: "Regalos Exclusivos",
-      subscriptionStats: "Estadísticas",
-      totalSubscriptions: "Suscripciones Totales",
-      totalGifts: "Regalos Totales",
-      unsubscribe: "Cancelar Suscripción",
-      subscribed: "Suscrito",
-      claimGift: "Reclamar Regalo",
-      claimed: "Reclamado",
-      noSubscriptions: "Aún no estás suscrito a ningún artista",
-      noGifts: "No hay regalos exclusivos disponibles",
-      exploreArtists: "Explorar Artistas",
-      giftFrom: "Regalo de",
-      subscribedOn: "Suscrito desde",
-      visualAccessibility: "Accesibilidad Visual",
-      hearingAccessibility: "Accesibilidad Auditiva",
-      motorAccessibility: "Accesibilidad Motora",
-      cognitiveAccessibility: "Accesibilidad Cognitiva",
-      fontSize: "Tamaño de Fuente",
-      small: "Pequeño",
-      medium: "Mediano",
-      large: "Grande",
-      extraLarge: "Extra Grande",
-      highContrast: "Alto Contraste",
-      colorBlindMode: "Modo Daltónico",
-      none: "Ninguno",
-      protanopia: "Protanopia (Rojo-Verde)",
-      deuteranopia: "Deuteranopia (Rojo-Verde)",
-      tritanopia: "Tritanopia (Azul-Amarillo)",
-      reduceMotion: "Reducir Animaciones",
-      textToSpeech: "Texto a Voz",
-      captions: "Subtítulos",
-      visualNotifications: "Notificaciones Visuales",
-      largerTargets: "Botones Más Grandes",
-
-      simplifiedInterface: "Interfaz Simplificada",
-      errors: {
-        generic: "Algo salió mal. Por favor, inténtalo de nuevo más tarde.",
-      },
-      loading: "Cargando...",
-      track: "Pista",
-      refresh: "Actualizar",
-      loadingTracks: "Cargando pistas...",
-      loadingError: "Error al cargar",
-      retry: "Reintentar",
-      noTracksFound: "No se encontró ninguna pista",
-      tryAnother: "Prueba otra",
-      close: "Cerrar",
-      clear: "Borrar",
-      paymentSoon: "Suscripción disponible próximamente",
-    },
-    catalan: {
-      aria: { open: "Opcions d’accessibilitat", close: "Tancar" },
-      header: "Accessibilitat",
-      keyboardNav: "Navegació per Teclat",
-      largerButtons: "Botons Més Grans",
-      voiceControl: "Control per Veu",
-      voiceControlDesc: "Controla l'aplicació amb comandes de veu",
-      cognitiveTitle: "Accessibilitat Cognitiva",
-      focusMode: "Mode Focus",
-      focusModeDesc: "Redueix distraccions visuals",
-      readingGuide: "Guia de Lectura",
-      readingGuideDesc: "Línia guia per llegir",
-      paymentSoon: "Subscripció disponible aviat",
-      subscription: {
-        title: "Subscriure's a un pla",
-        subtitle: "Tria una subscripció per donar suport a {{artistName}}",
-
-        button: {
-          continue: "Continuar",
-          redirecting: "Redirigint...",
-        },
-
-        message: {
-          redirecting: "Redirigint a la pàgina de pagament...",
-          paymentFailed: "El pagament ha fallat. Torna-ho a provar.",
-          success: "Pagament realitzat amb èxit!",
-        },
-
-        payment: {
-          stripe: "Targeta bancària (Stripe)",
-          lygos: "Mobile Money (Lygos)",
-        },
-
-        plans: {
-          monthly: {
-            label: "Subscripció mensual",
-            features: [
-              "Accés a llançaments exclusius",
-              "Escolta anticipada",
-              "Contingut exclusiu per a fans",
-              "Suport estàndard",
-            ],
-          },
-          quarterly: {
-            label: "Subscripció trimestral",
-            features: [
-              "Tots els avantatges mensuals",
-              "Contingut premium exclusiu",
-              "Accés a directes privats",
-              "Descàrregues limitades",
-              "Suport prioritari",
-            ],
-          },
-          annual: {
-            label: "Subscripció anual",
-            features: [
-              "Tots els avantatges trimestrals",
-              "Accés il·limitat a contingut premium",
-              "Descàrregues il·limitades",
-              "Trobades virtuals amb l’artista",
-              "Insígnia de Fan VIP",
-              "Suport VIP",
-            ],
-          },
-        },
-      },
-      loading: "Carregant...",
-      track: "Pista",
-      refresh: "Actualitzar",
-      loadingTracks: "Carregant pistes...",
-      loadingError: "Error en carregar",
-      retry: "Torna-ho a provar",
-      noTracksFound: "Cap pista trobada",
-      tryAnother: "Prova una altra",
-      close: "Tancar",
-      clear: "Netejar",
-      errors: {
-        generic:
-          "Alguna cosa ha anat malament. Si us plau, torna-ho a provar més tard.",
-      },
-      title: "Música Per a Tothom",
-      discover: "Descobrir",
-      myMusic: "La Meva Música",
-      artists: "Artistes",
-      search: "Cercar música, artistes...",
-      featured: "Destacats",
-      newReleases: "Nous Llançaments",
-
-      subscribe: "Subscriure's",
-      play: "Reproduir",
-      pause: "Pausar",
-      addToFavorites: "Afegir a favorits",
-      streams: "reproduccions",
-      subscribers: "subscriptors",
-      back: "Tornar",
-      nowPlaying: "Reproduint ara",
-      duration: "Durada",
-      lyrics: "Lletra",
-      textLyrics: "Lletra en Text",
-      signLanguage: "Llengua de Signes",
-      editorPlaylists: "Playlists dels Editors",
-      addToPlaylist: "Afegir a Playlist",
-      createPlaylist: "Crear Playlist",
-      playlistName: "Nom de la Playlist",
-      create: "Crear",
-      cancel: "Cancel·lar",
-      yourPlaylists: "Les Teves Playlists",
-      sortAlphabetically: "Ordenar Alfabèticament",
-      songs: "cançons",
-      noSongs: "No hi ha cançons en aquesta playlist",
-      addedToPlaylist: "Afegit a la playlist",
-      favorites: "Favorits",
-      addedToFavorites: "Afegit a favorits",
-      removedFromFavorites: "Eliminat de favorits",
-      accessibility: "Accessibilitat",
-      dashboard: "Tauler",
-      mySubscriptions: "Les Meves Subscripcions",
-      exclusiveGifts: "Regals Exclusius",
-      subscriptionStats: "Estadístiques",
-      totalSubscriptions: "Subscripcions Totals",
-      totalGifts: "Regals Totals",
-      unsubscribe: "Cancel·lar Subscripció",
-      subscribed: "Subscrit",
-      claimGift: "Reclamar Regal",
-      claimed: "Reclamat",
-      noSubscriptions: "Encara no estàs subscrit a cap artista",
-      noGifts: "No hi ha regals exclusius disponibles",
-      exploreArtists: "Explorar Artistes",
-      giftFrom: "Regal de",
-      subscribedOn: "Subscrit des de",
-      visualAccessibility: "Accessibilitat Visual",
-      hearingAccessibility: "Accessibilitat Auditiva",
-      motorAccessibility: "Accessibilitat Motora",
-      cognitiveAccessibility: "Accessibilitat Cognitiva",
-      fontSize: "Mida de Font",
-      small: "Petit",
-      medium: "Mitjà",
-      large: "Gran",
-      extraLarge: "Extra Gran",
-      highContrast: "Alt Contrast",
-      colorBlindMode: "Mode Daltònic",
-      none: "Cap",
-      protanopia: "Protanòpia (Vermell-Verd)",
-      deuteranopia: "Deuteranòpia (Vermell-Verd)",
-      tritanopia: "Tritanòpia (Blau-Groc)",
-      reduceMotion: "Reduir Animacions",
-      textToSpeech: "Text a Veu",
-      captions: "Subtítols",
-      visualNotifications: "Notificacions Visuals",
-      largerTargets: "Botons Més Grans",
-      dyslexiaFont: "Font per Dislèxia",
-      simplifiedInterface: "Interfície Simplificada",
-    },
-  };
-
-  const content = text[language as keyof typeof text] || text.english;
-
-  // ✅ Button size reduced
-  const BUTTON_SIZE = 64; // h-16 w-16
-  const MARGIN = 24;
-
-  // ✅ Position: init bottom-right on client
-  const [position, setPosition] = useState<{ x: number; y: number } | null>(
-    null,
-  );
-
-  // ✅ Dragging state
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-
-  // ✅ Init bottom-right + update on resize
-  useEffect(() => {
-    const setBottomRight = () => {
-      setPosition({
-        x: window.innerWidth - BUTTON_SIZE - MARGIN,
-        y: window.innerHeight - BUTTON_SIZE - MARGIN,
-      });
-    };
-
-    setBottomRight();
-    window.addEventListener("resize", setBottomRight);
-    return () => window.removeEventListener("resize", setBottomRight);
-  }, []);
-
-  // Reading guide mouse tracking
-  useEffect(() => {
-    if (!readingGuide) return;
-
-    const handleMouseMove = (e: MouseEvent) => {
-      document.documentElement.style.setProperty(
-        "--reading-guide-position",
-        `${e.clientY}px`,
-      );
-    };
-
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, [readingGuide]);
-
-  // A drag must not also toggle the popover when the mouse is released.
-  const didDragRef = React.useRef(false);
-
-  // ✅ Only start dragging if user clicked the BUTTON (not the popover)
-  const handleMouseDown = (e: React.MouseEvent) => {
-    didDragRef.current = false;
-    const clickedButton = (e.target as HTMLElement).closest(
-      `button[aria-label="${content.aria.open}"]`,
-    );
-    if (!clickedButton) return;
-
-    const wrapper = e.currentTarget as HTMLElement;
-    const rect = wrapper.getBoundingClientRect();
-
-    setDragOffset({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    });
-    setIsDragging(true);
-  };
-
-  // ✅ Drag listeners
-  useEffect(() => {
-    if (!isDragging) return;
-
-    const handleMouseMove = (e: MouseEvent) => {
-      didDragRef.current = true;
-      const x = e.clientX - dragOffset.x;
-      const y = e.clientY - dragOffset.y;
-
-      const maxX = window.innerWidth - BUTTON_SIZE;
-      const maxY = window.innerHeight - BUTTON_SIZE;
-
-      setPosition({
-        x: Math.max(0, Math.min(x, maxX)),
-        y: Math.max(0, Math.min(y, maxY)),
-      });
-    };
-
-    const handleMouseUp = () => setIsDragging(false);
-
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseup", handleMouseUp);
-
-    return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
-    };
-  }, [isDragging, dragOffset]);
-
-  const toggleKeyboardNav = (checked: boolean) => {
-    setKeyboardNav(checked);
-    document.documentElement.classList.toggle("keyboard-nav", checked);
-  };
-
-  const toggleLargerButtons = (checked: boolean) => {
-    setLargerButtons(checked);
-    document.documentElement.classList.toggle("larger-buttons", checked);
-  };
-
-  const toggleVoiceControl = (checked: boolean) => {
-    setVoiceControl(checked);
-    document.documentElement.classList.toggle("voice-control", checked);
-  };
-
-  const toggleFocusMode = (checked: boolean) => {
-    setFocusMode(checked);
-    document.documentElement.classList.toggle("focus-mode", checked);
-  };
-
-  const toggleReadingGuide = (checked: boolean) => {
-    setReadingGuide(checked);
-    document.documentElement.classList.toggle("reading-guide", checked);
-  };
-
-  if (!position) return null;
+export function AccessibilityButton({
+  language,
+  placement = "bottom",
+}: {
+  language: string;
+  placement?: "bottom" | "left" | "inline";
+}) {
+  const titleId = useId();
+  const dialog = useRef<HTMLDialogElement>(null);
+  const text = translations[language as keyof typeof translations] ?? translations.english;
+  const { preferences, setPreference } = useAccessibilityPreferences();
+  const { fontSize, colorBlindMode, highContrast, reduceMotion, textToSpeech, showCaptions, visualNotifications, largerTargets, keyboardNav, dyslexiaFont, focusMode, readingGuide } = preferences;
+  const position = {
+    bottom: "fixed bottom-4 right-4",
+    left: "fixed left-2 top-[42%] sm:left-4",
+    inline: "relative",
+  }[placement];
 
   return (
-    <div
-      style={{
-        // `position` was missing, so left/top were ignored and the button
-        // rendered in the page flow instead of floating bottom-right.
-        position: "fixed",
-        zIndex: 60,
-        left: `${position.x}px`,
-        top: `${position.y}px`,
-        cursor: isDragging ? "grabbing" : "grab",
-      }}
-      onMouseDown={handleMouseDown}
-    >
-      <Popover
-        open={isOpen}
-        onOpenChange={(open) => {
-          if (open && didDragRef.current) {
-            didDragRef.current = false;
-            return;
-          }
-          setIsOpen(open);
-        }}
+    <>
+      <button
+        type="button"
+        aria-label={text.accessibility}
+        aria-haspopup="dialog"
+        title={text.accessibility}
+        className={`${position} z-40 inline-grid h-12 w-12 shrink-0 place-items-center rounded-full border-2 border-white/60 bg-[#79356f] text-white shadow-lg hover:bg-[#934486]`}
+        onClick={() => dialog.current?.showModal()}
       >
-        <PopoverTrigger asChild>
-          <button
-            type="button"
-            className="relative h-14 w-14 rounded-full shadow-2xl transition-all hover:scale-105 focus:outline-none focus:ring-4 focus:ring-white/30"
-            aria-label={content.aria.open}
-            style={{
-              // 0.4 alpha left the white icon with too little contrast on
-              // light pages.
-              background: "rgba(140, 50, 118, 0.92)",
-              backdropFilter: "blur(10px)",
-              border: "2px solid rgba(255, 255, 255, 0.6)",
-              cursor: isDragging ? "grabbing" : "grab",
-              userSelect: "none",
-            }}
-          >
-            <div
-              className="absolute inset-0 rounded-full"
-              style={{
-                background:
-                  "radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.15) 0%, transparent 60%)",
-              }}
-            />
-            <StickmanIcon className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-8 w-8 text-white" />
-          </button>
-        </PopoverTrigger>
-
-        {/* ✅ Scrollable Popover */}
-        <PopoverContent
-          className="w-96 bg-black/95 border-gray-800 text-white backdrop-blur-xl max-h-[calc(100vh-120px)] flex flex-col"
-          side="top"
-          align="end"
-          sideOffset={16}
-        >
-          {/* Sticky header */}
-          <div className="sticky top-0 z-10 bg-black/95 pb-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <StickmanIcon className="h-5 w-5" />
-                <h4 className="font-semibold text-lg">{content.header}</h4>
-              </div>
-              <button
-                onClick={() => setIsOpen(false)}
-                className="rounded-full p-1 hover:bg-white/10 transition-colors"
-                aria-label={content.aria.close}
-                type="button"
+        <Accessibility size={26} aria-hidden="true" />
+      </button>
+      <dialog
+        ref={dialog}
+        aria-labelledby={titleId}
+        className="bbok-modal fixed inset-0 m-auto max-h-[calc(100dvh-2rem)] w-[min(700px,calc(100%-1.5rem))] overflow-y-auto rounded-2xl border border-white/30 bg-zinc-950 text-white shadow-2xl"
+      >
+        <div className="sticky top-0 z-10 bg-black/90 backdrop-blur-xl border-b border-white/20">
+          <div className="flex items-center justify-between gap-2 p-3 sm:p-4">
+            <h2
+              id={titleId}
+              className="text-base sm:text-lg text-white drop-shadow-lg flex items-center gap-2"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-white"
               >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            <Separator className="bg-gray-800 mt-3" />
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 16v-4" />
+                <path d="M12 8h.01" />
+              </svg>
+              {text.accessibility}
+            </h2>
+            <button
+              type="button"
+              onClick={() => dialog.current?.close()}
+              className="rounded-lg p-1.5 hover:bg-white/10 text-white/70 hover:text-white transition-colors"
+              aria-label={text.close}
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
           </div>
-
-          {/* Scrollable body */}
-          <div className="flex-1 overflow-y-auto pr-1 space-y-4 pt-3">
-            <div className="flex items-center justify-between p-3 rounded-lg bg-zinc-900/50">
-              <Label
-                htmlFor="keyboard-nav"
-                className="cursor-pointer text-base font-normal"
-              >
-                {content.keyboardNav}
-              </Label>
-              <Switch
-                id="keyboard-nav"
-                checked={keyboardNav}
-                onCheckedChange={toggleKeyboardNav}
-              />
-            </div>
-
-            <div className="flex items-center justify-between p-3 rounded-lg bg-zinc-900/50">
-              <Label
-                htmlFor="larger-buttons"
-                className="cursor-pointer text-base font-normal"
-              >
-                {content.largerButtons}
-              </Label>
-              <Switch
-                id="larger-buttons"
-                checked={largerButtons}
-                onCheckedChange={toggleLargerButtons}
-              />
-            </div>
-
-            <div className="space-y-2 p-3 rounded-lg bg-zinc-900/50">
-              <div className="flex items-center justify-between">
-                <Label
-                  htmlFor="voice-control"
-                  className="cursor-pointer text-base font-normal"
-                >
-                  {content.voiceControl}
-                </Label>
-                <Switch
-                  id="voice-control"
-                  checked={voiceControl}
-                  onCheckedChange={toggleVoiceControl}
-                />
+          <div className="px-3 sm:px-4 pb-2 text-white/50 text-[11px]">
+            {language === "english"
+              ? "Tip: Tap outside to close."
+              : language === "spanish"
+              ? "Consejo: toca fuera para cerrar."
+              : "Consell: toca fora per tancar."}
+          </div>
+        </div>
+        <div className="flex-1 overflow-y-auto overscroll-contain p-3 sm:p-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-4">
+              <div className="space-y-3">
+                <h3 className="text-sm sm:text-base text-white drop-shadow flex items-center gap-1.5">
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                  {text.visualAccessibility}
+                </h3>
+                <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20">
+                  <label className="text-white/90 mb-2 block text-xs sm:text-sm">
+                    {text.fontSize}
+                  </label>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+                    {(["small", "medium", "large", "xl"] as const).map(
+                      (size) => (
+                        <button
+                          key={size}
+                          type="button"
+                          onClick={() => setPreference("fontSize", size)}
+                          aria-pressed={fontSize === size}
+                          className={`px-3 py-1.5 rounded-lg transition-all text-xs ${
+                            fontSize === size
+                              ? "bg-white/30 text-white"
+                              : "bg-white/10 text-white/70 hover:bg-white/20"
+                          }`}
+                        >
+                          {text[size === "xl" ? "extraLarge" : size]}
+                        </button>
+                      )
+                    )}
+                  </div>
+                </div>
+                <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <circle cx="12" cy="12" r="10" />
+                      <path d="M12 2v20" />
+                    </svg>
+                    <span className="text-white/90 text-xs sm:text-sm">
+                      {text.highContrast}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={highContrast}
+                    aria-label={text.highContrast}
+                    onClick={() => setPreference("highContrast", !highContrast)}
+                    className={`w-12 h-7 rounded-full transition-all ${
+                      highContrast ? "bg-green-500" : "bg-white/20"
+                    }`}
+                  >
+                    <div
+                      className={`w-5 h-5 bg-white rounded-full transition-transform ${
+                        highContrast ? "translate-x-6" : "translate-x-1"
+                      }`}
+                    />
+                  </button>
+                </div>
+                <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20">
+                  <label className="text-white/90 mb-2 block text-xs sm:text-sm">
+                    {text.colorBlindMode}
+                  </label>
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {(
+                      [
+                        "none",
+                        "protanopia",
+                        "deuteranopia",
+                        "tritanopia",
+                      ] as const
+                    ).map((mode) => (
+                      <button
+                        key={mode}
+                        type="button"
+                        onClick={() => setPreference("colorBlindMode", mode)}
+                        aria-pressed={colorBlindMode === mode}
+                        className={`px-3 py-1.5 rounded-lg transition-all text-xs ${
+                          colorBlindMode === mode
+                            ? "bg-white/30 text-white"
+                            : "bg-white/10 text-white/70 hover:bg-white/20"
+                        }`}
+                      >
+                        {text[mode]}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+                    </svg>
+                    <span className="text-white/90 text-xs sm:text-sm">
+                      {text.reduceMotion}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={reduceMotion}
+                    aria-label={text.reduceMotion}
+                    onClick={() => setPreference("reduceMotion", !reduceMotion)}
+                    className={`w-12 h-7 rounded-full transition-all ${
+                      reduceMotion ? "bg-green-500" : "bg-white/20"
+                    }`}
+                  >
+                    <div
+                      className={`w-5 h-5 bg-white rounded-full transition-transform ${
+                        reduceMotion ? "translate-x-6" : "translate-x-1"
+                      }`}
+                    />
+                  </button>
+                </div>
+                <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <path d="M4 7V4h16v3" />
+                      <path d="M9 20h6" />
+                      <path d="M12 4v16" />
+                    </svg>
+                    <span className="text-white/90 text-xs sm:text-sm">
+                      {text.dyslexiaFont}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={dyslexiaFont}
+                    aria-label={text.dyslexiaFont}
+                    onClick={() => setPreference("dyslexiaFont", !dyslexiaFont)}
+                    className={`w-12 h-7 rounded-full transition-all ${
+                      dyslexiaFont ? "bg-green-500" : "bg-white/20"
+                    }`}
+                  >
+                    <div
+                      className={`w-5 h-5 bg-white rounded-full transition-transform ${
+                        dyslexiaFont ? "translate-x-6" : "translate-x-1"
+                      }`}
+                    />
+                  </button>
+                </div>
               </div>
-              <p className="text-sm text-gray-400">
-                {content.voiceControlDesc}
-              </p>
             </div>
-
-            <Separator className="bg-gray-800" />
-
-            <div className="flex items-center gap-2">
-              <Circle className="h-5 w-5" />
-              <h5 className="font-semibold text-base">
-                {content.cognitiveTitle}
-              </h5>
-            </div>
-
-            <div className="space-y-2 p-3 rounded-lg bg-zinc-900/50">
-              <div className="flex items-center justify-between">
-                <Label
-                  htmlFor="focus-mode"
-                  className="cursor-pointer text-base font-normal"
-                >
-                  {content.focusMode}
-                </Label>
-                <Switch
-                  id="focus-mode"
-                  checked={focusMode}
-                  onCheckedChange={toggleFocusMode}
-                />
+            <div className="space-y-4">
+              <div className="space-y-3">
+                <h3 className="text-sm sm:text-base text-white drop-shadow flex items-center gap-1.5">
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                    <line x1="12" y1="19" x2="12" y2="22" />
+                  </svg>
+                  {text.hearingAccessibility}
+                </h3>
+                <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <rect x="2" y="4" width="20" height="16" rx="2" />
+                      <path d="M8 10h.01" />
+                      <path d="M12 10h.01" />
+                      <path d="M16 10h.01" />
+                      <path d="M8 14h8" />
+                    </svg>
+                    <div>
+                      <span className="text-white/90 block text-xs sm:text-sm">
+                        {text.captions}
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={showCaptions}
+                    aria-label={text.captions}
+                    onClick={() => setPreference("showCaptions", !showCaptions)}
+                    className={`w-12 h-7 rounded-full transition-all ${
+                      showCaptions ? "bg-green-500" : "bg-white/20"
+                    }`}
+                  >
+                    <div
+                      className={`w-5 h-5 bg-white rounded-full transition-transform ${
+                        showCaptions ? "translate-x-6" : "translate-x-1"
+                      }`}
+                    />
+                  </button>
+                </div>
+                <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                      <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                    </svg>
+                    <span className="text-white/90 text-xs sm:text-sm">
+                      {text.visualNotifications}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={visualNotifications}
+                    aria-label={text.visualNotifications}
+                    onClick={() =>
+                      setPreference("visualNotifications", !visualNotifications)
+                    }
+                    className={`w-12 h-7 rounded-full transition-all ${
+                      visualNotifications ? "bg-green-500" : "bg-white/20"
+                    }`}
+                  >
+                    <div
+                      className={`w-5 h-5 bg-white rounded-full transition-transform ${
+                        visualNotifications
+                          ? "translate-x-6"
+                          : "translate-x-1"
+                      }`}
+                    />
+                  </button>
+                </div>
+                <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                      <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+                      <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                    </svg>
+                    <span className="text-white/90 text-xs sm:text-sm">
+                      {text.textToSpeech}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={textToSpeech}
+                    aria-label={text.textToSpeech}
+                    onClick={() => setPreference("textToSpeech", !textToSpeech)}
+                    className={`w-12 h-7 rounded-full transition-all ${
+                      textToSpeech ? "bg-green-500" : "bg-white/20"
+                    }`}
+                  >
+                    <div
+                      className={`w-5 h-5 bg-white rounded-full transition-transform ${
+                        textToSpeech ? "translate-x-6" : "translate-x-1"
+                      }`}
+                    />
+                  </button>
+                </div>
               </div>
-              <p className="text-sm text-gray-400">{content.focusModeDesc}</p>
-            </div>
-
-            <div className="space-y-2 p-3 rounded-lg bg-zinc-900/50">
-              <div className="flex items-center justify-between">
-                <Label
-                  htmlFor="reading-guide"
-                  className="cursor-pointer text-base font-normal"
-                >
-                  {content.readingGuide}
-                </Label>
-                <Switch
-                  id="reading-guide"
-                  checked={readingGuide}
-                  onCheckedChange={toggleReadingGuide}
-                />
+              <div className="space-y-3">
+                <h3 className="text-sm sm:text-base text-white drop-shadow">
+                  {text.motorAccessibility}
+                </h3>
+                <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20 flex items-center justify-between">
+                  <span className="text-white/90 text-xs sm:text-sm">
+                    {text.largerTargets}
+                  </span>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={largerTargets}
+                    aria-label={text.largerTargets}
+                    onClick={() => setPreference("largerTargets", !largerTargets)}
+                    className={`w-12 h-7 rounded-full transition-all ${
+                      largerTargets ? "bg-green-500" : "bg-white/20"
+                    }`}
+                  >
+                    <div
+                      className={`w-5 h-5 bg-white rounded-full transition-transform ${
+                        largerTargets ? "translate-x-6" : "translate-x-1"
+                      }`}
+                    />
+                  </button>
+                </div>
+                <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20 flex items-center justify-between">
+                  <span className="text-white/90 text-xs sm:text-sm">
+                    {text.keyboardNav}
+                  </span>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={keyboardNav}
+                    aria-label={text.keyboardNav}
+                    onClick={() => setPreference("keyboardNav", !keyboardNav)}
+                    className={`w-12 h-7 rounded-full transition-all ${
+                      keyboardNav ? "bg-green-500" : "bg-white/20"
+                    }`}
+                  >
+                    <div
+                      className={`w-5 h-5 bg-white rounded-full transition-transform ${
+                        keyboardNav ? "translate-x-6" : "translate-x-1"
+                      }`}
+                    />
+                  </button>
+                </div>
               </div>
-              <p className="text-sm text-gray-400">
-                {content.readingGuideDesc}
-              </p>
+              <div className="space-y-3">
+                <h3 className="text-sm sm:text-base text-white drop-shadow">
+                  {text.cognitiveAccessibility}
+                </h3>
+                <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20 flex items-center justify-between">
+                  <span className="text-white/90 text-xs sm:text-sm">
+                    {text.focusMode}
+                  </span>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={focusMode}
+                    aria-label={text.focusMode}
+                    onClick={() => setPreference("focusMode", !focusMode)}
+                    className={`w-12 h-7 rounded-full transition-all ${
+                      focusMode ? "bg-green-500" : "bg-white/20"
+                    }`}
+                  >
+                    <div
+                      className={`w-5 h-5 bg-white rounded-full transition-transform ${
+                        focusMode ? "translate-x-6" : "translate-x-1"
+                      }`}
+                    />
+                  </button>
+                </div>
+                <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20 flex items-center justify-between">
+                  <span className="text-white/90 text-xs sm:text-sm">
+                    {text.readingGuide}
+                  </span>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={readingGuide}
+                    aria-label={text.readingGuide}
+                    onClick={() => setPreference("readingGuide", !readingGuide)}
+                    className={`w-12 h-7 rounded-full transition-all ${
+                      readingGuide ? "bg-green-500" : "bg-white/20"
+                    }`}
+                  >
+                    <div
+                      className={`w-5 h-5 bg-white rounded-full transition-transform ${
+                        readingGuide ? "translate-x-6" : "translate-x-1"
+                      }`}
+                    />
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
-        </PopoverContent>
-      </Popover>
-    </div>
+        </div>
+        <div className="border-t border-white/10 bg-black/70 px-3 sm:px-4 py-2 text-[11px] text-white/50">
+          {language === "english"
+            ? "Changes are applied instantly."
+            : language === "spanish"
+            ? "Los cambios se aplican al instante."
+            : "Els canvis s'apliquen a l'instant."}
+        </div>
+      </dialog>
+    </>
   );
 }

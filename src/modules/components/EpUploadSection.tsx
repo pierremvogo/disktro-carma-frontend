@@ -595,7 +595,7 @@ export function EpUploadSection({ text, language }: EpUploadSectionProps) {
                         type="file"
                         accept="image/*"
                         onChange={handleArtwork}
-                        className="hidden"
+                        className="sr-only bbok-file-input"
                         id="single-artwork-upload"
                       />
                       <label

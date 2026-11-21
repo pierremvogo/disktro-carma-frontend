@@ -580,7 +580,7 @@ export default function AlbumTracksEditor({
                         type="file"
                         accept="audio/*"
                         onChange={handleTrackAudioChange(track.id)}
-                        className="hidden"
+                        className="sr-only bbok-file-input"
                         id={`album-track-upload-${track.id}`}
                       />
                       <label
@@ -716,7 +716,7 @@ export default function AlbumTracksEditor({
                         type="file"
                         accept="video/*"
                         onChange={handleTrackSignLanguage(track.id)}
-                        className="hidden"
+                        className="sr-only bbok-file-input"
                         id={`album-sign-language-${track.id}`}
                       />
                       <label
@@ -789,7 +789,7 @@ export default function AlbumTracksEditor({
                         type="file"
                         accept=".brf,.brl,.txt"
                         onChange={handleTrackBrailleFile(track.id)}
-                        className="hidden"
+                        className="sr-only bbok-file-input"
                         id={`album-braille-upload-${track.id}`}
                       />
                       <label

@@ -629,6 +629,7 @@ export function SingleUploadSection({
     setSuccessMessage("");
     setIsLoading(true);
 
+    setMiniVideoLoopUrl("");
     setMiniVideoFile(file);
     setMiniVideoPreview((prev) => {
       if (prev) URL.revokeObjectURL(prev);
@@ -641,11 +642,8 @@ export function SingleUploadSection({
     try {
       const res = await MediaModule.service.uploadVideoFile(fd);
 
-      if (res && res.url) {
-        setMiniVideoLoopUrl(res.url);
-      } else {
-      }
-      setIsLoading(false);
+      if (!res?.url) throw new Error("Missing mini video URL");
+      setMiniVideoLoopUrl(res.url);
     } catch (error) {
       console.error("Erreur upload mini-video :", error);
       setErrorMessage(text.errors.generic);
@@ -726,7 +724,8 @@ export function SingleUploadSection({
   // allUploadsDone => contrôle du bouton Upload
   // ==========
   let allUploadsDone =
-    !!audioUrl && !!coverUrl && !!signLanguageVideoUrl && !!brailleFileUrl;
+    !!audioUrl && !!coverUrl && !!signLanguageVideoUrl && !!brailleFileUrl &&
+    (!miniVideoFile || !!miniVideoLoopUrl);
 
   // ==========
   // handleAddTrack : logique Single (createSingle + createTrack + addTrackToSingle)
@@ -816,6 +815,7 @@ export function SingleUploadSection({
         title: trackTitle || undefined,
         userId: userId || undefined,
         lyrics: lyrics || undefined,
+        miniVideoLoopUrl: miniVideoLoopUrl || undefined,
         signLanguageVideoUrl: signLanguageVideoUrl || undefined,
         brailleFileUrl: brailleFileUrl || undefined,
       };
@@ -933,7 +933,7 @@ export function SingleUploadSection({
                   type="file"
                   accept="audio/*"
                   onChange={handleAudioFileChange}
-                  className="hidden"
+                  className="sr-only bbok-file-input"
                   id="single-audio-upload"
                 />
                 <label htmlFor="single-audio-upload" className="cursor-pointer">
@@ -989,7 +989,7 @@ export function SingleUploadSection({
                     type="file"
                     accept="image/*"
                     onChange={handleArtwork}
-                    className="hidden"
+                    className="sr-only bbok-file-input"
                     id="single-artwork-upload"
                   />
                   <label
@@ -1050,7 +1050,7 @@ export function SingleUploadSection({
                     type="file"
                     accept="video/*"
                     onChange={handleMiniVideoLoop}
-                    className="hidden"
+                    className="sr-only bbok-file-input"
                     id="single-mini-video-upload"
                   />
                   <label
@@ -1150,7 +1150,7 @@ export function SingleUploadSection({
                       type="file"
                       accept="video/*"
                       onChange={handleSignLanguageVideo}
-                      className="hidden"
+                      className="sr-only bbok-file-input"
                       id="sign-language-upload-single"
                     />
                     <label
@@ -1199,7 +1199,7 @@ export function SingleUploadSection({
                       type="file"
                       accept=".brf,.brl,.txt"
                       onChange={handleBrailleFile}
-                      className="hidden"
+                      className="sr-only bbok-file-input"
                       id="braille-upload-single"
                     />
                     <label

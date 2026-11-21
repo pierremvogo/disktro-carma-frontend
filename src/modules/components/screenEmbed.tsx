@@ -10,14 +10,12 @@ import { ArtistProfileSetup } from "./ArtistProfileSetup";
 import { Login } from "./Login";
 import { ArtistChoice } from "./ArtistChoice";
 import { AccessibilityButton } from "./accessibilityButton/AccessibilityButton";
-import { ColorBlindFilters } from "./ColorBlindFilters";
 import { UserModuleObject as UserModule } from "../module";
 import { getUserRole } from "@/@disktro/utils";
 import { useRouter, useSearchParams } from "next/navigation";
 
 type Language = "english" | "spanish" | "catalan";
 const LANGUAGE_STORAGE_KEY = "disktro_language";
-type size_type = "small" | "medium" | "large" | "xl";
 
 export function ScreenEmbed({ initialView }: { initialView?: string }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -33,21 +31,6 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
   const [isArtist, setIsArtist] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const [showAccessibility, setShowAccessibility] = useState(false);
-  const [fontSize, setFontSize] = useState<size_type>("medium");
-  const [highContrast, setHighContrast] = useState(false);
-  const [colorBlindMode, setColorBlindMode] = useState<
-    "none" | "protanopia" | "deuteranopia" | "tritanopia"
-  >("none");
-  const [reduceMotion, setReduceMotion] = useState(false);
-  const [textToSpeech, setTextToSpeech] = useState(false);
-  const [showCaptions, setShowCaptions] = useState(false);
-  const [visualNotifications, setVisualNotifications] = useState(false);
-  const [largerTargets, setLargerTargets] = useState(false);
-  const [keyboardNav, setKeyboardNav] = useState(false);
-  const [dyslexiaFont, setDyslexiaFont] = useState(false);
-  const [focusMode, setFocusMode] = useState(false);
-  const [readingGuide, setReadingGuide] = useState(false);
 
   const mediaScrollRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
@@ -60,7 +43,6 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
   const dragData = useRef({ startX: 0, scrollLeft: 0 });
 
   const [activeMediaIndex, setActiveMediaIndex] = useState(0);
-  const [largerButtons, setLargerButtons] = useState(false);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const ACCESS_TOKEN_KEY = UserModule.localState.ACCESS_TOKEN;
   const USER_ID_KEY = UserModule.localState.USER_ID;
@@ -100,45 +82,6 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
     };
   }, []);
 
-  useEffect(() => {
-    if (!showAccessibility) return;
-
-    const onKeyDown = (e: any) => {
-      if (e.key === "Escape") setShowAccessibility(false);
-    };
-
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [showAccessibility]);
-
-  // Accessibility: apply the settings that work through document-level CSS
-  // classes (see globals.css). A class is only added while its setting is on
-  // and removed on cleanup, so several components can share them safely.
-  useEffect(() => {
-    const root = document.documentElement;
-    const active: string[] = [];
-    if (reduceMotion) active.push("reduce-motion");
-    if (largerTargets) active.push("larger-targets");
-    if (keyboardNav) active.push("keyboard-nav");
-    if (focusMode) active.push("focus-mode");
-    active.forEach((c) => root.classList.add(c));
-    return () => active.forEach((c) => root.classList.remove(c));
-  }, [reduceMotion, largerTargets, keyboardNav, focusMode]);
-
-  // Accessibility: reading guide line that follows the pointer.
-  useEffect(() => {
-    if (!readingGuide) return;
-    const root = document.documentElement;
-    root.classList.add("reading-guide");
-    const onMove = (e: MouseEvent) =>
-      root.style.setProperty("--reading-guide-position", `${e.clientY}px`);
-    window.addEventListener("mousemove", onMove);
-    return () => {
-      window.removeEventListener("mousemove", onMove);
-      root.classList.remove("reading-guide");
-    };
-  }, [readingGuide]);
-
   // Gestion de la navigation au clavier pour le scroll horizontal
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "ArrowLeft") {
@@ -147,38 +90,6 @@ export function ScreenEmbed({ initialView }: { initialView?: string }) {
     } else if (e.key === "ArrowRight") {
       e.preventDefault();
       scrollByAmount(300);
-    }
-  };
-
-  const toggleLargerButtons = (size: size_type) => {
-    setFontSize(size);
-    switch (size) {
-      case "small":
-        document.documentElement.classList.remove("medium-buttons");
-        document.documentElement.classList.remove("xl-buttons");
-        document.documentElement.classList.remove("larger-buttons");
-        document.documentElement.classList.add("smaller-buttons");
-        break;
-      case "medium":
-        document.documentElement.classList.add("medium-buttons");
-        document.documentElement.classList.remove("xl-buttons");
-        document.documentElement.classList.remove("larger-buttons");
-        document.documentElement.classList.remove("smaller-buttons");
-        break;
-      case "large":
-        document.documentElement.classList.remove("medium-buttons");
-        document.documentElement.classList.remove("xl-buttons");
-        document.documentElement.classList.add("larger-buttons");
-        document.documentElement.classList.remove("smaller-buttons");
-        break;
-      case "xl":
-        document.documentElement.classList.remove("medium-buttons");
-        document.documentElement.classList.add("xl-buttons");
-        document.documentElement.classList.remove("larger-buttons");
-        document.documentElement.classList.remove("smaller-buttons");
-        break;
-      default:
-        document.documentElement.classList.remove("medium-buttons");
     }
   };
 
@@ -631,15 +542,7 @@ min-h-[100svh] md:min-h-screen
 overflow-y-scroll
 pt-[env(safe-area-inset-top)]
 pb-[env(safe-area-inset-bottom)]
- ${
-   fontSize === "large"
-     ? "text-lg"
-     : fontSize === "xl"
-       ? "text-xl"
-       : fontSize === "small"
-         ? "text-sm"
-         : ""
- } ${highContrast ? "contrast-150" : ""} ${dyslexiaFont ? "font-mono" : ""}`;
+`;
 
   useEffect(() => {
     if (initialView === "home") {
@@ -967,17 +870,8 @@ pb-[env(safe-area-inset-bottom)]
           'url("/image/4ac3eed398bb68113a14d0fa5efe7a6def6f7651.png")',
         backgroundSize: "cover",
         backgroundPosition: "center",
-        filter:
-          colorBlindMode === "protanopia"
-            ? "url(#protanopia)"
-            : colorBlindMode === "deuteranopia"
-              ? "url(#deuteranopia)"
-              : colorBlindMode === "tritanopia"
-                ? "url(#tritanopia)"
-                : "none",
       }}
     >
-      <ColorBlindFilters />
       {/* Overlay */}
       <div className="fixed inset-0 bg-black/50 pointer-events-none" />
 
@@ -990,42 +884,6 @@ pb-[env(safe-area-inset-bottom)]
           pb-[max(env(safe-area-inset-bottom),1rem)]
         "
       >
-        {/* Keyboard Navigation Hints */}
-        {keyboardNav && !showAccessibility && (
-          <div
-            className="fixed right-4 z-40 bg-black/80 backdrop-blur-md border border-white/30 rounded-xl p-3 text-[11px] text-white/80"
-            style={{ bottom: "calc(env(safe-area-inset-bottom) + 20px)" }}
-          >
-            <div className="space-y-1">
-              <div>
-                <kbd className="bg-white/20 px-1.5 py-0.5 rounded text-[10px]">
-                  ESC
-                </kbd>{" "}
-                {language === "spanish"
-                  ? "Volver"
-                  : language === "english"
-                    ? "Back"
-                    : "Tornar"}
-              </div>
-              <div>
-                <kbd className="bg-white/20 px-1.5 py-0.5 rounded text-[10px]">
-                  SPACE
-                </kbd>{" "}
-                {language === "spanish"
-                  ? "Play/Pausa"
-                  : language === "english"
-                    ? "Play/Pause"
-                    : "Play/Pausa"}
-              </div>
-              <div>
-                <kbd className="bg-white/20 px-1.5 py-0.5 rounded text-[10px]">
-                  Ctrl+A
-                </kbd>{" "}
-                {text.accessibility}
-              </div>
-            </div>
-          </div>
-        )}
         {/* HEADER - Logo + Menu Mobile */}
         <header
           className="flex items-center justify-between w-full px-4 sm:px-6 lg:px-8 py-3"
@@ -1052,6 +910,8 @@ pb-[env(safe-area-inset-bottom)]
               className="h-7 sm:h-8 md:h-10 w-auto"
             />
           </button>
+
+          <AccessibilityButton language={language} placement="left" />
 
           {/* Menu Mobile Burger */}
           <div className="lg:hidden relative" ref={menuRef}>
@@ -1206,45 +1066,6 @@ pb-[env(safe-area-inset-bottom)]
             aria-label="Main navigation"
           >
             <div className="flex items-center gap-2">
-              {/* Bouton Accessibilité */}
-              {/* <AccessibilityButton language={language} />  */}
-              <button
-                onClick={() => setShowAccessibility(true)}
-                aria-label={text.accessibility}
-                title={text.accessibility}
-                type="button"
-                className="relative h-8 w-8 sm:h-9 sm:w-9 rounded-full shadow-md transition-all hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/30 select-none"
-                style={{
-                  background: "rgba(168, 85, 145, 0.4)",
-                  backdropFilter: "blur(10px)",
-                  border: "2px solid rgba(255, 255, 255, 0.2)",
-                }}
-              >
-                <div
-                  className="absolute inset-0 rounded-full pointer-events-none"
-                  style={{
-                    background:
-                      "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15) 0%, transparent 60%)",
-                  }}
-                />
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="absolute top-1/2 left-1/2 h-4 w-4 sm:h-5 sm:w-5 -translate-x-1/2 -translate-y-1/2 text-white"
-                  aria-hidden="true"
-                >
-                  <circle cx="12" cy="5" r="2.5" />
-                  <line x1="12" y1="7.5" x2="12" y2="14" />
-                  <line x1="12" y1="9.5" x2="8" y2="12" />
-                  <line x1="12" y1="9.5" x2="16" y2="12" />
-                  <line x1="12" y1="14" x2="9" y2="19" />
-                  <line x1="12" y1="14" x2="15" y2="19" />
-                </svg>
-              </button>
               {/* Language Pills */}
               <div
                 className="flex items-center gap-1 bg-white/10 backdrop-blur-md rounded-full p-1 border border-white/10"
@@ -1388,492 +1209,8 @@ pb-[env(safe-area-inset-bottom)]
           </nav>
         </header>
 
-        {/* Accessibility Panel */}
-        {showAccessibility && (
-          <div
-            className="fixed inset-0 z-50"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="accessibility-title"
-            onMouseDown={() => setShowAccessibility(false)}
-          >
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-            <div
-              className="absolute inset-x-0 mx-auto w-[min(700px,calc(100%-1.5rem))] sm:w-[min(700px,calc(100%-2rem))] top-[calc(env(safe-area-inset-top)+0.75rem)] bottom-[calc(env(safe-area-inset-bottom)+0.75rem)] bg-black/80 backdrop-blur-xl rounded-2xl border border-white/30 shadow-2xl overflow-hidden flex flex-col"
-              onMouseDown={(e) => e.stopPropagation()}
-            >
-              <div className="sticky top-0 z-10 bg-black/90 backdrop-blur-xl border-b border-white/20">
-                <div className="flex items-center justify-between gap-2 p-3 sm:p-4">
-                  <h2
-                    id="accessibility-title"
-                    className="text-base sm:text-lg text-white drop-shadow-lg flex items-center gap-2"
-                  >
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="text-white"
-                    >
-                      <circle cx="12" cy="12" r="10" />
-                      <path d="M12 16v-4" />
-                      <path d="M12 8h.01" />
-                    </svg>
-                    {text.accessibility}
-                  </h2>
-                  <button
-                    type="button"
-                    onClick={() => setShowAccessibility(false)}
-                    className="rounded-lg p-1.5 hover:bg-white/10 text-white/70 hover:text-white transition-colors"
-                    aria-label="Close accessibility panel"
-                  >
-                    <svg
-                      width="18"
-                      height="18"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <line x1="18" y1="6" x2="6" y2="18" />
-                      <line x1="6" y1="6" x2="18" y2="18" />
-                    </svg>
-                  </button>
-                </div>
-                <div className="px-3 sm:px-4 pb-2 text-white/50 text-[11px]">
-                  {language === "english"
-                    ? "Tip: Tap outside to close."
-                    : language === "spanish"
-                      ? "Consejo: toca fuera para cerrar."
-                      : "Consell: toca fora per tancar."}
-                </div>
-              </div>
-              <div className="flex-1 overflow-y-auto overscroll-contain p-3 sm:p-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-4">
-                    <div className="space-y-3">
-                      <h3 className="text-sm sm:text-base text-white drop-shadow flex items-center gap-1.5">
-                        <svg
-                          width="18"
-                          height="18"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                        >
-                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                          <circle cx="12" cy="12" r="3" />
-                        </svg>
-                        {text.visualAccessibility}
-                      </h3>
-                      <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20">
-                        <label className="text-white/90 mb-2 block text-xs sm:text-sm">
-                          {text.fontSize}
-                        </label>
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
-                          {(["small", "medium", "large", "xl"] as const).map(
-                            (size) => (
-                              <button
-                                key={size}
-                                type="button"
-                                onClick={() => toggleLargerButtons(size)}
-                                aria-pressed={fontSize === size}
-                                className={`px-3 py-1.5 rounded-lg transition-all text-xs ${
-                                  fontSize === size
-                                    ? "bg-white/30 text-white"
-                                    : "bg-white/10 text-white/70 hover:bg-white/20"
-                                }`}
-                              >
-                                {text[size === "xl" ? "extraLarge" : size]}
-                              </button>
-                            ),
-                          )}
-                        </div>
-                      </div>
-                      <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20 flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <svg
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                          >
-                            <circle cx="12" cy="12" r="10" />
-                            <path d="M12 2v20" />
-                          </svg>
-                          <span className="text-white/90 text-xs sm:text-sm">
-                            {text.highContrast}
-                          </span>
-                        </div>
-                        <button
-                          type="button"
-                          role="switch"
-                          aria-checked={highContrast}
-                          aria-label={text.highContrast}
-                          onClick={() => setHighContrast(!highContrast)}
-                          className={`w-12 h-7 rounded-full transition-all ${
-                            highContrast ? "bg-green-500" : "bg-white/20"
-                          }`}
-                        >
-                          <div
-                            className={`w-5 h-5 bg-white rounded-full transition-transform ${
-                              highContrast ? "translate-x-6" : "translate-x-1"
-                            }`}
-                          />
-                        </button>
-                      </div>
-                      <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20">
-                        <label className="text-white/90 mb-2 block text-xs sm:text-sm">
-                          {text.colorBlindMode}
-                        </label>
-                        <div className="grid grid-cols-2 gap-1.5">
-                          {(
-                            [
-                              "none",
-                              "protanopia",
-                              "deuteranopia",
-                              "tritanopia",
-                            ] as const
-                          ).map((mode) => (
-                            <button
-                              key={mode}
-                              type="button"
-                              onClick={() => setColorBlindMode(mode)}
-                              aria-pressed={colorBlindMode === mode}
-                              className={`px-3 py-1.5 rounded-lg transition-all text-xs ${
-                                colorBlindMode === mode
-                                  ? "bg-white/30 text-white"
-                                  : "bg-white/10 text-white/70 hover:bg-white/20"
-                              }`}
-                            >
-                              {text[mode]}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                      <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20 flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <svg
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                          >
-                            <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-                          </svg>
-                          <span className="text-white/90 text-xs sm:text-sm">
-                            {text.reduceMotion}
-                          </span>
-                        </div>
-                        <button
-                          type="button"
-                          role="switch"
-                          aria-checked={reduceMotion}
-                          aria-label={text.reduceMotion}
-                          onClick={() => setReduceMotion(!reduceMotion)}
-                          className={`w-12 h-7 rounded-full transition-all ${
-                            reduceMotion ? "bg-green-500" : "bg-white/20"
-                          }`}
-                        >
-                          <div
-                            className={`w-5 h-5 bg-white rounded-full transition-transform ${
-                              reduceMotion ? "translate-x-6" : "translate-x-1"
-                            }`}
-                          />
-                        </button>
-                      </div>
-                      <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20 flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <svg
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                          >
-                            <path d="M4 7V4h16v3" />
-                            <path d="M9 20h6" />
-                            <path d="M12 4v16" />
-                          </svg>
-                          <span className="text-white/90 text-xs sm:text-sm">
-                            {text.dyslexiaFont}
-                          </span>
-                        </div>
-                        <button
-                          type="button"
-                          role="switch"
-                          aria-checked={dyslexiaFont}
-                          aria-label={text.dyslexiaFont}
-                          onClick={() => setDyslexiaFont(!dyslexiaFont)}
-                          className={`w-12 h-7 rounded-full transition-all ${
-                            dyslexiaFont ? "bg-green-500" : "bg-white/20"
-                          }`}
-                        >
-                          <div
-                            className={`w-5 h-5 bg-white rounded-full transition-transform ${
-                              dyslexiaFont ? "translate-x-6" : "translate-x-1"
-                            }`}
-                          />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="space-y-4">
-                    <div className="space-y-3">
-                      <h3 className="text-sm sm:text-base text-white drop-shadow flex items-center gap-1.5">
-                        <svg
-                          width="18"
-                          height="18"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                        >
-                          <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
-                          <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-                          <line x1="12" y1="19" x2="12" y2="22" />
-                        </svg>
-                        {text.hearingAccessibility}
-                      </h3>
-                      <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20 flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <svg
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                          >
-                            <rect x="2" y="4" width="20" height="16" rx="2" />
-                            <path d="M8 10h.01" />
-                            <path d="M12 10h.01" />
-                            <path d="M16 10h.01" />
-                            <path d="M8 14h8" />
-                          </svg>
-                          <div>
-                            <span className="text-white/90 block text-xs sm:text-sm">
-                              {text.captions}
-                            </span>
-                            <span className="text-white/50 text-[11px]">
-                              {text.signLanguage}
-                            </span>
-                          </div>
-                        </div>
-                        <button
-                          type="button"
-                          role="switch"
-                          aria-checked={showCaptions}
-                          aria-label={text.captions}
-                          onClick={() => setShowCaptions(!showCaptions)}
-                          className={`w-12 h-7 rounded-full transition-all ${
-                            showCaptions ? "bg-green-500" : "bg-white/20"
-                          }`}
-                        >
-                          <div
-                            className={`w-5 h-5 bg-white rounded-full transition-transform ${
-                              showCaptions ? "translate-x-6" : "translate-x-1"
-                            }`}
-                          />
-                        </button>
-                      </div>
-                      <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20 flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <svg
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                          >
-                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-                          </svg>
-                          <span className="text-white/90 text-xs sm:text-sm">
-                            {text.visualNotifications}
-                          </span>
-                        </div>
-                        <button
-                          type="button"
-                          role="switch"
-                          aria-checked={visualNotifications}
-                          aria-label={text.visualNotifications}
-                          onClick={() =>
-                            setVisualNotifications(!visualNotifications)
-                          }
-                          className={`w-12 h-7 rounded-full transition-all ${
-                            visualNotifications ? "bg-green-500" : "bg-white/20"
-                          }`}
-                        >
-                          <div
-                            className={`w-5 h-5 bg-white rounded-full transition-transform ${
-                              visualNotifications
-                                ? "translate-x-6"
-                                : "translate-x-1"
-                            }`}
-                          />
-                        </button>
-                      </div>
-                      <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20 flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <svg
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                          >
-                            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-                            <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
-                            <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
-                          </svg>
-                          <span className="text-white/90 text-xs sm:text-sm">
-                            {text.textToSpeech}
-                          </span>
-                        </div>
-                        <button
-                          type="button"
-                          role="switch"
-                          aria-checked={textToSpeech}
-                          aria-label={text.textToSpeech}
-                          onClick={() => setTextToSpeech(!textToSpeech)}
-                          className={`w-12 h-7 rounded-full transition-all ${
-                            textToSpeech ? "bg-green-500" : "bg-white/20"
-                          }`}
-                        >
-                          <div
-                            className={`w-5 h-5 bg-white rounded-full transition-transform ${
-                              textToSpeech ? "translate-x-6" : "translate-x-1"
-                            }`}
-                          />
-                        </button>
-                      </div>
-                    </div>
-                    <div className="space-y-3">
-                      <h3 className="text-sm sm:text-base text-white drop-shadow">
-                        {text.motorAccessibility}
-                      </h3>
-                      <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20 flex items-center justify-between">
-                        <span className="text-white/90 text-xs sm:text-sm">
-                          {text.largerTargets}
-                        </span>
-                        <button
-                          type="button"
-                          role="switch"
-                          aria-checked={largerTargets}
-                          aria-label={text.largerTargets}
-                          onClick={() => setLargerTargets(!largerTargets)}
-                          className={`w-12 h-7 rounded-full transition-all ${
-                            largerTargets ? "bg-green-500" : "bg-white/20"
-                          }`}
-                        >
-                          <div
-                            className={`w-5 h-5 bg-white rounded-full transition-transform ${
-                              largerTargets ? "translate-x-6" : "translate-x-1"
-                            }`}
-                          />
-                        </button>
-                      </div>
-                      <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20 flex items-center justify-between">
-                        <span className="text-white/90 text-xs sm:text-sm">
-                          {text.keyboardNav}
-                        </span>
-                        <button
-                          type="button"
-                          role="switch"
-                          aria-checked={keyboardNav}
-                          aria-label={text.keyboardNav}
-                          onClick={() => setKeyboardNav(!keyboardNav)}
-                          className={`w-12 h-7 rounded-full transition-all ${
-                            keyboardNav ? "bg-green-500" : "bg-white/20"
-                          }`}
-                        >
-                          <div
-                            className={`w-5 h-5 bg-white rounded-full transition-transform ${
-                              keyboardNav ? "translate-x-6" : "translate-x-1"
-                            }`}
-                          />
-                        </button>
-                      </div>
-                    </div>
-                    <div className="space-y-3">
-                      <h3 className="text-sm sm:text-base text-white drop-shadow">
-                        {text.cognitiveAccessibility}
-                      </h3>
-                      <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20 flex items-center justify-between">
-                        <span className="text-white/90 text-xs sm:text-sm">
-                          {text.focusMode}
-                        </span>
-                        <button
-                          type="button"
-                          role="switch"
-                          aria-checked={focusMode}
-                          aria-label={text.focusMode}
-                          onClick={() => setFocusMode(!focusMode)}
-                          className={`w-12 h-7 rounded-full transition-all ${
-                            focusMode ? "bg-green-500" : "bg-white/20"
-                          }`}
-                        >
-                          <div
-                            className={`w-5 h-5 bg-white rounded-full transition-transform ${
-                              focusMode ? "translate-x-6" : "translate-x-1"
-                            }`}
-                          />
-                        </button>
-                      </div>
-                      <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20 flex items-center justify-between">
-                        <span className="text-white/90 text-xs sm:text-sm">
-                          {text.readingGuide}
-                        </span>
-                        <button
-                          type="button"
-                          role="switch"
-                          aria-checked={readingGuide}
-                          aria-label={text.readingGuide}
-                          onClick={() => setReadingGuide(!readingGuide)}
-                          className={`w-12 h-7 rounded-full transition-all ${
-                            readingGuide ? "bg-green-500" : "bg-white/20"
-                          }`}
-                        >
-                          <div
-                            className={`w-5 h-5 bg-white rounded-full transition-transform ${
-                              readingGuide ? "translate-x-6" : "translate-x-1"
-                            }`}
-                          />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="border-t border-white/10 bg-black/70 px-3 sm:px-4 py-2 text-[11px] text-white/50">
-                {language === "english"
-                  ? "Changes are applied instantly."
-                  : language === "spanish"
-                    ? "Los cambios se aplican al instante."
-                    : "Els canvis s'apliquen a l'instant."}
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* CONTENU PRINCIPAL */}
-        <main
-          className="flex-1 w-full overflow-y-auto 
-          overscroll-auto px-4 sm:px-6 lg:px-8 pb-6"
-          role="main"
-        >
+        <div className="flex-1 w-full overflow-y-auto overscroll-auto px-4 sm:px-6 lg:px-8 pb-6">
           <div
             className=" relative
                         w-full
@@ -2320,7 +1657,7 @@ pb-[env(safe-area-inset-bottom)]
               </div>
             </div>
           </div>
-        </main>
+        </div>
       </div>
     </div>
   );

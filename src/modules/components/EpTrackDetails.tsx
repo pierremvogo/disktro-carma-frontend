@@ -580,7 +580,7 @@ export default function EpTracksEditor({
                         type="file"
                         accept="audio/*"
                         onChange={handleTrackAudioChange(track.id)}
-                        className="hidden"
+                        className="sr-only bbok-file-input"
                         id={`ep-track-upload-${track.id}`}
                       />
                       <label
@@ -716,7 +716,7 @@ export default function EpTracksEditor({
                         type="file"
                         accept="video/*"
                         onChange={handleTrackSignLanguage(track.id)}
-                        className="hidden"
+                        className="sr-only bbok-file-input"
                         id={`ep-sign-language-${track.id}`}
                       />
                       <label
@@ -793,7 +793,7 @@ export default function EpTracksEditor({
                         type="file"
                         accept=".brf,.brl,.txt"
                         onChange={handleTrackBrailleFile(track.id)}
-                        className="hidden"
+                        className="sr-only bbok-file-input"
                         id={`ep-braille-upload-${track.id}`}
                       />
                       <label
