@@ -768,7 +768,7 @@ export function AlbumUploadSection({
                         type="file"
                         accept="image/*"
                         onChange={handleArtwork}
-                        className="hidden"
+                        className="sr-only bbok-file-input"
                         id="single-artwork-upload"
                       />
                       <label

@@ -569,7 +569,7 @@ export function ArtistProfileSetup({
                       ref={fileInputRef}
                       type="file"
                       accept="image/*"
-                      className="hidden"
+                      className="sr-only bbok-file-input"
                       onChange={handleImageChange}
                     />
 

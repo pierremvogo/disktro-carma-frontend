@@ -1,3 +1,4 @@
+import { AccessibilityButton } from "./accessibilityButton/AccessibilityButton";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { UserModuleObject as UserModule } from "../module";
 import { getImageFile } from "@/@disktro/utils";
@@ -89,7 +90,17 @@ const EyeOff = ({ size = 24, className = "" }) => (
   </svg>
 );
 
+type Appearance = {
+  background: string;
+  hideAccessibility: boolean;
+  moodEmojis: Record<string, string>;
+};
+
 interface FanProfileProps {
+  appearance: Appearance;
+  onAppearanceChange: (appearance: Appearance) => void;
+  moods: { id: string; name: string }[];
+  canCustomizeMoods: boolean;
   onBack: () => void;
   language: string;
 }
@@ -100,7 +111,14 @@ type AccountErrors = {
   profilePicture?: string;
 };
 
-export function FanProfile({ onBack, language }: FanProfileProps) {
+export function FanProfile({
+  onBack, language, appearance, onAppearanceChange, moods, canCustomizeMoods,
+}: FanProfileProps) {
+  const appearanceText = language === "spanish"
+    ? ["Apariencia", "Color de fondo", "Restaurar fondo", "Mostrar botón de accesibilidad", "Emojis de estado de ánimo", "Disponible con una suscripción de pago", "Predeterminado"]
+    : language === "catalan"
+    ? ["Aspecte", "Color de fons", "Restaura el fons", "Mostra el botó d’accessibilitat", "Emojis d’estat d’ànim", "Disponible amb una subscripció de pagament", "Per defecte"]
+    : ["Appearance", "Background color", "Reset background", "Show accessibility button", "Mood emojis", "Available with a paid subscription", "Default"];
   const [activeTab, setActiveTab] = useState("account");
 
   // Password states
@@ -598,7 +616,10 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
   }, []);
 
   return (
-    <div className="w-full h-full overflow-y-auto p-8  bg-gradient-to-br from-slate-900 via-purple-900 to-black">
+    <div
+      className="min-h-dvh w-full overflow-y-auto bg-gradient-to-br from-slate-900 via-purple-900 to-black p-4 text-white sm:p-8"
+      style={appearance.background ? { background: appearance.background } : undefined}
+    >
       <button
         onClick={onBack}
         className="cursor-pointer flex items-center gap-2 text-white drop-shadow hover:opacity-70 transition-opacity mb-6"
@@ -618,6 +639,8 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
         {content.back}
       </button>
 
+      {!appearance.hideAccessibility && <AccessibilityButton language={language} />}
+
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl text-white drop-shadow-lg mb-8">
           {content.title}
@@ -628,10 +651,12 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
           {[
             { id: "account", label: content.account, icon: User },
             { id: "password", label: content.password, icon: Lock },
+            { id: "appearance", label: appearanceText[0], icon: Eye },
           ].map(({ id, label, icon: Icon }) => (
             <button
               key={id}
               onClick={() => setActiveTab(id)}
+              aria-pressed={activeTab === id}
               className={`cursor-pointer flex items-center gap-2 px-6 py-3 rounded-lg transition-all whitespace-nowrap ${
                 activeTab === id
                   ? "bg-white/30 backdrop-blur-md border-2 border-white/50"
@@ -643,6 +668,49 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
             </button>
           ))}
         </div>
+
+        {activeTab === "appearance" && (
+          <section className="space-y-5 rounded-xl border border-white/20 bg-black/60 p-5 text-white">
+            <h2 className="text-xl">{appearanceText[0]}</h2>
+            <div className="flex flex-wrap items-center gap-3">
+              <label htmlFor="fan-background">{appearanceText[1]}</label>
+              <input
+                type="color"
+                id="fan-background"
+                value={appearance.background || "#4a1456"}
+                onChange={(event) => onAppearanceChange({ ...appearance, background: event.target.value })}
+              />
+              <button type="button" className="rounded border border-white/40 px-3 py-2"
+                onClick={() => onAppearanceChange({ ...appearance, background: "" })}>
+                {appearanceText[2]}
+              </button>
+            </div>
+            <label className="flex items-center gap-2">
+              <input type="checkbox" checked={!appearance.hideAccessibility}
+                onChange={(event) => onAppearanceChange({ ...appearance, hideAccessibility: !event.target.checked })} />
+              {appearanceText[3]}
+            </label>
+            <fieldset disabled={!canCustomizeMoods} className="grid gap-3 md:grid-cols-2">
+              <legend className="mb-2 font-semibold">{appearanceText[4]}</legend>
+              {canCustomizeMoods && moods.map((mood) => (
+                <div key={mood.id} className="flex items-center justify-between gap-2">
+                  <label htmlFor={`fan-mood-${mood.id}`}>{mood.name}</label>
+                  <select id={`fan-mood-${mood.id}`} className="text-black" value={appearance.moodEmojis[mood.id] ?? ""}
+                    onChange={(event) => onAppearanceChange({
+                      ...appearance,
+                      moodEmojis: { ...appearance.moodEmojis, [mood.id]: event.target.value },
+                    })}>
+                    <option value="">{appearanceText[6]}</option>
+                    {["😊", "😌", "⚡", "😢", "❤️", "🎯", "💪", "✨", "🔥", "🌿", "🎵", "🌙"].map(
+                      (emoji) => <option key={emoji} value={emoji}>{emoji}</option>
+                    )}
+                  </select>
+                </div>
+              ))}
+            </fieldset>
+            {!canCustomizeMoods && <p className="text-sm">{appearanceText[5]}</p>}
+          </section>
+        )}
 
         {/* Account Tab */}
         {activeTab === "account" && (
@@ -676,7 +744,7 @@ export function FanProfile({ onBack, language }: FanProfileProps) {
                       type="file"
                       accept="image/*"
                       onChange={handleProfilePicture}
-                      className="hidden"
+                      className="sr-only bbok-file-input"
                       id="profile-picture-upload"
                     />
 

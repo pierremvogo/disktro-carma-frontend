@@ -1,7 +1,9 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import "./globals.css";
 import "@/core/translation/i18n";
 import { AccessibilityProvider } from "@/modules/components/AccessibilityProvider";
+import { AccessibilityPreferences } from "@/modules/components/AccessibilityPreferences";
 import InitLanguage from "@/modules/components/initLanguage";
 
 export const metadata: Metadata = {
@@ -23,7 +25,11 @@ export default function RootLayout({
       <body className={"min-h-screen flex flex-col antialiased"}>
         <InitLanguage />
         <AccessibilityProvider>
-          <main className="flex-1">{children}</main>
+          <AccessibilityPreferences>
+            <main className="flex-1">
+              <Suspense>{children}</Suspense>
+            </main>
+          </AccessibilityPreferences>
         </AccessibilityProvider>
       </body>
     </html>

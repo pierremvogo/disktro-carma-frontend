@@ -209,3 +209,41 @@ html.reduce-motion *::after {
   transition-duration: 0.001ms !important;
   scroll-behavior: auto !important;
 }
+
+:where(button, a, input, select, textarea, video, [tabindex]):focus-visible {
+  outline: 2px solid #c4b5fd;
+  outline-offset: 3px;
+}
+
+.bbok-modal::backdrop {
+  background: rgb(0 0 0 / 70%);
+  backdrop-filter: blur(6px);
+}
+
+html[data-bbok-font-size="small"] { font-size: 87.5%; }
+html[data-bbok-font-size="large"] { font-size: 112.5%; }
+html[data-bbok-font-size="xl"] { font-size: 125%; }
+
+html.bbok-dyslexia body { font-family: Verdana, Arial, sans-serif; letter-spacing: 0.04em; }
+html.bbok-contrast { --bbok-contrast: contrast(1.5); }
+html[data-bbok-color-mode="protanopia"] { --bbok-color-filter: url(#protanopia); }
+html[data-bbok-color-mode="deuteranopia"] { --bbok-color-filter: url(#deuteranopia); }
+html[data-bbok-color-mode="tritanopia"] { --bbok-color-filter: url(#tritanopia); }
+html.bbok-contrast,
+html[data-bbok-color-mode]:not([data-bbok-color-mode="none"]) {
+  filter: var(--bbok-contrast, contrast(1)) var(--bbok-color-filter, contrast(1));
+}
+
+html.bbok-reduced-motion *,
+html.bbok-reduced-motion *::before,
+html.bbok-reduced-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  scroll-behavior: auto !important;
+  transition-duration: 0.01ms !important;
+}
+
+.bbok-file-input:focus-visible ~ label {
+  outline: 2px solid #c4b5fd;
+  outline-offset: 3px;
+}
