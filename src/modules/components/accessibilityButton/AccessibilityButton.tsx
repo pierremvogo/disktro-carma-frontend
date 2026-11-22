@@ -1,8 +1,27 @@
 "use client";
 
 import React, { useId, useRef } from "react";
-import { Accessibility } from "lucide-react";
 import { useAccessibilityPreferences } from "../AccessibilityPreferences";
+
+function StickmanIcon({ className }: { className: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="4.8" r="2.15" />
+      <path d="M12 7.2c-0.9 1.5-1 3.4-.2 5.2l.2 1.1" />
+      <path d="M11.7 9.3 8.4 11.5M12.3 9.3l3.3 2.2" />
+      <path d="M12 13.3 9.3 19.1M12 13.3l3 5.8" />
+    </svg>
+  );
+}
 
 const translations = {
   spanish: {
@@ -119,7 +138,7 @@ export function AccessibilityButton({
         className={`${position} z-40 inline-grid h-12 w-12 shrink-0 place-items-center rounded-full border-2 border-white/60 bg-[#79356f] text-white shadow-lg hover:bg-[#934486]`}
         onClick={() => dialog.current?.showModal()}
       >
-        <Accessibility size={26} aria-hidden="true" />
+        <StickmanIcon className="h-8 w-8" />
       </button>
       <dialog
         ref={dialog}
@@ -132,21 +151,7 @@ export function AccessibilityButton({
               id={titleId}
               className="text-base sm:text-lg text-white drop-shadow-lg flex items-center gap-2"
             >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="text-white"
-              >
-                <circle cx="12" cy="12" r="10" />
-                <path d="M12 16v-4" />
-                <path d="M12 8h.01" />
-              </svg>
+              <StickmanIcon className="h-5 w-5 shrink-0" />
               {text.accessibility}
             </h2>
             <button
